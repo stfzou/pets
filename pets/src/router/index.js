@@ -1,27 +1,21 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import HelloWorld from '@/components/HelloWorld'
+import Seller from '@/components/seller/seller'
+
 
 Vue.use(Router)
-
 export default new Router({
+	mode: 'history',
   routes: [
     {
-      path: '/',
-      name: 'HelloWorld',
-      component: HelloWorld
-     },
-// 	{
-// 			payh:'',
-// 			name:'home',
-// 			redirect:'/home',
-// 			component:Home,
-// 			children:{
-// 				path:'',
-// 				redirect:'index',
-// 				component:Index
-// 			}
-// 		}
-	
-  ]
+      path:'',
+      component:Seller,
+			children: [
+				{
+					path:'seller',
+					component:Seller
+				}
+			]
+    }
+	]
 })
