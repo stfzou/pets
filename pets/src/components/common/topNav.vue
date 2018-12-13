@@ -40,7 +40,7 @@
 		}
 		span{
 			color: $white;
-			font-size: $f30;
+			@include font-dpr(30px);
 		}
 	}
 </style>

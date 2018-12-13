@@ -6,7 +6,9 @@ import router from './router'
 import 'lib-flexible/flexible.js'
 import '@/style/style.scss'
 import axios from "axios"
+import Cube from 'cube-ui'
 
+Vue.use(Cube)
 Vue.prototype.$ajax=axios
 Vue.config.productionTip = false
 

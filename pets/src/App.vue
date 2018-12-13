@@ -1,13 +1,13 @@
 <template>
   <div id="app">
     
-		<transition name="fade" mode="in-out">
+		<transition name="fade">
 			<keep-alive>
 				<router-view v-if="$route.meta.keepAlive"></router-view>
 			</keep-alive>
 		</transition>
 		
-		<transition name="fade" mode="in-out">
+		<transition name="fade">
 			<router-view v-if="!$route.meta.keepAlive"></router-view>页面缓存效果 
 		</transition>
 	
@@ -36,17 +36,24 @@ export default {
 	// @include font-dpr(16px);
 	font-size: 16px;/*no*/
 }
-.fade-enter {
-  opacity:0;
+// .fade-enter {
+//   opacity:0;
+// }
+// .fade-leave{
+//   opacity:1;
+// }
+// .fade-enter-active{
+//   transition:opacity .3s;
+// }
+// .fade-leave-active{
+//   opacity:0;
+//   transition:opacity .3s;
+// }
+
+.fade-enter-active, .fade-leave-active {
+   transition: opacity .5s
 }
-.fade-leave{
-  opacity:1;
-}
-.fade-enter-active{
-  transition:opacity .5s;
-}
-.fade-leave-active{
-  opacity:0;
-  transition:opacity .5s;
+.fade-enter, .fade-leave-active {
+   opacity: 0
 }
 </style>
