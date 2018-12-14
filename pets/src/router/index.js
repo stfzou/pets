@@ -3,7 +3,9 @@ import Router from 'vue-router'
 import Seller from '@/components/seller/seller'
 import SellerGoods from '@/components/seller/sellerGoods.vue'
 import SellerEval from '@/components/seller/sellerEvaluate.vue'
-
+import SellerInfo from '@/components/seller/sellerInfo.vue'
+import EvalContent from '@/components/seller/evalContent.vue'
+import SellerActive from '@/components/seller/sellerActive.vue'
 
 Vue.use(Router)
 export default new Router({
@@ -11,7 +13,12 @@ export default new Router({
     routes:[
 		{
 		  path:'',
-		  redirect:'/sellerGoods'
+		  redirect:'seller/sellerGoods'
+		},
+		{
+		  path:'/sellerActive',
+		  name:'sellerActive',
+		  component:SellerActive
 		},
 		{
 			path:'/seller',
@@ -24,8 +31,21 @@ export default new Router({
 				},
 				{
 					name:"sellerEval",
-					path:'sellerEval',
-					component:SellerEval
+					path:"sellerEval",
+					redirect:'sellerEval/evalContent',
+					component:SellerEval,
+					children:[
+						{	
+							name:'evalConten',
+							path:'evalContent',
+							component:EvalContent
+						}
+					]
+				},
+				{
+					name:'sellerInfo',
+					path:'sellerInfo',
+					component:SellerInfo
 				}
 			]
 		}

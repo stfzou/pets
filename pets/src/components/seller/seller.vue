@@ -77,9 +77,9 @@
 			return {
 				coupon:false,
 				navData:[
-					{navName:'所有商品',link:"sellerGoods"},
-					{navName:'店铺评价',link:"sellerEval"},
-					{navName:'商家信息',link:""},
+					{navName:'所有商品',link:{name:"sellerGoods"}},
+					{navName:'店铺评价',link:{name:"sellerEval"}},
+					{navName:'商家信息',link:{name:"sellerInfo"}},
 				]
 			}
 		},
@@ -105,10 +105,13 @@
 		},
 		mounted() {
 			//初始化导航选中
-			let pic = document.querySelector(".seller_nav .nav_icon");
-			let a = document.querySelectorAll(".seller_nav a")[0];
-			let currentLeft = a.offsetLeft+a.offsetWidth/2-pic.offsetWidth/2;
-			pic.style.left = currentLeft+'px';
+			this.$nextTick(function(){
+				let pic = document.querySelector(".seller_nav .nav_icon");
+				let a = document.querySelector(".seller_nav .router-link-active");
+				let currentLeft = a.offsetLeft+a.offsetWidth/2-pic.offsetWidth/2;
+				pic.style.left = currentLeft+'px';
+			})
+			
 		}
 	}
 </script>
@@ -133,6 +136,7 @@
 				padding: $p20;
 				margin-top: -118px;
 				.intd{
+					margin-bottom: 5px;
 					align-items: flex-start;
 					padding:20px 64px 30px 28px;
 					border-radius:10px;
@@ -242,10 +246,11 @@
 						.btom{
 							
 							span{
+								
 								border-radius:6px;
 								color: #FF523D;
-								@include font-dpr(22px);
-								padding:4px;
+								@include font-dpr(20px);
+								padding:2px;
 								border:1px solid #FF523D;/*no*/
 							}
 							.span1{
@@ -257,7 +262,7 @@
 								@include bg-image('btom');
 								background-size: cover;
 								display: inline-block;
-								margin-left: 90px;
+								margin-left: 60px;
 							}
 						}
 					}

@@ -32,3 +32,7 @@ $t_color:#000;
 //   }
 }
   
+@mixin line{
+	height: 10px;
+	background: #e8e8e8;
+}
