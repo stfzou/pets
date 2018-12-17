@@ -6,6 +6,7 @@ import SellerEval from '@/components/seller/sellerEvaluate.vue'
 import SellerInfo from '@/components/seller/sellerInfo.vue'
 import EvalContent from '@/components/seller/evalContent.vue'
 import SellerActive from '@/components/seller/sellerActive.vue'
+import SellerVipCt from '@/components/seller/sellerVipCt.vue'
 
 Vue.use(Router)
 export default new Router({
@@ -18,7 +19,14 @@ export default new Router({
 		{
 		  path:'/sellerActive',
 		  name:'sellerActive',
-		  component:SellerActive
+		  component:SellerActive,
+			children:[
+				{
+					path:'sellerVipCt',
+					component:SellerVipCt,
+					name:'sellerVipCt'
+				}
+			]
 		},
 		{
 			path:'/seller',

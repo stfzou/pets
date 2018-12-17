@@ -26,8 +26,10 @@
 <style lang="scss">
 	@import '../../style/common.scss';
 	@import '../../style/mixin.scss';
+	
 	.topNav{
 		height: 88px;
+		position: relative;
 		.back{
 			width: 26px;
 			height: 42px;
@@ -35,17 +37,31 @@
 			background-size: cover;
 		}
 		.nav_r{
+			width:115px;
 			.share{
+				display:inline-block;
 				width: 50px;
 				height: 40px;
 				@include bg-image('share');
 				background-size: cover;
+			}
+			.follow{
+				display:inline-block;
+				width: 42px;
+				height: 38px;
+				@include bg-image("icon-follow");
+				background-size:cover;
+				margin-right:15px;
 			}
 		}
 		
 		span{
 			color: $white;
 			@include font-dpr(30px);
+			position: absolute;
+			transform: translate(-50%,-50%);
+			left: 50%;
+			top: 50%;
 		}
 	}
 </style>

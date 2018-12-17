@@ -10,8 +10,10 @@ $t_color:#000;
 }
 @mixin bg-image($url) {
   background-image: url("../../assets/icon/" + $url + "@1x.png");
+  background-repeat: no-repeat;
   @media (-webkit-min-device-pixel-ratio:2),(min-device-pixel-ratio:2){
 	background-image: url("../../assets/icon/" + $url + "@2x.png");
+	background-repeat: no-repeat;
 
   }
 //   @media (-webkit-min-device-pixel-ratio:2),(min-device-pixel-ratio:2){
