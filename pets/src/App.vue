@@ -10,14 +10,30 @@
 		<transition name="fade">
 			<router-view v-if="!$route.meta.keepAlive"></router-view>页面缓存效果 
 		</transition>
-	
+		<Loading v-if="loading"></Loading>
 		
   </div>
 </template>
 
 <script>
+import Loading from './components/common/loading.vue'
+import {mapState} from 'vuex'
 export default {
-  name: 'App'
+  name: 'App',
+	created() {
+		this.$store.commit('showLoading');
+		setTimeout(()=>{
+			this.$store.commit("hideLoading");
+		},1000)
+	},
+	components:{
+		Loading
+	},
+	computed:{
+		 ...mapState([
+            'loading'
+      ])
+	}
 }
 </script>
 

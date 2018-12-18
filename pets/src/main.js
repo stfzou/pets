@@ -7,6 +7,7 @@ import 'lib-flexible/flexible.js'
 import '@/style/style.scss'
 import axios from "axios"
 import Cube from 'cube-ui'
+import store from './store/store.js'
 
 Vue.use(Cube)
 Vue.prototype.$ajax=axios
@@ -16,6 +17,7 @@ Vue.config.productionTip = false
 new Vue({
   el: '#app',
   router,
+  store,
   components: { App },
   template: '<App/>'
 })

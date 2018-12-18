@@ -62,6 +62,9 @@
 					</router-link>
 				</div>
 			</div>
+			<div class="load-warp flex_r_f_s" v-if="loading">
+				<cube-loading></cube-loading>
+			</div>
 			<transition name="fade">
 				<router-view></router-view>
 			</transition>
@@ -71,11 +74,13 @@
 </template>
 
 <script>
+	import {mapState} from 'vuex'
 	import TopNav from '../common/topNav.vue'
 	export default {
 		data() {
 			return {
 				coupon:false,
+				loading:false,
 				navData:[
 					{navName:'所有商品',link:{name:"sellerGoods"}},
 					{navName:'店铺评价',link:{name:"sellerEval"}},
@@ -100,7 +105,13 @@
 				//定义向右的移动初始距离
 				let currentLeft = e.target.offsetLeft+e.target.offsetWidth/2-pic.offsetWidth/2;
 				pic.style.left = currentLeft+'px';
+			},
+			loadState(){
 				
+				this.loading = true;
+				setTimeout(()=>{
+					this.loading = false;
+				},500)
 			}
 		},
 		mounted() {
@@ -110,9 +121,12 @@
 				let a = document.querySelector(".seller_nav .router-link-active");
 				let currentLeft = a.offsetLeft+a.offsetWidth/2-pic.offsetWidth/2;
 				pic.style.left = currentLeft+'px';
-			})
-			
+			});
+		},
+		watch:{
+			'$route':'loadState'
 		}
+	
 	}
 </script>
 
@@ -291,6 +305,9 @@
 					bottom: -1px;/*no*/
 					  
 				}
+			}
+			.load-warp{
+				justify-content: center;
 			}
 		}
 	}
