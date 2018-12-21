@@ -121,7 +121,10 @@ body {
   align-items:flex-start;
 }
 
-
+.container{
+	width:100%;
+	margin: 0 auto;
+}
 /* 鼠标移入变瘦 */
 .pointer{
 	cursor:pointer;
