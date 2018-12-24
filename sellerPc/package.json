@@ -14,6 +14,7 @@
   },
   "dependencies": {
     "element-ui": "^2.4.11",
+    "v-distpicker": "^1.0.21",
     "vue": "^2.5.2",
     "vue-amap": "^0.5.8",
     "vue-gemini-scrollbar": "^2.0.0",

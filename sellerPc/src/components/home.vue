@@ -17,12 +17,6 @@
 							<GeminiScrollbar class="my-scroll-bar">
 								<div class="nav_left">
 									<ul>
-										<li v-for="(item,index) in navData">
-											<a href="###" class="flex_c_f_e">
-												<img src="../assets/home/icon_caiwu@2x.png" alt="">
-												<p>收银台</p>
-											</a>
-										</li>
 										<li class="active">
 											<a href="###" class="flex_c_f_e">
 												<img src="../assets/home/icon_caiwu@2x.png" alt="">
@@ -30,6 +24,13 @@
 											</a>
 											<span class="triangle-right"></span>
 										</li>
+										<li v-for="(item,index) in navData">
+											<a href="###" class="flex_c_f_e">
+												<img src="../assets/home/icon_caiwu@2x.png" alt="">
+												<p>收银台</p>
+											</a>
+										</li>
+										
 									</ul>
 								</div>
 								<div class="nav_right">
@@ -121,7 +122,7 @@
 								ul{
 									li{
 										height: 90px;
-										margin-top:20px;
+										margin-bottom:20px;
 										padding: 0 14px;
 										
 										img{
