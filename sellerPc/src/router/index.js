@@ -6,6 +6,8 @@ import Home from '@/components/home'
 import DataReady from '@/components/dataReady'
 import SellerCondition from '@/components/sellerCondition'
 import SellerInfo from '@/components/sellerInfo'
+import QualificationsInfo from '@/components/qualificationsInfo'
+import StoreSuccess from '@/components/storeSuccess'
 
 Vue.use(Router)
 
@@ -44,6 +46,16 @@ export default new Router({
 					path:'sellerInfo',
 					name:'sellerInfo',
 					component:SellerInfo
+				},
+				{
+					path:'qualificationsInfo',
+					name:'qualificationsInfo',
+					component:QualificationsInfo
+				},
+				{
+					path:'storeSuccess',
+					name:'storeSuccess',
+					component:StoreSuccess
 				}
 			]
 		}

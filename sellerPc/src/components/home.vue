@@ -74,6 +74,7 @@
 <style lang="scss">
 	.homeWarpper{
 		height: 100%;
+		overflow: hidden;
 		.headerWrapper{
 			position: fixed;
 			width: 100%;

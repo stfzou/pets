@@ -9,11 +9,14 @@ import 'element-ui/lib/theme-chalk/index.css'
 import GeminiScrollbar from 'vue-gemini-scrollbar'
 import AMap from 'vue-amap'
 import VDistpicker from 'v-distpicker'
+import store from './store/store'
+
 
 Vue.component('v-distpicker', VDistpicker)//全局注册省市选择器组件
 Vue.use(ElementUI)
 Vue.use(AMap)
 Vue.use(GeminiScrollbar)//引用自定义滚动条组件
+
 
 AMap.initAMapApiLoader({
   key: 'fe2312e4704c6f8f7787c7864ecebae6',
@@ -28,6 +31,7 @@ Vue.config.productionTip = false
 new Vue({
   el: '#app',
   router,
+  store,
   components: { App },
   template: '<App/>'
 })

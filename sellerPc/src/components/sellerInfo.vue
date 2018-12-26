@@ -1,16 +1,17 @@
 <template>
 	<div class="sellerInfo">
+		
 		<ul class="seller_info_list">
 			<li>
 				<p>商家名称<span>*</span></p>
 				<div class="list_r">
-					<input class="active_input" type="text" placeholder="请与门店照片上的名称保持一致" />
+					<input class="active_input" v-model="storeNameInput" type="text" placeholder="请与门店照片上的名称保持一致" />
 				</div>
 			</li>
 			<li>
 				<p>联系人姓名<span>*</span></p>
 				<div class="list_r">
-					<input type="text" placeholder="请输入联系人姓名" />
+					<input type="text" v-model="userNameInput" placeholder="请输入联系人姓名" />
 				</div>
 			</li>
 			<li>
@@ -22,38 +23,36 @@
 			<li>
 				<p>经营品类<span>*</span></p>
 				<div class="list_r">
-					<el-select
-						v-model="varieties"
-						multiple
-						filterable
-						allow-create
-						default-first-option
-						placeholder="请选择经营品类(可多选)">
+					<el-select v-model="varietiesValue" multiple placeholder="请选择">
 						<el-option
-						  v-for="item in varietiesData"
-						  :key="item.value"
-						  :label="item.label"
-						  :value="item.value">
+							v-for="item in varietiesData"
+							:key="item.value"
+							:label="item.label"
+							:value="item.value">
 						</el-option>
-					 </el-select>
+					</el-select>
 				</div>
+				
+				 
 			</li>
 			<li>
 				<p>所在城市<span>*</span></p>
 				<div class="list_r">
-					<VDistpicker></VDistpicker>
+					<VDistpicker @province="onChangeProvince" @city="onChangeCity" @area="onChangeArea"></VDistpicker>
 				</div>
 			</li>
 			<li>
 				<p>详细地址<span>*</span></p>
 				<div class="list_r">
 					<input id="input_id" v-model="searchMap" class="active_input" type="text" placeholder="请输入详细街道名称和门牌号，请与执照地址一致">
-					<span class="map_button pointer">去定位</span>
+					<span class="map_button pointer" @click="mapShow = !mapShow">去定位</span>
+				
 				</div>
 			</li>
-			<li>
+			<li v-show="mapShow">
 				<p></p>
-				<div class="list_r map_r">
+				<div class="list_r map_r flex_r_s_b">
+					
 					<div class="amap-page-container">
 					
 					  <el-amap vid="amap" zoom="14" :plugin="plugin" class="amap-demo" :center="mapCenter">
@@ -103,7 +102,7 @@
 								<p>需真实反映店内环境（商品货架、美容室、收银台等）</p>
 							</div>
 							<div class="eg">
-								<img src="../assets/condition/shili01.png" alt="">
+								<img src="../assets/condition/shili02.png" alt="">
 							</div>
 						</div>
 					</div>
@@ -136,7 +135,7 @@
 				</div>
 			</li>
 		</ul>
-		<div class="pointer next_btn">点击进入下一步</div>
+		<div class="pointer next_btn" @click="next">点击进入下一步</div>
 		
 	</div>
 </template>
@@ -184,6 +183,7 @@
 				  label: '其他'
 				}
 				],
+				varietiesValue:[],
 				markers:{
 					 dragend: (e) => {
 						var geocoder = new AMap.Geocoder();
@@ -203,6 +203,11 @@
 					}
 				},
 				varieties: [],
+				storeNameInput:'',
+				userNameInput:'',
+				sheng:'',
+				shi:'',
+				qu:'',
 				province: "",
 				mapCenter: [121.59996, 31.197646],
 				area: "",
@@ -212,21 +217,22 @@
 					logo:''
 				},
 				searchOption: {
-					city: '',
+					city:'',
 					citylimit: true
 				},
 				searchMap:'',
 				lng: 0,
 				lat: 0,
 				loaded: false,
+				mapShow:true,
 				plugin: [{
 				  enableHighAccuracy: true,//是否使用高精度定位，默认:true
 				  timeout: 100,          //超过10秒后停止定位，默认：无穷大
 				  maximumAge: 0,           //定位结果缓存0毫秒，默认：0
 				  convert: false,           //自动偏移坐标，偏移后的坐标为高德坐标，默认：true
-				  showButton: true,        //显示定位按钮，默认：true
+				  showButton: false,        //显示定位按钮，默认：true
 				  buttonPosition: 'RB',    //定位按钮停靠位置，默认：'LB'，左下角
-				  showMarker: true,        //定位成功后在定位到的位置显示点标记，默认：true
+				  showMarker: false,        //定位成功后在定位到的位置显示点标记，默认：true
 				  showCircle: true,        //定位成功后用圆圈表示定位精度范围，默认：true
 				  panToLocation: true,     //定位成功后将定位到的位置作为地图中心点，默认：true
 				  zoomToAccuracy:true,//定位成功后调整地图视野范围使定位位置及精度范围视野内可见，默认：f
@@ -255,10 +261,6 @@
 					events:{
 						init(o){
 							
-							o.search(self.searchMap, function(status, result) {
-								// 搜索成功时，result即是对应的匹配数据
-								
-							})
  							AMap.event.addListener(o, "select", function(e){
  								console.log(e)
 								self.lng = e.poi.location.lng;
@@ -283,7 +285,7 @@
 		},
 		methods: {
 			  handleAvatarSuccess(res, file) {
-				this.outImg = URL.createObjectURL(file.raw);
+				this.sellerInfo.outImg = URL.createObjectURL(file.raw);
 			  },
 			  beforeAvatarUpload(file) {
 				const isJPG = file.type === 'image/jpeg';
@@ -309,10 +311,60 @@
 					this.mapCenter = [pois[0].lng, pois[0].lat];
 					
 				  }
+				},
+				//省市区赋值
+				onChangeProvince(data){
+					this.sheng = data.value;
+					console.log(this.sheng);
+				},
+				onChangeCity(data){
+					this.shi = data.value;
+					
+				},
+				onChangeArea(data){
+					this.qu = data.value;
+					
+				},
+				//下一步按钮验证
+				next(){
+					
+					this.$store.commit("sellerInfoSuccess");//商家信息填写成功
+					this.$router.push({name:'qualificationsInfo'});
+					
+					if(this.storeNameInput === ''){
+						this.$message.error('商家名字不能为空');
+						return false;
+					}else if(this.userNameInput === ''){
+						this.$message.error('用户名字不能为空');
+						return false;
+					}else if(this.varietiesValue == ''){
+						this.$message.error('请选择经营种类');
+						return false;
+					}else if(this.sheng == ''||this.shi == ''||this.qu == ''){
+						this.$message.error('请填写省市区');
+						return false;
+					}else if(this.searchMap === ''){
+						this.$message.error('请填写详细街道位置');
+						return false;
+					}else if(this.sellerInfo.outImg == ''){
+						this.$message.error('请上传门店照片');
+						return false;
+					}else if(this.sellerInfo.inImg == ''){
+						this.$message.error('请上传店内照片');
+						return false;
+					}else if(this.sellerInfo.logo == ''){
+						this.$message.error('请上传LOGO');
+						return false;
+					}
 				}
 				
 			
 		//
+		},
+		created(){
+			setTimeout(()=>{
+				this.mapShow = false;
+			},500)
 		}
 	}
 </script>
@@ -328,19 +380,14 @@
 			.amap-demo {
 				height: 300px;
 			}
-			.search-box {
-				position: absolute;
-				top: 25px;
-				left: 20px;
-			}
 			.amap-page-container {
 				position: relative;
 				height: 300px;
+				width: 500px;
 			}
-			.selectMarke{
-				width: 50px;
-				height: 50px;
-				background: red;
+			#output{
+				width: 200px;
+				height: 300px;
 			}
 		}
 		
@@ -362,13 +409,6 @@
 			.amap-demo {
 			  height: 300px;
 			}
-
-			.search-box {
-			  position: absolute;
-			  top: 25px;
-			  left: 20px;
-			}
-
 			.amap-page-container {
 			  position: relative;
 			}

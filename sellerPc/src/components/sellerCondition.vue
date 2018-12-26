@@ -6,21 +6,26 @@
 		<div class="main-cnt">
 			<ul class="nav flex_r_f_s">
 				<li class="active">
-					<span>①</span>
+					<img v-if="sellerSuccess" class="success" src="../assets/condition/icon_02.png" alt="">
+					<span v-else>①</span>
 					商家信息
 				</li>
 				<li>
-					<img src="../assets/condition/icon_01.png" alt="">
+					<img v-if="sellerSuccess" src="../assets/condition/icon_01a.png" alt="">
+					<img v-else src="../assets/condition/icon_01.png" alt="">
 				</li>
-				<li>
-					<span>②</span>
+				<li v-bind:class="{active:sellerSuccess}">
+					<img v-if="zzSuccess" class="success" src="../assets/condition/icon_02.png" alt="">
+					<span v-else>②</span>
 					资质信息
 				</li>
 				<li>
-					<img src="../assets/condition/icon_01.png" alt="">
+					<img v-if="zzSuccess" src="../assets/condition/icon_01a.png" alt="">
+					<img v-else src="../assets/condition/icon_01.png" alt="">
 				</li>
-				<li>
-					<span>③</span>
+				<li v-bind:class="{active:zzSuccess}">
+					<img v-if="zzSuccess" class="success" src="../assets/condition/icon_02.png" alt="">
+					<span v-else>③</span>
 					店铺信息提交成功
 				</li>
 			</ul>
@@ -35,12 +40,20 @@
 	export default {
 		data() {
 			return {
-				
+				sellerInfoState:false
 			};
 		},
 		methods: {
 			link() {
 				this.$router.push({name:'sellerInfo',query:{id:123}});
+			}
+		},
+		computed: {
+			sellerSuccess() {
+				return this.$store.state.inhabitantsData.sellerInfo
+			},
+			zzSuccess(){
+				return this.$store.state.inhabitantsData.aptitudeInfo
 			}
 		},
 		
@@ -83,10 +96,20 @@
 				justify-content:space-around;
 				li{
 					font-size: 20px;
-					font-weight:400
+					font-weight:400;
+					display: flex;
+					span{
+						margin-right: 12px;
+					}
 				}
 				.active{
 					color: #FF523D;
+					display: flex;
+					.success{
+						width: 18px;
+						height: 18px;
+						margin-right: 12px;
+					}
 				}
 			}
 		}
