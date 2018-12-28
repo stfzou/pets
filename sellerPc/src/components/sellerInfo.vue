@@ -1,143 +1,171 @@
 <template>
-	<div class="sellerInfo">
-		
-		<ul class="seller_info_list">
-			<li>
-				<p>商家名称<span>*</span></p>
-				<div class="list_r">
-					<input class="active_input" v-model="storeNameInput" type="text" placeholder="请与门店照片上的名称保持一致" />
-				</div>
-			</li>
-			<li>
-				<p>联系人姓名<span>*</span></p>
-				<div class="list_r">
-					<input type="text" v-model="userNameInput" placeholder="请输入联系人姓名" />
-				</div>
-			</li>
-			<li>
-				<p>联系人电话<span>*</span></p>
-				<div class="list_r">
-					<input class="gray_bg" type="text" readonly="readonly" value="13123456789" />
-				</div>
-			</li>
-			<li>
-				<p>经营品类<span>*</span></p>
-				<div class="list_r">
-					<el-select v-model="varietiesValue" multiple placeholder="请选择">
-						<el-option
-							v-for="item in varietiesData"
-							:key="item.value"
-							:label="item.label"
-							:value="item.value">
-						</el-option>
-					</el-select>
-				</div>
+	<div class="main-cnt">
+		<ul class="nav flex_r_f_s">
+			<li class="active">
 				
-				 
+				<span>①</span>
+				商家信息
 			</li>
 			<li>
-				<p>所在城市<span>*</span></p>
-				<div class="list_r">
-					<VDistpicker @province="onChangeProvince" @city="onChangeCity" @area="onChangeArea"></VDistpicker>
-				</div>
+				<img src="../assets/condition/icon_01.png" alt="">
 			</li>
 			<li>
-				<p>详细地址<span>*</span></p>
-				<div class="list_r">
-					<input id="input_id" v-model="searchMap" class="active_input" type="text" placeholder="请输入详细街道名称和门牌号，请与执照地址一致">
-					<span class="map_button pointer" @click="mapShow = !mapShow">去定位</span>
 				
-				</div>
-			</li>
-			<li v-show="mapShow">
-				<p></p>
-				<div class="list_r map_r flex_r_s_b">
-					
-					<div class="amap-page-container">
-					
-					  <el-amap vid="amap" zoom="14" :plugin="plugin" class="amap-demo" :center="mapCenter">
-						  
-						  <el-amap-marker :events="markers" draggable="true" vid="component-marker" :position="mapCenter"></el-amap-marker>
-
-					  </el-amap>
-					
-					 
-					</div>
-				</div>
+				<span>②</span>
+				资质信息
 			</li>
 			<li>
-				<p>店面照片<span>*</span></p>
-				<div class="list_r">
-					<div class="store_img">
-						<div class="outside flex_r_s_b">
-							<el-upload
-							  class="avatar-uploader"
-							  action="https://jsonplaceholder.typicode.com/posts/"
-							  :show-file-list="false"
-							  :on-success="handleAvatarSuccess"
-							  :before-upload="beforeAvatarUpload">
-							  <img v-if="sellerInfo.outImg" :src="sellerInfo.outImg" class="avatar">
-							  <i v-else class="el-icon-plus avatar-uploader-icon"></i>
-							</el-upload>
-							<div class="mid">
-								<h3>门店照片</h3>
-								<p>需拍出完整门框、门匾（建议正对门脸2米处拍摄）</p>
-							</div>
-							<div class="eg">
-								<img src="../assets/condition/shili01.png" alt="">
-							</div>
-						</div>
-						<div class="outside inside flex_r_s_b">
-							<el-upload
-							class="avatar-uploader"
-							action="https://jsonplaceholder.typicode.com/posts/"
-							:show-file-list="false"
-							:on-success="handleAvatarSuccess"
-							:before-upload="beforeAvatarUpload">
-							<img v-if="sellerInfo.outImg" :src="sellerInfo.outImg" class="avatar">
-							<i v-else class="el-icon-plus avatar-uploader-icon"></i>
-							</el-upload>
-							<div class="mid">
-								<h3>店内照片</h3>
-								<p>需真实反映店内环境（商品货架、美容室、收银台等）</p>
-							</div>
-							<div class="eg">
-								<img src="../assets/condition/shili02.png" alt="">
-							</div>
-						</div>
-					</div>
-				</div>
+				
+				<img src="../assets/condition/icon_01.png" alt="">
 			</li>
 			<li>
-				<p>商户LOGO<span>*</span></p>
-				<div class="list_r">
-					<div class="store_img">
-						<div class="outside flex_r_s_b">
-							<el-upload
-							class="avatar-uploader"
-							action="https://jsonplaceholder.typicode.com/posts/"
-							:show-file-list="false"
-							:on-success="handleAvatarSuccess"
-							:before-upload="beforeAvatarUpload">
-							<img v-if="sellerInfo.outImg" :src="sellerInfo.outImg" class="avatar">
-							<i v-else class="el-icon-plus avatar-uploader-icon"></i>
-							</el-upload>
-							<div class="mid">
-								<h3>商户LOGO</h3>
-								<p>需体现您店铺的特色，吸引更多消费者进店消费</p>
-							</div>
-							<div class="eg">
-								<img src="../assets/condition/shili03.png" alt="">
-							</div>
-						</div>
-						
-					</div>
-				</div>
+				<span>③</span>
+				店铺信息提交成功
 			</li>
 		</ul>
-		<div class="pointer next_btn" @click="next">点击进入下一步</div>
-		
+		<div class="view_warpper">
+			<div class="sellerInfo">
+					
+					<ul class="seller_info_list">
+						<li>
+							<p>商家名称<span>*</span></p>
+							<div class="list_r">
+								<input class="active_input" v-model="storeNameInput" type="text" placeholder="请与门店照片上的名称保持一致" />
+							</div>
+						</li>
+						<li>
+							<p>联系人姓名<span>*</span></p>
+							<div class="list_r">
+								<input type="text" v-model="userNameInput" placeholder="请输入联系人姓名" />
+							</div>
+						</li>
+						<li>
+							<p>联系人电话<span>*</span></p>
+							<div class="list_r">
+								<input class="gray_bg" type="text" readonly="readonly" value="13123456789" />
+							</div>
+						</li>
+						<li>
+							<p>经营品类<span>*</span></p>
+							<div class="list_r">
+								<el-select v-model="varietiesValue" multiple placeholder="请选择">
+									<el-option
+										v-for="item in varietiesData"
+										:key="item.value"
+										:label="item.label"
+										:value="item.value">
+									</el-option>
+								</el-select>
+							</div>
+							
+							 
+						</li>
+						<li>
+							<p>所在城市<span>*</span></p>
+							<div class="list_r">
+								<VDistpicker @province="onChangeProvince" @city="onChangeCity" @area="onChangeArea"></VDistpicker>
+							</div>
+						</li>
+						<li>
+							<p>详细地址<span>*</span></p>
+							<div class="list_r">
+								<input id="input_id" v-model="searchMap" class="active_input" type="text" placeholder="请输入详细街道名称和门牌号，请与执照地址一致">
+								<span class="map_button pointer" @click="mapShow = !mapShow">去定位</span>
+							
+							</div>
+						</li>
+						<li v-show="mapShow">
+							<p></p>
+							<div class="list_r map_r flex_r_s_b">
+								
+								<div class="amap-page-container">
+								
+								  <el-amap vid="amap" zoom="14" :plugin="plugin" class="amap-demo" :center="mapCenter">
+									  
+									  <el-amap-marker :events="markers" draggable="true" vid="component-marker" :position="mapCenter"></el-amap-marker>
+			
+								  </el-amap>
+								
+								 
+								</div>
+							</div>
+						</li>
+						<li>
+							<p>店面照片<span>*</span></p>
+							<div class="list_r">
+								<div class="store_img">
+									<div class="outside flex_r_s_b">
+										<el-upload
+										  class="avatar-uploader"
+										  action="https://jsonplaceholder.typicode.com/posts/"
+										  :show-file-list="false"
+										  :on-success="handleAvatarSuccess"
+										  :before-upload="beforeAvatarUpload">
+										  <img v-if="sellerInfo.outImg" :src="sellerInfo.outImg" class="avatar">
+										  <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+										</el-upload>
+										<div class="mid">
+											<h3>门店照片</h3>
+											<p>需拍出完整门框、门匾（建议正对门脸2米处拍摄）</p>
+										</div>
+										<div class="eg">
+											<img src="../assets/condition/shili01.png" alt="">
+										</div>
+									</div>
+									<div class="outside inside flex_r_s_b">
+										<el-upload
+										class="avatar-uploader"
+										action="https://jsonplaceholder.typicode.com/posts/"
+										:show-file-list="false"
+										:on-success="handleAvatarSuccess"
+										:before-upload="beforeAvatarUpload">
+										<img v-if="sellerInfo.outImg" :src="sellerInfo.outImg" class="avatar">
+										<i v-else class="el-icon-plus avatar-uploader-icon"></i>
+										</el-upload>
+										<div class="mid">
+											<h3>店内照片</h3>
+											<p>需真实反映店内环境（商品货架、美容室、收银台等）</p>
+										</div>
+										<div class="eg">
+											<img src="../assets/condition/shili02.png" alt="">
+										</div>
+									</div>
+								</div>
+							</div>
+						</li>
+						<li>
+							<p>商户LOGO<span>*</span></p>
+							<div class="list_r">
+								<div class="store_img">
+									<div class="outside flex_r_s_b">
+										<el-upload
+										class="avatar-uploader"
+										action="https://jsonplaceholder.typicode.com/posts/"
+										:show-file-list="false"
+										:on-success="handleAvatarSuccess"
+										:before-upload="beforeAvatarUpload">
+										<img v-if="sellerInfo.outImg" :src="sellerInfo.outImg" class="avatar">
+										<i v-else class="el-icon-plus avatar-uploader-icon"></i>
+										</el-upload>
+										<div class="mid">
+											<h3>商户LOGO</h3>
+											<p>需体现您店铺的特色，吸引更多消费者进店消费</p>
+										</div>
+										<div class="eg">
+											<img src="../assets/condition/shili03.png" alt="">
+										</div>
+									</div>
+									
+								</div>
+							</div>
+						</li>
+					</ul>
+					<div class="pointer next_btn" @click="next">点击进入下一步</div>
+					
+				</div>
+		</div>
 	</div>
+	
 </template>
 
 <script>
@@ -370,6 +398,42 @@
 </script>
 
 <style lang="scss">
+	.main-cnt{
+		width: 1200px;
+		margin: 20px auto 0 auto;
+		background: #fff;
+		padding: 0 20px;
+		padding-bottom: 54px;
+		box-sizing: border-box;
+		box-shadow: 0px 0px 10px 5px #ffe9e6;
+		padding-top: 60px;
+		.nav{
+			width: 1000px;
+			height: 60px;
+			border-radius:30px;
+			box-shadow: 0px 0px 10px 5px #ffe9e6;
+			margin:0 auto;
+			box-sizing: border-box;
+			justify-content:space-around;
+			li{
+				font-size: 20px;
+				font-weight:400;
+				display: flex;
+				span{
+					margin-right: 12px;
+				}
+			}
+			.active{
+				color: #FF523D;
+				display: flex;
+				.success{
+					width: 18px;
+					height: 18px;
+					margin-right: 12px;
+				}
+			}
+		}
+	}
 	.el-select-dropdown.is-multiple .el-select-dropdown__item.selected{
 		color: #FF523D;
 	}

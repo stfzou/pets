@@ -3,7 +3,8 @@
 		<header class="header">
 			<img src="../assets/data_ready.png" alt="">
 		</header>
-		<div class="main-cnt">
+		<router-view></router-view>
+		<!-- <div class="main-cnt">
 			<ul class="nav flex_r_f_s">
 				<li class="active">
 					<img v-if="sellerSuccess" class="success" src="../assets/condition/icon_02.png" alt="">
@@ -32,7 +33,7 @@
 			<div class="view_warpper">
 				<router-view></router-view>
 			</div>
-		</div>
+		</div> -->
 	</div>
 </template>
 
@@ -47,15 +48,8 @@
 			link() {
 				this.$router.push({name:'sellerInfo',query:{id:123}});
 			}
-		},
-		computed: {
-			sellerSuccess() {
-				return this.$store.state.inhabitantsData.sellerInfo
-			},
-			zzSuccess(){
-				return this.$store.state.inhabitantsData.aptitudeInfo
-			}
-		},
+		}
+		
 		
 	}
 </script>
@@ -77,41 +71,6 @@
 				margin-top: 30px;
 			}
 		}
-		.main-cnt{
-			width: 1200px;
-			margin: 20px auto 0 auto;
-			background: #fff;
-			padding: 0 20px;
-			padding-bottom: 54px;
-			box-sizing: border-box;
-			box-shadow: 0px 0px 10px 5px #ffe9e6;
-			padding-top: 60px;
-			.nav{
-				width: 1000px;
-				height: 60px;
-				border-radius:30px;
-				box-shadow: 0px 0px 10px 5px #ffe9e6;
-				margin:0 auto;
-				box-sizing: border-box;
-				justify-content:space-around;
-				li{
-					font-size: 20px;
-					font-weight:400;
-					display: flex;
-					span{
-						margin-right: 12px;
-					}
-				}
-				.active{
-					color: #FF523D;
-					display: flex;
-					.success{
-						width: 18px;
-						height: 18px;
-						margin-right: 12px;
-					}
-				}
-			}
-		}
+		
 	}
 </style>

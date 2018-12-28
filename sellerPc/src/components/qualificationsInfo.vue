@@ -1,168 +1,194 @@
 <template>
-	<div class="qualications">
-		<ul class="qualications_list">
-			<li>
-				<div class="title">法定代表身份信息</div>
+	<div class="main-cnt">
+		<ul class="nav flex_r_f_s">
+			<li class="active">
+				<img class="success" src="../assets/condition/icon_02.png" alt="">
+				商家信息
 			</li>
+			<li>
+				<img src="../assets/condition/icon_01a.png" alt="">
+			</li>
+			<li class="active">
+				<span>②</span>
+				资质信息
+			</li>
+			<li>
+				<img src="../assets/condition/icon_01.png" alt="">
+			</li>
+			<li>
 			
-			<li>
-				<p>真实姓名<span>*</span></p>
-				<div class="list_r">
-					<input v-model="inputData.userNameVal" type="text" value="" placeholder="请输入真实号码" />
-				</div>
-			</li>
-			<li>
-				<p>证件号码<span>*</span></p>
-				<div class="list_r">
-					<input v-model="inputData.sfzVal" type="text" value="" placeholder="请输证件号码" />
-				</div>
-			</li>
-			<li>
-				<p>证件照片<span>*</span></p>
-				<div class="list_r">
-					<div class="store_img">
-						<div class="outside flex_r_s_b">
-							<el-upload
-							class="avatar-uploader"
-							action="https://jsonplaceholder.typicode.com/posts/"
-							:show-file-list="false"
-							:on-success="handleAvatarSuccess"
-							:before-upload="beforeAvatarUpload">
-							<img v-if="imgData.sfzz" :src="imgData.sfzz" class="avatar">
-							<i v-else class="el-icon-plus avatar-uploader-icon"></i>
-							</el-upload>
-							<div class="mid">
-								<h3>法人身份证正面照片</h3>
-								<p>需要清晰展示人物五官、身份证文字信息和国徽</p>
-							</div>
-							<div class="eg">
-								<img src="../assets/condition/shili04.png" alt="">
-							</div>
-						</div>
-						<div class="outside inside flex_r_s_b">
-							<el-upload
-							class="avatar-uploader"
-							action="https://jsonplaceholder.typicode.com/posts/"
-							:show-file-list="false"
-							:on-success="handleAvatarSuccess"
-							:before-upload="beforeAvatarUpload">
-							<img v-if="imgData.sfzf" :src="imgData.sfzf" class="avatar">
-							<i v-else class="el-icon-plus avatar-uploader-icon"></i>
-							</el-upload>
-							<div class="mid">
-								<h3>法人身份证反面照片</h3>
-								<p>需要清晰展示人物五官、身份证文字信息和国徽</p>
-							</div>
-							<div class="eg">
-								<img src="../assets/condition/shili07.png" alt="">
-							</div>
-						</div>
-					</div>
-				</div>
-			</li>
-			<li>
-				<div class="title">主体经营信息</div>
-			</li>
-			<li>
-				<p>营业执照<span>*</span></p>
-				<div class="list_r">
-					<div class="store_img">
-						<div class="outside flex_r_s_b">
-							<el-upload
-							class="avatar-uploader"
-							action="https://jsonplaceholder.typicode.com/posts/"
-							:show-file-list="false"
-							:on-success="handleAvatarSuccess"
-							:before-upload="beforeAvatarUpload">
-							<img v-if="imgData.yyzz" :src="imgData.yyzz" class="avatar">
-							<i v-else class="el-icon-plus avatar-uploader-icon"></i>
-							</el-upload>
-							<div class="mid">
-								<h3>营业执照</h3>
-								<p>需上传清晰三证合一后的营业执照，边框完整；拍复印件需加盖鲜章；二维码能够识别</p>
-							</div>
-							<div class="eg">
-								<img src="../assets/condition/shili05.png" alt="">
-							</div>
-						</div>
-						
-					</div>
-				</div>
-			</li>
-			<li>
-				<p>注册号<span>*</span></p>
-				<div class="list_r">
-					<input v-model="inputData.zcCodeVal" type="text" value="" placeholder="请输入注册号" />
-				</div>
-			</li>
-			<li>
-				<p>单位名称<span>*</span></p>
-				<div class="list_r">
-					<input type="text" value="" placeholder="请输入单位名称" />
-				</div>
-			</li>
-			<li>
-				<div class="title">行业资质信息<span>(如:动物诊疗许可证，仅医疗单位提供)</span></div>
-			</li>
-			<li>
-				<p>资质照片<span>*</span></p>
-				<div class="list_r">
-					<div class="store_img">
-						<div class="outside flex_r_s_b">
-							<el-upload
-							class="avatar-uploader"
-							action="https://jsonplaceholder.typicode.com/posts/"
-							:show-file-list="false"
-							:on-success="handleAvatarSuccess"
-							:before-upload="beforeAvatarUpload">
-							<img v-if="imgData.zlz" :src="imgData.zlz" class="avatar">
-							<i v-else class="el-icon-plus avatar-uploader-icon"></i>
-							</el-upload>
-							<div class="mid">
-								<h3>动物诊疗许可证</h3>
-								<p>仅医疗单位上传，例如宠物医院；上传有效期内的彩色动物诊疗许可证，复印件需加盖鲜章</p>
-							</div>
-							<div class="eg">
-								<img src="../assets/condition/shili06.png" alt="">
-							</div>
-						</div>
-						
-					</div>
-				</div>
-			</li>
-			<li>
-				<p>许可证编号<span>*</span></p>
-				<div class="list_r">
-					<input v-model="inputData.identifierVal" type="text" value="" placeholder="请输入许可证编号" />
-				</div>
-			</li>
-			<li>
-				<p>诊疗活动范围<span>*</span></p>
-				<div class="list_r">
-					<el-input
-					  
-					  class="textarea"
-					  type="textarea"
-					  resize="none"
-					  placeholder="请输入内容"
-					  v-model="activeFw">
-					</el-input>
-				</div>
-			</li>
-			<li>
-				<p>有效期<span>*</span></p>
-				<div class="list_r">
-					<el-date-picker
-						v-model="yxDate"
-						type="date"
-						placeholder="选择日期">
-					</el-date-picker>
-					<el-checkbox v-model="checked">长期</el-checkbox>
-				</div>
+				<span >③</span>
+				店铺信息提交成功
 			</li>
 		</ul>
-		<div class="pointer next_btn" @click="next">提交进入下一步</div>
-	</div>
+		<div class="view_warpper">
+			<div class="qualications">
+				<ul class="qualications_list">
+					<li>
+						<div class="title">法定代表身份信息</div>
+					</li>
+					
+					<li>
+						<p>真实姓名<span>*</span></p>
+						<div class="list_r">
+							<input v-model="inputData.userNameVal" type="text" value="" placeholder="请输入真实号码" />
+						</div>
+					</li>
+					<li>
+						<p>证件号码<span>*</span></p>
+						<div class="list_r">
+							<input v-model="inputData.sfzVal" type="text" value="" placeholder="请输证件号码" />
+						</div>
+					</li>
+					<li>
+						<p>证件照片<span>*</span></p>
+						<div class="list_r">
+							<div class="store_img">
+								<div class="outside flex_r_s_b">
+									<el-upload
+									class="avatar-uploader"
+									action="https://jsonplaceholder.typicode.com/posts/"
+									:show-file-list="false"
+									:on-success="handleAvatarSuccess"
+									:before-upload="beforeAvatarUpload">
+									<img v-if="imgData.sfzz" :src="imgData.sfzz" class="avatar">
+									<i v-else class="el-icon-plus avatar-uploader-icon"></i>
+									</el-upload>
+									<div class="mid">
+										<h3>法人身份证正面照片</h3>
+										<p>需要清晰展示人物五官、身份证文字信息和国徽</p>
+									</div>
+									<div class="eg">
+										<img src="../assets/condition/shili04.png" alt="">
+									</div>
+								</div>
+								<div class="outside inside flex_r_s_b">
+									<el-upload
+									class="avatar-uploader"
+									action="https://jsonplaceholder.typicode.com/posts/"
+									:show-file-list="false"
+									:on-success="handleAvatarSuccess"
+									:before-upload="beforeAvatarUpload">
+									<img v-if="imgData.sfzf" :src="imgData.sfzf" class="avatar">
+									<i v-else class="el-icon-plus avatar-uploader-icon"></i>
+									</el-upload>
+									<div class="mid">
+										<h3>法人身份证反面照片</h3>
+										<p>需要清晰展示人物五官、身份证文字信息和国徽</p>
+									</div>
+									<div class="eg">
+										<img src="../assets/condition/shili07.png" alt="">
+									</div>
+								</div>
+							</div>
+						</div>
+					</li>
+					<li>
+						<div class="title">主体经营信息</div>
+					</li>
+					<li>
+						<p>营业执照<span>*</span></p>
+						<div class="list_r">
+							<div class="store_img">
+								<div class="outside flex_r_s_b">
+									<el-upload
+									class="avatar-uploader"
+									action="https://jsonplaceholder.typicode.com/posts/"
+									:show-file-list="false"
+									:on-success="handleAvatarSuccess"
+									:before-upload="beforeAvatarUpload">
+									<img v-if="imgData.yyzz" :src="imgData.yyzz" class="avatar">
+									<i v-else class="el-icon-plus avatar-uploader-icon"></i>
+									</el-upload>
+									<div class="mid">
+										<h3>营业执照</h3>
+										<p>需上传清晰三证合一后的营业执照，边框完整；拍复印件需加盖鲜章；二维码能够识别</p>
+									</div>
+									<div class="eg">
+										<img src="../assets/condition/shili05.png" alt="">
+									</div>
+								</div>
+								
+							</div>
+						</div>
+					</li>
+					<li>
+						<p>注册号<span>*</span></p>
+						<div class="list_r">
+							<input v-model="inputData.zcCodeVal" type="text" value="" placeholder="请输入注册号" />
+						</div>
+					</li>
+					<li>
+						<p>单位名称<span>*</span></p>
+						<div class="list_r">
+							<input type="text" value="" placeholder="请输入单位名称" />
+						</div>
+					</li>
+					<li>
+						<div class="title">行业资质信息<span>(如:动物诊疗许可证，仅医疗单位提供)</span></div>
+					</li>
+					<li>
+						<p>资质照片<span>*</span></p>
+						<div class="list_r">
+							<div class="store_img">
+								<div class="outside flex_r_s_b">
+									<el-upload
+									class="avatar-uploader"
+									action="https://jsonplaceholder.typicode.com/posts/"
+									:show-file-list="false"
+									:on-success="handleAvatarSuccess"
+									:before-upload="beforeAvatarUpload">
+									<img v-if="imgData.zlz" :src="imgData.zlz" class="avatar">
+									<i v-else class="el-icon-plus avatar-uploader-icon"></i>
+									</el-upload>
+									<div class="mid">
+										<h3>动物诊疗许可证</h3>
+										<p>仅医疗单位上传，例如宠物医院；上传有效期内的彩色动物诊疗许可证，复印件需加盖鲜章</p>
+									</div>
+									<div class="eg">
+										<img src="../assets/condition/shili06.png" alt="">
+									</div>
+								</div>
+								
+							</div>
+						</div>
+					</li>
+					<li>
+						<p>许可证编号<span>*</span></p>
+						<div class="list_r">
+							<input v-model="inputData.identifierVal" type="text" value="" placeholder="请输入许可证编号" />
+						</div>
+					</li>
+					<li>
+						<p>诊疗活动范围<span>*</span></p>
+						<div class="list_r">
+							<el-input
+								
+								class="textarea"
+								type="textarea"
+								resize="none"
+								placeholder="请输入内容"
+								v-model="activeFw">
+							</el-input>
+						</div>
+					</li>
+					<li>
+						<p>有效期<span>*</span></p>
+						<div class="list_r">
+							<el-date-picker
+								v-model="yxDate"
+								type="date"
+								placeholder="选择日期">
+							</el-date-picker>
+							<el-checkbox v-model="checked">长期</el-checkbox>
+						</div>
+					</li>
+				</ul>
+				<div class="pointer next_btn" @click="next">提交进入下一步</div>
+			</div>
+		</div>
+	</div> 
+	
 </template>
 
 <script>
@@ -255,6 +281,42 @@
 </script>
 
 <style lang="scss">
+	.main-cnt{
+		width: 1200px;
+		margin: 20px auto 0 auto;
+		background: #fff;
+		padding: 0 20px;
+		padding-bottom: 54px;
+		box-sizing: border-box;
+		box-shadow: 0px 0px 10px 5px #ffe9e6;
+		padding-top: 60px;
+		.nav{
+			width: 1000px;
+			height: 60px;
+			border-radius:30px;
+			box-shadow: 0px 0px 10px 5px #ffe9e6;
+			margin:0 auto;
+			box-sizing: border-box;
+			justify-content:space-around;
+			li{
+				font-size: 20px;
+				font-weight:400;
+				display: flex;
+				span{
+					margin-right: 12px;
+				}
+			}
+			.active{
+				color: #FF523D;
+				display: flex;
+				.success{
+					width: 18px;
+					height: 18px;
+					margin-right: 12px;
+				}
+			}
+		}
+	}
 	.qualications{
 		margin-top: 28px;
 		.next_btn{

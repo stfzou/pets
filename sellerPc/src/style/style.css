@@ -14,7 +14,19 @@ html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockq
   border-bottom: 1px solid rgba(7, 17, 27, 0.1);
 }
 
+.el-cascader-menus .el-cascader-menu__item.is-active{
+	color: #FF523D; 
+	/* 更改element-ui三级联动颜色 */
+}
 
+.clearfloat:after{
+	/* 清除浮动 */
+	display:block;
+	clear:both;
+	content:"";
+	visibility:hidden;
+	height:0
+} 
 /* HTML5 display-role reset for older browsers */
 
 article, aside, details, figcaption, figure, footer, header, menu, nav, section {
