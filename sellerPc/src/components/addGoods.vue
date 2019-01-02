@@ -76,7 +76,42 @@
 				<p class="list_l">价格及库存<span>*</span></p>
 				<div class="list_r stock">
 					<h4>批量设置:在下方栏中选择内容进行批量填充</h4>
-					<div class="stock-nav"></div>
+					<div class="stock-nav" style="width: 800px;">
+						<el-row :gutter="20">
+							<el-col :span="4">
+								<el-select v-model="navOneData" placeholder="请选择">
+									<el-option
+									v-for="(item,index) in tableNavDataFirst"
+									:key="index"
+									:label="item"
+									:value="item">
+									</el-option>
+								</el-select>
+							</el-col>
+							<el-col :span="4">
+								<el-select v-model="navTwoData" placeholder="请选择">
+									<el-option
+									v-for="(item,index) in tableNavDataLast"
+									:key="index"
+									:label="item"
+									:value="item">
+									</el-option>
+								</el-select>
+							</el-col>
+							<el-col :span="4">
+								<el-input @change="kucunInput" v-model="navKuncun" placeholder="库存"></el-input>
+							</el-col>
+							<el-col :span="4">
+								<el-input v-model="navXiaoshou" placeholder="销售价"></el-input>
+							</el-col>
+							<el-col :span="4">
+								<el-input v-model="navChengben" placeholder="成本价"></el-input>
+							</el-col>
+							<el-col :span="4">
+								<el-input v-model="navSku" placeholder="sku编码"></el-input>
+							</el-col>
+						</el-row>
+					</div>
 					<div class="stock-table" v-show="specifications!=''">
 						<el-table :data="tableData" :span-method="objectSpanMethod" :row-class-name="tableRowClassName" border style="width: 100%" cell-mouse-enter="tableHover">
 						    <el-table-column
@@ -119,20 +154,34 @@
 								label="sku编码"
 								width="114">
 								<template slot-scope="scope">
-									<el-input v-model="scope.row.sku"></el-input>
+									<input maxlength="10" type="text"  v-model="scope.row.sku" />
 								</template>
 							</el-table-column>
 							<el-table-column
 								prop="yulan"
 								label="预览图"
 								width="114">
+								<template slot-scope="scope">
+									<el-upload
+									  action="https://jsonplaceholder.typicode.com/posts/"
+									  ref="tablePic"
+									  class="avatar-uploader"
+									  :limit="1"
+									  list-type="picture"
+									  :show-file-list="false"
+									  :on-exceed="handleTableExceed"
+									  :on-success="function(res,file,fileList){return handleTablePic(res,file,fileList,scope.row)}">
+									  <img v-if="scope.row.yulan" :src="scope.row.yulan" class="avatar">
+									  <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+									</el-upload>
+								</template>
 							</el-table-column>
 						</el-table>
 						
 					</div>
 				</div>
 			</li>
-			<li>{{tableData}}</li>
+			<li>{{specifications}}</li>
 		</ul>
 	</div>
 
@@ -341,23 +390,56 @@
 				goodsMainList: [],
 				//商品规格数据
 				specifications: [],
-				ceshi:''
+				ceshi:'',
+				aNum:0,
+				bNum:0,
+				navOneData:'全部',
+				navTwoData:'全部',
+				navKuncun:'',
+				navChengben:'',
+				navXiaoshou:'',
+				navSku:''
 
 			};
 		},
 		computed: {
 			tableData() {
 				var nameArr = [];
-				this.specifications.forEach((e) => {
-					e.guigeName.forEach((j)=>{
-						j.parentVal = e.value;
-						nameArr.push(j);
+				if(this.specifications.length>0){
+					this.specifications.forEach((e) => {
+						e.guigeName.forEach((j)=>{
+							j.parentVal = e.value;
+							nameArr.push(j);
+						})
 					})
-				})
-				
+				}
 				return nameArr;
-				
+			},
+			tableNavDataFirst(){
+				let navOneArr = ['全部']
+				if(this.specifications[0]&&this.specifications[0].guigeName.length>0){
+					this.specifications[0].guigeName.forEach((e)=>{
+						navOneArr.push(e.name)
+					})
+					
+					return navOneArr
+				}else{
+					return navOneArr
+				}
+			},
+			tableNavDataLast(){
+				let navTwoArr = ['全部']
+				if(this.specifications[1]&&this.specifications[1].guigeName.length>0){
+					this.specifications[1].guigeName.forEach((e)=>{
+						navTwoArr.push(e.name)
+					})
+					
+					return navTwoArr
+				}else{
+					return navTwoArr
+				}
 			}
+			
 		},
 		methods: {
 			//商品分类回调
@@ -416,17 +498,19 @@
 					yulan:''
 				};
 
-				if (e.input != "") {
+				if (e.input!=' ') {
+					
 					stockObj.name = e.input;
 					e.guigeName.push(stockObj);
-					e.input = ""
+					e.input = ''
+				}else{
+					return false;
 				}
-
-
+				
 			},
 			deleteGuigeName(e, guigeNameI) {
 				e.guigeName.splice(guigeNameI, 1);
-
+				
 			},
 			//table
 			tableRowClassName({row, rowIndex}){
@@ -434,27 +518,73 @@
 					return 'active-table'
 				}
 			},
+			kucunInput(){
+				let kcData = [];
+				let re = /^[0-9]+.?[0-9]*/;
+				if(!re.test(this.navKuncun)){
+					if(this.navKuncun.length==1)
+					{
+						this.navKuncun=this.navKuncun.replace(/[^1-9]/g,'')
+					}else{
+						this.navKuncun=this.navKuncun.replace(/\D/g,'')
+					}
+				}else if(this.specifications[0].guigeName.length>0){
+						kcData = this.specifications[0].guigeName
+						if(this.navOneData === '全部'){
+							kcData.forEach((e)=>{
+								e.kucun = Math.floor(this.navKuncun * 100) / 100;
+							})
+						}
+				}else if(this.specifications[0].guigeName.length>0&&this.specifications[1].guigeName.length>0){
+					
+						kcData = this.specifications[0].guigeName
+						if(this.navOneData === '全部'){
+							kcData.forEach((e)=>{
+								e.kucun = Math.floor(this.navKuncun * 100) / 100;
+							})
+						}
+				}
+				
+				
+				
+			},
+			handleTablePic(res,file,fileList,e){ //表格图片上传
+				
+				console.log(file)
+				e.yulan = file.url
+				// e.yulan = file.url
+			},
+			handleTableExceed(files, fileList){
+				this.$message.warning(`当前限制选择1个文件`);
+			},
 			objectSpanMethod({ row, column, rowIndex, columnIndex }) {
-				let aNum = 0;
-				let bNum = 0;
-				if(this.specifications[0].guigeName){
-					aNum = this.specifications[0].guigeName.length;
-					if (columnIndex === 0) {
-						if (rowIndex % 2 === 0) {
-							return {
-							rowspan: aNum,
-							colspan: 1
-							};
-						} else {
-							return {
-							rowspan: bNum,
-							colspan: 1
-							};
+				if(this.specifications.length>0){
+					if(this.specifications[0].guigeName.length>0){
+						this.aNum = this.specifications[0].guigeName.length;
+					}
+					if(this.specifications[1]){
+						if(this.specifications[1].guigeName.length>0){
+							this.bNum = this.specifications[1].guigeName.length;
 						}
 					}
 				}
-				if(this.specifications[1].guigeName){
-					bNum = this.specifications[1].guigeName.length;
+				if (columnIndex === 0){
+				  if (rowIndex === 0) {
+					return {
+					  rowspan: this.aNum,
+					  colspan: 1
+					};
+				  }else if(rowIndex === this.aNum){
+					return {
+						rowspan: this.bNum,
+						colspan: 1
+					};  
+				  }else{
+					return {
+						rowspan: 0,
+						colspan: 0
+					};  
+				  }
 				}
 				
 				
@@ -749,8 +879,13 @@
 						line-height: 32px;
 						color: #999;
 					}
-
+					.stock-nav{
+						margin-bottom: 10px;
+						
+						
+					}
 					.stock-table {
+						
 						.el-table--enable-row-transition .el-table__body td{
 							height: 80px;
 							input{
@@ -765,10 +900,37 @@
 						}
 						.active-table{
 							background: #f7f7f7;
-							.input{
+							input{
 								background: #f7f7f7;
 							}
 						}
+						.avatar-uploader .el-upload {
+							border: 1px dashed #d9d9d9;
+							border-radius: 6px;
+							cursor: pointer;
+							position: relative;
+							overflow: hidden;
+							height: 60px;
+							width: 60px;
+							display: block;
+							margin: 0 auto;
+						  }
+						  .avatar-uploader .el-upload:hover {
+							border-color: #409EFF;
+						  }
+						  .avatar-uploader-icon {
+							font-size: 28px;
+							color: #8c939d;
+							width: 60px;
+							height: 60px;
+							line-height: 60px;
+							text-align: center;
+						  }
+						  .avatar {
+							width: 60px;
+							height: 60px;
+							display: block;
+						  }
 					}
 				}
 			}
