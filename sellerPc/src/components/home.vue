@@ -57,10 +57,14 @@
 					</el-aside>
 					<el-main class="cnt">
 							<router-view></router-view>
+							<footer class="footer" style="text-align: center;">自由犬  @2018  v20.41</footer>
+
 					</el-main>
 				</el-container>
 			</div>
+			
 		</div>
+		
 	</div>
 	
 </template>
@@ -178,6 +182,7 @@
 		}
 		.main-cnt{
 			height: 100%;
+			position: relative;
 			.cnt-scroll{
 				height: calc(100% - 120px);
 				margin-top: 120px;
@@ -277,6 +282,11 @@
 					.cnt{
 						background: #fff;
 						padding: 0;
+						.footer{
+							margin-bottom: 20px;
+							font-size: 14px;
+							color: #333333;
+						}
 					}
 				}
 			}

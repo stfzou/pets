@@ -99,16 +99,16 @@
 								</el-select>
 							</el-col>
 							<el-col :span="4">
-								<el-input @change="kucunInput" v-model="navKuncun" placeholder="库存"></el-input>
+								<el-input maxlength="10" @change="kucunInput(tableData)" v-model="navKuncun" placeholder="库存"></el-input>
 							</el-col>
 							<el-col :span="4">
-								<el-input v-model="navXiaoshou" placeholder="销售价"></el-input>
+								<el-input maxlength="10" @change="chengbenInput(tableData)" v-model="navChengben" placeholder="成本价"></el-input>
 							</el-col>
 							<el-col :span="4">
-								<el-input v-model="navChengben" placeholder="成本价"></el-input>
+								<el-input maxlength="10"  @change="xiaoshouInput(tableData)" v-model="navXiaoshou" placeholder="销售价"></el-input>
 							</el-col>
 							<el-col :span="4">
-								<el-input v-model="navSku" placeholder="sku编码"></el-input>
+								<el-input maxlength="10" v-model="navSku" placeholder="sku编码"></el-input>
 							</el-col>
 						</el-row>
 					</div>
@@ -154,7 +154,7 @@
 								label="sku编码"
 								width="114">
 								<template slot-scope="scope">
-									<input maxlength="10" type="text"  v-model="scope.row.sku" />
+									<input @change="validateReg(scope.row)" maxlength="10" type="text"  v-model="scope.row.sku" />
 								</template>
 							</el-table-column>
 							<el-table-column
@@ -181,17 +181,130 @@
 					</div>
 				</div>
 			</li>
-			<li>{{specifications}}</li>
+			<li class="clearfloat">
+				<p class="list_l">商品描述<span>*</span></p>
+				<div class="list_r editer">
+					<quill-editor v-model="editData.text" ref="myQuillEditor">
+					</quill-editor>
+				</div>
+			</li>
+			<li class="clearfloat">
+				<p class="list_l">店铺中分类</p>
+				<div class="list_r store_class">
+					<el-select v-model="storeClass.value" placeholder="请选择商品在店铺中的分类">
+						<el-option
+						  v-for="item in storeClass.storeClassData"
+						  :key="item"
+						  :label="item"
+						  :value="item">
+						</el-option>
+					  </el-select>
+				</div>
+			</li>
+			<li class="clearfloat">
+				<p class="list_l weight_p">物流重量</br><span>（含包装）</span></p>
+				<div class="list_r weight">
+						<div class="weight_box flex_r_s_b">
+							<el-input @change="weightReg" v-model="weight" placeholder="请输入内容"></el-input>
+							<span>kg</span>
+						</div>
+				</div>
+			</li>
+			<li>
+				<div class="add_goods_title chengnuo">服务与承诺</div>
+			</li>
+			<li class="clearfloat">
+				<p class="list_l">商品类型<span>*</span></p>
+				<div class="list_r goodsType">
+					<el-radio v-model="goodsType" label="普通商品">普通商品</el-radio>
+					<el-radio v-model="goodsType" label="效期商品">效期商品</el-radio>
+					<el-radio v-model="goodsType" label="服务类商品">服务类商品</el-radio>
+				</div>
+			</li>
+			<li class="clearfloat">
+				<p class="list_l">退换货服务</p>
+				<div class="list_r return_goods">
+					<el-select v-model="returnGoods.value" placeholder="请选择">
+						<el-option
+						  v-for="item in returnGoods.returnGoodsData"
+						  :key="item"
+						  :label="item"
+						  :value="item">
+						</el-option>
+					</el-select>
+					<span class="tx">若存在质量问题或与描述不同，本店将主动提供退换货服务并承担来回邮费</span>
+				</div>
+			</li>
+			<li class="clearfloat">
+				<p class="list_l">配送方式</p>
+				<div class="list_r delivery_mode">
+					<div class="delivery_mode_box">
+						<el-checkbox v-model="deliveryMode.mianfei">支持免费送货上门</el-checkbox>
+						<span class="tx">（客户单次购买达到一定金额即免费送货上门，详见商家设置>配送方式设置）</span>
+					</div>
+					<div class="delivery_mode_box">
+						<el-checkbox v-model="deliveryMode.ziti">支持客户上门自提</el-checkbox>
+						<span class="tx">（客户可以在营业时间范围内上门自提，详见商家设置>营业时间设置）</span>
+					</div>
+					<div class="delivery_mode_box">
+						<el-checkbox v-model="deliveryMode.tongcheng">支持同城快递发货</el-checkbox>
+						<span class="tx">（请正确设置好物流费用，详见商家设置>配送方式设置）</span>
+					</div>
+					<div class="delivery_mode_box">
+						<el-checkbox v-model="deliveryMode.disanfang">可选第三方配送</el-checkbox>
+						<span class="tx">（如蜂鸟配送、闪送等，详见商家设置.配送方式设置）</span>
+					</div>
+				</div>
+			</li>
+			<li class="clearfloat">
+				<p class="list_l">物流费用</p>
+				<div class="list_r logistics flex_r_f_s">
+					<div class="logistics_box flex_r_s_b">
+						<el-input @change="weightReg" v-model="logistics.value" placeholder="请输入物流费用"></el-input>
+						<span>元</span>
+					</div>
+					<el-checkbox v-model="logistics.baoyou">包邮</el-checkbox>
+					<span class="tx">（客户下单时选择同城快递是需支付的费用，如果商家包邮金额显示0元）</span>
+				</div>
+			</li>
+			<li class="clearfloat">
+				<p class="list_l">发货时间承诺<span>*</span></p>
+				<div class="list_r send_goods_time">
+					<div>
+						<el-radio v-model="sendTime" label="30分钟">30分钟内</el-radio>
+						<el-radio v-model="sendTime" label="1小时">1小时内</el-radio>
+						<el-radio v-model="sendTime" label="6小时">6小时内</el-radio>
+						<el-radio v-model="sendTime" label="12小时">12小时内</el-radio>
+						<el-radio v-model="sendTime" label="24小时">24小时内</el-radio>
+					</div>
+					<span class="tx">（支持送货上门的商品，推荐可以选择更短的发货时间以获得更优的购物体验，也可以获得更多排序优先权）</span>
+				</div>
+			</li>
+			<li>
+				<div class="certified_ensure">
+					<el-radio v-model="certified" label="正品保证">正品保证，假一赔十，全网商品</el-radio>
+					<span class="tx">（必须支持假一赔十服务）</span>
+				</div>
+			</li>
 		</ul>
+		<div class="save_box">
+			<el-button round class="save_btn">保存至草稿</el-button>
+			<el-button round class="fabu_btn">发布上架</el-button>
+		</div>
 	</div>
 
 </template>
 
 <script>
+	import { quillEditor } from 'vue-quill-editor' //调用编辑器
+	import 'quill/dist/quill.core.css';
+	import 'quill/dist/quill.snow.css';
+	import 'quill/dist/quill.bubble.css';
+
 	export default {
 		data() {
 			return {
-				selectedGoodsClass: [],
+				selectedGoodsClass: [],//商家分类数据
 				goodsClassData: [{
 					value: '狗狗专区',
 					label: '狗狗专区',
@@ -383,24 +496,46 @@
 						}]
 					}]
 				}],
-				goodsNameInput: '',
-				//商品主图数据
-				dialogImageUrl: '',
-				dialogVisible: false,
-				goodsMainList: [],
-				//商品规格数据
-				specifications: [],
-				ceshi:'',
+				goodsNameInput: '',//商店名字数据
+				dialogImageUrl: '',//商品主图地址数据
+				goodsMainList: [],//商品主图数据
+				specifications: [],//商品规格数据
 				aNum:0,
 				bNum:0,
 				navOneData:'全部',
 				navTwoData:'全部',
-				navKuncun:'',
-				navChengben:'',
-				navXiaoshou:'',
-				navSku:''
-
+				navKuncun:null,
+				navChengben:null,
+				navXiaoshou:null,
+				navSku:null,
+				editData:'',//富文本数据
+				storeClass:{ //店铺分类选择
+					storeClassData:['店铺1','店铺2','店铺3'],
+					value:''
+				},
+				weight:'',//重量
+				goodsType:'普通商品',//商品类型
+				returnGoods:{//商品退回数据
+					returnGoodsData:['换货1','换货2','换货3'],
+					value:''
+				},
+				deliveryMode:{ //配送方式数据
+					mianfei:true,
+					ziti:false,
+					tongcheng:true,
+					disanfang:true
+				},
+				logistics:{//物流数据
+					baoyou:true,
+					value:''
+				},
+				sendTime:'30分钟',//发送时间数据
+				certified:'正品保证',//正品保证数据
 			};
+		},
+		components: {
+			//使用编辑器
+			quillEditor
 		},
 		computed: {
 			tableData() {
@@ -438,7 +573,9 @@
 				}else{
 					return navTwoArr
 				}
-			}
+			},
+			
+
 			
 		},
 		methods: {
@@ -518,39 +655,281 @@
 					return 'active-table'
 				}
 			},
-			kucunInput(){
+			kucunInput(tbData){ //库存输入
+				let self = this;
 				let kcData = [];
+				let kcDataTwo = [];
 				let re = /^[0-9]+.?[0-9]*/;
+				
 				if(!re.test(this.navKuncun)){
 					if(this.navKuncun.length==1)
 					{
-						this.navKuncun=this.navKuncun.replace(/[^1-9]/g,'')
+						this.navKuncun = this.navKuncun.replace(/[^1-9]/g,'')
 					}else{
-						this.navKuncun=this.navKuncun.replace(/\D/g,'')
+						this.navKuncun = this.navKuncun.replace(/\D/g,'')
 					}
-				}else if(this.specifications[0].guigeName.length>0){
-						kcData = this.specifications[0].guigeName
-						if(this.navOneData === '全部'){
-							kcData.forEach((e)=>{
-								e.kucun = Math.floor(this.navKuncun * 100) / 100;
-							})
-						}
-				}else if(this.specifications[0].guigeName.length>0&&this.specifications[1].guigeName.length>0){
+				}else if(this.specifications.length>0){
 					
-						kcData = this.specifications[0].guigeName
-						if(this.navOneData === '全部'){
+					if(this.navOneData === '全部'&&this.navTwoData !== '全部'){
+						
+							if(this.specifications[0].guigeName.length>0){
+								kcData = this.specifications[0].guigeName
+								kcData.forEach((e)=>{
+									e.kucun = Math.floor(this.navKuncun * 100) / 100;
+								})
+							}
+							if(this.specifications[1].guigeName.length>0){
+								kcDataTwo = this.specifications[1].guigeName;
+								kcDataTwo.forEach((e)=>{
+									if(e.name === this.navTwoData){
+										e.kucun = Math.floor(this.navKuncun * 100) / 100;
+									}
+								})
+							}
+					}else if(this.navOneData === '全部'&&this.navTwoData === '全部'){
+						
+						if(this.specifications[0].guigeName.length>0 && this.specifications[1] == undefined){
+							
+							kcData = this.specifications[0].guigeName
 							kcData.forEach((e)=>{
 								e.kucun = Math.floor(this.navKuncun * 100) / 100;
 							})
+							
+						}else if(this.specifications[0].guigeName.length>0 && this.specifications[1].guigeName.length == 0){
+							kcData = this.specifications[0].guigeName
+							kcData.forEach((e)=>{
+								e.kucun = Math.floor(this.navKuncun * 100) / 100;
+							})
+						}else if(this.specifications[0].guigeName.length>0 && this.specifications[1].guigeName.length>0){
+							tbData.forEach((e)=>{
+								e.kucun = Math.floor(this.navKuncun * 100) / 100;
+							})
 						}
+						
+							
+					}else if(this.navOneData !== '全部'&&this.navTwoData === '全部'){
+						
+							if(this.specifications[1].guigeName.length>0){
+								kcData = this.specifications[1].guigeName
+								kcData.forEach((e)=>{
+									e.kucun = Math.floor(this.navKuncun * 100) / 100;
+								})
+							}
+							if(this.specifications[0].guigeName.length>0){
+								kcDataTwo  = this.specifications[0].guigeName
+								kcDataTwo .forEach((e)=>{
+									if(e.name === this.navOneData){
+										e.kucun = Math.floor(this.navKuncun * 100) / 100;
+									}
+								})
+							}
+					}else{
+						
+						if(this.specifications[1].guigeName.length>0){
+							kcData = this.specifications[1].guigeName
+							kcData.forEach((e)=>{
+								if(e.name === this.navTwoData){
+									e.kucun = Math.floor(this.navKuncun * 100) / 100;
+								}
+							})
+						}
+						if(this.specifications[0].guigeName.length>0){
+							kcDataTwo  = this.specifications[0].guigeName
+							kcDataTwo.forEach((e)=>{
+								if(e.name === this.navOneData){
+									e.kucun = Math.floor(this.navKuncun * 100) / 100;
+								}
+							})
+						}
+						
+					}
 				}
+			
+			},
+			chengbenInput(tbData){ //成本输入
+				let self = this;
+				let kcData = [];
+				let kcDataTwo = [];
+				let re = /^[0-9]+.?[0-9]*/;
 				
+				if(!re.test(this.navChengben)){
+					if(this.navChengben.length==1)
+					{
+						this.navChengben = this.navChengben.replace(/[^1-9]/g,'')
+					}else{
+						this.navChengben = this.navChengben.replace(/\D/g,'')
+					}
+				}else if(this.specifications.length>0){
+					
+					if(this.navOneData === '全部'&&this.navTwoData !== '全部'){
+						
+							if(this.specifications[0].guigeName.length>0){
+								kcData = this.specifications[0].guigeName
+								kcData.forEach((e)=>{
+									e.chengbenjia= Math.floor(this.navChengben * 100) / 100;
+								})
+							}
+							if(this.specifications[1].guigeName.length>0){
+								kcDataTwo = this.specifications[1].guigeName;
+								kcDataTwo.forEach((e)=>{
+									if(e.name === this.navTwoData){
+										e.chengbenjia= Math.floor(this.navChengben * 100) / 100;
+									}
+								})
+							}
+					}else if(this.navOneData === '全部'&&this.navTwoData === '全部'){
+						
+						if(this.specifications[0].guigeName.length>0 && this.specifications[1] == undefined){
+							
+							kcData = this.specifications[0].guigeName
+							kcData.forEach((e)=>{
+								e.chengbenjia= Math.floor(this.navChengben * 100) / 100;
+							})
+							
+						}else if(this.specifications[0].guigeName.length>0 && this.specifications[1].guigeName.length == 0){
+							kcData = this.specifications[0].guigeName
+							kcData.forEach((e)=>{
+								e.chengbenjia= Math.floor(this.navChengben * 100) / 100;
+							})
+						}else if(this.specifications[0].guigeName.length>0 && this.specifications[1].guigeName.length>0){
+							tbData.forEach((e)=>{
+								e.chengbenjia= Math.floor(this.navChengben * 100) / 100;
+							})
+						}
+						
+							
+					}else if(this.navOneData !== '全部'&&this.navTwoData === '全部'){
+						
+							if(this.specifications[1].guigeName.length>0){
+								kcData = this.specifications[1].guigeName
+								kcData.forEach((e)=>{
+									e.chengbenjia= Math.floor(this.navChengben * 100) / 100;
+								})
+							}
+							if(this.specifications[0].guigeName.length>0){
+								kcDataTwo  = this.specifications[0].guigeName
+								kcDataTwo .forEach((e)=>{
+									if(e.name === this.navOneData){
+										e.chengbenjia= Math.floor(this.navChengben * 100) / 100;
+									}
+								})
+							}
+					}else{
+						
+						if(this.specifications[1].guigeName.length>0){
+							kcData = this.specifications[1].guigeName
+							kcData.forEach((e)=>{
+								if(e.name === this.navTwoData){
+									e.chengbenjia= Math.floor(this.navChengben * 100) / 100;
+								}
+							})
+						}
+						if(this.specifications[0].guigeName.length>0){
+							kcDataTwo  = this.specifications[0].guigeName
+							kcDataTwo.forEach((e)=>{
+								if(e.name === this.navOneData){
+									e.chengbenjia= Math.floor(this.navChengben * 100) / 100;
+								}
+							})
+						}
+						
+					}
+				}
+			
+			},
+			xiaoshouInput(tbData){ //销售价输入
+		
+				let kcData = [];
+				let kcDataTwo = [];
+				let re = /^[0-9]+.?[0-9]*/;
 				
-				
+				if(!re.test(this.navXiaoshou)){
+					if(this.navXiaoshou.length==1)
+					{
+						this.navXiaoshou = this.navXiaoshou.replace(/[^1-9]/g,'')
+					}else{
+						this.navXiaoshou = this.navXiaoshou.replace(/\D/g,'')
+					}
+				}else if(this.specifications.length>0){
+					
+					if(this.navOneData === '全部'&&this.navTwoData !== '全部'){
+						
+							if(this.specifications[0].guigeName.length>0){
+								kcData = this.specifications[0].guigeName
+								kcData.forEach((e)=>{
+									e.xiaoshoujia= Math.floor(this.navXiaoshou * 100) / 100;
+								})
+							}
+							if(this.specifications[1].guigeName.length>0){
+								kcDataTwo = this.specifications[1].guigeName;
+								kcDataTwo.forEach((e)=>{
+									if(e.name === this.navTwoData){
+										e.xiaoshoujia= Math.floor(this.navXiaoshou * 100) / 100;
+									}
+								})
+							}
+					}else if(this.navOneData === '全部'&&this.navTwoData === '全部'){
+						
+						if(this.specifications[0].guigeName.length>0 && this.specifications[1] == undefined){
+							
+							kcData = this.specifications[0].guigeName
+							kcData.forEach((e)=>{
+								e.xiaoshoujia= Math.floor(this.navXiaoshou * 100) / 100;
+							})
+							
+						}else if(this.specifications[0].guigeName.length>0 && this.specifications[1].guigeName.length == 0){
+							kcData = this.specifications[0].guigeName
+							kcData.forEach((e)=>{
+								e.xiaoshoujia= Math.floor(this.navXiaoshou * 100) / 100;
+							})
+						}else if(this.specifications[0].guigeName.length>0 && this.specifications[1].guigeName.length>0){
+							tbData.forEach((e)=>{
+								e.xiaoshoujia= Math.floor(this.navXiaoshou * 100) / 100;
+							})
+						}
+						
+							
+					}else if(this.navOneData !== '全部'&&this.navTwoData === '全部'){
+						
+							if(this.specifications[1].guigeName.length>0){
+								kcData = this.specifications[1].guigeName
+								kcData.forEach((e)=>{
+									e.xiaoshoujia= Math.floor(this.navXiaoshou * 100) / 100;
+								})
+							}
+							if(this.specifications[0].guigeName.length>0){
+								kcDataTwo  = this.specifications[0].guigeName
+								kcDataTwo .forEach((e)=>{
+									if(e.name === this.navOneData){
+										e.xiaoshoujia= Math.floor(this.navXiaoshou * 100) / 100;
+									}
+								})
+							}
+					}else{
+						
+						if(this.specifications[1].guigeName.length>0){
+							kcData = this.specifications[1].guigeName
+							kcData.forEach((e)=>{
+								if(e.name === this.navTwoData){
+									e.xiaoshoujia= Math.floor(this.navXiaoshou * 100) / 100;
+								}
+							})
+						}
+						if(this.specifications[0].guigeName.length>0){
+							kcDataTwo  = this.specifications[0].guigeName
+							kcDataTwo.forEach((e)=>{
+								if(e.name === this.navOneData){
+									e.xiaoshoujia= Math.floor(this.navXiaoshou * 100) / 100;
+								}
+							})
+						}
+						
+					}
+				}
+			
 			},
 			handleTablePic(res,file,fileList,e){ //表格图片上传
 				
-				console.log(file)
 				e.yulan = file.url
 				// e.yulan = file.url
 			},
@@ -602,7 +981,7 @@
 				}else{
 					e.kucun = Math.floor(e.kucun * 100) / 100;
 				}
-				console.log(e.kucun)
+				
 			},
 			xiaoshouReg(e){
 				var re = /^[0-9]+.?[0-9]*/;//销售价判断
@@ -616,7 +995,7 @@
 				}else{
 					e.xiaoshoujia = Math.floor(e.xiaoshoujia * 100) / 100;
 				}
-				console.log(e.xiaoshoujia)
+				
 			},
 			chengbenReg(e){
 				var re = /^[0-9]+.?[0-9]*/;//成本价判断
@@ -630,22 +1009,65 @@
 				}else{
 					e.chengbenjia = Math.floor(e.chengbenjia * 100) / 100;
 				}
-				console.log(e.chengbenjia)
+				
+			},
+			validateReg(e){//校验关联交易号
+                var reg = /^[A-Za-z0-9\\-_]*$/;
+                if(!reg.test(e.sku)){
+                    e.sku = ''
+				}
+			},
+			weightReg(){
+				var re = /^[0-9]+.?[0-9]*/;
+				if(!re.test(this.weight)){
+					if(this.weight.length==1)
+					{
+						this.weight = this.weight.replace(/[^1-9]/g,'')
+					}else{
+						this.weight = this.weight.replace(/\D/g,'')
+					}
+				}
 			}
-			
-		},
+		}
 	}
 </script>
 
 <style lang="scss">
 	.add_goods_warp {
 		padding: 40px;
-
+		padding-right: 10px;
+		.save_box{
+			margin-top:68px;
+			.el-button{
+				height: 36px;
+				padding: 0;
+				line-height: 36px;
+				width: 300px;
+				color: #fff;
+				font-size: 16px;
+			}
+			.save_btn{
+				background:#434343;
+				margin-right: 100px;
+			}
+			.fabu_btn{
+				background: #FF523D;
+			}
+		}
 		.add_goods_list {
 			li {
-
 				margin-bottom: 30px;
-
+				.certified_ensure{
+					.tx{
+						font-size: 14px;
+						color: #666;
+						margin-left: 45px;
+					}
+					.el-radio__input.is-checked + .el-radio__label{
+						color: #333333;
+						font-size: 18px;
+					}
+				}
 				.add_goods_title {
 					font-size: 18px;
 					color: #FF523D;
@@ -931,6 +1353,120 @@
 							height: 60px;
 							display: block;
 						  }
+					}
+				}
+				.editer{
+					width: 800px;
+					.ql-toolbar.ql-snow + .ql-container.ql-snow{
+						height: 364px;
+					}
+				}
+				.store_class{
+					.el-input--suffix{
+						width: 300px;
+						font-size: 16px;
+					}
+				}
+				.weight{
+					.weight_box{
+						width: 300px;
+						padding-right: 5px;
+						box-sizing: border-box;
+						border: 1px solid #dcdfe6;
+						border-radius: 4px;
+						.el-input__inner{
+							border: none;
+							font-size: 16px;
+						}
+					}
+				}
+				.weight_p{
+					span{
+						font-size: 14px;
+						color: #666;
+						display: block;
+						
+					}
+					
+				}
+				.chengnuo{
+					margin-top: 50px;
+				}
+				
+				.el-radio{
+					line-height: 32px;
+				}
+				.el-radio__input.is-checked+.el-radio__label{
+					color:#ff523d;
+				}
+				.el-radio__input.is-checked .el-radio__inner{
+					border-color: #ff523d;
+					background: #ff523d;
+				}
+				.el-radio__inner:hover{
+					border-color: #ff523d;
+				}
+				.return_goods{
+					.tx{
+						font-size: 14px;
+						color: #666;
+					}
+					.el-input--suffix{
+						width: 300px;
+					}
+				}
+				.delivery_mode{
+					.delivery_mode_box{
+						height: 32px;
+						line-height: 32px;
+						.tx{
+							font-size: 14px;
+							color: #666;
+							margin-left: 30px;
+						}
+						
+					}
+				}
+				.el-checkbox__input.is-checked+.el-checkbox__label{
+					color:#ff523d;
+				}
+				.el-checkbox__input.is-checked .el-checkbox__inner{
+					border-color: #ff523d;
+					background: #ff523d;
+				}
+				.el-checkbox__input.is-focus .el-checkbox__inner{
+					border-color: #ff523d;
+				}
+				.el-checkbox__inner:hover{
+					border-color: #ff523d;
+				}
+				.logistics{
+					width: 900px;
+					.logistics_box{
+						width:300px;
+						
+						border: 1px solid #dcdfe6;
+						border-radius: 4px;
+						box-sizing: border-box;
+						padding-right: 5px;
+						.el-input__inner{
+							border: none;
+							font-size: 16px;
+						}
+					}
+					.tx{
+						font-size: 14px;
+						color: #666;
+						margin-left: 30px;
+					}
+					.el-checkbox{
+						margin-left: 8px;
+					}
+				}
+				.send_goods_time{
+					.tx{
+						font-size: 14px;
+						color: #666;
 					}
 				}
 			}
