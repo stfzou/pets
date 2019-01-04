@@ -110,6 +110,16 @@
 	.homeWarpper{
 		height: 100%;
 		overflow: hidden;
+		.el-checkbox__input.is-checked .el-checkbox__inner, .el-checkbox__input.is-indeterminate .el-checkbox__inner{
+			background-color: #FF523D;
+			border-color: #FF523D;
+		}
+		.el-checkbox__inner:hover{
+			border-color: #FF523D;
+		}
+		.el-checkbox__input.is-focus .el-checkbox__inner{
+			border-color: #FF523D;
+		}
 		.headerWrapper{
 			position: fixed;
 			width: 100%;

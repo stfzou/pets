@@ -9,6 +9,7 @@ import SellerInfo from '@/components/sellerInfo'
 import QualificationsInfo from '@/components/qualificationsInfo'
 import StoreSuccess from '@/components/storeSuccess'
 import AddGoods from '@/components/addGoods'
+import Sell from '@/components/selling'
 
 Vue.use(Router)
 
@@ -35,6 +36,10 @@ export default new Router({
 				path:'addGoods',
 				name:'addGoods',
 				component:AddGoods
+			},{
+				path:'sell',
+				name:'sell',
+				component:Sell
 			}]
 		},
 		{
