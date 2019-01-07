@@ -65,19 +65,42 @@
 				//底部文字状态
 				registerBtom:true,
 				loginBtom:false,
-				forgetBtom:false
-				
-				
+				forgetBtom:false,
 				
 			};
 		},
 		methods: {
-			getCode(){  //获取验证码
+			getCode(){
+				//获取验证码
+				let _this = this;
 				 const TIME_COUNT = 60;
 				 if (!this.timer) {
 				   this.count = TIME_COUNT;
 				   this.show = false;
-				   alert(1);
+					 this.axios({
+							headers:{
+								'Content-Type': 'application/x-www-form-urlencoded'
+							},
+					 		method: 'get',
+					 		url: 'http://192.168.0.109:8084/shops_sms_register',
+					 		data: this.qs.stringify({
+					 			phone:this.phone
+					 		})
+					 }).then(function(res){
+					 		
+					 })
+					 
+					this.axios.get('http://192.168.0.109:8084/shops_sms_register?phone='+this.phone,{ 
+						headers: {
+							'Content-Type': 'application/x-www-form-urlencoded'
+						}
+					})
+					.then(function (response) {
+							console.log(response);
+					})
+					.catch(function (error) {
+							console.log(error);
+					});
 				   this.timer = setInterval(() => {
 				   if (this.count > 0 && this.count <= TIME_COUNT) {
 					   this.count--;
@@ -89,7 +112,9 @@
 				   }, 1000)
 				  }
 			},
-			registerRuler(){  //注册验证
+			registerRuler(){
+				  //注册
+					let self = this;
 					if (this.phone === '') {
 						
 						this.$message({
@@ -131,16 +156,51 @@
 						});
 						return false;
 					}else{
+							this.axios.post('http://192.168.0.109:8084/shops_u_register',this.qs.stringify({
+								phone:this.phone,
+								password:this.pwd,
+								v_code:this.yz
+							}),{
+								headers:{
+									'Content-Type': 'application/x-www-form-urlencoded'
+								}
+							}).then(function(res){
+								
+								if(res.data.code === 1){
+								
+									self.$message({
+										showClose: true,
+										message: '注册成功',
+										type: 'success',
+									})
+									self.title = "账号登录"
+									self.phoneState=true
+									self.pwdState=true
+									self.yzState=false
+									//按钮状态
+									self.registerBtn=false
+									self.loginBtn=true
+									self.nextBtn=false
+									self.changeBtn=false
+									//底部文字状态
+									self.registerBtom=false
+									self.loginBtom=true
+									self.forgetBtom=false
+									
+								}else{
+									console.log(res)
+									 self.$message.error(res.data.msg);	
+								}
+								
+							}).catch(function(err){
+								console.log(err)
+							})
 						
-						this.$message({
-							showClose: true,
-							message: '注册成功',
-							type: 'success',
-						});
 						
 					}
 			},
 			login(){
+				let self = this;
 				this.title = "账号登录"
 				this.phoneState=true
 				this.pwdState=true
@@ -154,6 +214,8 @@
 				this.registerBtom=false
 				this.loginBtom=true
 				this.forgetBtom=false
+			
+				
 			},
 			register(){
 				this.title = "商家入驻"
@@ -260,6 +322,9 @@
 				}
 			},
 			loginRuler(){ //登录验证
+				console.log(sessionStorage.getItem('user'))
+				let self = this;
+				
 				if (this.phone === '') {
 					
 					this.$message({
@@ -285,12 +350,52 @@
 					});
 					return false;
 				}else{
-					
-					this.$message({
-						showClose: true,
-						message: '登录成功',
-						type: 'success',
-					});
+					 const loading = this.$loading({
+          lock: true,
+          text: '加载中，请稍后',
+          spinner: 'el-icon-loading',
+          background: 'rgba(0, 0, 0, 0.7)'
+        });
+     
+					self.loading = true;
+				
+					this.axios.post('http://192.168.0.109:8084/shops_u_login',this.qs.stringify({
+						phone:this.phone,
+						password:this.pwd,
+					}),{
+						headers:{
+							'Content-Type': 'application/x-www-form-urlencoded'
+						}
+					}).then(function(res){
+						if(res.data.code === 1){
+							
+							var userEntity = {
+									userName:res.data.user.userName,
+									userId:res.data.user.userId,
+									userPhone:res.data.user.phone
+							};
+							sessionStorage.setItem('user',JSON.stringify(userEntity));
+							self.$message({
+								showClose: true,
+								message: '登录成功',
+								type: 'success',
+							});
+							setTimeout(() => {
+								loading.close();
+							},100);
+							if(res.data.user.userShops.shopStatus === 0){
+								self.$router.push({name:'dataReady'})
+							}else{
+								self.$router.push({name:'addGoods'})
+							}
+						}else{
+							loading.close();
+							self.$message.error(res.data.msg);
+						}
+					}).catch(function(err){
+						loading.close();
+						self.$message.error(err);
+					})
 					
 				}
 			}
@@ -300,6 +405,14 @@
 </script>
 
 <style lang="scss">
+	.el-loading-spinner i{
+		color: #FF523D;
+		font-size: 30px;
+	}
+	.el-loading-spinner .el-loading-text{
+		color: #FF523D;
+		font-size: 18px;
+	}
 	.logo_warp{
 		position: relative;
 		height:100%;

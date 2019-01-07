@@ -77,7 +77,8 @@
 		},
 		methods: {
 			link() {
-				this.$router.push({name:'sellerCondition',query:{id:123}});
+				let userId = JSON.parse(sessionStorage.getItem('user'))
+				this.$router.push({name:'sellerInfo',query:{id:userId.userId}});
 			}
 		},
 		
@@ -111,6 +112,7 @@
 			padding-bottom: 54px;
 			box-sizing: border-box;
 			box-shadow: 0px 0px 10px 5px #ffe9e6;
+			padding-top: 60px;
 			.button{
 				width: 300px;
 				height: 38px;

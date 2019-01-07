@@ -80,7 +80,7 @@
 								
 								<div class="amap-page-container">
 								
-								  <el-amap vid="amap" zoom="14" :plugin="plugin" class="amap-demo" :center="mapCenter">
+								  <el-amap vid="amap" :zoom="zoom" :plugin="plugin" class="amap-demo" :center="mapCenter">
 									  
 									  <el-amap-marker :events="markers" draggable="true" vid="component-marker" :position="mapCenter"></el-amap-marker>
 			
@@ -99,8 +99,8 @@
 										  class="avatar-uploader"
 										  action="https://jsonplaceholder.typicode.com/posts/"
 										  :show-file-list="false"
-										  :on-success="handleAvatarSuccess"
-										  :before-upload="beforeAvatarUpload">
+											:limit="1"
+										  :on-success="handleStoreSuccess">
 										  <img v-if="sellerInfo.outImg" :src="sellerInfo.outImg" class="avatar">
 										  <i v-else class="el-icon-plus avatar-uploader-icon"></i>
 										</el-upload>
@@ -116,9 +116,7 @@
 										<el-upload
 										class="avatar-uploader"
 										action="https://jsonplaceholder.typicode.com/posts/"
-										:show-file-list="false"
-										:on-success="handleAvatarSuccess"
-										:before-upload="beforeAvatarUpload">
+										:show-file-list="false">
 										<img v-if="sellerInfo.outImg" :src="sellerInfo.outImg" class="avatar">
 										<i v-else class="el-icon-plus avatar-uploader-icon"></i>
 										</el-upload>
@@ -141,9 +139,7 @@
 										<el-upload
 										class="avatar-uploader"
 										action="https://jsonplaceholder.typicode.com/posts/"
-										:show-file-list="false"
-										:on-success="handleAvatarSuccess"
-										:before-upload="beforeAvatarUpload">
+										:show-file-list="false">
 										<img v-if="sellerInfo.outImg" :src="sellerInfo.outImg" class="avatar">
 										<i v-else class="el-icon-plus avatar-uploader-icon"></i>
 										</el-upload>
@@ -253,6 +249,7 @@
 				lat: 0,
 				loaded: false,
 				mapShow:true,
+				zoom:14,
 				plugin: [{
 				  enableHighAccuracy: true,//是否使用高精度定位，默认:true
 				  timeout: 100,          //超过10秒后停止定位，默认：无穷大
@@ -270,17 +267,18 @@
 					init(o) {
 					  // o 是高德地图定位插件实例
 					  o.getCurrentPosition((status, result) => {
-						//console.log(result)
-						
-						if (result && result.position) {
-						  self.searchOption.city = result.addressComponent.city;
-						  self.lng = result.position.lng;
-						  self.lat = result.position.lat;
-						  self.mapCenter = [self.lng, self.lat];
-						  self.loaded = true;
-						  self.$nextTick();
-						}
-					  });
+					
+							if (result && result.position) {
+							
+								self.searchOption.city = result.addressComponent.city;
+								self.lng = result.position.lng;
+								self.lat = result.position.lat;
+								self.mapCenter = [self.lng, self.lat];
+								self.loaded = true;
+								self.$nextTick();
+							}
+					  
+						});
 					}
 				  }
 				},{
@@ -312,22 +310,10 @@
 			};
 		},
 		methods: {
-			  handleAvatarSuccess(res, file) {
+			  handleStoreSuccess(res, file) {
 				this.sellerInfo.outImg = URL.createObjectURL(file.raw);
 			  },
-			  beforeAvatarUpload(file) {
-				const isJPG = file.type === 'image/jpeg';
-				const isLt2M = file.size / 1024 / 1024 < 2;
-
-				if (!isJPG) {
-				  this.$message.error('上传头像图片只能是 JPG 格式!');
-				}
-				if (!isLt2M) {
-				  this.$message.error('上传头像图片大小不能超过 2MB!');
-				}
-				 return isJPG && isLt2M;
-			    },
-			    addMarker: function() {
+			  addMarker: function() {
 				  let lng = 121.5 + Math.round(Math.random() * 1000) / 10000;
 				  let lat = 31.197646 + Math.round(Math.random() * 500) / 10000;
 				  this.markers.push([lng, lat]);

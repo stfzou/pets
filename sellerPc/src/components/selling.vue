@@ -1,5 +1,6 @@
 <template>
 	<div class="sell_warp">
+		
 		<div class="query">
 			<div class="query_goods_class">
 				<span class="query_title">商品分类</span>
@@ -95,7 +96,9 @@
 							<span>编辑</span>
 							<span>下架</span>
 							<span @click="share">分享商品</span>
-							<span @click="overhead">置顶商品</span>
+							<span @click="overhead">
+								置顶商品
+							</span>
 							
 						</div>
 					</template>
@@ -146,7 +149,18 @@
 				
 			</div>
 		</div>
-		<div class="overhead"></div>
+		<div v-if="sortState" class="overhead" ref="overhead">
+			<i class="el-icon-caret-top"></i>
+			<h4>将商品移动至</h4>
+			<div class="seat flex_r_s_b">
+				<div @click="selectSort(index)" :class="{active:index == sortNum}" v-for="(item,index) in sort" :key="index">第{{index+1}}位</div>
+				
+			</div>
+			<div class="button flex_r_s_b">
+				<div class="cancel" @click="cancelSortState">取消</div>
+				<div class="confirm">确定</div>
+			</div>
+		</div>
 	</div>
 </template>
 
@@ -261,6 +275,9 @@
 				}],
 				selectTable:[],
 				selectAll:false,
+				sort:[1,2,3,4,5],
+				sortNum:0,//排序数据
+				sortState:false,//数据排序状态
 			};
 		},
 		methods: {
@@ -278,18 +295,17 @@
 					callback:function(action, instance){
 						if(action == 'confirm'){
 							
-							if(_this.tableData.length == _this.selectTable.length){
+							if(_this.tableData.length === _this.selectTable.length){
 								_this.tableData = [];
 							}else{
 								_this.tableData.forEach((e,index,arr)=>{
 									_this.selectTable.forEach((j,i)=>{
-										if(e.bianma == j.bianma){
+										if(e.bianma === j.bianma){
 											arr.splice(index,1)
 										}
 									})
 								})
 							}
-							
 							
 							_this.selectTable = [];
 							_this.$message({
@@ -310,9 +326,23 @@
 			clearShare(){
 				this.modal = false;//关闭弹出框
 			},
-			overhead(e){
+			overhead(e){ //置顶商品出现
+				this.sortState = true;
+				setTimeout(()=>{
+					let left = e.clientX;
+					let top = e.clientY;
+					let width = this.$refs.overhead.offsetWidth-50;
+					this.$refs.overhead.style.left = left - width +'px';
+					this.$refs.overhead.style.top = top+20+'px';
 				
+				},5)
 				
+			},
+			selectSort(index){ //点击排序数字背景变色
+				this.sortNum = index;
+			},
+			cancelSortState(){
+				this.sortState = false;
 			}
 				
 		}
@@ -326,7 +356,67 @@
 		.overhead{
 			width: 190px;
 			height: 190px;
-			background: red;
+			background:#fff;
+			position:fixed;
+			padding: 10px;
+			box-sizing: border-box;
+			left:-200px;
+			top: 0;
+			z-index: 10000;
+			box-shadow: 0px 0px 5px 2px rgba(0,0,0,0.2);
+			.el-icon-caret-top{
+				position: absolute;
+				top: -18px;
+				right: 20px;
+				font-size:26px;
+				color: #fff;
+				
+			}
+			h4{
+				font-size: 16px;
+				color: #666;
+			}
+			.seat{
+				flex-wrap: wrap;
+				div{
+					width:70px;
+					height:24px;
+					text-align: center;
+					border:1px solid rgba(221,221,221,1);
+					background:#fff;
+					border-radius:12px;
+					font-size: 16px;
+					line-height: 24px;
+					color: #333;
+					margin-top: 10px;
+					cursor: pointer;
+				}
+				.active{
+					background: #FF523D;
+					color: #fff;
+				}
+			}
+			.button{
+				margin-top: 20px;
+				padding: 0 5px;
+				box-sizing: border-box;
+				div{
+					width: 56px;
+					height: 24px;
+					line-height: 24px;
+					color: #fff;
+					text-align: center;
+					font-size: 16px;
+					border-radius:12px;
+					cursor: pointer;
+				}
+				.cancel{
+					background: #7e7e7e;
+				}
+				.confirm{
+					background: #FF523D;
+				}
+			}
 		}
 		.modal{
 			height: 100%;
@@ -452,6 +542,7 @@
 								p{
 									font-size: 10px;
 									color: #000;
+									text-align: center;
 								}
 							}
 						}
@@ -521,6 +612,7 @@
 		}
 		.sales_table{
 			.sales_table_nav{
+				margin:20px 0 20px 0;
 				span{
 					margin-right: 35px;
 					cursor:pointer;
@@ -537,6 +629,7 @@
 					color: #FF523D;
 					margin-right: 5px;
 					cursor: pointer;
+					position:relative;
 				}
 			}
 			.table_btom{

@@ -10,13 +10,16 @@ import GeminiScrollbar from 'vue-gemini-scrollbar'
 import AMap from 'vue-amap'
 import VDistpicker from 'v-distpicker'
 import store from './store/store'
+import axios from 'axios'
+import Qs from 'qs'
 
 
 Vue.component('v-distpicker', VDistpicker)//全局注册省市选择器组件
 Vue.use(ElementUI)
 Vue.use(AMap)
 Vue.use(GeminiScrollbar)//引用自定义滚动条组件
-
+Vue.prototype.axios = axios;
+Vue.prototype.qs = Qs;
 
 AMap.initAMapApiLoader({
   key: 'fe2312e4704c6f8f7787c7864ecebae6',
