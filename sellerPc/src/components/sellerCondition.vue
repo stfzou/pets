@@ -56,11 +56,11 @@
 
 <style lang="scss">
 	.dataReady{
-		height: 100%;
+		
 		width: 100%;
 		background: #fff5f4;
 		padding-bottom: 138px;
-		overflow: auto;
+		
 		.header{
 			background: #ff8677;
 			height: 120px;

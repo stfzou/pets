@@ -45,15 +45,24 @@
 						<div class="list_r">
 							<div class="store_img">
 								<div class="outside flex_r_s_b">
-									<el-upload
-									class="avatar-uploader"
-									action="https://jsonplaceholder.typicode.com/posts/"
-									:show-file-list="false"
-									:on-success="handleAvatarSuccess"
-									:before-upload="beforeAvatarUpload">
-									<img v-if="imgData.sfzz" :src="imgData.sfzz" class="avatar">
-									<i v-else class="el-icon-plus avatar-uploader-icon"></i>
-									</el-upload>
+									<div class="outside_img" v-if="imgData.sfzz">
+										<img :src="imgData.sfzz">
+										<i @click="deleteImg($refs.uploadSfzz.uploadFiles,imgData,'sfzz')" class="el-icon-circle-close"></i>
+									</div>
+									<div v-show="!imgData.sfzz">
+											<el-upload
+												ref="uploadSfzz"
+												class="avatar-uploader"
+												action="https://jsonplaceholder.typicode.com/posts/"
+												:show-file-list="false"
+												list-type="picture-card"
+												:limit="1"
+												:on-progress="handleSfzzPreview"
+												:on-success="handleSfzzSuccess">
+												<i class="el-icon-plus avatar-uploader-icon"></i>
+											</el-upload>
+											<el-progress v-if="imgData.sfzzP>0" :percentage="imgData.sfzzP"></el-progress>
+									</div>
 									<div class="mid">
 										<h3>法人身份证正面照片</h3>
 										<p>需要清晰展示人物五官、身份证文字信息和国徽</p>
@@ -63,15 +72,24 @@
 									</div>
 								</div>
 								<div class="outside inside flex_r_s_b">
-									<el-upload
-									class="avatar-uploader"
-									action="https://jsonplaceholder.typicode.com/posts/"
-									:show-file-list="false"
-									:on-success="handleAvatarSuccess"
-									:before-upload="beforeAvatarUpload">
-									<img v-if="imgData.sfzf" :src="imgData.sfzf" class="avatar">
-									<i v-else class="el-icon-plus avatar-uploader-icon"></i>
-									</el-upload>
+									<div class="outside_img" v-if="imgData.sfzf">
+										<img :src="imgData.sfzf">
+										<i @click="deleteImg($refs.uploadSfzf.uploadFiles,imgData,'sfzf')" class="el-icon-circle-close"></i>
+									</div>
+									<div v-show="!imgData.sfzf">
+											<el-upload
+												ref="uploadSfzf"
+												class="avatar-uploader"
+												action="https://jsonplaceholder.typicode.com/posts/"
+												:show-file-list="false"
+												list-type="picture-card"
+												:limit="1"
+												:on-progress="handleSfzfPreview"
+												:on-success="handleSfzfSuccess">
+												<i class="el-icon-plus avatar-uploader-icon"></i>
+											</el-upload>
+											<el-progress v-if="imgData.sfzfP>0" :percentage="imgData.sfzfP"></el-progress>
+									</div>
 									<div class="mid">
 										<h3>法人身份证反面照片</h3>
 										<p>需要清晰展示人物五官、身份证文字信息和国徽</p>
@@ -91,15 +109,24 @@
 						<div class="list_r">
 							<div class="store_img">
 								<div class="outside flex_r_s_b">
-									<el-upload
-									class="avatar-uploader"
-									action="https://jsonplaceholder.typicode.com/posts/"
-									:show-file-list="false"
-									:on-success="handleAvatarSuccess"
-									:before-upload="beforeAvatarUpload">
-									<img v-if="imgData.yyzz" :src="imgData.yyzz" class="avatar">
-									<i v-else class="el-icon-plus avatar-uploader-icon"></i>
-									</el-upload>
+									<div class="outside_img" v-if="imgData.yyzz">
+										<img :src="imgData.yyzz">
+										<i @click="deleteImg($refs.uploadYyzz.uploadFiles,imgData,'yyzz')" class="el-icon-circle-close"></i>
+									</div>
+									<div v-show="!imgData.yyzz">
+											<el-upload
+												ref="uploadYyzz"
+												class="avatar-uploader"
+												action="https://jsonplaceholder.typicode.com/posts/"
+												:show-file-list="false"
+												list-type="picture-card"
+												:limit="1"
+												:on-progress="handleYyzzPreview"
+												:on-success="handleYyzzSuccess">
+												<i class="el-icon-plus avatar-uploader-icon"></i>
+											</el-upload>
+											<el-progress v-if="imgData.yyzzP>0" :percentage="imgData.yyzzP"></el-progress>
+									</div>
 									<div class="mid">
 										<h3>营业执照</h3>
 										<p>需上传清晰三证合一后的营业执照，边框完整；拍复印件需加盖鲜章；二维码能够识别</p>
@@ -132,15 +159,25 @@
 						<div class="list_r">
 							<div class="store_img">
 								<div class="outside flex_r_s_b">
-									<el-upload
-									class="avatar-uploader"
-									action="https://jsonplaceholder.typicode.com/posts/"
-									:show-file-list="false"
-									:on-success="handleAvatarSuccess"
-									:before-upload="beforeAvatarUpload">
-									<img v-if="imgData.zlz" :src="imgData.zlz" class="avatar">
-									<i v-else class="el-icon-plus avatar-uploader-icon"></i>
-									</el-upload>
+									<div class="outside_img" v-if="imgData.zlz">
+										<img :src="imgData.zlz">
+										<i @click="deleteImg($refs.uploadZlz.uploadFiles,imgData,'zlz')" class="el-icon-circle-close"></i>
+									</div>
+									<div v-show="!imgData.zlz">
+											<el-upload
+												ref="uploadZlz"
+												class="avatar-uploader"
+												action="https://jsonplaceholder.typicode.com/posts/"
+												:show-file-list="false"
+												list-type="picture-card"
+												:limit="1"
+												:on-progress="handleSZlzPreview"
+												:on-success="handleZlzSuccess">
+												<i class="el-icon-plus avatar-uploader-icon"></i>
+											</el-upload>
+											<el-progress v-if="imgData.zlzP>0" :percentage="imgData.zlzP"></el-progress>
+									</div>
+									
 									<div class="mid">
 										<h3>动物诊疗许可证</h3>
 										<p>仅医疗单位上传，例如宠物医院；上传有效期内的彩色动物诊疗许可证，复印件需加盖鲜章</p>
@@ -175,10 +212,18 @@
 					<li>
 						<p>有效期<span>*</span></p>
 						<div class="list_r">
-							<el-date-picker
+							<!-- <el-date-picker
 								v-model="yxDate"
 								type="date"
 								placeholder="选择日期">
+							</el-date-picker> -->
+							<el-date-picker
+							  class="yxdate"
+							  v-model="yxDate"
+							  type="daterange"
+							  range-separator="至"
+							  start-placeholder="开始日期"
+							  end-placeholder="结束日期">
 							</el-date-picker>
 							<el-checkbox v-model="checked">长期</el-checkbox>
 						</div>
@@ -198,7 +243,7 @@
 				activeFw:'',
 				yxDate:'',
 				checked:'',
-				imgData:{sfzz:'',sfzf:'',yyzz:'',zlz:''},
+				imgData:{sfzz:'',sfzzP:0,sfzf:'',sfzfP:0,yyzz:'',yyzzP:0,zlz:'',zlzP:0},
 				inputData:{
 					userNameVal:'',
 					sfzVal:'',
@@ -210,24 +255,55 @@
 			};
 		},
 		methods: {
-			handleAvatarSuccess(res, file) {
-				
-				this.sellerInfo.outImg = URL.createObjectURL(file.raw);
+			handleSfzzSuccess(res,file,fileList) { //身份证正面上传
+				this.imgData.sfzz = file.url;
+				this.imgData.sfzzP = 0;
 			},
-		    beforeAvatarUpload(file) {
-			    const isJPG = file.type === 'image/jpeg';
-				const isLt2M = file.size / 1024 / 1024 < 2;
-
-				if (!isJPG) {
-					this.$message.error('上传头像图片只能是 JPG 格式!');
-				}
-				if (!isLt2M) {
-					this.$message.error('上传头像图片大小不能超过 2MB!');
-				}
-				return isJPG && isLt2M;
+			handleSfzfSuccess(res,file,fileList) {//身份证反面上传
+				this.imgData.sfzf = file.url;
+				this.imgData.sfzfP = 0;
+			},
+			handleYyzzSuccess(res,file,fileList) {//营业执照上传
+				this.imgData.yyzz = file.url;
+				this.imgData.yyzzP = 0;
+			},
+			handleZlzSuccess(res,file,fileList) {//动物诊疗许可证上传
+				this.imgData.zlz = file.url;
+				this.imgData.zlzP = 0;
+			},
+			handleSfzzPreview(file){ //上传时百分比钩子
+				
+				this.imgData.sfzzP = file.percent;
+			},
+			handleSfzfPreview(file){ //上传时百分比钩子
+				
+				this.imgData.sfzfP = file.percent;
+			},
+			handleYyzzPreview(file){ //上传时百分比钩子
+				
+				this.imgData.yyzzP = file.percent;
+			},
+			handleSZlzPreview(file){ //上传时百分比钩子
+				
+				this.imgData.zlzP = file.percent;
+			},
+			deleteImg(arr,imgParent,img){ //照片删除
+				let self = this;
+				this.$confirm('此操作将永久删除该文件, 是否继续?', '提示', {
+						confirmButtonText: '确定',
+						cancelButtonText: '取消',
+						type: 'warning',
+						callback:function(action, instance){
+							if(action == 'confirm'){
+								arr.splice(0, 1);
+								imgParent[img] = '';
+							}
+						}
+				})
 			},
 			next(){
-				
+				console.log(this.yxDate);
+				return false
 				this.$store.commit("aptitudeInfoSuccess");
 				this.$router.push({name:'storeSuccess'})
 				if(this.inputData.userNameVal == ''){
@@ -360,6 +436,7 @@
 					float: left;
 					position: relative;
 					margin-left: 24px;
+					
 					.el-input__inner{
 						height: 32px;
 						line-height: 32px;
@@ -410,10 +487,43 @@
 						}
 						
 					}
+					
 					.store_img{
 						width:620px;
 						border:1px solid rgba(221,221,221,1);
 						border-radius:6px;
+						.avatar-uploader-icon {
+							font-size: 28px;
+							color: #8c939d;
+							width: 110px;
+							height: 110px;
+							line-height: 110px;
+							text-align: center;
+						}
+						.el-upload--picture-card{
+							height: 110px;
+							width: 110px;
+							line-height: 110px;
+						}
+						.outside_img{
+							height: 110px;
+							width: 110px;
+							position: relative;
+							font-size: 0;
+							img{
+								height: 110px;
+								width: 110px;
+								
+							}
+							.el-icon-circle-close{
+								position:absolute;
+								right: -5px;
+								top: -5px;
+								font-size: 18px;
+								cursor: pointer;
+								color: gray;
+							}
+						}
 						.avatar-uploader-icon {
 							font-size: 28px;
 							color: #8c939d;
@@ -464,6 +574,15 @@
 									height: 110px;
 								}
 							}
+						}
+					}
+					.yxdate{
+						padding: 0 10px;
+						.el-date-table td.end-date span{
+								background-color:red;
+						}
+						.el-date-table td.start-date span{
+							background-color:red;
 						}
 					}
 				}

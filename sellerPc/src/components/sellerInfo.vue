@@ -46,6 +46,19 @@
 							</div>
 						</li>
 						<li>
+							<p>商家类型<span>*</span></p>
+							<div class="list_r">
+								<el-select v-model="storeType" placeholder="请选择">
+									<el-option
+										v-for="item in storeTypeData"
+										:key="item"
+										:label="item"
+										:value="item">
+									</el-option>
+								</el-select>
+							</div>
+						</li>
+						<li>
 							<p>经营品类<span>*</span></p>
 							<div class="list_r">
 								<el-select v-model="varietiesValue" multiple placeholder="请选择">
@@ -95,31 +108,48 @@
 							<div class="list_r">
 								<div class="store_img">
 									<div class="outside flex_r_s_b">
-										<el-upload
-										  class="avatar-uploader"
-										  action="https://jsonplaceholder.typicode.com/posts/"
-										  :show-file-list="false"
-											:limit="1"
-										  :on-success="handleStoreSuccess">
-										  <img v-if="sellerInfo.outImg" :src="sellerInfo.outImg" class="avatar">
-										  <i v-else class="el-icon-plus avatar-uploader-icon"></i>
-										</el-upload>
+										<div class="outside_img" v-if="sellerInfo.outImg">
+											<img :src="sellerInfo.outImg">
+											<i @click="deleteImg($refs.uploadOutSide.uploadFiles,sellerInfo,'outImg')" class="el-icon-circle-close"></i>
+										</div>
+										<div v-show="!sellerInfo.outImg">
+												<el-upload
+													ref="uploadOutSide"
+													class="avatar-uploader"
+													action="https://jsonplaceholder.typicode.com/posts/"
+													:show-file-list="false"
+													list-type="picture-card"
+													:limit="1"
+													:on-success="handleStoreSuccess">
+													<i class="el-icon-plus avatar-uploader-icon"></i>
+												</el-upload>
+										</div>
+										
 										<div class="mid">
 											<h3>门店照片</h3>
 											<p>需拍出完整门框、门匾（建议正对门脸2米处拍摄）</p>
 										</div>
 										<div class="eg">
-											<img src="../assets/condition/shili01.png" alt="">
+											<img class="avatar" src="../assets/condition/shili01.png" alt="">
 										</div>
 									</div>
 									<div class="outside inside flex_r_s_b">
-										<el-upload
-										class="avatar-uploader"
-										action="https://jsonplaceholder.typicode.com/posts/"
-										:show-file-list="false">
-										<img v-if="sellerInfo.outImg" :src="sellerInfo.outImg" class="avatar">
-										<i v-else class="el-icon-plus avatar-uploader-icon"></i>
-										</el-upload>
+										<div class="outside_img" v-if="sellerInfo.inImg">
+											<img :src="sellerInfo.inImg">
+											<i @click="deleteImg($refs.uploadInSide.uploadFiles,sellerInfo,'inImg')" class="el-icon-circle-close"></i>
+										</div>
+										<div v-show="!sellerInfo.inImg">
+												<el-upload
+													ref="uploadInSide"
+													class="avatar-uploader"
+													action="https://jsonplaceholder.typicode.com/posts/"
+													:show-file-list="false"
+													list-type="picture-card"
+													:limit="1"
+													:on-success="handleStoreInSuccess">
+													<i class="el-icon-plus avatar-uploader-icon"></i>
+												</el-upload>
+										</div>
 										<div class="mid">
 											<h3>店内照片</h3>
 											<p>需真实反映店内环境（商品货架、美容室、收银台等）</p>
@@ -136,13 +166,22 @@
 							<div class="list_r">
 								<div class="store_img">
 									<div class="outside flex_r_s_b">
-										<el-upload
-										class="avatar-uploader"
-										action="https://jsonplaceholder.typicode.com/posts/"
-										:show-file-list="false">
-										<img v-if="sellerInfo.outImg" :src="sellerInfo.outImg" class="avatar">
-										<i v-else class="el-icon-plus avatar-uploader-icon"></i>
-										</el-upload>
+										<div class="outside_img" v-if="sellerInfo.logo">
+											<img :src="sellerInfo.logo">
+											<i @click="deleteImg($refs.uploadLogoSide.uploadFiles,sellerInfo,'logo')" class="el-icon-circle-close"></i>
+										</div>
+										<div v-show="!sellerInfo.logo">
+												<el-upload
+													ref="uploadLogoSide"
+													class="avatar-uploader"
+													action="https://jsonplaceholder.typicode.com/posts/"
+													:show-file-list="false"
+													list-type="picture-card"
+													:limit="1"
+													:on-success="handleStoreLogoSuccess">
+													<i class="el-icon-plus avatar-uploader-icon"></i>
+												</el-upload>
+										</div>
 										<div class="mid">
 											<h3>商户LOGO</h3>
 											<p>需体现您店铺的特色，吸引更多消费者进店消费</p>
@@ -226,9 +265,11 @@
 						  })
 					}
 				},
-				varieties: [],
+				varieties: [],//经营品类
 				storeNameInput:'',
 				userNameInput:'',
+				storeTypeData:['宠物店','医疗诊所','培训院校','犬场猫舍'],
+				storeType:'',//商家类型
 				sheng:'',
 				shi:'',
 				qu:'',
@@ -310,9 +351,30 @@
 			};
 		},
 		methods: {
-			  handleStoreSuccess(res, file) {
-				this.sellerInfo.outImg = URL.createObjectURL(file.raw);
+			  handleStoreSuccess(res,file,fileList) { //门店照片
+					this.sellerInfo.outImg = file.url;
 			  },
+				handleStoreInSuccess(res,file,fileList) {//店内照片
+					this.sellerInfo.inImg = file.url;
+				},
+				handleStoreLogoSuccess(res,file,fileList) {//商户logo
+					this.sellerInfo.logo = file.url;
+				},
+				deleteImg(arr,imgParent,img){ //照片删除
+					
+					let self = this;
+					this.$confirm('此操作将永久删除该文件, 是否继续?', '提示', {
+							confirmButtonText: '确定',
+							cancelButtonText: '取消',
+							type: 'warning',
+							callback:function(action, instance){
+								if(action == 'confirm'){
+									arr.splice(0, 1);
+									imgParent[img] = '';
+								}
+							}
+					})
+				},
 			  addMarker: function() {
 				  let lng = 121.5 + Math.round(Math.random() * 1000) / 10000;
 				  let lat = 31.197646 + Math.round(Math.random() * 500) / 10000;
@@ -342,7 +404,7 @@
 				//下一步按钮验证
 				next(){
 					
-					this.$store.commit("sellerInfoSuccess");//商家信息填写成功
+					//商家信息填写成功
 					this.$router.push({name:'qualificationsInfo'});
 					
 					if(this.storeNameInput === ''){
@@ -530,7 +592,11 @@
 						text-align: center;
 						margin-left: 12px;
 					}
-					
+					.el-upload--picture-card{
+						height: initial;
+						width: initial;
+						line-height:110px;
+					}
 					.avatar-uploader .el-upload {
 						border: 1px dashed #d9d9d9;
 						border-radius: 6px;
@@ -558,6 +624,25 @@
 						width:620px;
 						border:1px solid rgba(221,221,221,1);
 						border-radius:6px;
+						.outside_img{
+							height: 110px;
+							width: 110px;
+							position: relative;
+							font-size: 0;
+							img{
+								height: 110px;
+								width: 110px;
+								
+							}
+							.el-icon-circle-close{
+								position:absolute;
+								right: -5px;
+								top: -5px;
+								font-size: 18px;
+								cursor: pointer;
+								color: gray;
+							}
+						}
 						.inside{
 							border-top: 1px solid #ddd;
 						}
