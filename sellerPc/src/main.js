@@ -18,8 +18,24 @@ Vue.component('v-distpicker', VDistpicker)//全局注册省市选择器组件
 Vue.use(ElementUI)
 Vue.use(AMap)
 Vue.use(GeminiScrollbar)//引用自定义滚动条组件
+
+axios.defaults.baseURL = 'http://192.168.0.109:8084'
 Vue.prototype.axios = axios;
 Vue.prototype.qs = Qs;
+
+/** 验证用户是否登录 **/
+router.beforeEach((to,from,next) => {
+   
+	if(to.name == 'login'){
+		next();
+	}else if(sessionStorage.getItem('user')){
+		next();
+	}else{
+		next('/login');
+
+	}
+	
+})
 
 AMap.initAMapApiLoader({
   key: 'fe2312e4704c6f8f7787c7864ecebae6',

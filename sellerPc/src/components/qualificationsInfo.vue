@@ -53,9 +53,10 @@
 											<el-upload
 												ref="uploadSfzz"
 												class="avatar-uploader"
-												action="https://jsonplaceholder.typicode.com/posts/"
+												action="http://192.168.0.109:8084/updateImg"
 												:show-file-list="false"
 												list-type="picture-card"
+												name="Img"
 												:limit="1"
 												:on-progress="handleSfzzPreview"
 												:on-success="handleSfzzSuccess">
@@ -80,10 +81,11 @@
 											<el-upload
 												ref="uploadSfzf"
 												class="avatar-uploader"
-												action="https://jsonplaceholder.typicode.com/posts/"
+												action="http://192.168.0.109:8084/updateImg"
 												:show-file-list="false"
 												list-type="picture-card"
 												:limit="1"
+												name='Img'
 												:on-progress="handleSfzfPreview"
 												:on-success="handleSfzfSuccess">
 												<i class="el-icon-plus avatar-uploader-icon"></i>
@@ -117,10 +119,11 @@
 											<el-upload
 												ref="uploadYyzz"
 												class="avatar-uploader"
-												action="https://jsonplaceholder.typicode.com/posts/"
+												action="http://192.168.0.109:8084/updateImg"
 												:show-file-list="false"
 												list-type="picture-card"
 												:limit="1"
+												name="Img"
 												:on-progress="handleYyzzPreview"
 												:on-success="handleYyzzSuccess">
 												<i class="el-icon-plus avatar-uploader-icon"></i>
@@ -170,6 +173,7 @@
 												action="https://jsonplaceholder.typicode.com/posts/"
 												:show-file-list="false"
 												list-type="picture-card"
+												 name="Img"
 												:limit="1"
 												:on-progress="handleSZlzPreview"
 												:on-success="handleZlzSuccess">
@@ -256,6 +260,7 @@
 		},
 		methods: {
 			handleSfzzSuccess(res,file,fileList) { //身份证正面上传
+				
 				this.imgData.sfzz = file.url;
 				this.imgData.sfzzP = 0;
 			},

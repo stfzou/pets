@@ -42,7 +42,7 @@
 						<li>
 							<p>联系人电话<span>*</span></p>
 							<div class="list_r">
-								<input class="gray_bg" type="text" readonly="readonly" value="13123456789" />
+								<input class="gray_bg" type="text" readonly="readonly" v-model="phone" />
 							</div>
 						</li>
 						<li>
@@ -50,10 +50,10 @@
 							<div class="list_r">
 								<el-select v-model="storeType" placeholder="请选择">
 									<el-option
-										v-for="item in storeTypeData"
-										:key="item"
-										:label="item"
-										:value="item">
+										v-for="(item,index) in storeTypeData"
+										:key="index"
+										:label="item.shopTypeName"
+										:value="item.id">
 									</el-option>
 								</el-select>
 							</div>
@@ -64,14 +64,12 @@
 								<el-select v-model="varietiesValue" multiple placeholder="请选择">
 									<el-option
 										v-for="item in varietiesData"
-										:key="item.value"
-										:label="item.label"
-										:value="item.value">
+										:key="item.typeName"
+										:label="item.typeName"
+										:value="item.id">
 									</el-option>
 								</el-select>
 							</div>
-							
-							 
 						</li>
 						<li>
 							<p>所在城市<span>*</span></p>
@@ -116,10 +114,11 @@
 												<el-upload
 													ref="uploadOutSide"
 													class="avatar-uploader"
-													action="https://jsonplaceholder.typicode.com/posts/"
+													action="http://192.168.0.109:8084/updateImg"
 													:show-file-list="false"
 													list-type="picture-card"
 													:limit="1"
+													name="Img"
 													:on-success="handleStoreSuccess">
 													<i class="el-icon-plus avatar-uploader-icon"></i>
 												</el-upload>
@@ -142,10 +141,11 @@
 												<el-upload
 													ref="uploadInSide"
 													class="avatar-uploader"
-													action="https://jsonplaceholder.typicode.com/posts/"
+													action="http://192.168.0.109:8084/updateImg"
 													:show-file-list="false"
 													list-type="picture-card"
 													:limit="1"
+													name="Img"
 													:on-success="handleStoreInSuccess">
 													<i class="el-icon-plus avatar-uploader-icon"></i>
 												</el-upload>
@@ -174,9 +174,10 @@
 												<el-upload
 													ref="uploadLogoSide"
 													class="avatar-uploader"
-													action="https://jsonplaceholder.typicode.com/posts/"
+													action="http://192.168.0.109:8084/updateImg"
 													:show-file-list="false"
 													list-type="picture-card"
+													name="Img"
 													:limit="1"
 													:on-success="handleStoreLogoSuccess">
 													<i class="el-icon-plus avatar-uploader-icon"></i>
@@ -211,42 +212,8 @@
 		data() {
 			const self = this;
 			return {
-				varietiesData: [{
-				  value: '商品销售',
-				  label: '商品销售'
-				}, {
-				  value: '医疗救护',
-				  label: '医疗救护'
-				}, {
-				  value: '美容护理',
-				  label: '美容护理'
-				}, {
-				  value: '犬场猫舍',
-				  label: '犬场猫舍'
-				},{
-				  value: '摄影婚配',
-				  label: '摄影婚配'
-				},{
-				  value: '培训院校',
-				  label: '培训院校'
-				},{
-				  value: '寄养看护',
-				  label: '寄养看护'
-				},{
-				  value: '小宠爬虫',
-				  label: '小宠爬虫'
-				},{
-				  value: '花鸟水族',
-				  label: '花鸟水族'
-				},{
-				  value: '训练基地',
-				  label: '训练基地'
-				},{
-				  value: '其他',
-				  label: '其他'
-				}
-				],
-				varietiesValue:[],
+				varietiesData: [],
+				varietiesValue:[],//经营品类
 				markers:{
 					 dragend: (e) => {
 						var geocoder = new AMap.Geocoder();
@@ -265,10 +232,10 @@
 						  })
 					}
 				},
-				varieties: [],//经营品类
+				phone:JSON.parse(sessionStorage.getItem('user')).userPhone,
 				storeNameInput:'',
 				userNameInput:'',
-				storeTypeData:['宠物店','医疗诊所','培训院校','犬场猫舍'],
+				storeTypeData:[],
 				storeType:'',//商家类型
 				sheng:'',
 				shi:'',
@@ -278,8 +245,11 @@
 				area: "",
 				sellerInfo:{
 					outImg:'',
+					outId:'',
 					inImg:'',
-					logo:''
+					inId:'',
+					logo:'',
+					logoId:''
 				},
 				searchOption: {
 					city:'',
@@ -350,15 +320,47 @@
 				//
 			};
 		},
+		mounted:function(){
+			let self = this;
+			this.axios.all([
+				this.axios.post('/getOperateAll',{
+					headers: { //经营品类
+						'Content-Type': 'application/x-www-form-urlencoded',
+					}
+				}),
+				this.axios.post('/getShopTypeAll',{
+					headers: { //商店类型
+						'Content-Type': 'application/x-www-form-urlencoded',
+					}
+				})
+
+			]).then(self.axios.spread(function(resPl,resType){
+					if(resPl.data.code==1&&resType.data.code==1){
+						self.varietiesData = resPl.data.data;
+						self.storeTypeData = resType.data.data;
+					}else{
+						self.$message({
+							showClose: true,
+							message:'初始化数据失败',
+							type: 'error',
+						});
+					}
+					
+			}))
+		},
 		methods: {
 			  handleStoreSuccess(res,file,fileList) { //门店照片
 					this.sellerInfo.outImg = file.url;
+					this.sellerInfo.outId = file.response.data.imgId;
+					
 			  },
 				handleStoreInSuccess(res,file,fileList) {//店内照片
 					this.sellerInfo.inImg = file.url;
+					this.sellerInfo.inId = file.response.data.imgId;
 				},
 				handleStoreLogoSuccess(res,file,fileList) {//商户logo
 					this.sellerInfo.logo = file.url;
+					this.sellerInfo.logoId = file.response.data.imgId;
 				},
 				deleteImg(arr,imgParent,img){ //照片删除
 					
@@ -403,15 +405,16 @@
 				},
 				//下一步按钮验证
 				next(){
-					
+					let self = this;
 					//商家信息填写成功
-					this.$router.push({name:'qualificationsInfo'});
-					
 					if(this.storeNameInput === ''){
 						this.$message.error('商家名字不能为空');
 						return false;
 					}else if(this.userNameInput === ''){
 						this.$message.error('用户名字不能为空');
+						return false;
+					}else if(this.storeType == ''){
+						this.$message.error('请选择商家类型');
 						return false;
 					}else if(this.varietiesValue == ''){
 						this.$message.error('请选择经营种类');
@@ -422,15 +425,60 @@
 					}else if(this.searchMap === ''){
 						this.$message.error('请填写详细街道位置');
 						return false;
-					}else if(this.sellerInfo.outImg == ''){
+					}else if(this.sellerInfo.outId == ''){
 						this.$message.error('请上传门店照片');
 						return false;
-					}else if(this.sellerInfo.inImg == ''){
+					}else if(this.sellerInfo.inId == ''){
 						this.$message.error('请上传店内照片');
 						return false;
-					}else if(this.sellerInfo.logo == ''){
+					}else if(this.sellerInfo.logoId == ''){
 						this.$message.error('请上传LOGO');
+						
 						return false;
+					}else{
+						let loading = this.$loading({
+							lock: true,
+							text: '加载中，请稍后',
+							spinner: 'el-icon-loading',
+							background: 'rgba(0, 0, 0, 0.7)'
+						});
+						this.axios.post('/webShop/editShopsInfo', this.qs.stringify({
+							
+							shopId:JSON.parse(sessionStorage.getItem('user')).shopId,
+							shopName:self.storeNameInput,
+							contactName:self.userNameInput,
+							contactTel:JSON.parse(sessionStorage.getItem('user')).userPhone,
+							shopTypeId:self.storeType,
+							operateIds:self.varietiesValue,
+							province:self.sheng,
+							city:self.shi,
+							area:self.qu,
+							shopAddress:self.searchMap,
+							shopImg:self.sellerInfo.logoId,
+							shopImgFacade:self.sellerInfo.outId,
+							imgInStore:self.sellerInfo.inId,
+							latitude:self.mapCenter[1],
+							longitude:self.mapCenter[0],
+							
+						}), {
+							headers: {
+								'Content-Type': 'application/x-www-form-urlencoded'
+							}
+						}).then(function(res){
+							if(res.data.code == 1){
+								setTimeout(() => {
+									loading.close();
+								}, 1000);
+								self.$message({
+									showClose: true,
+									message: '提交成功',
+									type: 'success',
+								});
+								self.$router.push({name:'qualificationsInfo',params:{ shopTypeId:self.storeType}});
+							}else{
+								self.$message.error(res.msg);
+							}
+						})
 					}
 				}
 				

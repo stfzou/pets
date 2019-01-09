@@ -123,7 +123,6 @@
 			}
 			.title{
 				padding: 15px 0;
-				
 				p{
 					font-size: 22px;
 					color: #333;
