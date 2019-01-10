@@ -108,7 +108,7 @@
 									<div class="outside flex_r_s_b">
 										<div class="outside_img" v-if="sellerInfo.outImg">
 											<img :src="sellerInfo.outImg">
-											<i @click="deleteImg($refs.uploadOutSide.uploadFiles,sellerInfo,'outImg')" class="el-icon-circle-close"></i>
+											<i @click="deleteImg($refs.uploadOutSide.uploadFiles,'outImg')" class="el-icon-circle-close"></i>
 										</div>
 										<div v-show="!sellerInfo.outImg">
 												<el-upload
@@ -135,7 +135,7 @@
 									<div class="outside inside flex_r_s_b">
 										<div class="outside_img" v-if="sellerInfo.inImg">
 											<img :src="sellerInfo.inImg">
-											<i @click="deleteImg($refs.uploadInSide.uploadFiles,sellerInfo,'inImg')" class="el-icon-circle-close"></i>
+											<i @click="deleteImg($refs.uploadInSide.uploadFiles,'inImg')" class="el-icon-circle-close"></i>
 										</div>
 										<div v-show="!sellerInfo.inImg">
 												<el-upload
@@ -168,7 +168,7 @@
 									<div class="outside flex_r_s_b">
 										<div class="outside_img" v-if="sellerInfo.logo">
 											<img :src="sellerInfo.logo">
-											<i @click="deleteImg($refs.uploadLogoSide.uploadFiles,sellerInfo,'logo')" class="el-icon-circle-close"></i>
+											<i @click="deleteImg($refs.uploadLogoSide.uploadFiles,'logo')" class="el-icon-circle-close"></i>
 										</div>
 										<div v-show="!sellerInfo.logo">
 												<el-upload
@@ -251,10 +251,7 @@
 					logo:'',
 					logoId:''
 				},
-				searchOption: {
-					city:'',
-					citylimit: true
-				},
+				city:'',
 				searchMap:'',
 				lng: 0,
 				lat: 0,
@@ -278,15 +275,16 @@
 					init(o) {
 					  // o 是高德地图定位插件实例
 					  o.getCurrentPosition((status, result) => {
-					
-							if (result && result.position) {
 							
-								self.searchOption.city = result.addressComponent.city;
+							if (result && result.position) {
+								
+								
 								self.lng = result.position.lng;
 								self.lat = result.position.lat;
 								self.mapCenter = [self.lng, self.lat];
 								self.loaded = true;
 								self.$nextTick();
+								
 							}
 					  
 						});
@@ -295,15 +293,15 @@
 				},{
 					pName:'Autocomplete',
 					input:'input_id',
+					city:self.city,
 					events:{
 						init(o){
-							
  							AMap.event.addListener(o, "select", function(e){
- 								console.log(e)
 								self.lng = e.poi.location.lng;
 								self.lat = e.poi.location.lat;
 								self.mapCenter = [self.lng, self.lat];
 								self.searchMap = e.poi.name;
+							
  							});
 						}
 					}
@@ -350,29 +348,54 @@
 		},
 		methods: {
 			  handleStoreSuccess(res,file,fileList) { //门店照片
-					this.sellerInfo.outImg = file.url;
+					this.sellerInfo.outImg = file.response.data.imgAddr;
 					this.sellerInfo.outId = file.response.data.imgId;
 					
 			  },
 				handleStoreInSuccess(res,file,fileList) {//店内照片
-					this.sellerInfo.inImg = file.url;
+					this.sellerInfo.inImg = file.response.data.imgAddr;
 					this.sellerInfo.inId = file.response.data.imgId;
 				},
 				handleStoreLogoSuccess(res,file,fileList) {//商户logo
-					this.sellerInfo.logo = file.url;
+					this.sellerInfo.logo = file.response.data.imgAddr;
 					this.sellerInfo.logoId = file.response.data.imgId;
 				},
-				deleteImg(arr,imgParent,img){ //照片删除
+				deleteImg(arr,img){ //照片删除
 					
 					let self = this;
+					
 					this.$confirm('此操作将永久删除该文件, 是否继续?', '提示', {
 							confirmButtonText: '确定',
 							cancelButtonText: '取消',
 							type: 'warning',
 							callback:function(action, instance){
 								if(action == 'confirm'){
-									arr.splice(0, 1);
-									imgParent[img] = '';
+									self.axios.post('/deleteImg', self.qs.stringify({
+										imgAddr: self.sellerInfo[img],
+									}), {
+										headers: {
+											'Content-Type': 'application/x-www-form-urlencoded'
+										}
+									}).then(function(res){
+										if(res.data.code == 1){
+											arr.splice(0, 1);
+											self.sellerInfo[img] = '';
+										}else{
+											self.$message({
+												showClose: true,
+												message:res.data.msg,
+												type: 'error',
+											});
+										}
+									
+									}).catch(function(res){
+											self.$message({
+												showClose: true,
+												message:'服务器错误',
+												type: 'error',
+											});
+									})
+									
 								}
 							}
 					})

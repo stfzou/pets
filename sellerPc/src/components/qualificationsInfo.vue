@@ -47,7 +47,7 @@
 								<div class="outside flex_r_s_b">
 									<div class="outside_img" v-if="imgData.sfzz">
 										<img :src="imgData.sfzz">
-										<i @click="deleteImg($refs.uploadSfzz.uploadFiles,imgData,'sfzz')" class="el-icon-circle-close"></i>
+										<i @click="deleteImg($refs.uploadSfzz.uploadFiles,'sfzz')" class="el-icon-circle-close"></i>
 									</div>
 									<div v-show="!imgData.sfzz">
 											<el-upload
@@ -75,7 +75,7 @@
 								<div class="outside inside flex_r_s_b">
 									<div class="outside_img" v-if="imgData.sfzf">
 										<img :src="imgData.sfzf">
-										<i @click="deleteImg($refs.uploadSfzf.uploadFiles,imgData,'sfzf')" class="el-icon-circle-close"></i>
+										<i @click="deleteImg($refs.uploadSfzf.uploadFiles,'sfzf')" class="el-icon-circle-close"></i>
 									</div>
 									<div v-show="!imgData.sfzf">
 											<el-upload
@@ -113,7 +113,7 @@
 								<div class="outside flex_r_s_b">
 									<div class="outside_img" v-if="imgData.yyzz">
 										<img :src="imgData.yyzz">
-										<i @click="deleteImg($refs.uploadYyzz.uploadFiles,imgData,'yyzz')" class="el-icon-circle-close"></i>
+										<i @click="deleteImg($refs.uploadYyzz.uploadFiles,'yyzz')" class="el-icon-circle-close"></i>
 									</div>
 									<div v-show="!imgData.yyzz">
 											<el-upload
@@ -164,13 +164,13 @@
 								<div class="outside flex_r_s_b">
 									<div class="outside_img" v-if="imgData.zlz">
 										<img :src="imgData.zlz">
-										<i @click="deleteImg($refs.uploadZlz.uploadFiles,imgData,'zlz')" class="el-icon-circle-close"></i>
+										<i @click="deleteImg($refs.uploadZlz.uploadFiles,'zlz')" class="el-icon-circle-close"></i>
 									</div>
 									<div v-show="!imgData.zlz">
 											<el-upload
 												ref="uploadZlz"
 												class="avatar-uploader"
-												action="https://jsonplaceholder.typicode.com/posts/"
+												action="http://192.168.0.109:8084/updateImg"
 												:show-file-list="false"
 												list-type="picture-card"
 												 name="Img"
@@ -247,7 +247,7 @@
 				activeFw:'',
 				yxDate:'',
 				checked:'',
-				imgData:{sfzz:'',sfzzP:0,sfzf:'',sfzfP:0,yyzz:'',yyzzP:0,zlz:'',zlzP:0},
+				imgData:{sfzz:'',sfzzP:0,sfzzId:'',sfzf:'',sfzfP:0,sfzfId:'',yyzz:'',yyzzP:0,yyzzId:'',zlz:'',zlzP:0,zlzId:''},
 				inputData:{
 					userNameVal:'',
 					sfzVal:'',
@@ -261,24 +261,29 @@
 		methods: {
 			handleSfzzSuccess(res,file,fileList) { //身份证正面上传
 				
-				this.imgData.sfzz = file.url;
+				this.imgData.sfzz = file.response.data.imgAddr;
+				this.imgData.sfzzId = file.response.data.imgId;
 				this.imgData.sfzzP = 0;
 			},
 			handleSfzfSuccess(res,file,fileList) {//身份证反面上传
-				this.imgData.sfzf = file.url;
+				this.imgData.sfzf = file.response.data.imgAddr;
+				this.imgData.sfzfId = file.response.data.imgId;
 				this.imgData.sfzfP = 0;
 			},
 			handleYyzzSuccess(res,file,fileList) {//营业执照上传
-				this.imgData.yyzz = file.url;
+				this.imgData.yyzz = file.response.data.imgAddr;
+				this.imgData.yyzzId = file.response.data.imgId;
 				this.imgData.yyzzP = 0;
 			},
 			handleZlzSuccess(res,file,fileList) {//动物诊疗许可证上传
-				this.imgData.zlz = file.url;
+				this.imgData.zlz =  file.response.data.imgAddr;
+				this.imgData.zlzId = file.response.data.imgId;
 				this.imgData.zlzP = 0;
 			},
 			handleSfzzPreview(file){ //上传时百分比钩子
 				
 				this.imgData.sfzzP = file.percent;
+				console.log(this.imgData.sfzzP)
 			},
 			handleSfzfPreview(file){ //上传时百分比钩子
 				
@@ -292,7 +297,7 @@
 				
 				this.imgData.zlzP = file.percent;
 			},
-			deleteImg(arr,imgParent,img){ //照片删除
+			deleteImg(arr,img){ //照片删除
 				let self = this;
 				this.$confirm('此操作将永久删除该文件, 是否继续?', '提示', {
 						confirmButtonText: '确定',
@@ -300,8 +305,32 @@
 						type: 'warning',
 						callback:function(action, instance){
 							if(action == 'confirm'){
-								arr.splice(0, 1);
-								imgParent[img] = '';
+								self.axios.post('/deleteImg', self.qs.stringify({
+									imgAddr: self.imgData[img],
+								}), {
+									headers: {
+										'Content-Type': 'application/x-www-form-urlencoded'
+									}
+								}).then(function(res){
+									if(res.data.code == 1){
+										arr.splice(0, 1);
+										self.imgData[img] = '';
+									}else{
+										self.$message({
+											showClose: true,
+											message:res.data.msg,
+											type: 'error',
+										});
+									}
+								
+								}).catch(function(res){
+										self.$message({
+											showClose: true,
+											message:'服务器错误',
+											type: 'error',
+										});
+								})
+								
 							}
 						}
 				})
@@ -418,7 +447,7 @@
 			.title{
 				height: 20px;
 				line-height: 20px;
-				padding-left: 5px;
+				padding: 0 0 0 5px;
 				border-left: 2px solid #ff523d;
 				color:#ff523d ;
 				font-size: 18px;

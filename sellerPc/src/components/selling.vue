@@ -38,82 +38,94 @@
 				<span>已下架</span>
 				<span>草稿中</span>
 			</div>
-			<el-table
-			    ref="multipleTable"
-				:data="tableData"
-				style="width: 100%"
-				:default-sort = "{prop: 'date', order: 'descending'}"
-				@selection-change="handleSelectionChange">
-				<el-table-column
-					type="selection"
-					width="55">
-				</el-table-column>
-				<el-table-column
-				    prop="bianma"
-				    label="商品编码"
-					width="100">
-					
-				</el-table-column>
-				<el-table-column
-				    prop="img"
-				    label="商品图片">
-					<template slot-scope="scope">
-						<img class="table_img" :src="scope.row.img" alt="">
-					</template>
-				</el-table-column>
-				<el-table-column
-				    prop="name"
-				    label="商品名称"
-					width="390">
-				</el-table-column>
-				<el-table-column
-					prop="price"
-					width="100"
-					label="销售价格"
-					sortable>
-				</el-table-column>
-				<el-table-column
-					prop="kucun"
-					label="库存数量"
-					width="100"
-					sortable>
-				</el-table-column>
-				<el-table-column
-					prop="saleCount"
-					label="累计销售"
-					width="100"
-					sortable>
-				</el-table-column>
-				<el-table-column
-					prop="saleState"
-					label="销售状态">
-				</el-table-column>
-				<el-table-column
-					label="编辑"
-					width="250">
-					<template slot-scope="scope">
-						<div class="edite">
-							<span>编辑</span>
-							<span>下架</span>
-							<span @click="share">分享商品</span>
-							<span @click="overhead">
-								置顶商品
-							</span>
+			<el-tabs type="border-card">
+				  <el-tab-pane>
+					<span slot="label">全部</span>
+					<el-table
+						ref="multipleTable"
+						:data="tableData"
+						style="width: 100%"
+						:default-sort = "{prop: 'date', order: 'descending'}"
+						@selection-change="handleSelectionChange">
+						<el-table-column
+							type="selection"
+							width="55">
+						</el-table-column>
+						<el-table-column
+							prop="bianma"
+							label="商品编码"
+							width="100">
 							
+						</el-table-column>
+						<el-table-column
+							prop="img"
+							label="商品图片">
+							<template slot-scope="scope">
+								<img class="table_img" :src="scope.row.img" alt="">
+							</template>
+						</el-table-column>
+						<el-table-column
+							prop="name"
+							label="商品名称"
+							width="390">
+						</el-table-column>
+						<el-table-column
+							prop="price"
+							width="100"
+							label="销售价格"
+							sortable>
+						</el-table-column>
+						<el-table-column
+							prop="kucun"
+							label="库存数量"
+							width="100"
+							sortable>
+						</el-table-column>
+						<el-table-column
+							prop="saleCount"
+							label="累计销售"
+							width="100"
+							sortable>
+						</el-table-column>
+						<el-table-column
+							prop="saleState"
+							label="销售状态">
+						</el-table-column>
+						<el-table-column
+							label="编辑"
+							width="250">
+							<template slot-scope="scope">
+								<div class="edite">
+									<span>编辑</span>
+									<span>下架</span>
+									<span @click="share">分享商品</span>
+									<span @click="overhead">
+										置顶商品
+									</span>
+									
+								</div>
+							</template>
+						</el-table-column>
+					</el-table>
+					<div class="flex_r_f_s table_btom">
+						<div>
+							<el-button round>下架</el-button>
+							<el-button round @click="deleteTable">删除</el-button>
 						</div>
-					</template>
-				</el-table-column>
-			</el-table>
-			<div class="flex_r_f_s table_btom">
-				<div>
-					<el-button round>下架</el-button>
-					<el-button round @click="deleteTable">删除</el-button>
-				</div>
-				 <el-pagination
-					layout="prev, pager, next"
-					:total="55">
-				</el-pagination>
-			</div>
+						<el-pagination
+							layout="prev, pager, next"
+							:total="55">
+						</el-pagination>
+					</div>
+				  </el-tab-pane>
+				  <el-tab-pane label="在售中">在售中</el-tab-pane>
+				  <el-tab-pane label="已售罄">已售罄</el-tab-pane>
+				  <el-tab-pane label="已下架">已下架</el-tab-pane>
+				  <el-tab-pane label="草稿中">草稿中</el-tab-pane>
+
+			</el-tabs>
+		
+			
 		</div>
 		<div class="modal" v-if="modal">
 			<div class="modal_cnt">

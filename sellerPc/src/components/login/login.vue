@@ -439,12 +439,13 @@
 					}).then(function(res) {
 						
 						if (res.data.code === 1) {
-
+							
 							var userEntity = {
 								userName: res.data.user.userName,
 								userId: res.data.user.userId,
 								userPhone: res.data.user.phone,
-								shopId:res.data.user.userShops.shopId
+								shopId:res.data.user.userShops.shopId,
+								shopTypeName:res.data.user.userShops.shopId
 							};
 							sessionStorage.setItem('user', JSON.stringify(userEntity));
 							self.$message({
@@ -459,7 +460,11 @@
 								self.$router.push({
 									name: 'dataReady'
 								})
-							} else {
+							} else if(res.data.user.userShops.shopStatus === 4) {
+								self.$router.push({
+									name: 'qualificationsInfo'
+								})
+							}else{
 								self.$router.push({
 									name: 'addGoods'
 								})
@@ -470,7 +475,7 @@
 						}
 					}).catch(function(err) {
 						loading.close();
-						self.$message.error(err);
+						self.$message.error('服务器错误');
 					})
 
 				}
