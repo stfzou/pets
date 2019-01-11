@@ -439,13 +439,13 @@
 					}).then(function(res) {
 						
 						if (res.data.code === 1) {
-							
+						
 							var userEntity = {
 								userName: res.data.user.userName,
 								userId: res.data.user.userId,
 								userPhone: res.data.user.phone,
 								shopId:res.data.user.userShops.shopId,
-								shopTypeName:res.data.user.userShops.shopId
+								shopTypeName:res.data.user.userShops.shopName
 							};
 							sessionStorage.setItem('user', JSON.stringify(userEntity));
 							self.$message({
@@ -462,7 +462,8 @@
 								})
 							} else if(res.data.user.userShops.shopStatus === 4) {
 								self.$router.push({
-									name: 'qualificationsInfo'
+									name: 'qualificationsInfo',
+									params: { shopTypeName: res.data.user.userShops.shopName }
 								})
 							}else{
 								self.$router.push({

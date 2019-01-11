@@ -24,13 +24,13 @@
 					<div class="goods_main_pic">
 						<div class="goods_pic">
 							<div class="img-box" :key="index" v-for="(item,index) in goodsMainList">
-								<img width="100%" :src="item" alt="">
+								<img width="100%" :src="item.imgUrl" alt="">
 								<i class="el-icon-close pointer" @click="deleteGoodsMain(index)"></i>
 							</div>
 
 						</div>
-						<el-upload class="avatar-uploader" ref="uploadGoodsMain" action="https://jsonplaceholder.typicode.com/posts/" multiple
-						 :on-success="handlePictureCardPreview" :on-remove="handleRemove" :on-exceed="handleExceed" :limit="5" list-type="picture">
+						<el-upload class="avatar-uploader" ref="uploadGoodsMain" action="http://192.168.0.109:8084/updateImg" multiple
+						 :on-success="handlePictureCardPreview"  :on-exceed="handleExceed" :limit="5" list-type="picture" name="Img">
 							<div class="upload-text"><span>+</span>点击上传商品主图（{{goodsMainList.length}}/5）</div>
 						</el-upload>
 					</div>
@@ -163,15 +163,19 @@
 								width="114">
 								<template slot-scope="scope">
 									<el-upload
-									  action="https://jsonplaceholder.typicode.com/posts/"
+									  action="http://192.168.0.109:8084/updateImg"
 									  ref="tablePic"
 									  class="avatar-uploader"
 									  :limit="1"
+									  name="Img"
 									  list-type="picture"
 									  :show-file-list="false"
 									  :on-exceed="handleTableExceed"
 									  :on-success="function(res,file,fileList){return handleTablePic(res,file,fileList,scope.row)}">
-									  <img v-if="scope.row.yulan" :src="scope.row.yulan" class="avatar">
+									
+									 <img  v-if="scope.row.yulan" :src="scope.row.yulan" class="avatar">
+									
+									  
 									  <i v-else class="el-icon-plus avatar-uploader-icon"></i>
 									</el-upload>
 								</template>
@@ -191,6 +195,28 @@
 						placeholder="请输入内容"
 						v-model="editData">
 					</el-input>
+					<div class="shop_describe_img">
+						<el-row :gutter="20">
+						  <el-col :span="6" v-for="(item,index) in describeImg" :key="index">
+							  <div class="describe_img_box">
+							  	<img :src="item.imgUrl" alt="">
+							  	<i class="el-icon-close" @click="describeImgRemove(index)"></i>
+							  </div>
+						  </el-col>		
+						  <el-col :span="6">
+							  <div class="upload-describe">
+							  	<el-upload class="describe-uploader" ref="uploadDescribe" action="http://192.168.0.109:8084/updateImg" multiple
+							  	:on-success="handleDescribe" :limit="9" list-type="picture" :on-exceed="handleDescribeExceed" name="Img">
+							  	<i class="el-icon-plus"></i>
+							  	</el-upload>
+							  </div>
+						  </el-col>
+						
+						</el-row>
+
+						
+						
+					</div>
 				</div>
 			</li>
 			<li class="clearfloat">
@@ -514,6 +540,7 @@
 				navXiaoshou:null,
 				navSku:null,
 				editData:'',//商品编辑数据
+				describeImg:[],//商品描述图片
 				storeClass:{ //店铺分类选择
 					storeClassData:['店铺1','店铺2','店铺3'],
 					value:''
@@ -589,19 +616,99 @@
 				console.log(value);
 			},
 			//商品主图上传回调
-			handleRemove(file, fileList) {
-				console.log(file, fileList);
-			},
 			handlePictureCardPreview(response, file, fileList) {
-				this.goodsMainList.push(file.url);
-				console.log(fileList)
+				this.goodsMainList.push({
+					imgId:file.response.data.imgId,
+					imgUrl:file.response.data.imgAddr
+				});
+				
 			},
 			handleExceed(files, fileList) {
 				this.$message.warning(`当前限制选择 3 个文件`);
 			},
-			deleteGoodsMain(index) {
-				this.goodsMainList.splice(index, 1);
-				this.$refs.uploadGoodsMain.uploadFiles.splice(index, 1)
+			deleteGoodsMain(index) { //商品主图删除
+				
+				let self = this;
+				this.$confirm('此操作将永久删除该文件, 是否继续?', '提示', {
+						confirmButtonText: '确定',
+						cancelButtonText: '取消',
+						type: 'warning',
+						callback:function(action, instance){
+							
+							if(action == 'confirm'){
+								self.axios.post('/deleteImg', self.qs.stringify({
+									imgAddr: self.goodsMainList[index].imgUrl,
+								}), {
+									headers: {
+										'Content-Type': 'application/x-www-form-urlencoded'
+									}
+								}).then(function(res){
+									if(res.data.code == 1){
+										self.goodsMainList.splice(index, 1);
+										self.$refs.uploadGoodsMain.uploadFiles.splice(index, 1)
+									}else{
+										self.$message({
+											showClose: true,
+											message:res.data.msg,
+											type: 'error',
+										});
+									}
+								
+								}).catch(function(res){
+										self.$message({
+											showClose: true,
+											message:'服务器错误',
+											type: 'error',
+										});
+								})
+								
+							}
+						}
+				})
+			},
+			handleDescribe(response, file, fileList){ //商品描述图片上传
+			
+				this.describeImg.push({
+					imgId:file.response.data.imgId,
+					imgUrl:file.response.data.imgAddr
+				})
+			},
+			handleDescribeExceed(files, fileList){
+				this.$message.warning(`当前限制选择 9 个文件`);
+			},
+			describeImgRemove(index){//商品描述图片删除
+					let self = this;
+					this.$confirm('此操作将永久删除该文件, 是否继续?', '提示', {
+							confirmButtonText: '确定',
+							cancelButtonText: '取消',
+							type: 'warning',
+							callback:function(action,instance){
+								
+								if(action == 'confirm'){
+									
+									self.axios.post('/deleteImg', self.qs.stringify({
+										imgAddr: self.describeImg[index].imgUrl
+									}), {
+										headers: {
+											'Content-Type': 'application/x-www-form-urlencoded'
+										}
+									}).then(function(res){
+										if(res.data.code == 1){
+											 self.describeImg.splice(index, 1);
+											 self.$refs.uploadDescribe.uploadFiles.splice(index, 1)
+										}else{
+											self.$message({
+												showClose: true,
+												message:res.data.msg,
+												type: 'error',
+											});
+										}
+									
+									})
+									
+								}
+							}
+					})
 			},
 			//商品规格
 			addSpecification() { //添加规格
@@ -637,7 +744,8 @@
 					sku: '',
 					name: '',
 					parentVal:'',
-					yulan:''
+					yulan:'',
+					yulanId:''
 				};
 				e.input = e.input.replace(/\s*/g,"");
 				if (e.input!='') {
@@ -966,9 +1074,13 @@
 			
 			},
 			handleTablePic(res,file,fileList,e){ //表格图片上传
-				
-				e.yulan = file.url
+			
+				e.yulan = file.response.data.imgAddr
+				e.yulanId = file.response.data.imgId
 				// e.yulan = file.url
+			},
+			removeTablePic(res,file,fileList,e){
+				
 			},
 			handleTableExceed(files, fileList){
 				this.$message.warning(`当前限制选择1个文件`);
@@ -1397,6 +1509,53 @@
 					.el-textarea__inner{
 						height: 200px;
 					}
+					.shop_describe_img{
+						.el-col{
+							margin-top: 20px;
+						}
+						.describe_img_box{
+							
+							height: 200px;
+							margin: 0 auto;
+							position: relative;
+							img{
+								width: 100%;
+								height: 200px;
+							}
+							.el-icon-close{
+								position: absolute;
+								top:-5px;
+								right:-5px;
+								background: rgba(0, 0, 0, 0.5);
+								color: #fff;
+								border-radius: 50%;
+								z-index: 10000;
+								cursor: pointer;
+							}
+						}
+						.upload-describe{
+							
+							.describe-uploader{
+								height: 200px;
+								width: 185px;
+								border: 1px dashed #d9d9d9;
+								border-radius: 6px;
+								cursor: pointer;
+								position: relative;
+								overflow: hidden;
+								.el-icon-plus{
+									height: 200px;
+									width: 185px;
+									line-height:200px;
+									font-size: 60px;
+									color: gray;
+									
+								}
+							}
+							
+						}
+					}
+					
 				}
 				.store_class{
 					.el-input--suffix{

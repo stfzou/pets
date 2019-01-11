@@ -193,6 +193,7 @@
 		.main-cnt{
 			height: 100%;
 			position: relative;
+			padding: 0;
 			.cnt-scroll{
 				height: calc(100% - 120px);
 				margin-top: 120px;

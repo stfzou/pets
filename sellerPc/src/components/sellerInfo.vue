@@ -489,6 +489,7 @@
 							}
 						}).then(function(res){
 							if(res.data.code == 1){
+								
 								setTimeout(() => {
 									loading.close();
 								}, 1000);
@@ -497,9 +498,9 @@
 									message: '提交成功',
 									type: 'success',
 								});
-								self.$router.push({name:'qualificationsInfo',params:{ shopTypeId:self.storeType}});
+								self.$router.push({name:'qualificationsInfo'});
 							}else{
-								self.$message.error(res.msg);
+								self.$message.error(res.data.msg);
 							}
 						})
 					}

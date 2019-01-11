@@ -16,8 +16,8 @@
 				<img src="../assets/condition/icon_01.png" alt="">
 			</li>
 			<li>
-			
-				<span >③</span>
+
+				<span>③</span>
 				店铺信息提交成功
 			</li>
 		</ul>
@@ -27,7 +27,7 @@
 					<li>
 						<div class="title">法定代表身份信息</div>
 					</li>
-					
+
 					<li>
 						<p>真实姓名<span>*</span></p>
 						<div class="list_r">
@@ -50,19 +50,12 @@
 										<i @click="deleteImg($refs.uploadSfzz.uploadFiles,'sfzz')" class="el-icon-circle-close"></i>
 									</div>
 									<div v-show="!imgData.sfzz">
-											<el-upload
-												ref="uploadSfzz"
-												class="avatar-uploader"
-												action="http://192.168.0.109:8084/updateImg"
-												:show-file-list="false"
-												list-type="picture-card"
-												name="Img"
-												:limit="1"
-												:on-progress="handleSfzzPreview"
-												:on-success="handleSfzzSuccess">
-												<i class="el-icon-plus avatar-uploader-icon"></i>
-											</el-upload>
-											<el-progress v-if="imgData.sfzzP>0" :percentage="imgData.sfzzP"></el-progress>
+										<el-upload ref="uploadSfzz" class="avatar-uploader" action="http://192.168.0.109:8084/updateImg"
+										 :show-file-list="false" list-type="picture-card" name="Img" :limit="1" :on-progress="handleSfzzPreview"
+										 :on-success="handleSfzzSuccess">
+											<i class="el-icon-plus avatar-uploader-icon"></i>
+										</el-upload>
+										<el-progress v-if="imgData.sfzzP>0" :percentage="imgData.sfzzP"></el-progress>
 									</div>
 									<div class="mid">
 										<h3>法人身份证正面照片</h3>
@@ -78,19 +71,12 @@
 										<i @click="deleteImg($refs.uploadSfzf.uploadFiles,'sfzf')" class="el-icon-circle-close"></i>
 									</div>
 									<div v-show="!imgData.sfzf">
-											<el-upload
-												ref="uploadSfzf"
-												class="avatar-uploader"
-												action="http://192.168.0.109:8084/updateImg"
-												:show-file-list="false"
-												list-type="picture-card"
-												:limit="1"
-												name='Img'
-												:on-progress="handleSfzfPreview"
-												:on-success="handleSfzfSuccess">
-												<i class="el-icon-plus avatar-uploader-icon"></i>
-											</el-upload>
-											<el-progress v-if="imgData.sfzfP>0" :percentage="imgData.sfzfP"></el-progress>
+										<el-upload ref="uploadSfzf" class="avatar-uploader" action="http://192.168.0.109:8084/updateImg"
+										 :show-file-list="false" list-type="picture-card" :limit="1" name='Img' :on-progress="handleSfzfPreview"
+										 :on-success="handleSfzfSuccess">
+											<i class="el-icon-plus avatar-uploader-icon"></i>
+										</el-upload>
+										<el-progress v-if="imgData.sfzfP>0" :percentage="imgData.sfzfP"></el-progress>
 									</div>
 									<div class="mid">
 										<h3>法人身份证反面照片</h3>
@@ -116,19 +102,12 @@
 										<i @click="deleteImg($refs.uploadYyzz.uploadFiles,'yyzz')" class="el-icon-circle-close"></i>
 									</div>
 									<div v-show="!imgData.yyzz">
-											<el-upload
-												ref="uploadYyzz"
-												class="avatar-uploader"
-												action="http://192.168.0.109:8084/updateImg"
-												:show-file-list="false"
-												list-type="picture-card"
-												:limit="1"
-												name="Img"
-												:on-progress="handleYyzzPreview"
-												:on-success="handleYyzzSuccess">
-												<i class="el-icon-plus avatar-uploader-icon"></i>
-											</el-upload>
-											<el-progress v-if="imgData.yyzzP>0" :percentage="imgData.yyzzP"></el-progress>
+										<el-upload ref="uploadYyzz" class="avatar-uploader" action="http://192.168.0.109:8084/updateImg"
+										 :show-file-list="false" list-type="picture-card" :limit="1" name="Img" :on-progress="handleYyzzPreview"
+										 :on-success="handleYyzzSuccess">
+											<i class="el-icon-plus avatar-uploader-icon"></i>
+										</el-upload>
+										<el-progress v-if="imgData.yyzzP>0" :percentage="imgData.yyzzP"></el-progress>
 									</div>
 									<div class="mid">
 										<h3>营业执照</h3>
@@ -138,7 +117,7 @@
 										<img src="../assets/condition/shili05.png" alt="">
 									</div>
 								</div>
-								
+
 							</div>
 						</div>
 					</li>
@@ -151,7 +130,7 @@
 					<li>
 						<p>单位名称<span>*</span></p>
 						<div class="list_r">
-							<input type="text" value="" placeholder="请输入单位名称" />
+							<input type="text" value="" v-model="inputData.companyName" placeholder="请输入单位名称" />
 						</div>
 					</li>
 					<li>
@@ -167,21 +146,14 @@
 										<i @click="deleteImg($refs.uploadZlz.uploadFiles,'zlz')" class="el-icon-circle-close"></i>
 									</div>
 									<div v-show="!imgData.zlz">
-											<el-upload
-												ref="uploadZlz"
-												class="avatar-uploader"
-												action="http://192.168.0.109:8084/updateImg"
-												:show-file-list="false"
-												list-type="picture-card"
-												 name="Img"
-												:limit="1"
-												:on-progress="handleSZlzPreview"
-												:on-success="handleZlzSuccess">
-												<i class="el-icon-plus avatar-uploader-icon"></i>
-											</el-upload>
-											<el-progress v-if="imgData.zlzP>0" :percentage="imgData.zlzP"></el-progress>
+										<el-upload ref="uploadZlz" class="avatar-uploader" action="http://192.168.0.109:8084/updateImg"
+										 :show-file-list="false" list-type="picture-card" name="Img" :limit="1" :on-progress="handleSZlzPreview"
+										 :on-success="handleZlzSuccess">
+											<i class="el-icon-plus avatar-uploader-icon"></i>
+										</el-upload>
+										<el-progress v-if="imgData.zlzP>0" :percentage="imgData.zlzP"></el-progress>
 									</div>
-									
+
 									<div class="mid">
 										<h3>动物诊疗许可证</h3>
 										<p>仅医疗单位上传，例如宠物医院；上传有效期内的彩色动物诊疗许可证，复印件需加盖鲜章</p>
@@ -190,7 +162,7 @@
 										<img src="../assets/condition/shili06.png" alt="">
 									</div>
 								</div>
-								
+
 							</div>
 						</div>
 					</li>
@@ -203,13 +175,7 @@
 					<li>
 						<p>诊疗活动范围<span>*</span></p>
 						<div class="list_r">
-							<el-input
-								
-								class="textarea"
-								type="textarea"
-								resize="none"
-								placeholder="请输入内容"
-								v-model="activeFw">
+							<el-input class="textarea" type="textarea" resize="none" placeholder="请输入内容" v-model="activeFw">
 							</el-input>
 						</div>
 					</li>
@@ -221,13 +187,8 @@
 								type="date"
 								placeholder="选择日期">
 							</el-date-picker> -->
-							<el-date-picker
-							  class="yxdate"
-							  v-model="yxDate"
-							  type="daterange"
-							  range-separator="至"
-							  start-placeholder="开始日期"
-							  end-placeholder="结束日期">
+							<el-date-picker class="yxdate" v-model="yxDate" type="daterange" range-separator="至" start-placeholder="开始日期"
+							 end-placeholder="结束日期">
 							</el-date-picker>
 							<el-checkbox v-model="checked">长期</el-checkbox>
 						</div>
@@ -236,162 +197,319 @@
 				<div class="pointer next_btn" @click="next">提交进入下一步</div>
 			</div>
 		</div>
-	</div> 
-	
+	</div>
+
 </template>
 
 <script>
 	export default {
 		data() {
 			return {
-				activeFw:'',
-				yxDate:'',
-				checked:'',
-				imgData:{sfzz:'',sfzzP:0,sfzzId:'',sfzf:'',sfzfP:0,sfzfId:'',yyzz:'',yyzzP:0,yyzzId:'',zlz:'',zlzP:0,zlzId:''},
-				inputData:{
-					userNameVal:'',
-					sfzVal:'',
-					zcCodeVal:'',
-					danweiVal:'',
-					identifierVal:''
+				activeFw: '',
+				yxDate: '',
+				checked: '',
+				checkedNum: 0,
+				imgData: {
+					sfzz: '',
+					sfzzP: 0,
+					sfzzId: '',
+					sfzf: '',
+					sfzfP: 0,
+					sfzfId: '',
+					yyzz: '',
+					yyzzP: 0,
+					yyzzId: '',
+					zlz: '',
+					zlzP: 0,
+					zlzId: ''
 				},
-				regId:/(^\d{15}$)|(^\d{18}$)|(^\d{17}(\d|X|x)$)/
+				inputData: {
+					userNameVal: '',
+					sfzVal: '',
+					zcCodeVal: '',
+					danweiVal: '',
+					identifierVal: '',
+					companyName: ''
+				},
+				shopTypeName: '', //商家类型
+				isQualification: null,
+				regId: /(^\d{15}$)|(^\d{18}$)|(^\d{17}(\d|X|x)$)/
 			};
 		},
+		mounted: function() {
+			let self = this;
+			
+			this.axios.post('/webShop/selectShopsType ', this.qs.stringify({
+				shopId: JSON.parse(sessionStorage.getItem('user')).shopId
+			}), {
+				headers: {
+					'Content-Type': 'application/x-www-form-urlencoded'
+				}
+			}).then(function(res) {
+				if (res.data.code == 1) {
+					
+					self.shopTypeName = res.data.shopTypeName
+
+				} else {
+					self.$message.error(res.data.msg);
+				}
+			})
+		},
+		watch: {
+			checked(newValue, oldValue) {
+				if (newValue == true) {
+					this.checkedNum = 1;
+
+				} else {
+					this.checkedNum = 0;
+				}
+
+			}
+		},
 		methods: {
-			handleSfzzSuccess(res,file,fileList) { //身份证正面上传
-				
+			handleSfzzSuccess(res, file, fileList) { //身份证正面上传
+
 				this.imgData.sfzz = file.response.data.imgAddr;
 				this.imgData.sfzzId = file.response.data.imgId;
 				this.imgData.sfzzP = 0;
 			},
-			handleSfzfSuccess(res,file,fileList) {//身份证反面上传
+			handleSfzfSuccess(res, file, fileList) { //身份证反面上传
 				this.imgData.sfzf = file.response.data.imgAddr;
 				this.imgData.sfzfId = file.response.data.imgId;
 				this.imgData.sfzfP = 0;
 			},
-			handleYyzzSuccess(res,file,fileList) {//营业执照上传
+			handleYyzzSuccess(res, file, fileList) { //营业执照上传
 				this.imgData.yyzz = file.response.data.imgAddr;
 				this.imgData.yyzzId = file.response.data.imgId;
 				this.imgData.yyzzP = 0;
 			},
-			handleZlzSuccess(res,file,fileList) {//动物诊疗许可证上传
-				this.imgData.zlz =  file.response.data.imgAddr;
+			handleZlzSuccess(res, file, fileList) { //动物诊疗许可证上传
+				this.imgData.zlz = file.response.data.imgAddr;
 				this.imgData.zlzId = file.response.data.imgId;
 				this.imgData.zlzP = 0;
 			},
-			handleSfzzPreview(file){ //上传时百分比钩子
-				
+			handleSfzzPreview(file) { //上传时百分比钩子
+
 				this.imgData.sfzzP = file.percent;
 				console.log(this.imgData.sfzzP)
 			},
-			handleSfzfPreview(file){ //上传时百分比钩子
-				
+			handleSfzfPreview(file) { //上传时百分比钩子
+
 				this.imgData.sfzfP = file.percent;
 			},
-			handleYyzzPreview(file){ //上传时百分比钩子
-				
+			handleYyzzPreview(file) { //上传时百分比钩子
+
 				this.imgData.yyzzP = file.percent;
 			},
-			handleSZlzPreview(file){ //上传时百分比钩子
-				
+			handleSZlzPreview(file) { //上传时百分比钩子
+
 				this.imgData.zlzP = file.percent;
 			},
-			deleteImg(arr,img){ //照片删除
+			deleteImg(arr, img) { //照片删除
 				let self = this;
 				this.$confirm('此操作将永久删除该文件, 是否继续?', '提示', {
-						confirmButtonText: '确定',
-						cancelButtonText: '取消',
-						type: 'warning',
-						callback:function(action, instance){
-							if(action == 'confirm'){
-								self.axios.post('/deleteImg', self.qs.stringify({
-									imgAddr: self.imgData[img],
-								}), {
-									headers: {
-										'Content-Type': 'application/x-www-form-urlencoded'
-									}
-								}).then(function(res){
-									if(res.data.code == 1){
-										arr.splice(0, 1);
-										self.imgData[img] = '';
-									}else{
-										self.$message({
-											showClose: true,
-											message:res.data.msg,
-											type: 'error',
-										});
-									}
-								
-								}).catch(function(res){
-										self.$message({
-											showClose: true,
-											message:'服务器错误',
-											type: 'error',
-										});
-								})
-								
-							}
+					confirmButtonText: '确定',
+					cancelButtonText: '取消',
+					type: 'warning',
+					callback: function(action, instance) {
+						if (action == 'confirm') {
+							self.axios.post('/deleteImg', self.qs.stringify({
+								imgAddr: self.imgData[img],
+							}), {
+								headers: {
+									'Content-Type': 'application/x-www-form-urlencoded'
+								}
+							}).then(function(res) {
+								if (res.data.code == 1) {
+									arr.splice(0, 1);
+									self.imgData[img] = '';
+								} else {
+									self.$message({
+										showClose: true,
+										message: res.data.msg,
+										type: 'error',
+									});
+								}
+
+							}).catch(function(res) {
+								self.$message({
+									showClose: true,
+									message: '服务器错误',
+									type: 'error',
+								});
+							})
+
 						}
+					}
 				})
 			},
-			next(){
-				console.log(this.yxDate);
-				return false
-				this.$store.commit("aptitudeInfoSuccess");
-				this.$router.push({name:'storeSuccess'})
-				if(this.inputData.userNameVal == ''){
-					
-					this.$message.error('真实姓名不能为空');
-					return false;
-					
-				}else if(this.inputData.sfzVal == ''){
-					
-					this.$message.error('身份证号不能为空');
-					return false;
-					
-				}else if(!this.regId.test(this.inputData.sfzVal)){
-					
-					this.$message.error('身份证号格式错误');
-					return false;
-					
-				}else if(this.imgData.sfzz == ''){
-					
-					this.$message.error('请上传身份证正面照片');
-					return false;
-					
-				}else if(this.imgData.sfzf == ''){
-					
-					this.$message.error('请上传身份证反面照片');
-					return false;
-					
-				}else if(this.imgData.yyzz == ''){
-					
-					this.$message.error('请上传营业执照照片');
-					return false;
-					
-				}else if(this.imgData.zlz == ''){
-					
-					this.$message.error('请上传诊疗证');
-					return false;
-					
-				}else if(this.activeFw == ''){
-					
-					this.$message.error('请上输入诊疗活动范围');
-					return false;
-				}else if(this.yxDate == ''|| this.checked == ''){
-					
-					this.$message.error('请选择有效日期');
-					return false;
+			next() {
+				let self = this;
+				let shopInfoData = {};
+				if (self.shopTypeName == '医疗诊所') {
+					if (this.inputData.userNameVal == '') {
+
+						this.$message.error('真实姓名不能为空');
+						return false;
+
+					} else if (this.inputData.sfzVal == '') {
+
+						this.$message.error('身份证号不能为空');
+						return false;
+
+					} else if (!this.regId.test(this.inputData.sfzVal)) {
+
+						this.$message.error('身份证号格式错误');
+						return false;
+
+					} else if (this.imgData.sfzz == '') {
+
+						this.$message.error('请上传身份证正面照片');
+						return false;
+
+					} else if (this.imgData.sfzf == '') {
+
+						this.$message.error('请上传身份证反面照片');
+						return false;
+
+					} else if (this.imgData.yyzz == '') {
+
+						this.$message.error('请上传营业执照照片');
+						return false;
+
+					} else if (this.inputData.zcCodeVal == '') {
+
+						this.$message.error('请输入注册号');
+						return false;
+
+					} else if (this.inputData.companyName == '') {
+
+						this.$message.error('请输入单位名称');
+						return false;
+
+					} else if (this.imgData.zlz == '') {
+
+						this.$message.error('请上传诊疗证');
+						return false;
+
+					} else if (this.activeFw == '') {
+
+						this.$message.error('请上输入诊疗活动范围');
+						return false;
+
+					} else if (this.yxDate == '' || this.checked == '') {
+
+						this.$message.error('请选择有效日期');
+						return false;
+					} else {
+
+						shopInfoData = {
+							shopId: JSON.parse(sessionStorage.getItem('user')).shopId,
+							realName: self.inputData.userNameVal,
+							IDCardNumber: self.inputData.sfzVal,
+							IDCardFront: self.imgData.sfzzId,
+							IDCardBack: self.imgData.sfzfId,
+							license: self.imgData.yyzzId,
+							registerNumber: self.inputData.zcCodeVal,
+							unitName: self.inputData.companyName,
+							//资质信息
+							isQualification: 0,
+
+						}
+						this.axios.post('/webShop/editShopsInfo', this.qs.stringify(shopInfoData), {
+							headers: {
+								'Content-Type': 'application/x-www-form-urlencoded'
+							}
+						}).then(function(res) {
+							if (res.data.code == 1) {
+								console.log(res)
+								// this.$router.push({name:'storeSuccess'})
+							} else {
+								self.$message.error(res.data.msg);
+							}
+						})
+					}
+					// 
+
+				} else {
+					if (this.inputData.userNameVal == '') {
+
+						this.$message.error('真实姓名不能为空');
+						return false;
+
+					} else if (this.inputData.sfzVal == '') {
+
+						this.$message.error('身份证号不能为空');
+						return false;
+
+					} else if (!this.regId.test(this.inputData.sfzVal)) {
+
+						this.$message.error('身份证号格式错误');
+						return false;
+
+					} else if (this.imgData.sfzz == '') {
+
+						this.$message.error('请上传身份证正面照片');
+						return false;
+
+					} else if (this.imgData.sfzf == '') {
+
+						this.$message.error('请上传身份证反面照片');
+						return false;
+
+					} else if (this.imgData.yyzz == '') {
+
+						this.$message.error('请上传营业执照照片');
+						return false;
+
+					} else if (this.inputData.zcCodeVal == '') {
+						this.$message.error('请输入注册号');
+						return false;
+					} else if (this.inputData.companyName == '') {
+						this.$message.error('请输入单位名称');
+						return false;
+					} else {
+
+						shopInfoData = {
+							shopId: JSON.parse(sessionStorage.getItem('user')).shopId,
+							realName: self.inputData.userNameVal,
+							IDCardNumber: self.inputData.sfzVal,
+							IDCardFront: self.imgData.sfzzId,
+							IDCardBack: self.imgData.sfzfId,
+							license: self.imgData.yyzzId,
+							registerNumber: self.inputData.zcCodeVal,
+							unitName: self.inputData.companyName,
+							//资质信息
+							isQualification: 1,
+							qualificationImg: self.imgData.zlzId,
+							licenseNumber: self.inputData.identifierVal,
+							range: self.activeFw,
+							deadlineStart: self.yxDate[0],
+							deadlineEnd: self.yxDate[1],
+							isLong: self.checkedNum
+						}
+						this.axios.post('/webShop/editShopsInfo', this.qs.stringify(shopInfoData), {
+							headers: {
+								'Content-Type': 'application/x-www-form-urlencoded'
+							}
+						}).then(function(res) {
+							if (res.data.code == 1) {
+								console.log(res)
+								// this.$router.push({name:'storeSuccess'})
+							} else {
+								self.$message.error(res.data.msg);
+							}
+						})
+					}
 				}
-				
+
 			}
 		},
 	}
 </script>
 
 <style lang="scss">
-	.main-cnt{
+	.main-cnt {
 		width: 1200px;
 		margin: 20px auto 0 auto;
 		background: #fff;
@@ -400,26 +518,31 @@
 		box-sizing: border-box;
 		box-shadow: 0px 0px 10px 5px #ffe9e6;
 		padding-top: 60px;
-		.nav{
+
+		.nav {
 			width: 1000px;
 			height: 60px;
-			border-radius:30px;
+			border-radius: 30px;
 			box-shadow: 0px 0px 10px 5px #ffe9e6;
-			margin:0 auto;
+			margin: 0 auto;
 			box-sizing: border-box;
-			justify-content:space-around;
-			li{
+			justify-content: space-around;
+
+			li {
 				font-size: 20px;
-				font-weight:400;
+				font-weight: 400;
 				display: flex;
-				span{
+
+				span {
 					margin-right: 12px;
 				}
 			}
-			.active{
+
+			.active {
 				color: #FF523D;
 				display: flex;
-				.success{
+
+				.success {
 					width: 18px;
 					height: 18px;
 					margin-right: 12px;
@@ -427,91 +550,106 @@
 			}
 		}
 	}
-	.qualications{
+
+	.qualications {
 		margin-top: 28px;
-		.next_btn{
-			width:300px;
-			height:38px;
-			line-height:38px;
+
+		.next_btn {
+			width: 300px;
+			height: 38px;
+			line-height: 38px;
 			text-align: center;
 			margin: 0 auto;
 			color: #fff;
 			margin-top: 60px;
-			background:rgba(255,82,61,1);
-			box-shadow:0px 6px 8px 0px rgba(255,82,61,0.16);
-			border-radius:19px;
+			background: rgba(255, 82, 61, 1);
+			box-shadow: 0px 6px 8px 0px rgba(255, 82, 61, 0.16);
+			border-radius: 19px;
 		}
-		.qualications_list{
+
+		.qualications_list {
 			padding-left: 165px;
-			margin-top:60px;
-			.title{
+			margin-top: 60px;
+
+			.title {
 				height: 20px;
 				line-height: 20px;
 				padding: 0 0 0 5px;
 				border-left: 2px solid #ff523d;
-				color:#ff523d ;
+				color: #ff523d;
 				font-size: 18px;
 			}
-			li{
+
+			li {
 				overflow: hidden;
 				margin-top: 28px;
-				&>p{
+
+				&>p {
 					font-size: 18px;
 					color: #333;
 					line-height: 32px;
 					height: 32px;
 					float: left;
 					width: 115px;
-					span{
+
+					span {
 						color: #FF523D;
 					}
 				}
-				.list_r{
+
+				.list_r {
 					float: left;
 					position: relative;
 					margin-left: 24px;
-					
-					.el-input__inner{
+
+					.el-input__inner {
 						height: 32px;
 						line-height: 32px;
 						border-color: #ddd;
 						color: #333;
 					}
-					.el-input__icon{
+
+					.el-input__icon {
 						line-height: 32px;
 					}
-					.el-checkbox{
+
+					.el-checkbox {
 						margin-left: 5px;
-						.el-checkbox__inner:hover{
+
+						.el-checkbox__inner:hover {
 							border-color: #ff523d;
 						}
-						.el-checkbox__inner{
+
+						.el-checkbox__inner {
 							border-radius: 50%;
 							border-color: #ff523d;
 						}
-						.el-checkbox__input.is-checked .el-checkbox__inner{
+
+						.el-checkbox__input.is-checked .el-checkbox__inner {
 							background-color: #ff523d;
 							border-color: #ff523d;
 						}
-						.el-checkbox__label{
-							color:#666 ;
+
+						.el-checkbox__label {
+							color: #666;
 							padding-left: 5px;
 						}
 					}
-					
-					&>input{
+
+					&>input {
 						line-height: 32px;
 						color: #333;
 						font-size: 16px;
 						width: 280px;
 						outline: none;
-						border:1px solid rgba(221,221,221,1);
-						border-radius:6px;
+						border: 1px solid rgba(221, 221, 221, 1);
+						border-radius: 6px;
 						padding-left: 20px;
 						box-sizing: border-box;
 					}
-					.textarea{
-						textarea{
+
+					.textarea {
+						textarea {
 							width: 616px;
 							height: 62px;
 							outline: none;
@@ -519,13 +657,14 @@
 							font-size: 16px;
 							border-color: #ddd;
 						}
-						
+
 					}
-					
-					.store_img{
-						width:620px;
-						border:1px solid rgba(221,221,221,1);
-						border-radius:6px;
+
+					.store_img {
+						width: 620px;
+						border: 1px solid rgba(221, 221, 221, 1);
+						border-radius: 6px;
+
 						.avatar-uploader-icon {
 							font-size: 28px;
 							color: #8c939d;
@@ -534,23 +673,27 @@
 							line-height: 110px;
 							text-align: center;
 						}
-						.el-upload--picture-card{
+
+						.el-upload--picture-card {
 							height: 110px;
 							width: 110px;
 							line-height: 110px;
 						}
-						.outside_img{
+
+						.outside_img {
 							height: 110px;
 							width: 110px;
 							position: relative;
 							font-size: 0;
-							img{
+
+							img {
 								height: 110px;
 								width: 110px;
-								
+
 							}
-							.el-icon-circle-close{
-								position:absolute;
+
+							.el-icon-circle-close {
+								position: absolute;
 								right: -5px;
 								top: -5px;
 								font-size: 18px;
@@ -558,6 +701,7 @@
 								color: gray;
 							}
 						}
+
 						.avatar-uploader-icon {
 							font-size: 28px;
 							color: #8c939d;
@@ -566,11 +710,13 @@
 							line-height: 110px;
 							text-align: center;
 						}
+
 						.avatar {
 							width: 110px;
 							height: 110px;
 							display: block;
 						}
+
 						.avatar-uploader .el-upload {
 							border: 1px dashed #d9d9d9;
 							border-radius: 6px;
@@ -578,45 +724,55 @@
 							position: relative;
 							overflow: hidden;
 						}
+
 						.avatar-uploader .el-upload:hover {
 							border-color: #409EFF;
 						}
-						.inside{
+
+						.inside {
 							border-top: 1px solid #ddd;
 						}
-						.outside{
+
+						.outside {
 							padding: 10px;
-							box-sizing:border-box;
+							box-sizing: border-box;
 							align-items: flex-start;
-							.mid{
+
+							.mid {
 								width: 270px;
-								h3{
+
+								h3 {
 									font-size: 16px;
 									color: #333;
 									margin-top: 5px;
 								}
-								p{
+
+								p {
 									color: #666;
 									font-size: 14px;
 									line-height: 24px;
 									margin-top: 5px;
 								}
 							}
-							.eg{
-								img{
+
+							.eg {
+								img {
 									width: 180px;
 									height: 110px;
 								}
 							}
 						}
 					}
-					.yxdate{
+
+					.yxdate {
 						padding: 0 10px;
-						.el-date-table td.end-date span{
-								background-color:red;
+
+						.el-date-table td.end-date span {
+							background-color: red;
 						}
-						.el-date-table td.start-date span{
-							background-color:red;
+
+						.el-date-table td.start-date span {
+							background-color: red;
 						}
 					}
 				}
