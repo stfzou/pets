@@ -8,7 +8,7 @@
 				<p class="list_l">商品分类<span>*</span></p>
 				<div class="list_r">
 					<el-cascader class="goodsClass" placeholder="请选择商品分类" :options="goodsClassData" v-model="selectedGoodsClass"
-					 @change="handleChange">
+					 @change="handleChange" @active-item-change="activeChange" >
 					</el-cascader>
 				</div>
 			</li>
@@ -107,9 +107,7 @@
 							<el-col :span="4">
 								<el-input maxlength="10"  @change="xiaoshouInput(tableData)" v-model="navXiaoshou" placeholder="销售价"></el-input>
 							</el-col>
-							<el-col :span="4">
-								<el-input maxlength="10" v-model="navSku" placeholder="sku编码"></el-input>
-							</el-col>
+							
 						</el-row>
 					</div>
 					<div class="stock-table" v-show="specifications!=''">
@@ -162,21 +160,23 @@
 								label="预览图"
 								width="114">
 								<template slot-scope="scope">
+									<div class="yulan_img" v-if="scope.row.yulan">
+										<img  v-if="scope.row.yulan" :src="scope.row.yulan" class="avatar">
+										<i class="el-icon-close pointer" @click="describeImgRemove(scope.row)"></i>
+									</div>
 									<el-upload
+									  v-show="!scope.row.yulan"
+									  :limit="1"
 									  action="http://192.168.0.109:8084/updateImg"
 									  ref="tablePic"
 									  class="avatar-uploader"
-									  :limit="1"
 									  name="Img"
 									  list-type="picture"
+									  :file-list="scope.row.flieList"
 									  :show-file-list="false"
 									  :on-exceed="handleTableExceed"
 									  :on-success="function(res,file,fileList){return handleTablePic(res,file,fileList,scope.row)}">
-									
-									 <img  v-if="scope.row.yulan" :src="scope.row.yulan" class="avatar">
-									
-									  
-									  <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+									  <i class="el-icon-plus avatar-uploader-icon"></i>
 									</el-upload>
 								</template>
 							</el-table-column>
@@ -327,206 +327,12 @@
 </template>
 
 <script>
-	import { quillEditor } from 'vue-quill-editor' //调用编辑器
-	import 'quill/dist/quill.core.css';
-	import 'quill/dist/quill.snow.css';
-	import 'quill/dist/quill.bubble.css';
-
+	
 	export default {
 		data() {
 			return {
 				selectedGoodsClass: [],//商家分类数据
-				goodsClassData: [{
-					value: '狗狗专区',
-					label: '狗狗专区',
-					children: [{
-						value: '狗狗主粮',
-						label: '狗狗主粮',
-						children: [{
-							value: '国产粮',
-							label: '国产粮'
-						}, {
-							value: '进口粮',
-							label: '进口粮'
-						}, {
-							value: '功能粮',
-							label: '功能粮'
-						}]
-					}, {
-						value: '狗狗零食',
-						label: '狗狗零食',
-						children: [{
-							value: '国产粮',
-							label: '国产粮'
-						}, {
-							value: '进口粮',
-							label: '进口粮'
-						}, {
-							value: '功能粮',
-							label: '功能粮'
-						}]
-					}, {
-						value: '狗狗玩具',
-						label: '狗狗玩具',
-						children: [{
-							value: '国产粮',
-							label: '国产粮'
-						}, {
-							value: '进口粮',
-							label: '进口粮'
-						}, {
-							value: '功能粮',
-							label: '功能粮'
-						}]
-					}, {
-						value: '狗保健品',
-						label: '狗保健品',
-						children: [{
-							value: '国产粮',
-							label: '国产粮'
-						}, {
-							value: '进口粮',
-							label: '进口粮'
-						}, {
-							value: '功能粮',
-							label: '功能粮'
-						}]
-					}, {
-						value: '清洁用品',
-						label: '清洁用品',
-						children: [{
-							value: '国产粮',
-							label: '国产粮'
-						}, {
-							value: '进口粮',
-							label: '进口粮'
-						}, {
-							value: '功能粮',
-							label: '功能粮'
-						}]
-					}, {
-						value: '狗用香波',
-						label: '狗用香波',
-						children: [{
-							value: '国产粮',
-							label: '国产粮'
-						}, {
-							value: '进口粮',
-							label: '进口粮'
-						}, {
-							value: '功能粮',
-							label: '功能粮'
-						}]
-					}, {
-						value: '护理药品',
-						label: '护理药品',
-						children: [{
-							value: '国产粮',
-							label: '国产粮'
-						}, {
-							value: '进口粮',
-							label: '进口粮'
-						}, {
-							value: '功能粮',
-							label: '功能粮'
-						}]
-					}]
-				}, {
-					value: '猫猫专区',
-					label: '猫猫专区',
-					children: [{
-						value: '猫猫主粮',
-						label: '猫猫主粮',
-						children: [{
-							value: '国产粮',
-							label: '国产粮'
-						}, {
-							value: '进口粮',
-							label: '进口粮'
-						}, {
-							value: '功能粮',
-							label: '功能粮'
-						}]
-					}, {
-						value: '猫猫零食',
-						label: '猫猫零食',
-						children: [{
-							value: '国产粮',
-							label: '国产粮'
-						}, {
-							value: '进口粮',
-							label: '进口粮'
-						}, {
-							value: '功能粮',
-							label: '功能粮'
-						}]
-					}, {
-						value: '猫猫玩具',
-						label: '猫猫玩具',
-						children: [{
-							value: '国产粮',
-							label: '国产粮'
-						}, {
-							value: '进口粮',
-							label: '进口粮'
-						}, {
-							value: '功能粮',
-							label: '功能粮'
-						}]
-					}, {
-						value: '猫猫健品',
-						label: '猫猫健品',
-						children: [{
-							value: '国产粮',
-							label: '国产粮'
-						}, {
-							value: '进口粮',
-							label: '进口粮'
-						}, {
-							value: '功能粮',
-							label: '功能粮'
-						}]
-					}, {
-						value: '清洁用品',
-						label: '清洁用品',
-						children: [{
-							value: '国产粮',
-							label: '国产粮'
-						}, {
-							value: '进口粮',
-							label: '进口粮'
-						}, {
-							value: '功能粮',
-							label: '功能粮'
-						}]
-					}, {
-						value: '猫用香波',
-						label: '猫用香波',
-						children: [{
-							value: '国产粮',
-							label: '国产粮'
-						}, {
-							value: '进口粮',
-							label: '进口粮'
-						}, {
-							value: '功能粮',
-							label: '功能粮'
-						}]
-					}, {
-						value: '护理药品',
-						label: '护理药品',
-						children: [{
-							value: '国产粮',
-							label: '国产粮'
-						}, {
-							value: '进口粮',
-							label: '进口粮'
-						}, {
-							value: '功能粮',
-							label: '功能粮'
-						}]
-					}]
-				}],
+				goodsClassData: [],
 				goodsNameInput: '',//商店名字数据
 				dialogImageUrl: '',//商品主图地址数据
 				goodsMainList: [],//商品主图数据
@@ -564,10 +370,6 @@
 				sendTime:'30分钟',//发送时间数据
 				certified:'正品保证',//正品保证数据
 			};
-		},
-		components: {
-			//使用编辑器
-			quillEditor
 		},
 		computed: {
 			tableData() {
@@ -610,13 +412,78 @@
 
 			
 		},
+		mounted:function(){
+				
+				//初始化商品分类
+				let self = this;
+				this.axios.post('/selectGroupAll',{
+					headers: { //经营品类
+						'Content-Type': 'application/x-www-form-urlencoded',
+					}
+				}).then(function(res){
+					if(res.data.code == 1){
+						res.data.data.forEach(function(e){
+							let obj = {label:'',value:'',children:[]};
+							obj.label = e.name;
+							obj.value = e.id;
+							self.axios.post('/selectGSortOne',self.qs.stringify({gIds:obj.value}),{
+								headers: { //经营品类
+									'Content-Type': 'application/x-www-form-urlencoded',
+								}
+							}).then(function(subres){
+								
+								if(subres.data.code == 1){
+									
+									
+									subres.data.data[0].forEach(function(s){//二级分类回调
+									
+										let childrenObj = {lable:'',value:'',children:[]};
+										childrenObj.label = s.sortName;
+										childrenObj.value = s.sortId;
+										self.axios.post('/selectSortTwo',self.qs.stringify({sortIds:childrenObj.value}),{
+											headers: { //经营品类
+												'Content-Type': 'application/x-www-form-urlencoded',
+											}
+										}).then(function(gs){
+											
+											if(gs.data.code == 1){ //三级分类回调
+												gs.data.data[0].forEach(function(g){
+													
+													childrenObj.children.push({label:g.sortName,value:g.sortId});
+													
+												})
+												
+												
+											}
+										})
+										obj.children.push(childrenObj)
+									})
+								}
+							})
+							self.goodsClassData.push(obj)
+							
+						})
+					}else{
+						this.$message({
+							showClose: true,
+							message:res.data.msg,
+							type: 'error',
+						});
+					}
+				})
+				
+		},
 		methods: {
 			//商品分类回调
 			handleChange(value) {
-				console.log(value);
+				
+			},
+			activeChange(val){
+				// console.log(val)
 			},
 			//商品主图上传回调
 			handlePictureCardPreview(response, file, fileList) {
+				console.log(this.goodsClassData)
 				this.goodsMainList.push({
 					imgId:file.response.data.imgId,
 					imgUrl:file.response.data.imgAddr
@@ -667,16 +534,17 @@
 				})
 			},
 			handleDescribe(response, file, fileList){ //商品描述图片上传
-			
+				
 				this.describeImg.push({
 					imgId:file.response.data.imgId,
 					imgUrl:file.response.data.imgAddr
 				})
+				console.log(fileList)
 			},
 			handleDescribeExceed(files, fileList){
 				this.$message.warning(`当前限制选择 9 个文件`);
 			},
-			describeImgRemove(index){//商品描述图片删除
+			describeImgRemove(scope){//商品描述图片删除
 					let self = this;
 					this.$confirm('此操作将永久删除该文件, 是否继续?', '提示', {
 							confirmButtonText: '确定',
@@ -687,15 +555,16 @@
 								if(action == 'confirm'){
 									
 									self.axios.post('/deleteImg', self.qs.stringify({
-										imgAddr: self.describeImg[index].imgUrl
+										imgAddr: scope.yulan
 									}), {
 										headers: {
 											'Content-Type': 'application/x-www-form-urlencoded'
 										}
 									}).then(function(res){
 										if(res.data.code == 1){
-											 self.describeImg.splice(index, 1);
-											 self.$refs.uploadDescribe.uploadFiles.splice(index, 1)
+											scope.yulan = '';
+											scope.flieList.splice(0,1)
+											
 										}else{
 											self.$message({
 												showClose: true,
@@ -745,7 +614,8 @@
 					name: '',
 					parentVal:'',
 					yulan:'',
-					yulanId:''
+					yulanId:'',
+					flieList:[]
 				};
 				e.input = e.input.replace(/\s*/g,"");
 				if (e.input!='') {
@@ -1074,12 +944,13 @@
 			
 			},
 			handleTablePic(res,file,fileList,e){ //表格图片上传
-			
+				
 				e.yulan = file.response.data.imgAddr
 				e.yulanId = file.response.data.imgId
 				// e.yulan = file.url
 			},
-			removeTablePic(res,file,fileList,e){
+		
+			removeTablePic(res,file,fileList){
 				
 			},
 			handleTableExceed(files, fileList){
@@ -1497,10 +1368,27 @@
 							line-height: 60px;
 							text-align: center;
 						  }
-						  .avatar {
-							width: 60px;
-							height: 60px;
-							display: block;
+						 
+						  .yulan_img{
+							  height: 60px;
+							  width: 60px;
+							  position: relative;
+							  margin: 0 auto;
+							 .avatar {
+								width: 60px;
+								height: 60px;
+								display: block;
+								
+							}
+							.el-icon-close{
+								position: absolute;
+								top: 0;
+								right:0;
+								background: rgba(0, 0, 0, 0.5);
+								color: #fff;
+								border-radius: 50%;
+								z-index: 10000;
+							 }
 						  }
 					}
 				}
