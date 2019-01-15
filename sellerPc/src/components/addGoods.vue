@@ -13,7 +13,7 @@
 				</div>
 			</li>
 			<li class="clearfloat">
-				<p class="list_l">商品名称的的<span>*</span></p>
+				<p class="list_l">商品名称<span>*</span></p>
 				<div class="list_r">
 					<el-input class="goodsNameInput" v-model="goodsNameInput" maxlength="30" placeholder="请输入内容"></el-input>
 				</div>
@@ -40,15 +40,15 @@
 				<div class="add_goods_title">商品规格与库存</div>
 			</li>
 			<li class="clearfloat">
-				<p class="list_l">商品规格<span>*</span></p>
+				<p class="list_l">商品规格</p>
 				<div class="list_r specifications">
 					<h4>最多添加两个商品规格</h4>
 					<div class="specifications-list-warp">
 						<div class="specifications-list" :key="index" v-for="(e,index) in specifications">
 
 							<div class="list-top">
-								<el-select :key="index" v-model="e.value" placeholder="请选择">
-									<el-option v-for="item in e.options" :key="item.value" :value="item.value" :label="item.label">
+								<el-select v-model="e.value" placeholder="请选择">
+									<el-option v-for="item in e.options" :key="item.value" :value="item.label" :label="item.label">
 									</el-option>
 								</el-select>
 								<span class="delete pointer" @click="deleteSpecification(index)">删除</span>
@@ -107,50 +107,69 @@
 							<el-col :span="4">
 								<el-input maxlength="10"  @change="xiaoshouInput(tableData)" v-model="navXiaoshou" placeholder="销售价"></el-input>
 							</el-col>
+							<el-col :span="4">
+								<el-input maxlength="10"  @change="kgInput(tableData)" v-model="navKg" placeholder="重量"></el-input>
+							</el-col>
 							
 						</el-row>
 					</div>
-					<div class="stock-table" v-show="specifications!=''">
-						<el-table :data="tableData" :span-method="objectSpanMethod" :row-class-name="tableRowClassName" border style="width: 100%" cell-mouse-enter="tableHover">
+					<div class="stock-table" v-show="true">
+						<el-table :data="tableDataCs" :span-method="objectSpanMethod" :row-class-name="tableRowClassName" border style="width: 100%" cell-mouse-enter="tableHover">
 						    <el-table-column
-							    prop="parentVal"
-							    label="一级分类"
-							    width="114">
+								v-if="specifications[0]"
+							    prop="specOne"
+							    width="100">
+								<template slot="header" slot-scope="scope">
+									<!-- <div>{{scope.row.kucun}}</div> -->
+									<div></div>
+								</template>
 						    </el-table-column>
 							<el-table-column
-								prop="name"
-								label="二级分类"
-								width="114">
+								v-if="specifications[1]"
+								prop="specTwo"
+								width="100">
+								<template slot="header" slot-scope="scope">
+									
+								</template>
 							</el-table-column>
 							<el-table-column
 								prop="kucun"
 								label="库存*"
-								width="114">
+								width="100">
 								<template slot-scope="scope">
+									<div>{{scope.row}}</div>
 									<input maxlength="10" type="text" @change="inputEvent(scope.row)"  v-model="scope.row.kucun" />
 								</template>
 							</el-table-column>
 							<el-table-column
 								prop="xiaoshoujia"
 								label="销售价"
-								width="114">
+								width="100">
 								<template slot-scope="scope">
-									<input maxlength="10" type="text" @change="xiaoshouReg(scope.row)" v-model="scope.row.xiaoshoujia" />
+									<input maxlength="10" type="text" @change="xiaoshouReg(scope.row)" v-model="scope.row.sellPrice" />
 									
 								</template>
 							</el-table-column>
 							<el-table-column
 								prop="chengbenjia"
 								label="成本价"
-								width="114">
+								width="100">
 								<template  slot-scope="scope">
-									<input maxlength="10" type="text" @change="chengbenReg(scope.row)"  v-model="scope.row.chengbenjia" />
+									<input maxlength="10" type="text" @change="chengbenReg(scope.row)"  v-model="scope.row.cost" />
+								</template>
+							</el-table-column>
+							<el-table-column
+								prop="kg"
+								label="重量"
+								width="100">
+								<template  slot-scope="scope">
+									<input maxlength="10" type="text" @change="chengbenReg(scope.row)"  v-model="scope.row.kg" />
 								</template>
 							</el-table-column>
 							<el-table-column
 								prop="sku"
 								label="sku编码"
-								width="114">
+								width="100">
 								<template slot-scope="scope">
 									<input @change="validateReg(scope.row)" maxlength="10" type="text"  v-model="scope.row.sku" />
 								</template>
@@ -158,11 +177,11 @@
 							<el-table-column
 								prop="yulan"
 								label="预览图"
-								width="114">
+								width="100">
 								<template slot-scope="scope">
 									<div class="yulan_img" v-if="scope.row.yulan">
 										<img  v-if="scope.row.yulan" :src="scope.row.yulan" class="avatar">
-										<i class="el-icon-close pointer" @click="describeImgRemove(scope.row)"></i>
+										<i class="el-icon-close pointer" @click="tableImgRemove(scope.row)"></i>
 									</div>
 									<el-upload
 									  v-show="!scope.row.yulan"
@@ -180,6 +199,54 @@
 									</el-upload>
 								</template>
 							</el-table-column>
+						</el-table>
+						
+					</div>
+				
+					<div class="stock-table" v-show="false">
+						<el-table :data="noSpecifications" :span-method="objectSpanMethod" :row-class-name="tableRowClassName" border style="width: 100%" cell-mouse-enter="tableHover">
+							
+							<el-table-column
+								prop="kucun"
+								label="库存*"
+								width="160">
+								<template slot-scope="scope">
+									<input maxlength="10" type="text" @change="inputEvent(scope.row)"  v-model="scope.row.kucun" />
+								</template>
+							</el-table-column>
+							<el-table-column
+								prop="xiaoshoujia"
+								label="销售价"
+								width="160">
+								<template slot-scope="scope">
+									<input maxlength="10" type="text" @change="xiaoshouReg(scope.row)" v-model="scope.row.xiaoshoujia" />
+								</template>
+							</el-table-column>
+							<el-table-column
+								prop="chengbenjia"
+								label="成本价"
+								width="160">
+								<template  slot-scope="scope">
+									<input maxlength="10" type="text" @change="chengbenReg(scope.row)"  v-model="scope.row.chengbenjia" />
+								</template>
+							</el-table-column>
+							<el-table-column
+								prop="kg"
+								label="重量"
+								width="160">
+								<template  slot-scope="scope">
+									<input maxlength="10" type="text" @change="chengbenReg(scope.row)"  v-model="scope.row.kg" />
+								</template>
+							</el-table-column>
+							<el-table-column
+								prop="sku"
+								label="sku编码"
+								width="160">
+								<template slot-scope="scope">
+									<input @change="validateReg(scope.row)" maxlength="10" type="text"  v-model="scope.row.sku" />
+								</template>
+							</el-table-column>
+							
 						</el-table>
 						
 					</div>
@@ -232,15 +299,7 @@
 					  </el-select>
 				</div>
 			</li>
-			<li class="clearfloat">
-				<p class="list_l weight_p">物流重量</br><span>（含包装）</span></p>
-				<div class="list_r weight">
-						<div class="weight_box flex_r_s_b">
-							<el-input @change="weightReg" v-model="weight" placeholder="请输入内容"></el-input>
-							<span>kg</span>
-						</div>
-				</div>
-			</li>
+		
 			<li>
 				<div class="add_goods_title chengnuo">服务与承诺</div>
 			</li>
@@ -317,6 +376,9 @@
 					<span class="tx">（必须支持假一赔十服务）</span>
 				</div>
 			</li>
+			<li>
+				{{tableDataCs}}
+			</li>
 		</ul>
 		<div class="save_box">
 			<el-button round class="save_btn">保存至草稿</el-button>
@@ -337,21 +399,21 @@
 				dialogImageUrl: '',//商品主图地址数据
 				goodsMainList: [],//商品主图数据
 				specifications: [],//商品规格数据
-				aNum:0,
-				bNum:0,
+				specOption:[],
+				noSpecifications:[{kucun:'',xiaoshoujia:'',chengben:'',kg:'',sku:''}],//无商品规格数据
 				navOneData:'全部',
 				navTwoData:'全部',
 				navKuncun:null,
 				navChengben:null,
 				navXiaoshou:null,
 				navSku:null,
+				navKg:null,
 				editData:'',//商品编辑数据
 				describeImg:[],//商品描述图片
 				storeClass:{ //店铺分类选择
 					storeClassData:['店铺1','店铺2','店铺3'],
 					value:''
 				},
-				weight:'',//重量
 				goodsType:'普通商品',//商品类型
 				returnGoods:{//商品退回数据
 					returnGoodsData:['换货1','换货2','换货3'],
@@ -372,8 +434,35 @@
 			};
 		},
 		computed: {
+			tableDataCs(){
+				let arr=[];
+				if(this.specifications.length==2){
+					if(this.specifications[0].guigeName.length>0&&this.specifications[1].guigeName.length>0){
+						this.specifications[0].guigeName.forEach((e)=>{
+							if(this.specifications[1].guigeName){
+								this.specifications[1].guigeName.forEach((j)=>{
+									arr.push({specOneH:e.parentVal,specTwoH:e.parentVal,specOne:e.name,specTwo:j.name,kucun:'123',sellPrice:'',cost:'',kg:'',sku:'',yulan:'',yulanId:'',flieList:[]})
+								})
+							}
+						})
+					}else{
+						
+						this.specifications[0].guigeName.forEach((e)=>{
+							arr.push({specOneH:e.parentVal,specTwoH:'',specOne:e.name,kucun:'123',sellPrice:'',cost:'',kg:'',sku:'',yulan:'',yulanId:'',flieList:[]})
+						})
+					}
+					
+				}else{
+					if(this.specifications.length==1&&this.specifications[0].guigeName){
+						this.specifications[0].guigeName.forEach((e)=>{
+							arr.push({specOne:e.name,kucun:'',sellPrice:'',cost:'',kg:'',sku:'',yulan:'',yulanId:'',flieList:[]})
+						})
+					}
+				}
+				return arr;
+			},
 			tableData() {
-				var nameArr = [];
+				let nameArr = [];
 				if(this.specifications.length>0){
 					this.specifications.forEach((e) => {
 						e.guigeName.forEach((j)=>{
@@ -408,13 +497,49 @@
 					return navTwoArr
 				}
 			},
-			
+			bNum(){
+				let num;
+				if(this.specifications[1]){
+					if(this.specifications[1].guigeName.length>1){
+						num = this.specifications[1].guigeName.length;
+						return num;
+					}else{
+						num = 0;
+						return num;
+					}
+				}else{
+					num = 0;
+					return num;
+				}
+			}
 
 			
 		},
 		mounted:function(){
+			this.getGoodsSpecName();	
+			this.getGoodsClass();
+		},
+		methods: {
+			getGoodsSpecName(){ //获取规格名字
+				let self = this;
+				this.axios.post('/webShop/selectAttrNameAll',{
+				 	headers: { //经营品类
+				 		'Content-Type': 'application/x-www-form-urlencoded',
+				 	}
+				 }).then(function(res){
+					if(res.data.code == 1){
+						res.data.data.forEach((e)=>{
+							self.specOption.push({value:e.id,label:e.attrName});
+						})
+					}else{
+						this.$message.error(res.data.msg);
+					}
+				 }).catch(function(res){
+					 this.$message.error(res);
+				 })
+			},
+			getGoodsClass(){//初始化商品分类
 				
-				//初始化商品分类
 				let self = this;
 				this.axios.post('/selectGroupAll',{
 					headers: { //经营品类
@@ -471,9 +596,7 @@
 						});
 					}
 				})
-				
-		},
-		methods: {
+			},
 			//商品分类回调
 			handleChange(value) {
 				
@@ -544,7 +667,8 @@
 			handleDescribeExceed(files, fileList){
 				this.$message.warning(`当前限制选择 9 个文件`);
 			},
-			describeImgRemove(scope){//商品描述图片删除
+			tableImgRemove(scope){//table图片删除
+					
 					let self = this;
 					this.$confirm('此操作将永久删除该文件, 是否继续?', '提示', {
 							confirmButtonText: '确定',
@@ -579,21 +703,54 @@
 							}
 					})
 			},
+			describeImgRemove(index){ //描述图片删除
+				let self = this;
+				this.$confirm('此操作将永久删除该文件, 是否继续?', '提示', {
+						confirmButtonText: '确定',
+						cancelButtonText: '取消',
+						type: 'warning',
+						callback:function(action,instance){
+							
+							if(action == 'confirm'){
+								
+								self.axios.post('/deleteImg', self.qs.stringify({
+									imgAddr: self.describeImg[index].imgUrl
+								}), {
+									headers: {
+										'Content-Type': 'application/x-www-form-urlencoded'
+									}
+								}).then(function(res){
+									if(res.data.code == 1){
+										self.describeImg[index].imgUrl = '';
+										self.describeImg[index].imgId = '';
+										self.describeImg.splice(index,1);
+										self.$refs.uploadDescribe.uploadFiles.splice(index,1);
+										
+									}else{
+										self.$message({
+											showClose: true,
+											message:res.data.msg,
+											type: 'error',
+										});
+									}
+								
+								})
+								
+							}
+						}
+				})
+			},
 			//商品规格
-			addSpecification() { //添加规格
+			addSpecification() {//添加规格
+				let self = this;
 				if (this.specifications.length < 2) {
 					let obj = {
-						options: [{
-							value: '尺寸',
-							label: '尺寸'
-						}, {
-							value: '颜色',
-							label: '颜色'
-						}],
+						options:self.specOption,
 						value: '',
 						input: '',
 						guigeName: []
 					}
+				
 					this.specifications.push(obj)
 				} else {
 					this.$message({
@@ -607,16 +764,15 @@
 			},
 			addGuigeName(e) { //添加规格名称
 				let stockObj = {
-					kucun: '',
-					xiaoshoujia: '',
-					chengbenjia: '',
-					sku: '',
+					id:'',
 					name: '',
 					parentVal:'',
-					yulan:'',
-					yulanId:'',
-					flieList:[]
 				};
+				this.specOption.forEach(function(j){
+					if(j.value == e.value){
+						stockObj.parentVal = j.label;
+					}
+				})
 				e.input = e.input.replace(/\s*/g,"");
 				if (e.input!='') {
 					stockObj.name = e.input;
@@ -629,7 +785,6 @@
 			},
 			deleteGuigeName(e, guigeNameI) {
 				e.guigeName.splice(guigeNameI, 1);
-				
 			},
 			//table
 			tableRowClassName({row, rowIndex}){
@@ -841,7 +996,7 @@
 			
 			},
 			xiaoshouInput(tbData){ //销售价输入
-		
+				let self = this;
 				let kcData = [];
 				let kcDataTwo = [];
 				let re = /^[0-9]+.?[0-9]*/;
@@ -943,6 +1098,108 @@
 				}
 			
 			},
+			kgInput(tbData){
+				let self = this;
+				let kcData = [];
+				let kcDataTwo = [];
+				let re = /^[0-9]+.?[0-9]*/;
+				
+				if(!re.test(this.navKg)){
+					if(this.navKg.length==1)
+					{
+						this.navKg = this.navKg.replace(/[^1-9]/g,'')
+					}else{
+						this.navKg = this.navKg.replace(/\D/g,'')
+					}
+				}else if(this.specifications.length>0){
+					
+					if(this.navOneData === '全部'&&this.navTwoData !== '全部'){
+						
+							if(this.specifications[0]){
+								if(this.specifications[0].guigeName.length>0){
+									kcData = this.specifications[0].guigeName
+									kcData.forEach((e)=>{
+										e.kg = Math.floor(this.navKg * 100) / 100;
+									})
+								}
+								
+							}
+							if(this.specifications[1]){
+								if(this.specifications[1].guigeName.length>0){
+									kcDataTwo = this.specifications[1].guigeName;
+									kcDataTwo.forEach((e)=>{
+										if(e.name === this.navTwoData){
+											e.kg= Math.floor(this.navKg * 100) / 100;
+										}
+									})
+								}
+								
+							}
+					}else if(this.navOneData === '全部'&&this.navTwoData === '全部'){
+						
+						if(this.specifications[0].guigeName.length>0 && this.specifications[1] == undefined){
+							
+							kcData = this.specifications[0].guigeName
+							kcData.forEach((e)=>{
+								e.kg= Math.floor(this.navKg * 100) / 100;
+							})
+							
+						}else if(this.specifications[0].guigeName.length>0 && this.specifications[1].guigeName.length == 0){
+							kcData = this.specifications[0].guigeName
+							kcData.forEach((e)=>{
+								e.kg= Math.floor(this.navKg * 100) / 100;
+							})
+						}else if(this.specifications[0].guigeName.length>0 && this.specifications[1].guigeName.length>0){
+							tbData.forEach((e)=>{
+								e.kg= Math.floor(this.navKg * 100) / 100;
+							})
+						}
+						
+							
+					}else if(this.navOneData !== '全部'&&this.navTwoData === '全部'){
+						
+							if(this.specifications[1]){
+								if(this.specifications[1].guigeName.length>0){
+									kcData = this.specifications[1].guigeName
+									kcData.forEach((e)=>{
+										e.kg= Math.floor(this.navKg * 100) / 100;
+									})
+								}
+								
+							}
+							if(this.specifications[0]){
+								if(this.specifications[0].guigeName.length>0){
+									kcDataTwo  = this.specifications[0].guigeName
+									kcDataTwo .forEach((e)=>{
+										if(e.name === this.navOneData){
+											e.kg= Math.floor(this.navKg * 100) / 100;
+										}
+									})
+								}
+								
+							}
+					}else{
+						
+						if(this.specifications[1].guigeName.length>0){
+							kcData = this.specifications[1].guigeName
+							kcData.forEach((e)=>{
+								if(e.name === this.navTwoData){
+									e.kg= Math.floor(this.navKg * 100) / 100;
+								}
+							})
+						}
+						if(this.specifications[0].guigeName.length>0){
+							kcDataTwo  = this.specifications[0].guigeName
+							kcDataTwo.forEach((e)=>{
+								if(e.name === this.navOneData){
+									e.kg= Math.floor(this.navKg * 100) / 100;
+								}
+							})
+						}
+						
+					}
+				}
+			},
 			handleTablePic(res,file,fileList,e){ //表格图片上传
 				
 				e.yulan = file.response.data.imgAddr
@@ -956,35 +1213,30 @@
 			handleTableExceed(files, fileList){
 				this.$message.warning(`当前限制选择1个文件`);
 			},
-			objectSpanMethod({ row, column, rowIndex, columnIndex }) {
-				if(this.specifications.length>0){
-					if(this.specifications[0].guigeName.length>0){
-						this.aNum = this.specifications[0].guigeName.length;
-					}
-					if(this.specifications[1]){
-						if(this.specifications[1].guigeName.length>0){
-							this.bNum = this.specifications[1].guigeName.length;
+			objectSpanMethod({ row, column, rowIndex, columnIndex }) {//表格合并
+				console.log(this.bNum)
+				if (columnIndex === 0) {
+					if(this.bNum == 1){
+						return {
+							rowspan: 0,
+							colspan: 0
+						};
+						
+					}else if(this.bNum > 1){
+						if (rowIndex % this.bNum === 0) {
+							return {
+								rowspan: this.bNum,
+								colspan: 1
+							};
+						}else{
+							return {
+								rowspan: 0,
+								colspan: 0
+							};
 						}
 					}
 				}
-				if (columnIndex === 0){
-				  if (rowIndex === 0) {
-					return {
-					  rowspan: this.aNum,
-					  colspan: 1
-					};
-				  }else if(rowIndex === this.aNum){
-					return {
-						rowspan: this.bNum,
-						colspan: 1
-					};  
-				  }else{
-					return {
-						rowspan: 0,
-						colspan: 0
-					};  
-				  }
-				}
+		
 				
 				
 			},
@@ -1417,7 +1669,7 @@
 								background: rgba(0, 0, 0, 0.5);
 								color: #fff;
 								border-radius: 50%;
-								z-index: 10000;
+								
 								cursor: pointer;
 							}
 						}
