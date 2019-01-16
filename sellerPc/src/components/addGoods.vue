@@ -7,7 +7,7 @@
 			<li class="clearfloat">
 				<p class="list_l">商品分类<span>*</span></p>
 				<div class="list_r">
-					<el-cascader class="goodsClass" placeholder="请选择商品分类" :options="goodsClassData" v-model="selectedGoodsClass"
+					<el-cascader class="goodsClass h32" placeholder="请选择商品分类" :options="goodsClassData" v-model="selectedGoodsClass"
 					 @change="handleChange" @active-item-change="activeChange" >
 					</el-cascader>
 				</div>
@@ -15,7 +15,7 @@
 			<li class="clearfloat">
 				<p class="list_l">商品名称<span>*</span></p>
 				<div class="list_r">
-					<el-input class="goodsNameInput" v-model="goodsNameInput" maxlength="30" placeholder="请输入内容"></el-input>
+					<el-input class="goodsNameInput h32" v-model="goodsNameInput" maxlength="30" placeholder="请输入内容"></el-input>
 				</div>
 			</li>
 			<li class="clearfloat">
@@ -47,11 +47,11 @@
 						<div class="specifications-list" :key="index" v-for="(e,index) in specifications">
 
 							<div class="list-top">
-								<el-select v-model="e.value" placeholder="请选择">
-									<el-option v-for="item in e.options" :key="item.value" :value="item.label" :label="item.label">
+								<el-select ref="select" v-model="e.value" :value-key="index+''" @change="specSelect" placeholder="请选择">
+									<el-option v-for="item in e.options" :key="item.value" :value="item.value" :label="item.label">
 									</el-option>
 								</el-select>
-								<span class="delete pointer" @click="deleteSpecification(index)">删除</span>
+								<span class="delete pointer" @click="deleteSpecification($event,index)">删除</span>
 							</div>
 							<div class="list-bottom">
 								<div class="guige-name">
@@ -61,8 +61,23 @@
 									</span>
 								</div>
 								<div class="input-guige">
-									<el-input v-model="e.input" maxlength="10" placeholder="请输入内容"></el-input>
-									<span class="add pointer" @click="addGuigeName(e)">添加</span>
+									<el-select
+										v-model="e.input"
+										@change="function(j){
+											return searchChange(j,e)
+										}"
+										multiple
+										default-first-option
+										placeholder="请选择文章标签">
+										<el-option
+										  v-for="s in e.sOption"
+										  :key="s.value"
+										  :label="s.label"
+										  :value="s.value">
+										</el-option>
+									  </el-select>
+								 <el-input class="searchOptInput" v-model="e.inputVal" maxlength="10" placeholder="请输入内容"></el-input> 
+							<span class="add pointer" @click="addGuigeName(e)">添加</span>
 								</div>
 							</div>
 
@@ -118,26 +133,22 @@
 						    <el-table-column
 								v-if="specifications[0]"
 							    prop="specOne"
+								:label="tableHead[0].name"
 							    width="100">
-								<template slot="header" slot-scope="scope">
-									<!-- <div>{{scope.row.kucun}}</div> -->
-									<div></div>
-								</template>
+								
 						    </el-table-column>
 							<el-table-column
 								v-if="specifications[1]"
 								prop="specTwo"
+								:label="tableHead[1].name"
 								width="100">
-								<template slot="header" slot-scope="scope">
-									
-								</template>
 							</el-table-column>
 							<el-table-column
 								prop="kucun"
 								label="库存*"
 								width="100">
 								<template slot-scope="scope">
-									<div>{{scope.row}}</div>
+									
 									<input maxlength="10" type="text" @change="inputEvent(scope.row)"  v-model="scope.row.kucun" />
 								</template>
 							</el-table-column>
@@ -289,7 +300,7 @@
 			<li class="clearfloat">
 				<p class="list_l">店铺中分类</p>
 				<div class="list_r store_class">
-					<el-select v-model="storeClass.value" placeholder="请选择商品在店铺中的分类">
+					<el-select class="h32" v-model="storeClass.value" placeholder="请选择商品在店铺中的分类">
 						<el-option
 						  v-for="item in storeClass.storeClassData"
 						  :key="item"
@@ -314,7 +325,7 @@
 			<li class="clearfloat">
 				<p class="list_l">退换货服务</p>
 				<div class="list_r return_goods">
-					<el-select v-model="returnGoods.value" placeholder="请选择">
+					<el-select class="h32" v-model="returnGoods.value" placeholder="请选择">
 						<el-option
 						  v-for="item in returnGoods.returnGoodsData"
 						  :key="item"
@@ -350,7 +361,7 @@
 				<p class="list_l">物流费用</p>
 				<div class="list_r logistics flex_r_f_s">
 					<div class="logistics_box flex_r_s_b">
-						<el-input @change="weightReg" v-model="logistics.value" placeholder="请输入物流费用"></el-input>
+						<el-input class="h32" @change="weightReg" v-model="logistics.value" placeholder="请输入物流费用"></el-input>
 						<span>元</span>
 					</div>
 					<el-checkbox v-model="logistics.baoyou">包邮</el-checkbox>
@@ -431,6 +442,9 @@
 				},
 				sendTime:'30分钟',//发送时间数据
 				certified:'正品保证',//正品保证数据
+				tableHead:[{name:'',Id:''},{name:'',Id:''}],
+				searchOptOne:[],
+				searchOptTwo:[]
 			};
 		},
 		computed: {
@@ -441,37 +455,35 @@
 						this.specifications[0].guigeName.forEach((e)=>{
 							if(this.specifications[1].guigeName){
 								this.specifications[1].guigeName.forEach((j)=>{
-									arr.push({specOneH:e.parentVal,specTwoH:e.parentVal,specOne:e.name,specTwo:j.name,kucun:'123',sellPrice:'',cost:'',kg:'',sku:'',yulan:'',yulanId:'',flieList:[]})
+									arr.push({idOne:e.id,idTwo:j.id,specOne:e.name,specTwo:j.name,kucun:'',sellPrice:'',cost:'',kg:'',sku:'',yulan:'',yulanId:'',flieList:[]})
 								})
 							}
 						})
-					}else{
+					
+					}else if(this.specifications[0].guigeName.length==0&&this.specifications[1].guigeName.length>0){
 						
-						this.specifications[0].guigeName.forEach((e)=>{
-							arr.push({specOneH:e.parentVal,specTwoH:'',specOne:e.name,kucun:'123',sellPrice:'',cost:'',kg:'',sku:'',yulan:'',yulanId:'',flieList:[]})
+						this.specifications[1].guigeName.forEach((e)=>{
+							arr.push({idOne:e.id,specOne:e.name,kucun:'',sellPrice:'',cost:'',kg:'',sku:'',yulan:'',yulanId:'',flieList:[]})
 						})
+						
+					
+						
+					}else{
+						this.specifications[0].guigeName.forEach((e)=>{
+							arr.push({idOne:e.id,specOne:e.name,kucun:'',sellPrice:'',cost:'',kg:'',sku:'',yulan:'',yulanId:'',flieList:[]})
+						})
+						
 					}
 					
 				}else{
 					if(this.specifications.length==1&&this.specifications[0].guigeName){
 						this.specifications[0].guigeName.forEach((e)=>{
-							arr.push({specOne:e.name,kucun:'',sellPrice:'',cost:'',kg:'',sku:'',yulan:'',yulanId:'',flieList:[]})
+							arr.push({idOne:e.id,specOne:e.name,kucun:'',sellPrice:'',cost:'',kg:'',sku:'',yulan:'',yulanId:'',flieList:[]})
 						})
 					}
+					
 				}
 				return arr;
-			},
-			tableData() {
-				let nameArr = [];
-				if(this.specifications.length>0){
-					this.specifications.forEach((e) => {
-						e.guigeName.forEach((j)=>{
-							j.parentVal = e.value;
-							nameArr.push(j);
-						})
-					})
-				}
-				return nameArr;
 			},
 			tableNavDataFirst(){
 				let navOneArr = ['全部']
@@ -497,7 +509,7 @@
 					return navTwoArr
 				}
 			},
-			bNum(){
+			bNum(){//计算表格合并所用数据
 				let num;
 				if(this.specifications[1]){
 					if(this.specifications[1].guigeName.length>1){
@@ -511,7 +523,8 @@
 					num = 0;
 					return num;
 				}
-			}
+			},
+		
 
 			
 		},
@@ -520,6 +533,15 @@
 			this.getGoodsClass();
 		},
 		methods: {
+			searchChange(j,e){
+// 				j.forEach((i)=>{
+// 					
+// 				})
+					console.log(e.input)
+			},
+			removeTag(j){
+				console.log(j)
+			},
 			getGoodsSpecName(){ //获取规格名字
 				let self = this;
 				this.axios.post('/webShop/selectAttrNameAll',{
@@ -532,10 +554,10 @@
 							self.specOption.push({value:e.id,label:e.attrName});
 						})
 					}else{
-						this.$message.error(res.data.msg);
+						self.$message.error(res.data.msg);
 					}
 				 }).catch(function(res){
-					 this.$message.error(res);
+					 self.$message.error(res);
 				 })
 			},
 			getGoodsClass(){//初始化商品分类
@@ -662,7 +684,7 @@
 					imgId:file.response.data.imgId,
 					imgUrl:file.response.data.imgAddr
 				})
-				console.log(fileList)
+				
 			},
 			handleDescribeExceed(files, fileList){
 				this.$message.warning(`当前限制选择 9 个文件`);
@@ -743,48 +765,145 @@
 			//商品规格
 			addSpecification() {//添加规格
 				let self = this;
-				if (this.specifications.length < 2) {
-					let obj = {
-						options:self.specOption,
-						value: '',
-						input: '',
-						guigeName: []
+				if (this.specifications.length<2) {
+					if(this.specifications[0]&&this.specifications[0].value==''){
+						this.$message({
+							message: '请选择规格',
+							type: 'warning'
+						});
+					}else{
+						let obj = {
+							options:self.specOption,
+							value: '',
+							inputVal:'',
+							input: [],
+							guigeName: [],
+							sOption:[]
+						}
+						
+						this.tableHead.push({name:'',id:''});
+						this.specifications.push(obj);
 					}
-				
-					this.specifications.push(obj)
-				} else {
+					
+				}else if(this.specifications.length==2){
 					this.$message({
 						message: '只能添加两个规格',
 						type: 'warning'
 					});
 				}
+				
+				
 			},
-			deleteSpecification(index) { //删除规格
+			deleteSpecification(event,index) { //删除规格
 				this.specifications.splice(index, 1);
+				this.tableHead.splice(index, 1);
+			
 			},
-			addGuigeName(e) { //添加规格名称
-				let stockObj = {
-					id:'',
-					name: '',
-					parentVal:'',
-				};
-				this.specOption.forEach(function(j){
-					if(j.value == e.value){
-						stockObj.parentVal = j.label;
-					}
-				})
-				e.input = e.input.replace(/\s*/g,"");
-				if (e.input!='') {
-					stockObj.name = e.input;
-					e.guigeName.push(stockObj);
-					e.input = ''
+			addGuigeName(e) {
+				let self = this;//添加规格名称
+				if(e.value==''){
+					this.$message({
+						message: '请选择规格名称再添加',
+						type: 'warning'
+					});
 				}else{
-					return false;
+					
+					let stockObj = {
+						id:e.value,
+						name: ''
+					};
+					let isHttp = true;
+					e.inputVal = e.inputVal.replace(/\s*/g,"");
+						
+						this.axios.post('/webShop/addAttrValue', this.qs.stringify({
+								anId:e.value,
+								avName:e.inputVal,
+								status:0
+						}), {
+							headers: {
+								'Content-Type': 'application/x-www-form-urlencoded'
+							}
+						}).then(function(res){
+							if(res.data.code == 1){
+								e.sOption.push({value:res.data.data.attrValueId,label:res.data.data.attrValueName});
+								e.input.push(res.data.data.attrValueId)
+								e.inputVal = '';
+								console.log(res)
+							}else{
+								self.$message({
+									showClose: true,
+									message:res.data.msg,
+									type: 'error',
+								});
+							}
+						})
+				
+					
+					
+					
+					
 				}
+				
 				
 			},
 			deleteGuigeName(e, guigeNameI) {
 				e.guigeName.splice(guigeNameI, 1);
+			},
+			specSelect(e){
+				let self = this;
+				if(this.specifications[1]){
+					
+					this.specOption.forEach((e)=>{
+						if(e.value == this.specifications[1].value){
+							this.tableHead[1].name = e.label;
+							this.tableDataCs.forEach((j)=>{
+								j.idTwo = e.value;
+							})
+						}
+					})
+					this.axios.post('/webShop/selectANV', this.qs.stringify({
+						attrNameId:this.specifications[1].value
+					}), {
+						headers: {
+							'Content-Type': 'application/x-www-form-urlencoded'
+						}
+					}).then(function(res){
+						if(res.data.code == 1){
+							self.specifications[1].sOption=[];
+							res.data.data.forEach((j)=>{
+								self.specifications[1].sOption.push({value:j.attrValueId,label:j.attrValueName})
+							})
+						
+						}
+					})
+				}
+				if(this.specifications[0]){
+					
+					this.specOption.forEach((e)=>{
+						if(e.value == this.specifications[0].value){
+							this.tableHead[0].name = e.label;
+							this.tableDataCs.forEach((j)=>{
+								j.idOne = e.value;
+							})
+						}
+					})
+					this.axios.post('/webShop/selectANV', this.qs.stringify({
+						attrNameId:this.specifications[0].value
+					}), {
+						headers: {
+							'Content-Type': 'application/x-www-form-urlencoded'
+						}
+					}).then(function(res){
+						if(res.data.code == 1){
+							self.specifications[0].sOption=[];
+							res.data.data.forEach((j)=>{
+								self.specifications[0].sOption.push({value:j.attrValueId,label:j.attrValueName})
+							})
+						
+						}
+					})
+				}
+				
 			},
 			//table
 			tableRowClassName({row, rowIndex}){
@@ -1214,7 +1333,7 @@
 				this.$message.warning(`当前限制选择1个文件`);
 			},
 			objectSpanMethod({ row, column, rowIndex, columnIndex }) {//表格合并
-				console.log(this.bNum)
+				
 				if (columnIndex === 0) {
 					if(this.bNum == 1){
 						return {
@@ -1367,13 +1486,13 @@
 					float: left;
 					margin-left: 24px;
 
-					.el-input,
-					.el-input__inner {
-						height: 32px;
-						line-height: 32px;
-						color: #333;
+					.h32{
+						.el-input,.el-input__inner{
+							height: 32px;
+							line-height: 32px;
+						}
+						
 					}
-
 					.el-input.is-active .el-input__inner,
 					.el-input__inner:focus {
 						border-color: #dcdfe6;
@@ -1523,9 +1642,10 @@
 								.input-guige {
 
 									span {
-										color: #FF523D;
 										font-size: 14px;
-										margin-left: 10px;
+									}
+									.searchOptInput{
+										margin-top: 10px;
 									}
 								}
 
