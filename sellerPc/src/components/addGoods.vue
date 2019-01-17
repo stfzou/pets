@@ -47,24 +47,23 @@
 						<div class="specifications-list" :key="index" v-for="(e,index) in specifications">
 
 							<div class="list-top">
-								<el-select ref="select" v-model="e.value" :value-key="index+''" @change="specSelect" placeholder="请选择">
+								<el-select ref="select" v-model="e.value" :value-key="index+''" placeholder="请选择" @change="function(n){
+										return specSelect(n,e)
+								}">
 									<el-option v-for="item in e.options" :key="item.value" :value="item.value" :label="item.label">
 									</el-option>
 								</el-select>
 								<span class="delete pointer" @click="deleteSpecification($event,index)">删除</span>
 							</div>
 							<div class="list-bottom">
-								<div class="guige-name">
-									<span :key="guigeNameI" v-for="(guigeItem,guigeNameI) in e.guigeName">
-										{{guigeItem.name}}
-										<i class="el-icon-close pointer" @click="deleteGuigeName(e,guigeNameI)"></i>
-									</span>
-								</div>
 								<div class="input-guige">
 									<el-select
 										v-model="e.input"
 										@change="function(j){
 											return searchChange(j,e)
+										}"
+										@remove-tag="function(j){
+											return removeTag(j,e)
 										}"
 										multiple
 										default-first-option
@@ -94,36 +93,36 @@
 					<div class="stock-nav" style="width: 800px;">
 						<el-row :gutter="20">
 							<el-col :span="4">
-								<el-select v-model="navOneData" placeholder="请选择">
+								<el-select v-model="navData[0]" placeholder="请选择">
 									<el-option
 									v-for="(item,index) in tableNavDataFirst"
 									:key="index"
-									:label="item"
-									:value="item">
+									:label="item.name"
+									:value="item.value">
 									</el-option>
 								</el-select>
 							</el-col>
 							<el-col :span="4">
-								<el-select v-model="navTwoData" placeholder="请选择">
+								<el-select v-model="navData[1]" placeholder="请选择">
 									<el-option
 									v-for="(item,index) in tableNavDataLast"
 									:key="index"
-									:label="item"
-									:value="item">
+									:label="item.name"
+									:value="item.value">
 									</el-option>
 								</el-select>
 							</el-col>
 							<el-col :span="4">
-								<el-input maxlength="10" @change="kucunInput(tableData)" v-model="navKuncun" placeholder="库存"></el-input>
+								<el-input maxlength="10" @change="kucunInput(tableDataCs,'kucun','navKuncun')" v-model="navKuncun" placeholder="库存"></el-input>
 							</el-col>
 							<el-col :span="4">
-								<el-input maxlength="10" @change="chengbenInput(tableData)" v-model="navChengben" placeholder="成本价"></el-input>
+								<el-input maxlength="10" @change="kucunInput(tableDataCs,'cost','navChengben')" v-model="navChengben" placeholder="成本价"></el-input>
 							</el-col>
 							<el-col :span="4">
-								<el-input maxlength="10"  @change="xiaoshouInput(tableData)" v-model="navXiaoshou" placeholder="销售价"></el-input>
+								<el-input maxlength="10" @change="kucunInput(tableDataCs,'sellPrice','navXiaoshou')" v-model="navXiaoshou" placeholder="销售价"></el-input>
 							</el-col>
 							<el-col :span="4">
-								<el-input maxlength="10"  @change="kgInput(tableData)" v-model="navKg" placeholder="重量"></el-input>
+								<el-input maxlength="10" @change="kucunInput(tableDataCs,'kg','navKg')" v-model="navKg" placeholder="重量(kg)"></el-input>
 							</el-col>
 							
 						</el-row>
@@ -133,14 +132,14 @@
 						    <el-table-column
 								v-if="specifications[0]"
 							    prop="specOne"
-								:label="tableHead[0].name"
+								:label="specifications[0].tableName"
 							    width="100">
 								
 						    </el-table-column>
 							<el-table-column
 								v-if="specifications[1]"
 								prop="specTwo"
-								:label="tableHead[1].name"
+								:label="specifications[1].tableName"
 								width="100">
 							</el-table-column>
 							<el-table-column
@@ -211,7 +210,6 @@
 								</template>
 							</el-table-column>
 						</el-table>
-						
 					</div>
 				
 					<div class="stock-table" v-show="false">
@@ -291,8 +289,6 @@
 						  </el-col>
 						
 						</el-row>
-
-						
 						
 					</div>
 				</div>
@@ -412,8 +408,7 @@
 				specifications: [],//商品规格数据
 				specOption:[],
 				noSpecifications:[{kucun:'',xiaoshoujia:'',chengben:'',kg:'',sku:''}],//无商品规格数据
-				navOneData:'全部',
-				navTwoData:'全部',
+				navData:['全部','全部'],
 				navKuncun:null,
 				navChengben:null,
 				navXiaoshou:null,
@@ -442,9 +437,8 @@
 				},
 				sendTime:'30分钟',//发送时间数据
 				certified:'正品保证',//正品保证数据
-				tableHead:[{name:'',Id:''},{name:'',Id:''}],
-				searchOptOne:[],
-				searchOptTwo:[]
+				clearAllOne:'',
+				clearAllTwo:''
 			};
 		},
 		computed: {
@@ -455,7 +449,7 @@
 						this.specifications[0].guigeName.forEach((e)=>{
 							if(this.specifications[1].guigeName){
 								this.specifications[1].guigeName.forEach((j)=>{
-									arr.push({idOne:e.id,idTwo:j.id,specOne:e.name,specTwo:j.name,kucun:'',sellPrice:'',cost:'',kg:'',sku:'',yulan:'',yulanId:'',flieList:[]})
+									arr.push({id:e.parentId,idOne:e.subId,idTwo:j.subId,specOne:e.name,specTwo:j.name,kucun:'',sellPrice:'',cost:'',kg:'',sku:'',yulan:'',yulanId:'',flieList:[]})
 								})
 							}
 						})
@@ -463,14 +457,14 @@
 					}else if(this.specifications[0].guigeName.length==0&&this.specifications[1].guigeName.length>0){
 						
 						this.specifications[1].guigeName.forEach((e)=>{
-							arr.push({idOne:e.id,specOne:e.name,kucun:'',sellPrice:'',cost:'',kg:'',sku:'',yulan:'',yulanId:'',flieList:[]})
+							arr.push({id:e.parentId,idOne:e.subId,specOne:e.name,kucun:'',sellPrice:'',cost:'',kg:'',sku:'',yulan:'',yulanId:'',flieList:[]})
 						})
 						
 					
 						
 					}else{
 						this.specifications[0].guigeName.forEach((e)=>{
-							arr.push({idOne:e.id,specOne:e.name,kucun:'',sellPrice:'',cost:'',kg:'',sku:'',yulan:'',yulanId:'',flieList:[]})
+							arr.push({id:e.parentId,idOne:e.subId,specOne:e.name,kucun:'',sellPrice:'',cost:'',kg:'',sku:'',yulan:'',yulanId:'',flieList:[]})
 						})
 						
 					}
@@ -478,7 +472,7 @@
 				}else{
 					if(this.specifications.length==1&&this.specifications[0].guigeName){
 						this.specifications[0].guigeName.forEach((e)=>{
-							arr.push({idOne:e.id,specOne:e.name,kucun:'',sellPrice:'',cost:'',kg:'',sku:'',yulan:'',yulanId:'',flieList:[]})
+							arr.push({id:e.parentId,idOne:e.subId,specOne:e.name,kucun:'',sellPrice:'',cost:'',kg:'',sku:'',yulan:'',yulanId:'',flieList:[]})
 						})
 					}
 					
@@ -486,10 +480,10 @@
 				return arr;
 			},
 			tableNavDataFirst(){
-				let navOneArr = ['全部']
+				let navOneArr = [{name:'全部',value:'全部'}]
 				if(this.specifications[0]&&this.specifications[0].guigeName.length>0){
 					this.specifications[0].guigeName.forEach((e)=>{
-						navOneArr.push(e.name)
+						navOneArr.push({value:e.subId,name:e.name})
 					})
 					
 					return navOneArr
@@ -498,12 +492,11 @@
 				}
 			},
 			tableNavDataLast(){
-				let navTwoArr = ['全部']
+				let navTwoArr = [{name:'全部',value:'全部'}]
 				if(this.specifications[1]&&this.specifications[1].guigeName.length>0){
 					this.specifications[1].guigeName.forEach((e)=>{
-						navTwoArr.push(e.name)
+						navTwoArr.push({value:e.subId,name:e.name})
 					})
-					
 					return navTwoArr
 				}else{
 					return navTwoArr
@@ -534,13 +527,63 @@
 		},
 		methods: {
 			searchChange(j,e){
-// 				j.forEach((i)=>{
-// 					
-// 				})
-					console.log(e.input)
+				  e.guigeName=[];
+					
+					j.forEach((s)=>{
+						e.sOption.forEach((i)=>{
+							if(s==i.value){
+								e.guigeName.push({subId:s,name:i.label,parentId:e.value})
+							}
+						})
+					})
+ 			
+					// console.log(e.input)
 			},
-			removeTag(j){
-				console.log(j)
+			removeTag(j,e){
+				let self = this;
+				let isHttp = true;
+				e.sOption.forEach((s)=>{
+					if(j==s.value&&s.status==1){
+						isHttp = false;
+					}
+				})
+				if(isHttp){
+					this.axios.post('/webShop/deleteAttrValue', this.qs.stringify({
+							attrNameId:e.value,
+							avIds:j
+					}), {
+						headers: {
+							'Content-Type': 'application/x-www-form-urlencoded'
+						}
+					}).then(function(res){
+						if(res.data.code==1){
+							e.input.forEach((s,i,arr)=>{
+								if(j == s){
+									arr.splice(i,1)
+								}
+							});
+							e.sOption.forEach((s,i,arr)=>{
+								if(j == s.value){
+									arr.splice(i,1)
+								}
+							})
+							console.log('删除自定义')
+						}else{
+							self.$message.error(res.data.msg);
+						}
+					})
+				}else{
+					e.input.forEach((s,i,arr)=>{
+						if(j == s){
+							arr.splice(i,1)
+						}
+					});
+					console.log('删除默认')
+				}
+				
+				
+				
+				
 			},
 			getGoodsSpecName(){ //获取规格名字
 				let self = this;
@@ -776,12 +819,13 @@
 							options:self.specOption,
 							value: '',
 							inputVal:'',
-							input: [],
+							input: [],//添加的规格属性
 							guigeName: [],
-							sOption:[]
+							sOption:[],
+							tableName:'',
+							clearAll:0
 						}
 						
-						this.tableHead.push({name:'',id:''});
 						this.specifications.push(obj);
 					}
 					
@@ -796,8 +840,8 @@
 			},
 			deleteSpecification(event,index) { //删除规格
 				this.specifications.splice(index, 1);
-				this.tableHead.splice(index, 1);
-			
+				this.navData[0] = '全部';
+				this.navData[1] = '全部';
 			},
 			addGuigeName(e) {
 				let self = this;//添加规格名称
@@ -808,16 +852,18 @@
 					});
 				}else{
 					
-					let stockObj = {
-						id:e.value,
-						name: ''
-					};
 					let isHttp = true;
 					e.inputVal = e.inputVal.replace(/\s*/g,"");
-						
+					e.sOption.forEach((j)=>{
+						if(j.label == e.inputVal){
+							isHttp = false;
+						}
+					})
+					if(isHttp){
 						this.axios.post('/webShop/addAttrValue', this.qs.stringify({
 								anId:e.value,
 								avName:e.inputVal,
+								
 								status:0
 						}), {
 							headers: {
@@ -825,10 +871,11 @@
 							}
 						}).then(function(res){
 							if(res.data.code == 1){
-								e.sOption.push({value:res.data.data.attrValueId,label:res.data.data.attrValueName});
+								e.sOption.push({value:res.data.data.attrValueId,label:res.data.data.attrValueName,status:0});
 								e.input.push(res.data.data.attrValueId)
 								e.inputVal = '';
-								console.log(res)
+								e.guigeName.push({subId:res.data.data.attrValueId,name:res.data.data.attrValueName,parentId:e.value})
+								
 							}else{
 								self.$message({
 									showClose: true,
@@ -837,72 +884,68 @@
 								});
 							}
 						})
-				
-					
-					
-					
+					}else{
+						self.$message({
+							showClose: true,
+							message:'请选择默认属性或者自定义添加默认不存在的属性',
+							type: 'error',
+						});
+					}
 					
 				}
 				
 				
 			},
-			deleteGuigeName(e, guigeNameI) {
-				e.guigeName.splice(guigeNameI, 1);
-			},
-			specSelect(e){
+			specSelect(n,e){
 				let self = this;
-				if(this.specifications[1]){
-					
-					this.specOption.forEach((e)=>{
-						if(e.value == this.specifications[1].value){
-							this.tableHead[1].name = e.label;
-							this.tableDataCs.forEach((j)=>{
-								j.idTwo = e.value;
-							})
-						}
-					})
+				self.specOption.forEach((m)=>{
+					if(m.value == n){
+						e.tableName = m.label;
+					}
+				})
+				
+				console.log(n)
+					if(e.clearAll!=0){
+						let arr = [];
+						e.sOption.forEach((j)=>{
+							if(j.status==0){
+								arr.push(j.value)
+							}
+						})
+						this.axios.post('/webShop/selectANV', this.qs.stringify({
+							attrNameId:e.n,
+							avIds:arr
+						}), {
+							headers: {
+								'Content-Type': 'application/x-www-form-urlencoded'
+							}
+						}).then(function(res){
+							if(res.data.code==1){
+									e.input = [];
+									e.guigeName = [];
+							}else{
+								self.$message.error(res.data.msg);
+							}
+						})
+					}		
+					e.clearAll = n;		
 					this.axios.post('/webShop/selectANV', this.qs.stringify({
-						attrNameId:this.specifications[1].value
+						attrNameId:n
 					}), {
 						headers: {
 							'Content-Type': 'application/x-www-form-urlencoded'
 						}
 					}).then(function(res){
 						if(res.data.code == 1){
-							self.specifications[1].sOption=[];
+							e.sOption=[];
 							res.data.data.forEach((j)=>{
-								self.specifications[1].sOption.push({value:j.attrValueId,label:j.attrValueName})
+								e.sOption.push({value:j.attrValueId,label:j.attrValueName,status:j.status})
 							})
-						
+							
 						}
 					})
-				}
-				if(this.specifications[0]){
-					
-					this.specOption.forEach((e)=>{
-						if(e.value == this.specifications[0].value){
-							this.tableHead[0].name = e.label;
-							this.tableDataCs.forEach((j)=>{
-								j.idOne = e.value;
-							})
-						}
-					})
-					this.axios.post('/webShop/selectANV', this.qs.stringify({
-						attrNameId:this.specifications[0].value
-					}), {
-						headers: {
-							'Content-Type': 'application/x-www-form-urlencoded'
-						}
-					}).then(function(res){
-						if(res.data.code == 1){
-							self.specifications[0].sOption=[];
-							res.data.data.forEach((j)=>{
-								self.specifications[0].sOption.push({value:j.attrValueId,label:j.attrValueName})
-							})
-						
-						}
-					})
-				}
+			
+		
 				
 			},
 			//table
@@ -911,413 +954,57 @@
 					return 'active-table'
 				}
 			},
-			kucunInput(tbData){ //库存输入
+			kucunInput(tbData,attrName,navInput){ //库存输入
 				let self = this;
-				let kcData = [];
-				let kcDataTwo = [];
 				let re = /^[0-9]+.?[0-9]*/;
-				
 				if(!re.test(this.navKuncun)){
-					if(this.navKuncun.length==1)
+					if(this[navInput].length==1)
 					{
-						this.navKuncun = this.navKuncun.replace(/[^1-9]/g,'')
+						this[navInput] = this[navInput].replace(/[^1-9]/g,'')
 					}else{
-						this.navKuncun = this.navKuncun.replace(/\D/g,'')
+						this[navInput] = this[navInput].replace(/\D/g,'')
 					}
 				}else if(this.specifications.length>0){
 					
-					if(this.navOneData === '全部'&&this.navTwoData !== '全部'){
+					if(this.navData[0] === '全部'&&this.navData[1] !== '全部'){
 						
-							if(this.specifications[0]){
-								if(this.specifications[0].guigeName.length>0){
-									kcData = this.specifications[0].guigeName
-									kcData.forEach((e)=>{
-										e.kucun = Math.floor(this.navKuncun * 100) / 100;
-									})
-								}
-								
-							}
 							if(this.specifications[1]){
 								if(this.specifications[1].guigeName.length>0){
-									kcDataTwo = this.specifications[1].guigeName;
-									kcDataTwo.forEach((e)=>{
-										if(e.name === this.navTwoData){
-											e.kucun = Math.floor(this.navKuncun * 100) / 100;
-										}
+									this.tableDataCs.forEach((e)=>{
+											if(e.idTwo==this.navData[1]){
+												e[attrName] = Math.floor(this[navInput] * 100) / 100;
+											}
+											
 									})
 								}
-								
 							}
-					}else if(this.navOneData === '全部'&&this.navTwoData === '全部'){
+					}else if(this.navData[0] === '全部'&&this.navData[1] === '全部'){
 						
-						if(this.specifications[0].guigeName.length>0 && this.specifications[1] == undefined){
+						if(this.specifications){
 							
-							kcData = this.specifications[0].guigeName
-							kcData.forEach((e)=>{
-								e.kucun = Math.floor(this.navKuncun * 100) / 100;
+							this.tableDataCs.forEach((e)=>{
+									e[attrName] = Math.floor(this[navInput] * 100) / 100;
 							})
 							
-						}else if(this.specifications[0].guigeName.length>0 && this.specifications[1].guigeName.length == 0){
-							kcData = this.specifications[0].guigeName
-							kcData.forEach((e)=>{
-								e.kucun = Math.floor(this.navKuncun * 100) / 100;
-							})
-						}else if(this.specifications[0].guigeName.length>0 && this.specifications[1].guigeName.length>0){
-							tbData.forEach((e)=>{
-								e.kucun = Math.floor(this.navKuncun * 100) / 100;
-							})
 						}
-						
 							
-					}else if(this.navOneData !== '全部'&&this.navTwoData === '全部'){
+					}else if(this.navData[0]!== '全部'&&this.navData[1] === '全部'){
 							
-							if(this.specifications[1]){
-								if(this.specifications[1].guigeName.length>0){
-									kcData = this.specifications[1].guigeName
-									kcData.forEach((e)=>{
-										e.kucun = Math.floor(this.navKuncun * 100) / 100;
-									})
-								}
-								
-							}
-							if(this.specifications[0].guigeName.length>0){
-								
-								kcDataTwo  = this.specifications[0].guigeName
-								kcDataTwo .forEach((e)=>{
-									if(e.name === this.navOneData){
-										e.kucun = Math.floor(this.navKuncun * 100) / 100;
+							this.tableDataCs.forEach((e)=>{
+									if(e.idOne==this.navData[0]){
+										e[attrName] = Math.floor(this[navInput] * 100) / 100;
 									}
-								})
-							}
+									
+							})
 					}else{
-						
-						if(this.specifications[1].guigeName.length>0){
-							kcData = this.specifications[1].guigeName
-							kcData.forEach((e)=>{
-								if(e.name === this.navTwoData){
-									e.kucun = Math.floor(this.navKuncun * 100) / 100;
+						this.tableDataCs.forEach((e)=>{
+								if(e.idOne==this.navData[0]&&e.idTwo==this.navData[1]){
+									e[attrName] = Math.floor(this[navInput] * 100) / 100;
 								}
-							})
-						}
-						if(this.specifications[0].guigeName.length>0){
-							kcDataTwo  = this.specifications[0].guigeName
-							kcDataTwo.forEach((e)=>{
-								if(e.name === this.navOneData){
-									e.kucun = Math.floor(this.navKuncun * 100) / 100;
-								}
-							})
-						}
-						
+						})
 					}
 				}
 			
-			},
-			chengbenInput(tbData){ //成本输入
-				let self = this;
-				let kcData = [];
-				let kcDataTwo = [];
-				let re = /^[0-9]+.?[0-9]*/;
-				
-				if(!re.test(this.navChengben)){
-					if(this.navChengben.length==1)
-					{
-						this.navChengben = this.navChengben.replace(/[^1-9]/g,'')
-					}else{
-						this.navChengben = this.navChengben.replace(/\D/g,'')
-					}
-				}else if(this.specifications.length>0){
-					
-					if(this.navOneData === '全部'&&this.navTwoData !== '全部'){
-						
-							if(this.specifications[0]){
-								if(this.specifications[0].guigeName.length>0){
-									kcData = this.specifications[0].guigeName
-									kcData.forEach((e)=>{
-										e.chengbenjia= Math.floor(this.navChengben * 100) / 100;
-									})
-								}
-								
-							}
-							if(this.specifications[1]){
-								if(this.specifications[1].guigeName.length>0){
-									kcDataTwo = this.specifications[1].guigeName;
-									kcDataTwo.forEach((e)=>{
-										if(e.name === this.navTwoData){
-											e.chengbenjia= Math.floor(this.navChengben * 100) / 100;
-										}
-									})
-								}
-							}
-					}else if(this.navOneData === '全部'&&this.navTwoData === '全部'){
-						
-						if(this.specifications[0].guigeName.length>0 && this.specifications[1] == undefined){
-							
-							kcData = this.specifications[0].guigeName
-							kcData.forEach((e)=>{
-								e.chengbenjia= Math.floor(this.navChengben * 100) / 100;
-							})
-							
-						}else if(this.specifications[0].guigeName.length>0 && this.specifications[1].guigeName.length == 0){
-							kcData = this.specifications[0].guigeName
-							kcData.forEach((e)=>{
-								e.chengbenjia= Math.floor(this.navChengben * 100) / 100;
-							})
-						}else if(this.specifications[0].guigeName.length>0 && this.specifications[1].guigeName.length>0){
-							tbData.forEach((e)=>{
-								e.chengbenjia= Math.floor(this.navChengben * 100) / 100;
-							})
-						}
-						
-							
-					}else if(this.navOneData !== '全部'&&this.navTwoData === '全部'){
-						
-							if(this.specifications[1]){
-								if(this.specifications[1].guigeName.length>0){
-									kcData = this.specifications[1].guigeName
-									kcData.forEach((e)=>{
-										e.chengbenjia= Math.floor(this.navChengben * 100) / 100;
-									})
-								}
-								
-							}
-							if(this.specifications[0]){
-								if(this.specifications[0].guigeName.length>0){
-									kcDataTwo  = this.specifications[0].guigeName
-									kcDataTwo .forEach((e)=>{
-										if(e.name === this.navOneData){
-											e.chengbenjia= Math.floor(this.navChengben * 100) / 100;
-										}
-									})
-								}
-								
-							}
-					}else{
-						
-						if(this.specifications[1].guigeName.length>0){
-							kcData = this.specifications[1].guigeName
-							kcData.forEach((e)=>{
-								if(e.name === this.navTwoData){
-									e.chengbenjia= Math.floor(this.navChengben * 100) / 100;
-								}
-							})
-						}
-						if(this.specifications[0].guigeName.length>0){
-							kcDataTwo  = this.specifications[0].guigeName
-							kcDataTwo.forEach((e)=>{
-								if(e.name === this.navOneData){
-									e.chengbenjia= Math.floor(this.navChengben * 100) / 100;
-								}
-							})
-						}
-						
-					}
-				}
-			
-			},
-			xiaoshouInput(tbData){ //销售价输入
-				let self = this;
-				let kcData = [];
-				let kcDataTwo = [];
-				let re = /^[0-9]+.?[0-9]*/;
-				
-				if(!re.test(this.navXiaoshou)){
-					if(this.navXiaoshou.length==1)
-					{
-						this.navXiaoshou = this.navXiaoshou.replace(/[^1-9]/g,'')
-					}else{
-						this.navXiaoshou = this.navXiaoshou.replace(/\D/g,'')
-					}
-				}else if(this.specifications.length>0){
-					
-					if(this.navOneData === '全部'&&this.navTwoData !== '全部'){
-						
-							if(this.specifications[0]){
-								if(this.specifications[0].guigeName.length>0){
-									kcData = this.specifications[0].guigeName
-									kcData.forEach((e)=>{
-										e.xiaoshoujia= Math.floor(this.navXiaoshou * 100) / 100;
-									})
-								}
-								
-							}
-							if(this.specifications[1]){
-								if(this.specifications[1].guigeName.length>0){
-									kcDataTwo = this.specifications[1].guigeName;
-									kcDataTwo.forEach((e)=>{
-										if(e.name === this.navTwoData){
-											e.xiaoshoujia= Math.floor(this.navXiaoshou * 100) / 100;
-										}
-									})
-								}
-								
-							}
-					}else if(this.navOneData === '全部'&&this.navTwoData === '全部'){
-						
-						if(this.specifications[0].guigeName.length>0 && this.specifications[1] == undefined){
-							
-							kcData = this.specifications[0].guigeName
-							kcData.forEach((e)=>{
-								e.xiaoshoujia= Math.floor(this.navXiaoshou * 100) / 100;
-							})
-							
-						}else if(this.specifications[0].guigeName.length>0 && this.specifications[1].guigeName.length == 0){
-							kcData = this.specifications[0].guigeName
-							kcData.forEach((e)=>{
-								e.xiaoshoujia= Math.floor(this.navXiaoshou * 100) / 100;
-							})
-						}else if(this.specifications[0].guigeName.length>0 && this.specifications[1].guigeName.length>0){
-							tbData.forEach((e)=>{
-								e.xiaoshoujia= Math.floor(this.navXiaoshou * 100) / 100;
-							})
-						}
-						
-							
-					}else if(this.navOneData !== '全部'&&this.navTwoData === '全部'){
-						
-							if(this.specifications[1]){
-								if(this.specifications[1].guigeName.length>0){
-									kcData = this.specifications[1].guigeName
-									kcData.forEach((e)=>{
-										e.xiaoshoujia= Math.floor(this.navXiaoshou * 100) / 100;
-									})
-								}
-								
-							}
-							if(this.specifications[0]){
-								if(this.specifications[0].guigeName.length>0){
-									kcDataTwo  = this.specifications[0].guigeName
-									kcDataTwo .forEach((e)=>{
-										if(e.name === this.navOneData){
-											e.xiaoshoujia= Math.floor(this.navXiaoshou * 100) / 100;
-										}
-									})
-								}
-								
-							}
-					}else{
-						
-						if(this.specifications[1].guigeName.length>0){
-							kcData = this.specifications[1].guigeName
-							kcData.forEach((e)=>{
-								if(e.name === this.navTwoData){
-									e.xiaoshoujia= Math.floor(this.navXiaoshou * 100) / 100;
-								}
-							})
-						}
-						if(this.specifications[0].guigeName.length>0){
-							kcDataTwo  = this.specifications[0].guigeName
-							kcDataTwo.forEach((e)=>{
-								if(e.name === this.navOneData){
-									e.xiaoshoujia= Math.floor(this.navXiaoshou * 100) / 100;
-								}
-							})
-						}
-						
-					}
-				}
-			
-			},
-			kgInput(tbData){
-				let self = this;
-				let kcData = [];
-				let kcDataTwo = [];
-				let re = /^[0-9]+.?[0-9]*/;
-				
-				if(!re.test(this.navKg)){
-					if(this.navKg.length==1)
-					{
-						this.navKg = this.navKg.replace(/[^1-9]/g,'')
-					}else{
-						this.navKg = this.navKg.replace(/\D/g,'')
-					}
-				}else if(this.specifications.length>0){
-					
-					if(this.navOneData === '全部'&&this.navTwoData !== '全部'){
-						
-							if(this.specifications[0]){
-								if(this.specifications[0].guigeName.length>0){
-									kcData = this.specifications[0].guigeName
-									kcData.forEach((e)=>{
-										e.kg = Math.floor(this.navKg * 100) / 100;
-									})
-								}
-								
-							}
-							if(this.specifications[1]){
-								if(this.specifications[1].guigeName.length>0){
-									kcDataTwo = this.specifications[1].guigeName;
-									kcDataTwo.forEach((e)=>{
-										if(e.name === this.navTwoData){
-											e.kg= Math.floor(this.navKg * 100) / 100;
-										}
-									})
-								}
-								
-							}
-					}else if(this.navOneData === '全部'&&this.navTwoData === '全部'){
-						
-						if(this.specifications[0].guigeName.length>0 && this.specifications[1] == undefined){
-							
-							kcData = this.specifications[0].guigeName
-							kcData.forEach((e)=>{
-								e.kg= Math.floor(this.navKg * 100) / 100;
-							})
-							
-						}else if(this.specifications[0].guigeName.length>0 && this.specifications[1].guigeName.length == 0){
-							kcData = this.specifications[0].guigeName
-							kcData.forEach((e)=>{
-								e.kg= Math.floor(this.navKg * 100) / 100;
-							})
-						}else if(this.specifications[0].guigeName.length>0 && this.specifications[1].guigeName.length>0){
-							tbData.forEach((e)=>{
-								e.kg= Math.floor(this.navKg * 100) / 100;
-							})
-						}
-						
-							
-					}else if(this.navOneData !== '全部'&&this.navTwoData === '全部'){
-						
-							if(this.specifications[1]){
-								if(this.specifications[1].guigeName.length>0){
-									kcData = this.specifications[1].guigeName
-									kcData.forEach((e)=>{
-										e.kg= Math.floor(this.navKg * 100) / 100;
-									})
-								}
-								
-							}
-							if(this.specifications[0]){
-								if(this.specifications[0].guigeName.length>0){
-									kcDataTwo  = this.specifications[0].guigeName
-									kcDataTwo .forEach((e)=>{
-										if(e.name === this.navOneData){
-											e.kg= Math.floor(this.navKg * 100) / 100;
-										}
-									})
-								}
-								
-							}
-					}else{
-						
-						if(this.specifications[1].guigeName.length>0){
-							kcData = this.specifications[1].guigeName
-							kcData.forEach((e)=>{
-								if(e.name === this.navTwoData){
-									e.kg= Math.floor(this.navKg * 100) / 100;
-								}
-							})
-						}
-						if(this.specifications[0].guigeName.length>0){
-							kcDataTwo  = this.specifications[0].guigeName
-							kcDataTwo.forEach((e)=>{
-								if(e.name === this.navOneData){
-									e.kg= Math.floor(this.navKg * 100) / 100;
-								}
-							})
-						}
-						
-					}
-				}
 			},
 			handleTablePic(res,file,fileList,e){ //表格图片上传
 				
