@@ -13,6 +13,33 @@
 				</div>
 			</li>
 			<li class="clearfloat">
+				<p class="list_l">商品品牌<span>*</span></p>
+				<div class="list_r">
+					<el-select class="h32 goodsBrand" v-model="goodsBrandId" filterable placeholder="请选择">
+						<el-option
+							v-for="item in goodsBrand"
+							:key="item.brandId"
+							:label="item.brandName"
+							:value="item.brandId">
+						</el-option>
+					</el-select>
+				</div>
+			</li>
+			<li class="clearfloat" v-if="goodsAttr.goodsAttrData.length>0">
+				<p class="list_l">商品属性<span>*</span></p>
+				<div class="list_r goods_attr_box">
+						
+						<el-select class="h32" v-model="goodsAttr.goodsAttrId[index].avId" :placeholder="item[0].avName" :key="index" v-for="(item,index) in goodsAttr.goodsAttrData">
+								<el-option
+									v-for="(i,j) in item"
+									:key="i.avId"
+									:label="i.avName"
+									:value="i.avId">
+								</el-option>
+						</el-select>
+				</div>
+			</li>
+			<li class="clearfloat">
 				<p class="list_l">商品名称<span>*</span></p>
 				<div class="list_r">
 					<el-input class="goodsNameInput h32" v-model="goodsNameInput" maxlength="30" placeholder="请输入内容"></el-input>
@@ -128,7 +155,8 @@
 						</el-row>
 					</div>
 					<div class="stock-table" v-show="true">
-						<el-table :data="tableDataCs" :span-method="objectSpanMethod" :row-class-name="tableRowClassName" border style="width: 100%" cell-mouse-enter="tableHover">
+						<el-table :data="tableDataCs" :span-method="objectSpanMethod" :row-class-name="tableRowClassName"
+						 border style="width: 100%" cell-mouse-enter="tableHover">
 						    <el-table-column
 								v-if="specifications[0]"
 							    prop="specOne"
@@ -147,8 +175,8 @@
 								label="库存*"
 								width="100">
 								<template slot-scope="scope">
-									
-									<input maxlength="10" type="text" @change="inputEvent(scope.row)"  v-model="scope.row.kucun" />
+									<div>{{scope.row.kucun}}</div>
+									<input maxlength="10" v-on:keyup="inputChange(scope.row)" type="text"  v-model="scope.row.kucun" />
 								</template>
 							</el-table-column>
 							<el-table-column
@@ -156,7 +184,7 @@
 								label="销售价"
 								width="100">
 								<template slot-scope="scope">
-									<input maxlength="10" type="text" @change="xiaoshouReg(scope.row)" v-model="scope.row.sellPrice" />
+									<input maxlength="10" type="text" v-model="scope.row.sellPrice" />
 									
 								</template>
 							</el-table-column>
@@ -165,7 +193,7 @@
 								label="成本价"
 								width="100">
 								<template  slot-scope="scope">
-									<input maxlength="10" type="text" @change="chengbenReg(scope.row)"  v-model="scope.row.cost" />
+									<input maxlength="10" type="text"   v-model="scope.row.cost" />
 								</template>
 							</el-table-column>
 							<el-table-column
@@ -173,7 +201,7 @@
 								label="重量"
 								width="100">
 								<template  slot-scope="scope">
-									<input maxlength="10" type="text" @change="chengbenReg(scope.row)"  v-model="scope.row.kg" />
+									<input maxlength="10" type="text"  v-model="scope.row.kg" />
 								</template>
 							</el-table-column>
 							<el-table-column
@@ -181,7 +209,7 @@
 								label="sku编码"
 								width="100">
 								<template slot-scope="scope">
-									<input @change="validateReg(scope.row)" maxlength="10" type="text"  v-model="scope.row.sku" />
+									<input maxlength="10" type="text"  v-model="scope.row.sku" />
 								</template>
 							</el-table-column>
 							<el-table-column
@@ -437,8 +465,13 @@
 				},
 				sendTime:'30分钟',//发送时间数据
 				certified:'正品保证',//正品保证数据
-				clearAllOne:'',
-				clearAllTwo:''
+				goodsBrand:[],//商品品牌
+				goodsBrandId:'',//商品品牌Id
+				goodsAttr:{	//商品属性
+					goodsAttrData:[],
+					goodsAttrId:[]//储存当前属性数据
+				},
+				value:''
 			};
 		},
 		computed: {
@@ -517,7 +550,17 @@
 					return num;
 				}
 			},
-		
+			goodsAttrId(){
+				let arr =[];
+				this.goodsAttr.goodsAttrData.forEach((e)=>{
+					e.forEach((j)=>{
+						if(j.status == 1){
+							arr.push(j)
+						}
+					})
+				})
+				return arr;
+			}
 
 			
 		},
@@ -526,6 +569,16 @@
 			this.getGoodsClass();
 		},
 		methods: {
+			inputChange(value){
+				// console.log(this.tableDataCs)
+				let reg = /^\d+\.?\d{0,2}$/
+				
+				if(!reg.test(value['kucun'])){
+					value['kucun'] = ''
+				}
+				
+			
+			},
 			searchChange(j,e){
 				  e.guigeName=[];
 					
@@ -661,9 +714,46 @@
 						});
 					}
 				})
-			},
-			//商品分类回调
-			handleChange(value) {
+			},			
+			handleChange(value) { //商品分类回调并
+				let self = this;
+				console.log(value)
+				self.axios.post('/webShop/selectSortBrandAll',self.qs.stringify({//初始化商品品牌数据
+					sortId:value[1],
+				}), {
+					headers: {
+						'Content-Type': 'application/x-www-form-urlencoded'
+					}
+				}).then(function(res){
+					if(res.data.code == 1){
+						if(res.data.data.length>1){
+							self.goodsBrand = res.data.data;
+						}else{
+							self.goodsBrand = [];
+							self.goodsBrandId = '';
+						}
+					}else{
+						self.$message.error(res.data.msg);
+					}
+				});
+				
+				self.axios.post('/selectSortAttrNameValues',self.qs.stringify({//初始化商品属性
+					sortId:value[2],
+				}), {
+					headers: {
+						'Content-Type': 'application/x-www-form-urlencoded'
+					}
+				}).then(function(res){
+					if(res.data.code == 1){
+							res.data.data.forEach((e)=>{
+								self.goodsAttr.goodsAttrId.push({anId:e[0].anId,anName:e[0].anName,avId:''});
+							})
+							self.goodsAttr.goodsAttrData = res.data.data;
+						
+					}else{
+						self.$message.error(res.data.msg);
+					}
+				});
 				
 			},
 			activeChange(val){
@@ -671,7 +761,7 @@
 			},
 			//商品主图上传回调
 			handlePictureCardPreview(response, file, fileList) {
-				console.log(this.goodsClassData)
+				console.log(this.goodsAttr.goodsAttrId)
 				this.goodsMainList.push({
 					imgId:file.response.data.imgId,
 					imgUrl:file.response.data.imgAddr
@@ -1048,14 +1138,10 @@
 			},
 			inputEvent(e){
 				//库存判断
-				var re = /^[0-9]+.?[0-9]*/;
+				var re = /^\d+\.?\d{0,2}$/;
 				if(!re.test(e.kucun)){
-					if(e.kucun.length==1)
-					{
-						e.kucun=e.kucun.replace(/[^1-9]/g,'')
-					}else{
-						e.kucun=e.kucun.replace(/\D/g,'')
-					}
+					e.kucun = '';
+					alert(1)
 				}else{
 					e.kucun = Math.floor(e.kucun * 100) / 100;
 				}
@@ -1168,7 +1254,12 @@
 					}
 
 				}
-
+				.goods_attr_box{
+					.el-select{
+						margin-right: 10px;
+						width: 150px;
+					}
+				}
 				.list_r {
 					float: left;
 					margin-left: 24px;
@@ -1206,7 +1297,9 @@
 					.goodsClass {
 						width: 420px;
 					}
-
+					.goodsBrand{
+						width: 420px;
+					}
 					.goodsNameInput {
 						width: 600px;
 						font-size: 16px;
@@ -1328,8 +1421,10 @@
 
 								.input-guige {
 
-									span {
+									.add{
 										font-size: 14px;
+										color:#FF523D;
+										margin-left: 5px;
 									}
 									.searchOptInput{
 										margin-top: 10px;
@@ -1351,7 +1446,7 @@
 										margin-right: 5px;
 										margin-bottom: 5px;
 										position: relative;
-
+										
 										i {
 											position: absolute;
 											right: -5px;

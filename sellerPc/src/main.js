@@ -14,6 +14,7 @@ import axios from 'axios'
 import Qs from 'qs'
 
 
+
 Vue.component('v-distpicker', VDistpicker)//全局注册省市选择器组件
 Vue.use(ElementUI)
 Vue.use(AMap)
