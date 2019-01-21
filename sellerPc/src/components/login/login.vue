@@ -375,7 +375,7 @@
 								loading.close();
 								self.$message({
 									showClose: true,
-									message:'修改',
+									message:'修改成功',
 									type: 'success',
 								});
 							}, 2000);

@@ -5,7 +5,7 @@
 			<div class="query_goods_class">
 				<span class="query_title">商品分类</span>
 				<el-cascader
-					:options="goodsClassOption"
+					:options="goodsClassData"
 					v-model="selectGoodsClass">
 				</el-cascader>
 			</div>
@@ -29,103 +29,92 @@
 				<span class="query_line">—</span>
 				<el-input v-model="kucun.max"></el-input>
 			</div>
+			<div class="query_goods_class search_btn">
+				<el-button icon="el-icon-search" round>查询</el-button>
+			</div>
 		</div>
 		<div class="sales_table">
 			<div class="sales_table_nav">
-				<span>全部</span>
-				<span>在售中</span>
-				<span>已售罄</span>
-				<span>已下架</span>
-				<span>草稿中</span>
+				<span @click="updateTable(index)" :class="{active:index == selectNum}" :key="index" v-for="(item,index) in tableNavData">{{item.name}}</span>
 			</div>
-			<el-tabs type="border-card">
-				  <el-tab-pane>
-					<span slot="label">全部</span>
-					<el-table
-						ref="multipleTable"
-						:data="tableData"
-						style="width: 100%"
-						:default-sort = "{prop: 'date', order: 'descending'}"
-						@selection-change="handleSelectionChange">
-						<el-table-column
-							type="selection"
-							width="55">
-						</el-table-column>
-						<el-table-column
-							prop="bianma"
-							label="商品编码"
-							width="100">
-							
-						</el-table-column>
-						<el-table-column
-							prop="img"
-							label="商品图片">
-							<template slot-scope="scope">
-								<img class="table_img" :src="scope.row.img" alt="">
-							</template>
-						</el-table-column>
-						<el-table-column
-							prop="name"
-							label="商品名称"
-							width="390">
-						</el-table-column>
-						<el-table-column
-							prop="price"
-							width="100"
-							label="销售价格"
-							sortable>
-						</el-table-column>
-						<el-table-column
-							prop="kucun"
-							label="库存数量"
-							width="100"
-							sortable>
-						</el-table-column>
-						<el-table-column
-							prop="saleCount"
-							label="累计销售"
-							width="100"
-							sortable>
-						</el-table-column>
-						<el-table-column
-							prop="saleState"
-							label="销售状态">
-						</el-table-column>
-						<el-table-column
-							label="编辑"
-							width="250">
-							<template slot-scope="scope">
-								<div class="edite">
-									<span>编辑</span>
-									<span>下架</span>
-									<span @click="share">分享商品</span>
-									<span @click="overhead">
-										置顶商品
-									</span>
-									
-								</div>
-							</template>
-						</el-table-column>
-					</el-table>
-					<div class="flex_r_f_s table_btom">
-						<div>
-							<el-button round>下架</el-button>
-							<el-button round @click="deleteTable">删除</el-button>
-						</div>
-						<el-pagination
-							layout="prev, pager, next"
-							:total="55">
-						</el-pagination>
-					</div>
-				  </el-tab-pane>
-				  <el-tab-pane label="在售中">在售中</el-tab-pane>
-				  <el-tab-pane label="已售罄">已售罄</el-tab-pane>
-				  <el-tab-pane label="已下架">已下架</el-tab-pane>
-				  <el-tab-pane label="草稿中">草稿中</el-tab-pane>
-
-			</el-tabs>
-		
 			
+				  <el-table
+				  	ref="multipleTable"
+				  	:data="tableData"
+				  	style="width: 100%"
+				  	:default-sort = "{prop: 'date', order: 'descending'}"
+				  	@selection-change="handleSelectionChange">
+				  	<el-table-column
+				  		type="selection"
+				  		width="55">
+				  	</el-table-column>
+				  	<el-table-column
+				  		prop="bianma"
+				  		label="商品编码"
+				  		width="100">
+				  		
+				  	</el-table-column>
+				  	<el-table-column
+				  		prop="img"
+				  		label="商品图片">
+				  		<template slot-scope="scope">
+				  			<img class="table_img" :src="scope.row.img" alt="">
+				  		</template>
+				  	</el-table-column>
+				  	<el-table-column
+				  		prop="name"
+				  		label="商品名称"
+				  		width="390">
+				  	</el-table-column>
+				  	<el-table-column
+				  		prop="price"
+				  		width="100"
+				  		label="销售价格"
+				  		sortable>
+				  	</el-table-column>
+				  	<el-table-column
+				  		prop="kucun"
+				  		label="库存数量"
+				  		width="100"
+				  		sortable>
+				  	</el-table-column>
+				  	<el-table-column
+				  		prop="saleCount"
+				  		label="累计销售"
+				  		width="100"
+				  		sortable>
+				  	</el-table-column>
+				  	<el-table-column
+				  		prop="saleState"
+				  		label="销售状态">
+				  	</el-table-column>
+				  	<el-table-column
+				  		label="编辑"
+				  		width="250">
+				  		<template slot-scope="scope">
+				  			<div class="edite">
+				  				<span>编辑</span>
+				  				<span>下架</span>
+				  				<span @click="share">分享商品</span>
+				  				<span @click="overhead">
+				  					置顶商品
+				  				</span>
+				  				
+				  			</div>
+				  		</template>
+				  	</el-table-column>
+				  </el-table>
+				  <div class="flex_r_f_s table_btom">
+				  	<div>
+				  		<el-button round>下架</el-button>
+				  		<el-button round @click="deleteTable">删除</el-button>
+				  	</div>
+				  	<el-pagination
+				  		layout="prev, pager, next"
+				  		:total="55">
+				  	</el-pagination>
+				  </div>
+		
 		</div>
 		<div class="modal" v-if="modal">
 			<div class="modal_cnt">
@@ -182,73 +171,11 @@
 		data() {
 			return {
 				selectGoodsClass:[],//商品分类选择数据
-				goodsClassOption:[
-					{
-						value:'猫猫专区',
-						label:'猫猫专区',
-						children:[{
-							value:'猫猫主粮',
-							label:'猫猫零食',
-							children:[{
-								value:'进口零食',
-								label:'进口零食'
-							},{
-								value:'国产零食',
-								label:'国产零食'
-							},{
-								value:'功能零食',
-								label:'功能零食'
-							}]
-						},{
-							value:'猫猫主粮',
-							label:'猫猫零食',
-							children:[{
-								value:'进口零食',
-								label:'进口零食'
-							},{
-								value:'国产零食',
-								label:'国产零食'
-							},{
-								value:'功能零食',
-								label:'功能零食'
-							}]
-						}]
-					},{
-						value:'狗狗专区',
-						label:'狗狗专区',
-						children:[{
-							value:'狗狗主粮',
-							label:'狗狗零食',
-							children:[{
-								value:'进口零食',
-								label:'进口零食'
-							},{
-								value:'国产零食',
-								label:'国产零食'
-							},{
-								value:'功能零食',
-								label:'功能零食'
-							}]
-						},{
-							value:'猫猫主粮',
-							label:'猫猫零食',
-							children:[{
-								value:'进口零食',
-								label:'进口零食'
-							},{
-								value:'国产零食',
-								label:'国产零食'
-							},{
-								value:'功能零食',
-								label:'功能零食'
-							}]
-						}]
-					}
-					
-				],
 				goodsNum:'',//商品编码
 				goodsName:'',//商品名称
 				modal:false,
+				goodsClassData:[],//商品分类
+				selectNum:0,
 				xiaoliang:{ //销量
 					max:'',
 					min:''
@@ -285,12 +212,17 @@
 					saleState:'在售',
 					operation:''
 				}],
+				tableNavData:[{name:'全部',status:''},{name:'在售中',status:''},{name:'已售罄',status:''},{name:'已下架',status:''},{name:'草稿中',status:''}],
 				selectTable:[],
 				selectAll:false,
 				sort:[1,2,3,4,5],
 				sortNum:0,//排序数据
 				sortState:false,//数据排序状态
 			};
+		},
+		mounted:function(){
+			this.$store.commit('initialNav',{navNum:1,subNum:1});
+			this.getGoodsClass();
 		},
 		methods: {
 			handleSelectionChange(val){
@@ -355,7 +287,70 @@
 			},
 			cancelSortState(){
 				this.sortState = false;
-			}
+			},
+			updateTable(index){
+				this.selectNum = index;
+				
+			},
+			getGoodsClass(){//初始化商品分类
+				
+				let self = this;
+				this.axios.post('/selectGroupAll',{
+					headers: { //经营品类
+						'Content-Type': 'application/x-www-form-urlencoded',
+					}
+				}).then(function(res){
+					if(res.data.code == 1){
+						res.data.data.forEach(function(e){
+							let obj = {label:'',value:'',children:[]};
+							obj.label = e.name;
+							obj.value = e.id;
+							self.axios.post('/selectGSortOne',self.qs.stringify({gIds:obj.value}),{
+								headers: { //经营品类
+									'Content-Type': 'application/x-www-form-urlencoded',
+								}
+							}).then(function(subres){
+								
+								if(subres.data.code == 1){
+									
+									
+									subres.data.data[0].forEach(function(s){//二级分类回调
+									
+										let childrenObj = {lable:'',value:'',children:[]};
+										childrenObj.label = s.sortName;
+										childrenObj.value = s.sortId;
+										self.axios.post('/selectSortTwo',self.qs.stringify({sortIds:childrenObj.value}),{
+											headers: { //经营品类
+												'Content-Type': 'application/x-www-form-urlencoded',
+											}
+										}).then(function(gs){
+											
+											if(gs.data.code == 1){ //三级分类回调
+												gs.data.data[0].forEach(function(g){
+													
+													childrenObj.children.push({label:g.sortName,value:g.sortId});
+													
+												})
+												
+												
+											}
+										})
+										obj.children.push(childrenObj)
+									})
+								}
+							})
+							self.goodsClassData.push(obj)
+							
+						})
+					}else{
+						this.$message({
+							showClose: true,
+							message:res.data.msg,
+							type: 'error',
+						});
+					}
+				})
+			},	
 				
 		}
 	
@@ -606,6 +601,12 @@
 			.el-input.is-active .el-input__inner, .el-input__inner:focus{
 				border-color: #dcdfe6;
 			}
+			
+			.el-button.is-round{
+				padding: 10px 10px;
+				background: #FF523D;
+				color: #fff;
+			}
 		}
 		.goods_num{
 			.el-input{
@@ -630,7 +631,9 @@
 					cursor:pointer;
 					font-size: 16px;
 				}
-				
+				.active{
+					color: #FF523D;
+				}
 			}
 			.table_btom.flex_r_f_s{
 				justify-content: space-between;

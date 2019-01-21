@@ -32,8 +32,9 @@
 									<ul>
 										<li :class="{active:navIndex == index}" v-for="(item,index) in navData" @click="selectNav(item,index)">
 											<div class="flex_c_f_e pointer">
+												
 												<img :src="item.url" alt="">
-												<p>收银台</p>
+												<p>{{item.navName}}</p>
 											</div>
 											<div class="triangle-right"></div>
 										</li>
@@ -44,9 +45,10 @@
 							</GeminiScrollbar>
 							<div class="nav_right">
 								<ul>
-									<li v-for="(item,index) in subNavData" class="flex_r_f_e">
-										<img :src="item.subIcon" alt="">
-										<router-link to="/home">
+									<li v-for="(item,index) in subNavData" class="flex_r_f_s" @click="subSelect(index)">
+										<img v-if="subNavIndex==index" src="../assets/condition/icon_02.png" alt="">
+										<img v-else :src="item.subIcon" alt="">
+										<router-link :to="{name:item.link}" active-class="active">
 											{{item.subNavName}}
 										</router-link>
 									</li>
@@ -75,33 +77,71 @@
 		data() {
 			return {
 				navData:[{
-					navName:'收银台',url:require('../assets/home/icon_caiwu@2x.png'),subData:[{subNavName:'',subIcon:'',}]
+					navName:'收银台',url:require('../assets/home/icon_shouyin@2x.png'),subData:[{subNavName:'',subIcon:'',}]
 					},{
-					navName:'商品管理',url:require('../assets/home/icon_caiwu@2x.png'),
+					navName:'商品管理',url:require('../assets/home/icon_shangpin@2x.png'),
 					subData:[{
-						subNavName:'新增商品',subIcon:require('../assets/home/icon_fabu@2x.png'),
+						subNavName:'新增商品',
+						subIcon:require('../assets/home/icon_fabu@2x.png'),
+						link:'addGoods'
+						},{
+						subNavName:'未出售商品',
+						subIcon:require('../assets/home/icon_home3.png'),
+						link:'sell'
+						},{
+						subNavName:'未上架商品',
+						subIcon:require('../assets/home/icon_home1.png'),
+						link:''
+						},{
+						subNavName:'草稿箱',
+						subIcon:require('../assets/home/icon_home2.png'),
+						link:''
+						},{
+						subNavName:'商品展示分类',
+						subIcon:require('../assets/home/icon_home5.png'),
+						link:''
+						},{
+						subNavName:'评价管理',
+						subIcon:require('../assets/home/icon_home4.png'),
+						link:''
 						}]	
 					},{
-						navName:'订单管理',url:require('../assets/home/icon_caiwu@2x.png'),subData:[{subNavName:'',subIcon:'',}]
+						navName:'订单管理',url:require('../assets/home/icon_dingdan@2x.png'),subData:[{subNavName:'',subIcon:'',}]
 					},{
-						navName:'客户管理',url:require('../assets/home/icon_caiwu@2x.png'),subData:[{subNavName:'',subIcon:'',}]
+						navName:'客户管理',url:require('../assets/home/icon_kehu@2x.png'),subData:[{subNavName:'',subIcon:'',}]
 					},{
-						navName:'营销推广',url:require('../assets/home/icon_caiwu@2x.png'),subData:[{subNavName:'',subIcon:'',}]
+						navName:'营销推广',url:require('../assets/home/icon_yinxiao@2x.png'),subData:[{subNavName:'',subIcon:'',}]
 					},{
-						navName:'报表中心',url:require('../assets/home/icon_caiwu@2x.png'),subData:[{subNavName:'',subIcon:'',}]
+						navName:'报表中心',url:require('../assets/home/icon_baobiao@2x.png'),subData:[{subNavName:'',subIcon:'',}]
 					},{
-						navName:'设置',url:require('../assets/home/icon_caiwu@2x.png'),subData:[{subNavName:'',subIcon:'',}]
+						navName:'财务管理',url:require('../assets/home/icon_caiwu@2x.png'),subData:[{subNavName:'',subIcon:'',}]
+					},{
+						navName:'消息管理',url:require('../assets/home/icon_xiaoxi@2x.png'),subData:[{subNavName:'',subIcon:'',}]
+					},{
+						navName:'设置',url:require('../assets/home/icon_shezhi@2x.png'),subData:[{subNavName:'',subIcon:'',}]
 					}],
 				subNavData:[],
-				navIndex:1,
+				navIndex:null,
+				subNavIndex:null
 			};
 		},
 		methods: {
 			selectNav(item,index) {
 				this.navIndex = index;
 				this.subNavData = item.subData;
+			},
+			subSelect(index){
+				this.subNavIndex = index;
 			}
 		},
+		mounted(){
+			this.navIndex = this.$store.state.nav.navNum;
+			this.subNavIndex = this.$store.state.nav.subNum;
+			console.log(this.$store.state)
+			this.subNavData = this.navData[this.navIndex].subData;
+		}
+			
+		
 		
 	}
 </script>
@@ -223,8 +263,15 @@
 										vertical-align: center;
 									}
 									a{
-										font-size: 18px;
+										font-size: 16px;
 										color: #333;
+										margin-left: 10px;
+									}
+// 									.router-link-active{
+// 										color: #FF523D;
+// 									}
+									.active{
+										color: #FF523D;
 									}
 								}
 							}
@@ -244,6 +291,7 @@
 							.nav_left{
 								width: 110px;
 								background: #434343;
+								
 								ul{
 									li{
 										height: 90px;
