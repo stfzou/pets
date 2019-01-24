@@ -89,9 +89,9 @@
 						subIcon:require('../assets/home/icon_home3.png'),
 						link:'sell'
 						},{
-						subNavName:'未上架商品',
+						subNavName:'商品编辑',
 						subIcon:require('../assets/home/icon_home1.png'),
-						link:''
+						link:'goodsEdit'
 						},{
 						subNavName:'草稿箱',
 						subIcon:require('../assets/home/icon_home2.png'),
@@ -137,7 +137,6 @@
 		mounted(){
 			this.navIndex = this.$store.state.nav.navNum;
 			this.subNavIndex = this.$store.state.nav.subNum;
-			console.log(this.$store.state)
 			this.subNavData = this.navData[this.navIndex].subData;
 		}
 			

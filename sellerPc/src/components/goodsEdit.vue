@@ -333,7 +333,7 @@
 						  </el-col>		
 						  <el-col :span="6">
 							  <div class="upload-describe">
-							  	<el-upload class="describe-uploader" ref="uploadDescribe" action="http://192.168.0.109:8084/updateImg" multiple
+							  	<el-upload class="describe-uploader" ref="uploadDescribe" action="http://192.168.0.109:8084/updateImg" multiple :file-list="describeImg"
 							  	:on-success="handleDescribe" :limit="9" list-type="picture" :on-exceed="handleDescribeExceed" name="Img" :before-upload="sizeReg">
 							  	<i class="el-icon-plus"></i>
 							  	</el-upload>
@@ -504,11 +504,11 @@
 					goodsAttrData:[],
 					goodsAttrId:[]//储存当前属性数据
 				},
-				value:'',
 				specStatus:'1',
 				quality:'1',//保质期
 				isQuality:false,
-				guigeList:[]
+				guigeList:[],
+				productId:''//商品Id
 			};
 		},
 		computed: {
@@ -550,6 +550,7 @@
 					return num;
 				}
 			},
+			
 	
 
 			
@@ -558,12 +559,208 @@
 			this.getGoodsSpecName();	
 			this.getGoodsClass();
 			this.$store.commit('initialNav',{navNum:1,subNum:0});
-			
+			this.getEditGoodsType()
 			
 		},
 	
 		methods: {
-			
+			getEditGoodsType(){
+				
+				let self = this;
+				let isPush = true;
+				this.axios.post('/selectShopsProductTips',self.qs.stringify({productId:'37'}),{
+					headers: { //经营品类
+						'Content-Type': 'application/x-www-form-urlencoded',
+					}
+				}).then(function(res){
+					if(res.data.code == 1){
+						let re = res.data.data;
+						//获取商品Id
+						self.productId = re.productId;
+						//获取已选择商品分类
+						self.selectedGoodsClass.push(re.sort.gId);
+						self.selectedGoodsClass.push(re.sort.parentId);
+						self.selectedGoodsClass.push(re.sort.sortId);
+						//获取已选取商品名称
+						self.goodsNameInput = re.productName;
+						re.pImgs.forEach((e)=>{
+							self.goodsMainList.push({
+								imgId:e.imgId,
+								imgUrl:e.imgAddr
+							})
+						})
+						//获取商品规格
+						re.skus[0].anvs.forEach((e)=>{
+							let id = e.anId
+							let obj = {
+								options:self.specOption,
+								value:id,
+								inputVal:'',
+								input: [],//添加的规格属性
+								guigeName: [],
+								sOption:[],
+								tableName:e.anName,
+								clearAll:0,
+							}
+							
+							self.axios.post('/webShop/selectANV', self.qs.stringify({
+								attrNameId:id
+							}), {
+								headers: {
+									'Content-Type': 'application/x-www-form-urlencoded'
+								}
+							}).then(function(res){
+								if(res.data.code == 1){
+									console.log(res)
+									res.data.data.forEach((j)=>{
+										obj.sOption.push({value:j.attrValueId,label:j.attrValueName,status:j.status})
+									})
+								}
+							})
+							self.specifications.push(obj)
+							
+						});
+						
+						if(self.specifications.length>0){
+							re.skus.forEach((e)=>{
+								e.anvs.forEach((j)=>{
+									self.specifications.forEach((s)=>{
+										// s.value = j.anId
+										if(j.anId == s.value&&s.input.indexOf(j.avId)<0){
+											s.input.push(j.avId);
+											if(j.avStatus == 0){
+												s.sOption.push({value:j.avId,label:j.avName,status:j.avStatus})
+											}
+										}
+										
+									})
+									
+								})
+								
+								if(self.specifications.length==2){
+									self.guigeList.push({
+										idS1:e.anvs[0].anId,idS2:e.anvs[1].anId,idOne:e.anvs[0].avId,idTwo:e.anvs[1].avId,
+										specOne:e.anvs[0].avName,specTwo:e.anvs[1].avName,kucun:e.skuPNum,sellPrice:e.original,
+										cost:e.costPrice,kg:e.productWeight,sku:e.skuCode,yulan:e.skuImgAddr,yulanId:e.skuImgId,flieList:[]
+									})
+								}else if(self.specifications.length==1){
+									self.guigeList.push({
+										idS1:e.anvs[0].anId,idOne:e.anvs[0].avId,
+										specOne:e.anvs[0].avName,kucun:e.skuPNum,sellPrice:e.original,
+										cost:e.costPrice,kg:e.productWeight,sku:e.skuCode,yulan:e.skuImgAddr,yulanId:e.skuImgId,flieList:[]
+									})
+								}
+									
+							})
+							setTimeout(()=>{
+								self.specifications.forEach((e)=>{
+								//{subId:res.data.data.attrValueId,name:res.data.data.attrValueName,parentId:e.value}
+									e.input.forEach((i)=>{
+										let obj = {parentId:e.value,subId:i,name:''}
+										e.sOption.forEach((n)=>{
+											
+											if(n.value == i){
+												obj.name = n.label;
+											}
+										})
+										e.guigeName.push(obj);
+									})
+									
+								})
+								
+							},100)
+						}else{
+							self.noSpecifications = [];
+							self.noSpecifications.push({
+								kucun:re.skus[0].skuPNum,sellPrice:re.skus[0].original,cost:re.skus[0].costPrice,kg:re.skus[0].productWeight,
+								sku:re.skus[0].skuCode,yulan:re.skus[0].skuImgAddr,yulanId:re.skus[0].skuImgId,flieList:[]
+							})
+						}
+						
+						
+						//获取商品品牌
+						self.axios.post('/webShop/selectSortBrandAll',self.qs.stringify({//初始化商品品牌数据
+							sortId:re.sort.parentId,
+						}), {
+							headers: {
+								'Content-Type': 'application/x-www-form-urlencoded'
+							}
+						}).then(function(response){
+							if(response.data.code == 1){
+								if(response.data.data.length>1){
+									self.goodsBrand = response.data.data;
+								}else{
+									self.goodsBrand = [];
+									self.goodsBrandId = '';
+								}
+							}else{
+								self.$message.error(response.data.msg);
+							}
+						});
+						
+						self.goodsBrandId = re.brand.brandId
+						
+						//获取商品属性
+						self.axios.post('/selectSortAttrNameValues',self.qs.stringify({//初始化商品属性
+							sortId:re.sort.sortId,
+						}), {
+							headers: {
+								'Content-Type': 'application/x-www-form-urlencoded'
+							}
+						}).then(function(response){
+							if(response.data.code == 1){
+									self.goodsAttr.goodsAttrData = response.data.data;
+									re.sanv.forEach((e)=>{
+										self.goodsAttr.goodsAttrId.push({anId:e.anId,avId:e.avId});
+									})
+								
+							}else{
+								self.$message.error(response.data.msg);
+							}
+							
+						});
+						
+						//获取描述商品内容
+						if(re.productDesc!=''){
+							self.editData = re.productDesc;
+						}
+						if(re.descImgs.length>0){
+							re.descImgs.forEach((e)=>{
+								self.describeImg.push({
+									imgId:e.imgId,
+									imgUrl:e.imgAddr
+								})
+							})
+						}
+						//获取商品类型
+						self.goodsType = re.productType+'';
+						
+						if(re.productType=='2'){
+							self.isQuality = true;
+							self.quality = re.productTips.keepTime+''
+						}
+						//获取退换货服务
+						self.returnGoods.value = re.productTips.returnService+''
+						
+						//物流费用
+						if(re.productTips.productFare){
+							self.logistics.value = re.productTips.productFare;
+						}
+						if(re.productTips.isShipping == 1){
+							self.logistics.baoyou = true;
+						}else{
+							self.logistics.baoyou = false;
+						}
+						
+						//发货时间承诺
+						self.sendTime = re.productTips.shipTime+''
+					}else{
+						self.$message.error(res.data.msg)
+					}
+				})
+				
+				
+			},
 			sizeReg(file){//检测上传l图片宽高
 				let _this = this; 
 				return new Promise(function(resolve, reject) { 
@@ -754,6 +951,7 @@
 				})
 				
 				this.axios.post('/webShop/editProduct', this.qs.stringify({
+					productId:self.productId,
 					shopId: JSON.parse(sessionStorage.getItem('user')).shopId,
 					sortIds: self.selectedGoodsClass[2],
 					sanv:JSON.stringify(arr2),
@@ -779,6 +977,7 @@
 					}
 				}).then(function(res){
 					if(res.data.code == 1){
+						self.$router.go(0)
 						self.$message({
 							showClose: true,
 							message:'提交成功',
@@ -804,17 +1003,17 @@
 				
 			},
 			searchChange(j,e){
-				  e.guigeName=[];
-					console.log(j)
-					j.forEach((s)=>{
-						e.sOption.forEach((i)=>{
-							if(s==i.value){
-								e.guigeName.push({subId:s,name:i.label,parentId:e.value})
-								this.tbData()
-							}
-						})
+				e.guigeName=[];
+				j.forEach((s)=>{
+					e.sOption.forEach((i)=>{
+						if(s==i.value){
+							e.guigeName.push({subId:s,name:i.label,parentId:e.value})
+							this.tbData()
+							
+						}
 					})
- 			
+				})
+				
 					// console.log(e.input)
 			},
 			removeTag(j,e){
@@ -978,7 +1177,7 @@
 					}else{
 						self.$message.error(res.data.msg);
 					}
-					console.log(self.goodsAttr.goodsAttrId)
+					
 				});
 				
 			},
@@ -987,7 +1186,7 @@
 			},
 			//商品主图上传回调
 			handlePictureCardPreview(response, file, fileList) {
-				
+				console.log(this.goodsAttr.goodsAttrId)
 				this.goodsMainList.push({
 					imgId:file.response.data.imgId,
 					imgUrl:file.response.data.imgAddr
@@ -1386,6 +1585,7 @@
 				this.guigeList = [];
 				if(self.specifications.length>1){
 					self.specifications[0].guigeName.forEach((p)=>{
+						
 						if(self.specifications[1].guigeName){
 							self.specifications[1].guigeName.forEach((s)=>{
 								self.guigeList.push({
@@ -1406,7 +1606,7 @@
 					})
 				}
 			}
-	
+			
 			
 		}
 	}
@@ -1543,7 +1743,7 @@
 									background: rgba(0, 0, 0, 0.5);
 									color: #fff;
 									border-radius: 50%;
-									z-index: 10000;
+									z-index: 100;
 								}
 
 								img {
@@ -1757,7 +1957,7 @@
 								background: rgba(0, 0, 0, 0.5);
 								color: #fff;
 								border-radius: 50%;
-								z-index: 10000;
+								z-index: 100;
 							 }
 						  }
 					}
@@ -1787,7 +1987,6 @@
 								background: rgba(0, 0, 0, 0.5);
 								color: #fff;
 								border-radius: 50%;
-								
 								cursor: pointer;
 							}
 						}

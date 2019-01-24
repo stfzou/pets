@@ -10,6 +10,7 @@ import QualificationsInfo from '@/components/qualificationsInfo'
 import StoreSuccess from '@/components/storeSuccess'
 import AddGoods from '@/components/addGoods'
 import Sell from '@/components/selling'
+import GoodsEdit from '@/components/goodsEdit'
 
 Vue.use(Router)
 
@@ -40,6 +41,10 @@ export default new Router({
 				path:'sell',
 				name:'sell',
 				component:Sell
+			},{
+				path:'goodsEdit',
+				name:'goodsEdit',
+				component:GoodsEdit
 			}]
 		},
 		{
