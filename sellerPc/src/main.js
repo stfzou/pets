@@ -30,10 +30,11 @@ router.beforeEach((to,from,next) => {
 	if(to.name == 'login'){
 		next();
 	}else if(sessionStorage.getItem('user')){
+		
 		next();
+		
 	}else{
 		next('/login');
-
 	}
 	
 })

@@ -27,7 +27,7 @@ export default new Router({
 		},
 		{
 			path: '',
-			redirect: '/home'
+			redirect: '/home/addGoods'
 		},
 		{
 			path: '/home',

@@ -74,7 +74,7 @@
 						<div class="specifications-list" :key="index" v-for="(e,index) in specifications">
 
 							<div class="list-top">
-								<el-select ref="select" v-model="e.value" :value-key="index+''" placeholder="请选择" @change="function(n){
+								<el-select ref="select" v-model="e.value" :value-key="index+''" placeholder="请选择规格名称" @change="function(n){
 										return specSelect(n,e)
 								}">
 									<el-option v-for="item in e.options" :key="item.value" :value="item.value" :label="item.label">
@@ -82,7 +82,7 @@
 								</el-select>
 								<span class="delete pointer" @click="deleteSpecification($event,index)">删除</span>
 							</div>
-							<div class="list-bottom">
+							<div class="list-bottom" v-show="e.value">
 								<div class="input-guige">
 									<el-select
 										v-model="e.input"
@@ -94,7 +94,7 @@
 										}"
 										multiple
 										default-first-option
-										placeholder="请选择文章标签">
+										placeholder="请选择规格属性(可多选)">
 										<el-option
 										  v-for="s in e.sOption"
 										  :key="s.value"
@@ -102,8 +102,8 @@
 										  :value="s.value">
 										</el-option>
 									  </el-select>
-								 <el-input class="searchOptInput" v-model="e.inputVal" maxlength="10" placeholder="请输入内容"></el-input> 
-							<span class="add pointer" @click="addGuigeName(e)">添加</span>
+								 <el-input class="searchOptInput" v-model="e.inputVal" maxlength="10" placeholder="自定义规格属性"></el-input> 
+								<span class="add pointer" @click="addGuigeName(e)">添加</span>
 								</div>
 							</div>
 
@@ -172,7 +172,7 @@
 							</el-table-column>
 							<el-table-column
 								prop="kucun"
-								label="库存*"
+								label="库存"
 								width="100">
 								<template slot-scope="scope">
 								
@@ -198,7 +198,7 @@
 							</el-table-column>
 							<el-table-column
 								prop="kg"
-								label="重量"
+								label="重量(kg)"
 								width="100">
 								<template  slot-scope="scope">
 									<input maxlength="10" v-on:keyup="inputChange(scope.row,'kg')" type="text"  v-model="scope.row.kg" />
@@ -324,23 +324,21 @@
 						v-model="editData">
 					</el-input>
 					<div class="shop_describe_img">
-						<el-row :gutter="20">
-						  <el-col :span="6" v-for="(item,index) in describeImg" :key="index">
-							  <div class="describe_img_box">
-							  	<img :src="item.imgUrl" alt="">
-							  	<i class="el-icon-close" @click="describeImgRemove(index)"></i>
-							  </div>
-						  </el-col>		
-						  <el-col :span="6">
-							  <div class="upload-describe">
-							  	<el-upload class="describe-uploader" ref="uploadDescribe" action="http://192.168.0.109:8084/updateImg" multiple
-							  	:on-success="handleDescribe" :limit="9" list-type="picture" :on-exceed="handleDescribeExceed" name="Img" :before-upload="sizeReg">
-							  	<i class="el-icon-plus"></i>
-							  	</el-upload>
-							  </div>
-						  </el-col>
-						
-						</el-row>
+						<draggable v-model="describeImg"  :options = "{animation:500}">
+							<transition-group>
+									
+									<div class="describe_img_box" v-for="(element,index) in describeImg" :key="element.imgId">
+										<img :src="element.imgUrl" alt="">
+										<i class="el-icon-close" @click="describeImgRemove(index)"></i>
+									</div>
+							</transition-group>
+						</draggable>
+							<div class="upload-describe">
+								<el-upload class="describe-uploader" ref="uploadDescribe" action="http://192.168.0.109:8084/updateImg" multiple :file-list="describeImg"
+								:on-success="handleDescribe" :limit="9" list-type="picture" :on-exceed="handleDescribeExceed" name="Img" :before-upload="sizeReg">
+								<i class="el-icon-plus"></i>
+								</el-upload>
+							</div>
 						
 					</div>
 				</div>
@@ -397,19 +395,19 @@
 				<p class="list_l">配送方式</p>
 				<div class="list_r delivery_mode">
 					<div class="delivery_mode_box">
-						<el-checkbox v-model="deliveryMode.mianfei">支持免费送货上门</el-checkbox>
+						<el-checkbox v-model="deliveryMode.mianfei" disabled>支持免费送货上门</el-checkbox>
 						<span class="tx">（客户单次购买达到一定金额即免费送货上门，详见商家设置>配送方式设置）</span>
 					</div>
 					<div class="delivery_mode_box">
-						<el-checkbox v-model="deliveryMode.ziti">支持客户上门自提</el-checkbox>
+						<el-checkbox v-model="deliveryMode.ziti" disabled>支持客户上门自提</el-checkbox>
 						<span class="tx">（客户可以在营业时间范围内上门自提，详见商家设置>营业时间设置）</span>
 					</div>
 					<div class="delivery_mode_box">
-						<el-checkbox v-model="deliveryMode.tongcheng">支持同城快递发货</el-checkbox>
+						<el-checkbox v-model="deliveryMode.tongcheng" disabled>支持同城快递发货</el-checkbox>
 						<span class="tx">（请正确设置好物流费用，详见商家设置>配送方式设置）</span>
 					</div>
 					<div class="delivery_mode_box">
-						<el-checkbox v-model="deliveryMode.disanfang">可选第三方配送</el-checkbox>
+						<el-checkbox v-model="deliveryMode.disanfang" disabled>可选第三方配送</el-checkbox>
 						<span class="tx">（如蜂鸟配送、闪送等，详见商家设置.配送方式设置）</span>
 					</div>
 				</div>
@@ -444,9 +442,7 @@
 					<span class="tx">（必须支持假一赔十服务）</span>
 				</div>
 			</li>
-			<li>
-				{{guigeList}}
-			</li>
+			
 		</ul>
 		<div class="save_box">
 			<el-button round class="save_btn" @click="commit(0)">保存</el-button>
@@ -457,8 +453,11 @@
 </template>
 
 <script>
-	
+	import draggable from 'vuedraggable'
 	export default {
+		components: {
+			draggable
+		},
 		data() {
 			return {
 				selectedGoodsClass: [],//商家分类数据
@@ -573,7 +572,7 @@
 						image.onload = function () { 
 							var width = this.width; 
 							var height = this.height; 
-							if (width<200||height<100){ 
+							if (width<500||height<500){ 
 								_this.$alert('图片宽高尺寸必须大于500!', '提示', {confirmButtonText: '确定'}); 
 								reject(); 
 							} 
@@ -805,7 +804,6 @@
 			},
 			searchChange(j,e){
 				  e.guigeName=[];
-					console.log(j)
 					j.forEach((s)=>{
 						e.sOption.forEach((i)=>{
 							if(s==i.value){
@@ -814,7 +812,9 @@
 							}
 						})
 					})
- 			
+					if(this.specifications[0].input.length == 0){
+						this.guigeList = [];
+					}
 					// console.log(e.input)
 			},
 			removeTag(j,e){
@@ -838,7 +838,6 @@
 							e.input.forEach((s,i,arr)=>{
 								if(j == s){
 									arr.splice(i,1)
-									e.guigeName.splice(i,1)
 								}
 							});
 							e.sOption.forEach((s,i,arr)=>{
@@ -855,6 +854,8 @@
 					e.input.forEach((s,i,arr)=>{
 						if(j == s){
 							arr.splice(i,1)
+							e.guigeName.splice(i,1)
+							self.tbData();
 						}
 					});
 					console.log('删除默认')
@@ -1217,14 +1218,13 @@
 			},
 			specSelect(n,e){
 				let self = this;
+				
 				self.specOption.forEach((m)=>{
 					if(m.value == n){
 						e.tableName = m.label;
 					}
 				})
-				
-			
-					if(e.clearAll!=0){
+				if(e.clearAll!=0){
 						let arr = [];
 						e.sOption.forEach((j)=>{
 							if(j.status==0){
@@ -1242,6 +1242,7 @@
 							if(res.data.code==1){
 									e.input = [];
 									e.guigeName = [];
+									self.tbData();
 							}else{
 								self.$message.error(res.data.msg);
 							}
@@ -1517,7 +1518,7 @@
 						width: 420px;
 					}
 					.goodsNameInput {
-						width: 600px;
+						width: 420px;
 						font-size: 16px;
 
 					}
@@ -1768,17 +1769,18 @@
 						height: 200px;
 					}
 					.shop_describe_img{
-						.el-col{
-							margin-top: 20px;
-						}
+						padding-top: 20px;
 						.describe_img_box{
-							
-							height: 200px;
+							float: left;
+							width: 130px;
+							height: 130px;
 							margin: 0 auto;
 							position: relative;
+							margin-right: 35px;
+							margin-bottom: 20px;
 							img{
-								width: 100%;
-								height: 200px;
+								width: 130px;
+								height: 130px;
 							}
 							.el-icon-close{
 								position: absolute;
@@ -1787,24 +1789,29 @@
 								background: rgba(0, 0, 0, 0.5);
 								color: #fff;
 								border-radius: 50%;
-								
 								cursor: pointer;
 							}
 						}
+						.describe_img_box:nth-child(5n){
+							margin-right: 0;
+						}
 						.upload-describe{
+							float: left;
 							
 							.describe-uploader{
-								height: 200px;
-								width: 185px;
+								
+								height: 130px;
+								width: 130px;
 								border: 1px dashed #d9d9d9;
 								border-radius: 6px;
+								box-sizing: border-box;
 								cursor: pointer;
 								position: relative;
 								overflow: hidden;
 								.el-icon-plus{
-									height: 200px;
-									width: 185px;
-									line-height:200px;
+									height: 130px;
+									width: 130px;
+									line-height:130px;
 									font-size: 60px;
 									color: gray;
 									

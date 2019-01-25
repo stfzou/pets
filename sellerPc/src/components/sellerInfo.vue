@@ -119,7 +119,8 @@
 													list-type="picture-card"
 													:limit="1"
 													name="Img"
-													:on-success="handleStoreSuccess">
+													:on-success="handleStoreSuccess"
+													:before-upload="beforeAvatarUpload">
 													<i class="el-icon-plus avatar-uploader-icon"></i>
 												</el-upload>
 										</div>
@@ -146,7 +147,8 @@
 													list-type="picture-card"
 													:limit="1"
 													name="Img"
-													:on-success="handleStoreInSuccess">
+													:on-success="handleStoreInSuccess"
+													:before-upload="beforeAvatarUpload">
 													<i class="el-icon-plus avatar-uploader-icon"></i>
 												</el-upload>
 										</div>
@@ -179,7 +181,8 @@
 													list-type="picture-card"
 													name="Img"
 													:limit="1"
-													:on-success="handleStoreLogoSuccess">
+													:on-success="handleStoreLogoSuccess"
+													:before-upload="beforeAvatarUpload">
 													<i class="el-icon-plus avatar-uploader-icon"></i>
 												</el-upload>
 										</div>
@@ -320,6 +323,44 @@
 		},
 		mounted:function(){
 			let self = this;
+			
+			this.axios.post('/selectShopUserInfo', this.qs.stringify({
+				userId:JSON.parse(sessionStorage.getItem('user')).userId
+				
+			}), {
+				headers: {
+					'Content-Type': 'application/x-www-form-urlencoded'
+				}
+			}).then((res)=>{
+				if(res.data.code == 1){
+					if(res.data.user.userShops.shopStatus === 3){
+						
+						self.$router.push({
+							name: 'login'
+						})
+						
+					}else if(res.data.user.userShops.shopStatus === 4) {
+								
+						self.$router.push({
+							name: 'qualificationsInfo',
+							params: { shopTypeName: res.data.user.userShops.shopName }
+						})
+					}else if(res.data.user.userShops.shopStatus === 2){
+						
+						self.$router.push({
+							name: 'addGoods'
+						})
+					}else if(res.data.user.userShops.shopStatus === 1){
+						
+						self.$router.push({
+							name: 'storeSuccess'
+						})
+						
+					}
+				}
+			})
+			
+			
 			this.axios.all([
 				this.axios.post('/getOperateAll',{
 					headers: { //经营品类
@@ -344,14 +385,23 @@
 						});
 					}
 					
-			}))
+			}));
+			
 		},
 		methods: {
-			  handleStoreSuccess(res,file,fileList) { //门店照片
+				beforeAvatarUpload(file) {
+							
+					const isLt2M = file.size / 1024 / 1024 < 2;
+					if (!isLt2M) {
+					  this.$message.error('上传图片大小不能超过 2MB!');
+					}
+					return isLt2M;
+				},
+				handleStoreSuccess(res,file,fileList) { //门店照片
 					this.sellerInfo.outImg = file.response.data.imgAddr;
 					this.sellerInfo.outId = file.response.data.imgId;
 					
-			  },
+				},
 				handleStoreInSuccess(res,file,fileList) {//店内照片
 					this.sellerInfo.inImg = file.response.data.imgAddr;
 					this.sellerInfo.inId = file.response.data.imgId;
@@ -400,7 +450,7 @@
 							}
 					})
 				},
-			  addMarker: function() {
+				addMarker: function() {
 				  let lng = 121.5 + Math.round(Math.random() * 1000) / 10000;
 				  let lat = 31.197646 + Math.round(Math.random() * 500) / 10000;
 				  this.markers.push([lng, lat]);
@@ -472,7 +522,7 @@
 							contactName:self.userNameInput,
 							contactTel:JSON.parse(sessionStorage.getItem('user')).userPhone,
 							shopTypeId:self.storeType,
-							operateIds:self.varietiesValue,
+							operateIds:self.varietiesValue.join(','),
 							province:self.sheng,
 							city:self.shi,
 							area:self.qu,

@@ -7,19 +7,19 @@
 			<div class="login_form">
 				<h3>{{title}}</h3>
 				<ul>
-					<li class="phone" v-if="phoneState">
+					<li class="phone" v-show="phoneState">
 						<input v-model="phone" type="text" placeholder="请输入您的手机号" />
 					</li>
-					<li class="pwd" v-if="pwdState">
+					<li class="pwd" v-show="pwdState">
 						<input v-model="pwd" type="password" placeholder="请输入您的密码" />
 					</li>
-					<li class="yz" v-if="yzState">
+					<li class="yz" v-show="yzState">
 						<input v-model="yz" type="text" placeholder="请输入您的验证码" />
-						<span class="getcode" v-show="show" @click="getCode">获取验证码</span>
-						<span v-show="!show" class="count getcode">{{count}} s</span>
+						<span class="getcode pointer" v-show="show" @click="getCode">获取验证码</span>
+						<span v-show="!show" class="count getcode pointer">{{count}} 秒</span>
 					</li>
 				</ul>
-				<el-button :plain="true" v-if="registerBtn" @click="registerRuler">立即入驻</el-button>
+				<el-button :plain="true" v-if="registerBtn" @click="registerRuler">立即注册</el-button>
 				<el-button :plain="true" v-if="loginBtn" @click="loginRuler">立即登录</el-button>
 				<el-button :plain="true" v-if="nextBtn" @click="next">下一步</el-button>
 				<el-button :plain="true" v-if="changeBtn" @click="changeRuler">完成</el-button>
@@ -445,7 +445,8 @@
 								userId: res.data.user.userId,
 								userPhone: res.data.user.phone,
 								shopId:res.data.user.userShops.shopId,
-								shopTypeName:res.data.user.userShops.shopName
+								shopTypeName:res.data.user.userShops.shopName,
+								shopStatus:res.data.user.userShops.shopStatus
 							};
 							sessionStorage.setItem('user', JSON.stringify(userEntity));
 							self.$message({
@@ -457,26 +458,40 @@
 								loading.close();
 							}, 1000);
 							if (res.data.user.userShops.shopStatus === 0) {
+								
 								self.$router.push({
 									name: 'dataReady'
 								})
-							} else if(res.data.user.userShops.shopStatus === 4) {
+							}else if(res.data.user.userShops.shopStatus === 4) {
+								
 								self.$router.push({
 									name: 'qualificationsInfo',
 									params: { shopTypeName: res.data.user.userShops.shopName }
 								})
-							}else{
+							}else if(res.data.user.userShops.shopStatus === 3){
+								
+								self.$message.error('审核失败');
+								
+							}else if(res.data.user.userShops.shopStatus === 2){
+								
 								self.$router.push({
 									name: 'addGoods'
 								})
+							}else if(res.data.user.userShops.shopStatus === 1){
+								
+								self.$router.push({
+									name: 'storeSuccess'
+								})
+								
 							}
-						} else {
+							
+						}else {
 							loading.close();
 							self.$message.error(res.data.msg);
 						}
 					}).catch(function(err) {
 						loading.close();
-						self.$message.error('服务器错误');
+						self.$message.error(err);
 					})
 
 				}

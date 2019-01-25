@@ -5,7 +5,7 @@
   "author": "zouhong <1007151493@qq.com>",
   "private": true,
   "scripts": {
-    "dev": "webpack-dev-server --inline --progress --config build/webpack.dev.conf.js",
+    "dev": "webpack-dev-server --inline --progress --config build/webpack.dev.conf.js --host 0.0.0.0",
     "start": "npm run dev",
     "unit": "jest --config test/unit/jest.conf.js --coverage",
     "e2e": "node test/e2e/runner.js",
@@ -22,6 +22,7 @@
     "vue-gemini-scrollbar": "^2.0.0",
     "vue-quill-editor": "^3.0.6",
     "vue-router": "^3.0.1",
+    "vuedraggable": "^2.17.0",
     "vuex": "^3.0.1"
   },
   "devDependencies": {

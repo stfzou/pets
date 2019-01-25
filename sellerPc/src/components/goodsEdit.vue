@@ -324,25 +324,24 @@
 						v-model="editData">
 					</el-input>
 					<div class="shop_describe_img">
-						<el-row :gutter="20">
-						  <el-col :span="6" v-for="(item,index) in describeImg" :key="index">
-							  <div class="describe_img_box">
-							  	<img :src="item.imgUrl" alt="">
-							  	<i class="el-icon-close" @click="describeImgRemove(index)"></i>
-							  </div>
-						  </el-col>		
-						  <el-col :span="6">
-							  <div class="upload-describe">
-							  	<el-upload class="describe-uploader" ref="uploadDescribe" action="http://192.168.0.109:8084/updateImg" multiple :file-list="describeImg"
-							  	:on-success="handleDescribe" :limit="9" list-type="picture" :on-exceed="handleDescribeExceed" name="Img" :before-upload="sizeReg">
-							  	<i class="el-icon-plus"></i>
-							  	</el-upload>
-							  </div>
-						  </el-col>
-						
-						</el-row>
-						
-					</div>
+					
+							<draggable v-model="describeImg"  :options = "{animation:500}">
+								<transition-group>
+										
+										<div class="describe_img_box" v-for="(element,index) in describeImg" :key="element.imgId">
+											<img :src="element.imgUrl" alt="">
+											<i class="el-icon-close" @click="describeImgRemove(index)"></i>
+										</div>
+								</transition-group>
+							</draggable>
+								<div class="upload-describe">
+									<el-upload class="describe-uploader" ref="uploadDescribe" action="http://192.168.0.109:8084/updateImg" multiple :file-list="describeImg"
+									:on-success="handleDescribe" :limit="9" list-type="picture" :on-exceed="handleDescribeExceed" name="Img" :before-upload="sizeReg">
+									<i class="el-icon-plus"></i>
+									</el-upload>
+								</div>
+								
+						</div>
 				</div>
 			</li>
 			<li class="clearfloat" v-if="false">
@@ -444,9 +443,7 @@
 					<span class="tx">（必须支持假一赔十服务）</span>
 				</div>
 			</li>
-			<li>
-				{{guigeList}}
-			</li>
+			
 		</ul>
 		<div class="save_box">
 			<el-button round class="save_btn" @click="commit(0)">保存</el-button>
@@ -457,8 +454,11 @@
 </template>
 
 <script>
-	
+	import draggable from 'vuedraggable'
 	export default {
+		components: {
+			draggable
+		},
 		data() {
 			return {
 				selectedGoodsClass: [],//商家分类数据
@@ -558,7 +558,7 @@
 		mounted:function(){
 			this.getGoodsSpecName();	
 			this.getGoodsClass();
-			this.$store.commit('initialNav',{navNum:1,subNum:0});
+			this.$store.commit('initialNav',{navNum:1,subNum:2});
 			this.getEditGoodsType()
 			
 		},
@@ -770,7 +770,7 @@
 						image.onload = function () { 
 							var width = this.width; 
 							var height = this.height; 
-							if (width<200||height<100){ 
+							if (width<10||height<10){ 
 								_this.$alert('图片宽高尺寸必须大于500!', '提示', {confirmButtonText: '确定'}); 
 								reject(); 
 							} 
@@ -1968,17 +1968,18 @@
 						height: 200px;
 					}
 					.shop_describe_img{
-						.el-col{
-							margin-top: 20px;
-						}
+						padding-top: 20px;
 						.describe_img_box{
-							
-							height: 200px;
+							float: left;
+							width: 130px;
+							height: 130px;
 							margin: 0 auto;
 							position: relative;
+							margin-right: 35px;
+							margin-bottom: 20px;
 							img{
-								width: 100%;
-								height: 200px;
+								width: 130px;
+								height: 130px;
 							}
 							.el-icon-close{
 								position: absolute;
@@ -1990,20 +1991,26 @@
 								cursor: pointer;
 							}
 						}
+						.describe_img_box:nth-child(5n){
+							margin-right: 0;
+						}
 						.upload-describe{
+							float: left;
 							
 							.describe-uploader{
-								height: 200px;
-								width: 185px;
+								
+								height: 130px;
+								width: 130px;
 								border: 1px dashed #d9d9d9;
 								border-radius: 6px;
+								box-sizing: border-box;
 								cursor: pointer;
 								position: relative;
 								overflow: hidden;
 								.el-icon-plus{
-									height: 200px;
-									width: 185px;
-									line-height:200px;
+									height: 130px;
+									width: 130px;
+									line-height:130px;
 									font-size: 60px;
 									color: gray;
 									

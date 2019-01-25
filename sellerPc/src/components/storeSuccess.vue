@@ -30,7 +30,7 @@
 					<span class="line_text">接下来你可以</span>
 					<span class="row_line"></span>
 				</div>
-				<ul class="flex_r_f_s">
+				<ul class="flex_r_s_b">
 					<li>
 						<img src="../assets/condition/icon_shuju.png" alt="">
 						<p>准备商品资料数据</br>(做几个主图详情图)</p>

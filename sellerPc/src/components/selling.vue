@@ -242,13 +242,16 @@
 							if(_this.tableData.length === _this.selectTable.length){
 								_this.tableData = [];
 							}else{
-								_this.tableData.forEach((e,index,arr)=>{
-									_this.selectTable.forEach((j,i)=>{
-										if(e.bianma === j.bianma){
-											arr.splice(index,1)
+								
+								for(var i=0; i<_this.tableData.length;i++){
+									for(var j=0; j<_this.selectTable.length;j++){
+										if(_this.tableData[j].bianma == _this.selectTable[i].bianma){
+											_this.tableData.splice(j,1);
+											j--
 										}
-									})
-								})
+									}
+								}
+								
 							}
 							
 							_this.selectTable = [];

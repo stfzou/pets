@@ -5,10 +5,6 @@
 				<div class="container flex_r_s_b">
 					<div class="c_left flex_r_s_b">
 						<img class="logo" src="../assets/header@2x.png" alt="">
-						<div class="history">
-							<span class="back pointer"></span>
-							<span class="go pointer"></span>
-						</div>
 					</div>
 					<div class="c_right flex_r_f_s">
 						<img class="head_img" src="../assets/home/head_icon.png" alt="">
@@ -16,7 +12,7 @@
 							<p>自由犬宠物用品<i class="el-icon-caret-bottom"></i></p>
 						</div>
 						<span class="shuxian"></span>
-						<div class="quit pointer">退出登录</div>
+						<div class="quit pointer" @click="quit">退出登录</div>
 					</div>
 				</div>
 			</header>
@@ -132,7 +128,21 @@
 			},
 			subSelect(index){
 				this.subNavIndex = index;
-			}
+			},
+			quit(){
+				let self = this;
+				this.$confirm('是否要退出登录?', '提示', {
+						confirmButtonText: '确定',
+						cancelButtonText: '取消',
+						type: 'warning',
+						callback:function(action, instance){
+							if(action == 'confirm'){
+								window.sessionStorage.removeItem('user');
+								self.$router.push({name:'login'});
+							}
+						}
+				})
+			}	
 		},
 		mounted(){
 			this.navIndex = this.$store.state.nav.navNum;

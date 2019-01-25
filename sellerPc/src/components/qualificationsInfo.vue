@@ -52,7 +52,7 @@
 									<div v-show="!imgData.sfzz">
 										<el-upload ref="uploadSfzz" class="avatar-uploader" action="http://192.168.0.109:8084/updateImg"
 										 :show-file-list="false" list-type="picture-card" name="Img" :limit="1" :on-progress="handleSfzzPreview"
-										 :on-success="handleSfzzSuccess">
+										 :on-success="handleSfzzSuccess" :before-upload="beforeAvatarUpload">
 											<i class="el-icon-plus avatar-uploader-icon"></i>
 										</el-upload>
 										<el-progress v-if="imgData.sfzzP>0" :percentage="imgData.sfzzP"></el-progress>
@@ -73,7 +73,7 @@
 									<div v-show="!imgData.sfzf">
 										<el-upload ref="uploadSfzf" class="avatar-uploader" action="http://192.168.0.109:8084/updateImg"
 										 :show-file-list="false" list-type="picture-card" :limit="1" name='Img' :on-progress="handleSfzfPreview"
-										 :on-success="handleSfzfSuccess">
+										 :on-success="handleSfzfSuccess" :before-upload="beforeAvatarUpload">
 											<i class="el-icon-plus avatar-uploader-icon"></i>
 										</el-upload>
 										<el-progress v-if="imgData.sfzfP>0" :percentage="imgData.sfzfP"></el-progress>
@@ -104,7 +104,7 @@
 									<div v-show="!imgData.yyzz">
 										<el-upload ref="uploadYyzz" class="avatar-uploader" action="http://192.168.0.109:8084/updateImg"
 										 :show-file-list="false" list-type="picture-card" :limit="1" name="Img" :on-progress="handleYyzzPreview"
-										 :on-success="handleYyzzSuccess">
+										 :on-success="handleYyzzSuccess" :before-upload="beforeAvatarUpload">
 											<i class="el-icon-plus avatar-uploader-icon"></i>
 										</el-upload>
 										<el-progress v-if="imgData.yyzzP>0" :percentage="imgData.yyzzP"></el-progress>
@@ -133,10 +133,10 @@
 							<input type="text" value="" v-model="inputData.companyName" placeholder="请输入单位名称" />
 						</div>
 					</li>
-					<li>
+					<li v-if="shopTypeName == '医疗诊所'">
 						<div class="title">行业资质信息<span>(如:动物诊疗许可证，仅医疗单位提供)</span></div>
 					</li>
-					<li>
+					<li  v-if="shopTypeName == '医疗诊所'">
 						<p>资质照片<span>*</span></p>
 						<div class="list_r">
 							<div class="store_img">
@@ -148,7 +148,7 @@
 									<div v-show="!imgData.zlz">
 										<el-upload ref="uploadZlz" class="avatar-uploader" action="http://192.168.0.109:8084/updateImg"
 										 :show-file-list="false" list-type="picture-card" name="Img" :limit="1" :on-progress="handleSZlzPreview"
-										 :on-success="handleZlzSuccess">
+										 :on-success="handleZlzSuccess" :before-upload="beforeAvatarUpload">
 											<i class="el-icon-plus avatar-uploader-icon"></i>
 										</el-upload>
 										<el-progress v-if="imgData.zlzP>0" :percentage="imgData.zlzP"></el-progress>
@@ -166,20 +166,20 @@
 							</div>
 						</div>
 					</li>
-					<li>
+					<li  v-if="shopTypeName == '医疗诊所'">
 						<p>许可证编号<span>*</span></p>
 						<div class="list_r">
 							<input v-model="inputData.identifierVal" type="text" value="" placeholder="请输入许可证编号" />
 						</div>
 					</li>
-					<li>
+					<li  v-if="shopTypeName == '医疗诊所'">
 						<p>诊疗活动范围<span>*</span></p>
 						<div class="list_r">
 							<el-input class="textarea" type="textarea" resize="none" placeholder="请输入内容" v-model="activeFw">
 							</el-input>
 						</div>
 					</li>
-					<li>
+					<li  v-if="shopTypeName == '医疗诊所'">
 						<p>有效期<span>*</span></p>
 						<div class="list_r">
 							<!-- <el-date-picker
@@ -231,13 +231,46 @@
 					identifierVal: '',
 					companyName: ''
 				},
-				shopTypeName: '', //商家类型
+				shopTypeName:'', //商家类型
 				isQualification: null,
 				regId: /(^\d{15}$)|(^\d{18}$)|(^\d{17}(\d|X|x)$)/
 			};
 		},
 		mounted: function() {
 			let self = this;
+			
+			this.axios.post('/selectShopUserInfo', this.qs.stringify({
+				userId:JSON.parse(sessionStorage.getItem('user')).userId
+				
+			}), {
+				headers: {
+					'Content-Type': 'application/x-www-form-urlencoded'
+				}
+			}).then((res)=>{
+				if(res.data.code == 1){
+					if (res.data.user.userShops.shopStatus === 0) {
+						
+						self.$router.push({
+							name: 'dataReady'
+						})
+					}else if(res.data.user.userShops.shopStatus === 3){
+						
+						self.$message.error('审核失败');
+						
+					}else if(res.data.user.userShops.shopStatus === 2){
+						
+						self.$router.push({
+							name: 'addGoods'
+						})
+					}else if(res.data.user.userShops.shopStatus === 1){
+						
+						self.$router.push({
+							name: 'storeSuccess'
+						})
+						
+					}
+				}
+			})
 			
 			this.axios.post('/webShop/selectShopsType ', this.qs.stringify({
 				shopId: JSON.parse(sessionStorage.getItem('user')).shopId
@@ -247,9 +280,9 @@
 				}
 			}).then(function(res) {
 				if (res.data.code == 1) {
+					console.log(res)
+					self.shopTypeName = res.data.data.shopTypeName
 					
-					self.shopTypeName = res.data.shopTypeName
-
 				} else {
 					self.$message.error(res.data.msg);
 				}
@@ -267,6 +300,15 @@
 			}
 		},
 		methods: {
+			 beforeAvatarUpload(file) {
+				
+				const isLt2M = file.size / 1024 / 1024 < 2;
+
+				if (!isLt2M) {
+				  this.$message.error('上传图片大小不能超过 2MB!');
+				}
+				return isLt2M;
+			},
 			handleSfzzSuccess(res, file, fileList) { //身份证正面上传
 
 				this.imgData.sfzz = file.response.data.imgAddr;
@@ -346,7 +388,9 @@
 			next() {
 				let self = this;
 				let shopInfoData = {};
+				
 				if (self.shopTypeName == '医疗诊所') {
+					console.log(0)
 					if (this.inputData.userNameVal == '') {
 
 						this.$message.error('真实姓名不能为空');
@@ -413,17 +457,23 @@
 							registerNumber: self.inputData.zcCodeVal,
 							unitName: self.inputData.companyName,
 							//资质信息
-							isQualification: 0,
+							isQualification: 1,
+							qualificationImg: self.imgData.zlzId,
+							licenseNumber: self.inputData.identifierVal,
+							range: self.activeFw,
+							deadlineStart: self.yxDate[0],
+							deadlineEnd: self.yxDate[1],
+							isLong: self.checkedNum
 
 						}
-						this.axios.post('/webShop/editShopsInfo', this.qs.stringify(shopInfoData), {
+						this.axios.post('/webShop/editShopsQualification', this.qs.stringify(shopInfoData), {
 							headers: {
 								'Content-Type': 'application/x-www-form-urlencoded'
 							}
 						}).then(function(res) {
 							if (res.data.code == 1) {
-								console.log(res)
-								// this.$router.push({name:'storeSuccess'})
+								
+								self.$router.push({name:'storeSuccess'})
 							} else {
 								self.$message.error(res.data.msg);
 							}
@@ -432,6 +482,7 @@
 					// 
 
 				} else {
+					console.log(1)
 					if (this.inputData.userNameVal == '') {
 
 						this.$message.error('真实姓名不能为空');
@@ -480,22 +531,17 @@
 							registerNumber: self.inputData.zcCodeVal,
 							unitName: self.inputData.companyName,
 							//资质信息
-							isQualification: 1,
-							qualificationImg: self.imgData.zlzId,
-							licenseNumber: self.inputData.identifierVal,
-							range: self.activeFw,
-							deadlineStart: self.yxDate[0],
-							deadlineEnd: self.yxDate[1],
-							isLong: self.checkedNum
+							isQualification: 0,
+							
 						}
-						this.axios.post('/webShop/editShopsInfo', this.qs.stringify(shopInfoData), {
+						this.axios.post('/webShop/editShopsQualification', this.qs.stringify(shopInfoData), {
 							headers: {
 								'Content-Type': 'application/x-www-form-urlencoded'
 							}
 						}).then(function(res) {
 							if (res.data.code == 1) {
-								console.log(res)
-								// this.$router.push({name:'storeSuccess'})
+								
+								self.$router.push({name:'storeSuccess'})
 							} else {
 								self.$message.error(res.data.msg);
 							}
