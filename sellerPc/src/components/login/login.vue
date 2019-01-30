@@ -490,8 +490,10 @@
 							self.$message.error(res.data.msg);
 						}
 					}).catch(function(err) {
-						loading.close();
 						self.$message.error(err);
+						loading.close();
+						
+						
 					})
 
 				}

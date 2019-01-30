@@ -85,9 +85,9 @@
 						subIcon:require('../assets/home/icon_home3.png'),
 						link:'sell'
 						},{
-						subNavName:'商品编辑',
+						subNavName:'未上架的商品',
 						subIcon:require('../assets/home/icon_home1.png'),
-						link:'goodsEdit'
+						link:''
 						},{
 						subNavName:'草稿箱',
 						subIcon:require('../assets/home/icon_home2.png'),

@@ -54,7 +54,7 @@
 								<img width="100%" :src="item.imgUrl" alt="">
 								<i class="el-icon-close pointer" @click="deleteGoodsMain(index)"></i>
 							</div>
-
+						
 						</div>
 						<el-upload class="avatar-uploader" ref="uploadGoodsMain" action="http://192.168.0.109:8084/updateImg" multiple
 						 :on-success="handlePictureCardPreview"  :on-exceed="handleExceed" :limit="5" list-type="picture" name="Img" :before-upload="sizeReg">
@@ -334,6 +334,7 @@
 										</div>
 								</transition-group>
 							</draggable>
+							
 								<div class="upload-describe">
 									<el-upload class="describe-uploader" ref="uploadDescribe" action="http://192.168.0.109:8084/updateImg" multiple :file-list="describeImg"
 									:on-success="handleDescribe" :limit="9" list-type="picture" :on-exceed="handleDescribeExceed" name="Img" :before-upload="sizeReg">
@@ -551,14 +552,14 @@
 				}
 			},
 			
-	
-
-			
 		},
 		mounted:function(){
+			
 			this.getGoodsSpecName();	
 			this.getGoodsClass();
-			this.$store.commit('initialNav',{navNum:1,subNum:2});
+			
+			//获取商品Id
+			this.productId = this.$route.query.gId;
 			this.getEditGoodsType()
 			
 		},
@@ -568,15 +569,16 @@
 				
 				let self = this;
 				let isPush = true;
-				this.axios.post('/selectShopsProductTips',self.qs.stringify({productId:'37'}),{
+				let pId = this.productId;
+				
+				this.axios.post('/selectShopsProductTips',self.qs.stringify({productId:pId}),{
 					headers: { //经营品类
 						'Content-Type': 'application/x-www-form-urlencoded',
 					}
 				}).then(function(res){
 					if(res.data.code == 1){
 						let re = res.data.data;
-						//获取商品Id
-						self.productId = re.productId;
+						
 						//获取已选择商品分类
 						self.selectedGoodsClass.push(re.sort.gId);
 						self.selectedGoodsClass.push(re.sort.parentId);
@@ -770,7 +772,7 @@
 						image.onload = function () { 
 							var width = this.width; 
 							var height = this.height; 
-							if (width<10||height<10){ 
+							if (width<500||height<500){ 
 								_this.$alert('图片宽高尺寸必须大于500!', '提示', {confirmButtonText: '确定'}); 
 								reject(); 
 							} 
@@ -1717,7 +1719,7 @@
 						width: 420px;
 					}
 					.goodsNameInput {
-						width: 600px;
+						width: 420px;
 						font-size: 16px;
 
 					}

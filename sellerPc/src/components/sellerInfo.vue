@@ -90,9 +90,9 @@
 							<div class="list_r map_r flex_r_s_b">
 								
 								<div class="amap-page-container">
-								
+								 <el-amap-search-box class="search-box" :search-option="searchOption" :on-search-result="onSearchResult"></el-amap-search-box>
 								  <el-amap vid="amap" :zoom="zoom" :plugin="plugin" class="amap-demo" :center="mapCenter">
-									  
+									 
 									  <el-amap-marker :events="markers" draggable="true" vid="component-marker" :position="mapCenter"></el-amap-marker>
 			
 								  </el-amap>
@@ -223,17 +223,12 @@
 						self.lng = e.lnglat.lng;
 						self.lat = e.lnglat.lat;
 						self.mapCenter = [self.lng, self.lat];
-						
-						//地理逆编码
-						geocoder.getAddress(self.mapCenter, function(status, result) {
-								
-								if (status === 'complete' && result.info === 'OK') {
-									// result为对应的地理位置详细信息
-									
-									self.searchMap = result.regeocode.formattedAddress
-								}
-						  })
+						console.log(self.mapCenter)
 					}
+				},
+				 searchOption: {
+					city:'',
+					citylimit: true
 				},
 				phone:JSON.parse(sessionStorage.getItem('user')).userPhone,
 				storeNameInput:'',
@@ -285,32 +280,18 @@
 								self.lng = result.position.lng;
 								self.lat = result.position.lat;
 								self.mapCenter = [self.lng, self.lat];
+								self.searchOption.city = result.addressComponent.city;
 								self.loaded = true;
 								self.$nextTick();
+								// console.log(result.addressComponent.city)
 								
 							}
 					  
 						});
 					}
 				  }
-				},{
-					pName:'Autocomplete',
-					input:'input_id',
-					city:self.city,
-					events:{
-						init(o){
- 							AMap.event.addListener(o, "select", function(e){
-								self.lng = e.poi.location.lng;
-								self.lat = e.poi.location.lat;
-								self.mapCenter = [self.lng, self.lat];
-								self.searchMap = e.poi.name;
-							
- 							});
-						}
-					}
-					
-					
-				},{
+				},
+				{
 					pName:'Geocoder',
 					events:{
 						init(o){
@@ -323,7 +304,6 @@
 		},
 		mounted:function(){
 			let self = this;
-			
 			this.axios.post('/selectShopUserInfo', this.qs.stringify({
 				userId:JSON.parse(sessionStorage.getItem('user')).userId
 				
@@ -476,6 +456,13 @@
 					this.qu = data.value;
 					
 				},
+				onSearchResult(pois){
+					let self = this;
+					self.lng = pois[0].location.lng;
+					self.lat = pois[0].location.lat;
+					self.mapCenter = [self.lng, self.lat];
+					console.log(self.mapCenter)
+				},
 				//下一步按钮验证
 				next(){
 					let self = this;
@@ -623,6 +610,11 @@
 				width: 200px;
 				height: 300px;
 			}
+			.search-box {
+			  position: absolute;
+			  top: 25px;
+			  left: 20px;
+			}
 		}
 		
 		
@@ -646,7 +638,7 @@
 			.amap-page-container {
 			  position: relative;
 			}
-			li{
+			&>li{
 				overflow: hidden;
 				margin-top: 28px;
 				&>p{

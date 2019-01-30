@@ -12,13 +12,14 @@ import VDistpicker from 'v-distpicker'
 import store from './store/store'
 import axios from 'axios'
 import Qs from 'qs'
-
+import QRCode from 'qrcodejs2'
 
 
 Vue.component('v-distpicker', VDistpicker)//全局注册省市选择器组件
 Vue.use(ElementUI)
 Vue.use(AMap)
 Vue.use(GeminiScrollbar)//引用自定义滚动条组件
+//Vue.use(QRCode)
 
 axios.defaults.baseURL = 'http://192.168.0.109:8084'
 Vue.prototype.axios = axios;

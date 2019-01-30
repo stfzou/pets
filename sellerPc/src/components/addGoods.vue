@@ -54,7 +54,15 @@
 								<img width="100%" :src="item.imgUrl" alt="">
 								<i class="el-icon-close pointer" @click="deleteGoodsMain(index)"></i>
 							</div>
-
+							<!-- <draggable v-model="goodsMainList"  :options = "{animation:500}">
+								<transition-group>
+										<div class="img-box" :key="item.id" v-for="(item,index) in goodsMainList">
+											<img width="100%" :src="item.imgUrl" alt="">
+											<i class="el-icon-close pointer" @click="deleteGoodsMain(index)"></i>
+										</div>
+										
+								</transition-group>
+							</draggable> -->
 						</div>
 						<el-upload class="avatar-uploader" ref="uploadGoodsMain" action="http://192.168.0.109:8084/updateImg" multiple
 						 :on-success="handlePictureCardPreview"  :on-exceed="handleExceed" :limit="5" list-type="picture" name="Img" :before-upload="sizeReg">
@@ -572,7 +580,7 @@
 						image.onload = function () { 
 							var width = this.width; 
 							var height = this.height; 
-							if (width<500||height<500){ 
+							if (width<10||height<10){ 
 								_this.$alert('图片宽高尺寸必须大于500!', '提示', {confirmButtonText: '确定'}); 
 								reject(); 
 							} 
@@ -601,7 +609,7 @@
 				let guigeS = null;
 				let postage = '';
 				let status = null;
-			
+				let n = num;
 				if(num == 2){
 						// this.commitReg();
 					if(this.selectedGoodsClass.length==0){
@@ -746,7 +754,7 @@
 				this.goodsMainList.forEach((e)=>{
 					mainImg.push(e.imgId)
 				});
-				console.log(mainImg)
+				// console.log(mainImg)
 				
 				this.describeImg.forEach((e)=>{
 					describePic.push(e.imgId)
@@ -770,7 +778,7 @@
 					descImgs:describePic.join(','),
 					isSpec:guigeS,
 					skus:JSON.stringify(arr),
-					status:num
+					status:n
 					
 				}), {
 					headers: {
@@ -1536,15 +1544,14 @@
 								padding: 5px;
 								border: 1px solid #ddd;
 								position: relative;
-
-								i {
+								i{
 									position: absolute;
 									top: -5px;
 									right: -5px;
 									background: rgba(0, 0, 0, 0.5);
 									color: #fff;
 									border-radius: 50%;
-									z-index: 10000;
+									z-index: 100;
 								}
 
 								img {
