@@ -49,7 +49,7 @@
 				<p class="list_l">商品主图<span>*</span></p>
 				<div class="list_r">
 					<div class="goods_main_pic">
-						<div class="goods_pic">
+						<div class="goods_pic" v-if="goodsMainList.length>0">
 							<div class="img-box" :key="index" v-for="(item,index) in goodsMainList">
 								<img width="100%" :src="item.imgUrl" alt="">
 								<i class="el-icon-close pointer" @click="deleteGoodsMain(index)"></i>
@@ -578,19 +578,27 @@
 				}).then(function(res){
 					if(res.data.code == 1){
 						let re = res.data.data;
-						
+						console.log(res)
 						//获取已选择商品分类
-						self.selectedGoodsClass.push(re.sort.gId);
-						self.selectedGoodsClass.push(re.sort.parentId);
-						self.selectedGoodsClass.push(re.sort.sortId);
+						if(re.sort){
+							self.selectedGoodsClass.push(re.sort.gId);
+							self.selectedGoodsClass.push(re.sort.parentId);
+							self.selectedGoodsClass.push(re.sort.sortId);
+						}
+						
 						//获取已选取商品名称
-						self.goodsNameInput = re.productName;
-						re.pImgs.forEach((e)=>{
-							self.goodsMainList.push({
-								imgId:e.imgId,
-								imgUrl:e.imgAddr
+						if(re.productName!=''){
+							self.goodsNameInput = re.productName;
+						}
+						if(re.pImgs.length>0){
+							re.pImgs.forEach((e)=>{
+								self.goodsMainList.push({
+									imgId:e.imgId,
+									imgUrl:e.imgAddr
+								})
 							})
-						})
+						}
+						
 						//获取商品规格
 						re.skus[0].anvs.forEach((e)=>{
 							let id = e.anId
@@ -613,7 +621,7 @@
 								}
 							}).then(function(res){
 								if(res.data.code == 1){
-									console.log(res)
+									
 									res.data.data.forEach((j)=>{
 										obj.sOption.push({value:j.attrValueId,label:j.attrValueName,status:j.status})
 									})
@@ -681,46 +689,61 @@
 						
 						
 						//获取商品品牌
-						self.axios.post('/webShop/selectSortBrandAll',self.qs.stringify({//初始化商品品牌数据
-							sortId:re.sort.parentId,
-						}), {
-							headers: {
-								'Content-Type': 'application/x-www-form-urlencoded'
-							}
-						}).then(function(response){
-							if(response.data.code == 1){
-								if(response.data.data.length>1){
-									self.goodsBrand = response.data.data;
-								}else{
-									self.goodsBrand = [];
-									self.goodsBrandId = '';
+						if(re.sort){
+							self.axios.post('/webShop/selectSortBrandAll',self.qs.stringify({//初始化商品品牌数据
+								sortId:re.sort.parentId,
+							}), {
+								headers: {
+									'Content-Type': 'application/x-www-form-urlencoded'
 								}
-							}else{
-								self.$message.error(response.data.msg);
-							}
-						});
-						
-						self.goodsBrandId = re.brand.brandId
+							}).then(function(response){
+								if(response.data.code == 1){
+									if(response.data.data.length>1){
+										self.goodsBrand = response.data.data;
+									}else{
+										self.goodsBrand = [];
+										self.goodsBrandId = '';
+									}
+								}else{
+									self.$message.error(response.data.msg);
+								}
+							});
+							
+						}
+						if(re.brand){
+							self.goodsBrandId = re.brand.brandId
+						}
 						
 						//获取商品属性
-						self.axios.post('/selectSortAttrNameValues',self.qs.stringify({//初始化商品属性
-							sortId:re.sort.sortId,
-						}), {
-							headers: {
-								'Content-Type': 'application/x-www-form-urlencoded'
-							}
-						}).then(function(response){
-							if(response.data.code == 1){
-									self.goodsAttr.goodsAttrData = response.data.data;
-									re.sanv.forEach((e)=>{
-										self.goodsAttr.goodsAttrId.push({anId:e.anId,avId:e.avId});
-									})
-								
-							}else{
-								self.$message.error(response.data.msg);
-							}
+						if(re.sort){
 							
-						});
+							self.axios.post('/selectSortAttrNameValues',self.qs.stringify({//初始化商品属性
+								sortId:re.sort.sortId,
+							}), {
+								headers: {
+									'Content-Type': 'application/x-www-form-urlencoded'
+								}
+							}).then(function(response){
+								if(response.data.code == 1){
+										self.goodsAttr.goodsAttrData = response.data.data;
+										
+										self.goodsAttr.goodsAttrData.forEach((e,i)=>{
+											if(re.sanv[i]){
+												self.goodsAttr.goodsAttrId.push({anId:re.sanv[i].anId,avId:re.sanv[i].avId});
+											}else{
+												self.goodsAttr.goodsAttrId.push({anId:e[0].anId,avId:''});
+											}
+											
+										})
+										
+										
+								}else{
+									self.$message.error(response.data.msg);
+								}
+								
+							});
+						}
+						
 						
 						//获取描述商品内容
 						if(re.productDesc!=''){
@@ -735,17 +758,22 @@
 							})
 						}
 						//获取商品类型
-						self.goodsType = re.productType+'';
+						if(re.productType!=''){
+							self.goodsType = re.productType+'';
+						}
 						
 						if(re.productType=='2'){
 							self.isQuality = true;
 							self.quality = re.productTips.keepTime+''
 						}
 						//获取退换货服务
-						self.returnGoods.value = re.productTips.returnService+''
+						if(re.productTips.returnService){
+							self.returnGoods.value = re.productTips.returnService+''
+						}
+						
 						
 						//物流费用
-						if(re.productTips.productFare){
+						if(re.productTips.productFare!=''){
 							self.logistics.value = re.productTips.productFare;
 						}
 						if(re.productTips.isShipping == 1){
@@ -755,7 +783,10 @@
 						}
 						
 						//发货时间承诺
-						self.sendTime = re.productTips.shipTime+''
+						if(re.productTips.shipTime!=''){
+							self.sendTime = re.productTips.shipTime+''
+						}
+						
 					}else{
 						self.$message.error(res.data.msg)
 					}
@@ -946,7 +977,7 @@
 				this.goodsMainList.forEach((e)=>{
 					mainImg.push(e.imgId)
 				});
-				console.log(mainImg)
+				
 				
 				this.describeImg.forEach((e)=>{
 					describePic.push(e.imgId)

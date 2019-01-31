@@ -62,9 +62,10 @@
 					<template slot-scope="scope">
 						<div class="edite">
 							<span @click="editLink(scope.row)">编辑</span>
-							<span @click="shelve(scope.row)">下架</span>
-							<span @click="share">分享商品</span>
-							<span @click="overhead">
+							<span @click="deleteOne(scope.row)" v-if="scope.row.productStatus=='3'||scope.row.productStatus=='4'||scope.row.productStatus=='2'">删除</span>
+							<span v-if="scope.row.productStatus=='1'" @click="shelve(scope.row)">下架</span>
+							<span v-if="scope.row.productStatus=='1'" @click="share">分享商品</span>
+							<span v-if="scope.row.productStatus=='1'" @click="overhead">
 								置顶商品
 							</span>
 
@@ -84,7 +85,7 @@
 					<el-button round @click="shelveAll">下架</el-button>
 					<el-button round @click="deleteTable">删除</el-button>
 				</div>
-				<el-pagination layout="prev, pager, next" :total="32">
+				<el-pagination layout="prev, pager, next" :total="total" :page-size="5" @current-change="getPageData">
 				</el-pagination>
 			</div>
 
@@ -168,7 +169,9 @@
 				}],
 				selectTable: [],
 				selectAll: false,
-				loading: true
+				loading: true,
+				page:'1',
+				total:10
 
 			};
 		},
@@ -178,7 +181,7 @@
 				subNum: 1
 			});
 			this.getGoodsClass();
-			this.getAllGoods('-1');
+			this.getAllGoods('-1','1');
 
 		},
 		filters:{
@@ -187,6 +190,8 @@
 					return '已下架'
 				}else if(value == '1'){
 					return '在售中'
+				}else if(value == '3'){
+					return '草稿'
 				}
 			}
 		},
@@ -245,6 +250,41 @@
 					this.$message('还没有选择任何数据');
 				}
 
+			},
+			deleteOne(scope){//删除单个下架或者草稿
+				let self = this; 
+				this.$confirm('是否继续删除商品?', '提示', {
+					confirmButtonText: '确定',
+					cancelButtonText: '取消',
+					type: 'warning',
+					callback: function(action, instance) {
+						if (action == 'confirm') {
+							self.axios.post('/shop/deleteProduct', self.qs.stringify({
+								shopId: JSON.parse(sessionStorage.getItem('user')).shopId,
+								productIds:scope.productId
+							}), {
+								headers: { //经营品类
+									'Content-Type': 'application/x-www-form-urlencoded',
+								}
+							}).then((res)=>{
+								if(res.data.code == 1){
+									self.tableData.forEach((e,i)=>{
+										if(e.productId == scope.productId){
+											self.tableData.splice(i,1);
+										}
+									})
+									self.$message({
+										message: '删除成功',
+										type: 'success'
+									});
+								}else{
+									self.$message.error(res.data.msg);
+								}
+							})
+							
+						}
+					}
+				})
 			},
 			share() { //打开弹出框
 				let self = this;
@@ -340,12 +380,19 @@
 									}
 								}).then(function(res){
 									if(res.data.code == 1){
+										self.tableData.forEach((e)=>{
+											self.selectTable.forEach((j)=>{
+												if(e.productId == j.productId){
+													e.productStatus = '4';
+												}
+											})
+										})
 										self.$message({
 											showClose: true,
 											message: '商品下架成功',
 											type: 'success',
 										});
-										self.$router.go(0)
+										
 									}else{
 										self.$message.error(res.data.msg);
 									}
@@ -366,11 +413,11 @@
 			cancelSortState() {
 				this.sortState = false;
 			},
-			updateTable(item, index) {
+			updateTable(item,index) {
 				this.selectNum = index;
 				this.selectState = item.status;
 				this.loading = true;
-				this.getAllGoods(item.status);
+				this.getAllGoods(item.status,'1');
 			},
 			getGoodsClass() { //初始化商品分类
 
@@ -462,13 +509,14 @@
 			select(val) {
 				console.log(val)
 			},
-			getAllGoods(state) { //根据状态查询商品
+			getAllGoods(state,val) { //根据状态查询商品
+			
 				let self = this;
 				this.axios.post('/webShop/selectShopsProduct', this.qs.stringify({
 					shopId: JSON.parse(sessionStorage.getItem('user')).shopId,
 					status: state,
-					pageNo: '1',
-					pageSize: '10',
+					pageNo: val,
+					pageSize: '5',
 					sortId: self.selectGoodsClass[2],
 					productCoding: self.goodsNum,
 					productName: self.goodsName,
@@ -483,7 +531,7 @@
 				}).then(function(res) {
 					if (res.data.code == 1) {
 						self.tableData = res.data.data.list;
-						console.log(res)
+						self.total = res.data.data.total;
 						setTimeout(() => {
 							self.loading = false;
 						}, 500)
@@ -496,7 +544,7 @@
 					}
 				})
 			},
-			editLink(scope) {
+			editLink(scope) { //编辑
 				this.$store.commit('initialNav', {
 					navNum: 1,
 					subNum: 1
@@ -508,6 +556,11 @@
 					}
 				})
 
+			},
+			getPageData(val){//获取当前页数据
+				
+				this.page = val;
+				this.getAllGoods(this.selectState,val);
 			}
 		}
 
