@@ -489,8 +489,9 @@
 							loading.close();
 							self.$message.error(res.data.msg);
 						}
-					}).catch(function(err) {
-						self.$message.error(err);
+					}).catch(function(err){
+						
+						self.$message.error('网络出了一点问题');
 						loading.close();
 						
 					})

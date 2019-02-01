@@ -65,7 +65,7 @@
 							<span @click="deleteOne(scope.row)" v-if="scope.row.productStatus=='3'||scope.row.productStatus=='4'||scope.row.productStatus=='2'">删除</span>
 							<span v-if="scope.row.productStatus=='1'" @click="shelve(scope.row)">下架</span>
 							<span v-if="scope.row.productStatus=='1'" @click="share">分享商品</span>
-							<span v-if="scope.row.productStatus=='1'" @click="overhead">
+							<span v-if="scope.row.productStatus=='1'" @click="overhead(scope.row)">
 								置顶商品
 							</span>
 
@@ -292,7 +292,7 @@
 				self.modal = true;
 				setTimeout(() => {
 					self.qrcode()
-				}, 100)
+				},50)
 
 			},
 			clearShare() {
@@ -318,8 +318,31 @@
 
 			},
 			overhead(e) { //置顶商品
-
-
+				let self = this;
+				let tump = e;
+				console.log(tump)
+				self.axios.post('/webShop/updateProductToppingTime', self.qs.stringify({
+					productId:e.productId
+				}), {
+					headers: { //经营品类
+						'Content-Type': 'application/x-www-form-urlencoded',
+					}
+				}).then((res)=>{
+					if(res.data.code == 1){
+						self.tableData.forEach((j,i)=>{
+							if(j.productId == e.productId){
+								self.tableData.splice(i,1);
+								return false;
+							}
+						})
+						self.tableData.unshift(tump);
+						self.$message({
+							showClose: true,
+							message:'置顶成功',
+							type: 'success',
+						});
+					}
+				})
 			},
 			shelve(scope){//商品下架
 				let self = this;
@@ -504,7 +527,7 @@
 			},
 			search() { //搜索
 				this.loading = true;
-				this.getAllGoods(this.selectState);
+				this.getAllGoods(this.selectState,'1');
 			},
 			select(val) {
 				console.log(val)

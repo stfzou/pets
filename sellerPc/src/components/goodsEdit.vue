@@ -447,7 +447,7 @@
 			
 		</ul>
 		<div class="save_box">
-			<el-button round class="save_btn" @click="commit(0)">保存</el-button>
+			<el-button round class="save_btn" @click="commit(0)">保存草稿</el-button>
 			<el-button round class="fabu_btn" @click="commit(2)">发布上架</el-button>
 		</div>
 	</div>
@@ -1010,12 +1010,16 @@
 					}
 				}).then(function(res){
 					if(res.data.code == 1){
-						self.$router.go(0)
 						self.$message({
 							showClose: true,
 							message:'提交成功',
 							type: 'success',
 						});
+						setTimeout(()=>{
+							self.$router.go(0)
+						},500)
+						
+						
 					}else{
 						self.$message.error(res.data.msg);
 					}
