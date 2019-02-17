@@ -11,6 +11,7 @@ import StoreSuccess from '@/components/storeSuccess'
 import AddGoods from '@/components/addGoods'
 import Sell from '@/components/selling'
 import GoodsEdit from '@/components/goodsEdit'
+import Upload from '@/components/upload'
 
 Vue.use(Router)
 
@@ -24,6 +25,11 @@ export default new Router({
 			path: '/login',
 			name: 'login',
 			component: Login
+		},
+		{
+			path: '/upload',
+			name: 'upload',
+			component: Upload
 		},
 		{
 			path: '',

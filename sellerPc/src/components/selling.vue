@@ -39,25 +39,32 @@
 			<el-table v-loading="loading" element-loading-text="拼命加载中" element-loading-spinner="el-icon-loading"
 			 element-loading-background="#fff" ref="multipleTable" :data="tableData" style="width: 100%" :default-sort="{prop: 'date', order: 'descending'}"
 			 @selection-change="handleSelectionChange">
-				<el-table-column type="selection" width="55">
+				<el-table-column type="selection" width="40">
 				</el-table-column>
-				<el-table-column prop="productCoding" label="商品编码" width="120">
-
-				</el-table-column>
-				<el-table-column prop="p_img" label="商品图片" width="120">
+				<el-table-column prop="p_img" label="商品图片" width="100">
 					<template slot-scope="scope">
 						<img class="table_img" :src="scope.row.p_img" alt="">
 					</template>
 				</el-table-column>
-				<el-table-column prop="productName" label="商品名称" width="200">
+				<el-table-column prop="productName" label="商品名称">
+					<template slot-scope="scope">
+						<div class="goodsName">{{scope.row.productName}}</div>
+						<div class="goodsCode">商品编码:{{scope.row.productCoding}}</div>
+					</template>
 				</el-table-column>
-				<el-table-column prop="original" width="200" label="销售价格" sortable>
+				<el-table-column prop="original" width="100" label="销售价格">
 				</el-table-column>
-				<el-table-column prop="productNum" label="库存数量" width="200" sortable>
+				<el-table-column prop="productNum" label="库存数量" width="100">
 				</el-table-column>
-				<el-table-column prop="saleNum" label="累计销售" width="200" sortable>
+				<el-table-column prop="saleNum" label="累计销售" width="100">
 				</el-table-column>
-				
+				<el-table-column label="商品状态" width="100">
+					<template slot-scope="scope">
+						<div>
+							{{scope.row.productStatus|goodsStatus}}
+						</div>
+					</template>
+				</el-table-column>
 				<el-table-column label="编辑" width="250">
 					<template slot-scope="scope">
 						<div class="edite">
@@ -72,20 +79,14 @@
 						</div>
 					</template>
 				</el-table-column>
-				<el-table-column label="商品状态">
-					<template slot-scope="scope">
-						<div>
-							{{scope.row.productStatus|goodsStatus}}
-						</div>
-					</template>
-				</el-table-column>
+				
 			</el-table>
 			<div class="flex_r_f_s table_btom">
 				<div>
 					<el-button round @click="shelveAll">下架</el-button>
 					<el-button round @click="deleteTable">删除</el-button>
 				</div>
-				<el-pagination layout="prev, pager, next" :total="total" :page-size="5" @current-change="getPageData">
+				<el-pagination layout="prev, pager, next" :total="total" :page-size="15" @current-change="getPageData">
 				</el-pagination>
 			</div>
 
@@ -429,10 +430,7 @@
 				
 				
 			},
-			selectSort(index) { //点击排序数字背景变色
-				this.sortNum = index;
-
-			},
+			
 			cancelSortState() {
 				this.sortState = false;
 			},
@@ -539,7 +537,7 @@
 					shopId: JSON.parse(sessionStorage.getItem('user')).shopId,
 					status: state,
 					pageNo: val,
-					pageSize: '5',
+					pageSize: '15',
 					sortId: self.selectGoodsClass[2],
 					productCoding: self.goodsNum,
 					productName: self.goodsName,
@@ -867,7 +865,7 @@
 			margin-bottom: 30px;
 
 			.query_title {
-				font-size: 18px;
+				font-size: 14px;
 				color: #333;
 				margin-right: 5px;
 				width: 76px;
@@ -878,6 +876,7 @@
 				height: 30px;
 				line-height: 30px;
 				outline: none;
+				font-size: 14px;
 			}
 
 			.el-input.is-active .el-input__inner,
@@ -924,14 +923,16 @@
 					color: #FF523D;
 				}
 			}
-
+			.goodsName{
+				color: #0ab0f6;
+			}
 			.table_btom.flex_r_f_s {
 				justify-content: space-between;
 			}
 
 			.edite {
 				span {
-					font-size: 16px;
+					font-size: 14px;
 					color: #FF523D;
 					margin-right: 5px;
 					cursor: pointer;
@@ -963,7 +964,7 @@
 
 			.el-table thead th {
 				background: #ff8677;
-				padding: 0;
+				padding: 5px 0;
 				color: #fff;
 			}
 

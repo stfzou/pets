@@ -15,7 +15,7 @@
 			<li class="clearfloat" v-if="goodsBrand.length>0">
 				<p class="list_l">商品品牌<span>*</span></p>
 				<div class="list_r">
-					<el-select class="h32 goodsBrand" v-model="goodsBrandId" filterable placeholder="请选择">
+					<el-select class="h32 goodsBrand"  v-model="goodsBrandId" filterable placeholder="请选择">
 						<el-option
 							v-for="item in goodsBrand"
 							:key="item.brandId"
@@ -42,7 +42,7 @@
 			<li class="clearfloat">
 				<p class="list_l">商品名称<span>*</span></p>
 				<div class="list_r">
-					<el-input class="goodsNameInput h32" v-model="goodsNameInput" maxlength="30" placeholder="请输入内容"></el-input>
+					<el-input class="goodsNameInput h32" v-model="goodsNameInput" maxlength="60" placeholder="请输入商品名称"></el-input>
 				</div>
 			</li>
 			<li class="clearfloat">
@@ -50,11 +50,18 @@
 				<div class="list_r">
 					<div class="goods_main_pic">
 						<div class="goods_pic" v-if="goodsMainList.length>0">
-							<div class="img-box" :key="index" v-for="(item,index) in goodsMainList">
-								<img width="100%" :src="item.imgUrl" alt="">
-								<i class="el-icon-close pointer" @click="deleteGoodsMain(index)"></i>
-							</div>
-						
+							
+							<draggable v-model="goodsMainList" :options = "{animation:500}">
+								<transition-group>
+										
+										<div class="img-box" :key="item.imgId" v-for="(item,index) in goodsMainList">
+											<img width="100%" :src="item.imgUrl" alt="">
+											<i class="el-icon-close pointer" @click="deleteGoodsMain(index)"></i>
+										</div>
+										
+								</transition-group>
+							</draggable>
+							<div style="font-size: 12px; color: #ccc;margin-bottom: 10px;">提示:拖动可改变图片顺序</div>
 						</div>
 						<el-upload class="avatar-uploader" ref="uploadGoodsMain" action="http://192.168.0.109:8084/updateImg" multiple
 						 :on-success="handlePictureCardPreview"  :on-exceed="handleExceed" :limit="5" list-type="picture" name="Img" :before-upload="sizeReg">
@@ -74,7 +81,7 @@
 						<div class="specifications-list" :key="index" v-for="(e,index) in specifications">
 
 							<div class="list-top">
-								<el-select ref="select" v-model="e.value" :value-key="index+''" placeholder="请选择" @change="function(n){
+								<el-select ref="select" v-model="e.value" :value-key="index+''" placeholder="请选择规格名称" @change="function(n){
 										return specSelect(n,e)
 								}">
 									<el-option v-for="item in e.options" :key="item.value" :value="item.value" :label="item.label">
@@ -94,7 +101,7 @@
 										}"
 										multiple
 										default-first-option
-										placeholder="请选择文章标签">
+										placeholder="请选择规格属性(可多选)">
 										<el-option
 										  v-for="s in e.sOption"
 										  :key="s.value"
@@ -102,7 +109,7 @@
 										  :value="s.value">
 										</el-option>
 									  </el-select>
-								 <el-input class="searchOptInput" v-model="e.inputVal" maxlength="10" placeholder="请输入内容"></el-input> 
+								 <el-input class="searchOptInput" v-model="e.inputVal" maxlength="10" placeholder="自定义规格属性"></el-input> 
 							<span class="add pointer" @click="addGuigeName(e)">添加</span>
 								</div>
 							</div>
@@ -143,11 +150,12 @@
 								<el-input maxlength="10" @change="kucunInput(guigeList,'kucun','navKuncun')" v-model="navKuncun" placeholder="库存"></el-input>
 							</el-col>
 							<el-col :span="4">
-								<el-input maxlength="10" @change="kucunInput(guigeList,'cost','navChengben')" v-model="navChengben" placeholder="成本价"></el-input>
-							</el-col>
-							<el-col :span="4">
 								<el-input maxlength="10" @change="kucunInput(guigeList,'sellPrice','navXiaoshou')" v-model="navXiaoshou" placeholder="销售价"></el-input>
 							</el-col>
+							<el-col :span="4">
+								<el-input maxlength="10" @change="kucunInput(guigeList,'cost','navChengben')" v-model="navChengben" placeholder="成本价"></el-input>
+							</el-col>
+							
 							<el-col :span="4">
 								<el-input maxlength="10" @change="kucunInput(guigeList,'kg','navKg')" v-model="navKg" placeholder="重量(kg)"></el-input>
 							</el-col>
@@ -174,6 +182,9 @@
 								prop="kucun"
 								label="库存*"
 								width="100">
+								 <template slot="header" slot-scope="scope">
+									<div class="tbHead">库存<span>*</span></div>
+								  </template>
 								<template slot-scope="scope">
 								
 									<input maxlength="10" v-on:keyup="inputChange(scope.row,'kucun')" type="text"  v-model="scope.row.kucun" />
@@ -183,6 +194,9 @@
 								prop="sellPrice"
 								label="销售价"
 								width="100">
+								<template slot="header" slot-scope="scope">
+									<div class="tbHead">销售价<span>*</span></div>
+								 </template>
 								<template slot-scope="scope">
 									<input maxlength="10" v-on:keyup="inputChange(scope.row,'sellPrice')" type="text" v-model="scope.row.sellPrice" />
 									
@@ -192,6 +206,9 @@
 								prop="cost"
 								label="成本价"
 								width="100">
+								<template slot="header" slot-scope="scope">
+									<div class="tbHead">成本价<span>*</span></div>
+								 </template>
 								<template  slot-scope="scope">
 									<input maxlength="10" v-on:keyup="inputChange(scope.row,'cost')" type="text"   v-model="scope.row.cost" />
 								</template>
@@ -200,6 +217,9 @@
 								prop="kg"
 								label="重量"
 								width="100">
+								<template slot="header" slot-scope="scope">
+									<div class="tbHead">重量<span>*</span></div>
+								 </template>
 								<template  slot-scope="scope">
 									<input maxlength="10" v-on:keyup="inputChange(scope.row,'kg')" type="text"  v-model="scope.row.kg" />
 								</template>
@@ -247,6 +267,9 @@
 								prop="kucun"
 								label="库存*"
 								width="133.3">
+								<template slot="header" slot-scope="scope">
+									<div class="tbHead">库存<span>*</span></div>
+								 </template>
 								<template slot-scope="scope">
 									<input maxlength="10" type="text" v-on:keyup="inputChange(scope.row,'kucun')" v-model="scope.row.kucun" />
 								</template>
@@ -255,6 +278,9 @@
 								prop="sellPrice"
 								label="销售价"
 								width="133.3">
+								<template slot="header" slot-scope="scope">
+									<div class="tbHead">销售价<span>*</span></div>
+								 </template>
 								<template slot-scope="scope">
 									<input maxlength="10" type="text" v-on:keyup="inputChange(scope.row,'sellPrice')" v-model="scope.row.sellPrice" />
 								</template>
@@ -263,6 +289,9 @@
 								prop="cost"
 								label="成本价"
 								width="133.3">
+								<template slot="header" slot-scope="scope">
+									<div class="tbHead">成本价<span>*</span></div>
+								 </template>
 								<template  slot-scope="scope">
 									<input maxlength="10" type="text" v-on:keyup="inputChange(scope.row,'cost')" v-model="scope.row.cost" />
 								</template>
@@ -271,6 +300,9 @@
 								prop="kg"
 								label="重量"
 								width="133.3">
+								<template slot="header" slot-scope="scope">
+									<div class="tbHead">重量<span>*</span></div>
+								 </template>
 								<template  slot-scope="scope">
 									<input maxlength="10" type="text" v-on:keyup="inputChange(scope.row,'kg')" v-model="scope.row.kg" />
 								</template>
@@ -314,7 +346,7 @@
 				</div>
 			</li>
 			<li class="clearfloat">
-				<p class="list_l">商品描述<span>*</span></p>
+				<p class="list_l" >商品描述<span>*</span></p>
 				<div class="list_r editer">
 					<el-input
 						class="textarea"
@@ -323,26 +355,28 @@
 						placeholder="请输入内容"
 						v-model="editData">
 					</el-input>
-					<div class="shop_describe_img">
+				 	<div class="shop_describe_img">
 					
 							<draggable v-model="describeImg"  :options = "{animation:500}">
 								<transition-group>
 										
 										<div class="describe_img_box" v-for="(element,index) in describeImg" :key="element.imgId">
-											<img :src="element.imgUrl" alt="">
+											<img :src="element.imgUrl" :height="element.height" :width="element.width" alt="">
 											<i class="el-icon-close" @click="describeImgRemove(index)"></i>
 										</div>
 								</transition-group>
 							</draggable>
 							
 								<div class="upload-describe">
-									<el-upload class="describe-uploader" ref="uploadDescribe" action="http://192.168.0.109:8084/updateImg" multiple :file-list="describeImg"
-									:on-success="handleDescribe" :limit="9" list-type="picture" :on-exceed="handleDescribeExceed" name="Img" :before-upload="sizeReg">
+									<el-upload class="describe-uploader" ref="uploadDescribe" action="http://192.168.0.109:8084/updateImg" multiple
+									:on-success="handleDescribe" :limit="20" list-type="picture" :on-exceed="handleDescribeExceed" name="Img" :before-upload="sizeReg">
 									<i class="el-icon-plus"></i>
 									</el-upload>
 								</div>
-								
-						</div>
+								<div style="font-size: 12px; color: #ccc;margin-top: 10px ; float: left;width: 100%;">提示:拖动可改变图片顺序</div>
+					</div> 
+					
+					
 				</div>
 			</li>
 			<li class="clearfloat" v-if="false">
@@ -380,7 +414,7 @@
 				</div>
 			</li>
 			<li class="clearfloat">
-				<p class="list_l">退换货服务</p>
+				<p class="list_l">退换货服务<span>*</span></p>
 				<div class="list_r return_goods">
 					<el-select class="h32" v-model="returnGoods.value" placeholder="请选择">
 						<el-option
@@ -415,7 +449,7 @@
 				</div>
 			</li>
 			<li class="clearfloat">
-				<p class="list_l">物流费用</p>
+				<p class="list_l">物流费用<span>*</span></p>
 				<div class="list_r logistics flex_r_f_s">
 					<div class="logistics_box flex_r_s_b">
 						<el-input class="h32" :disabled="logistics.baoyou" @change="inputChange(logistics,'value')" v-model="logistics.value" placeholder="请输入物流费用"></el-input>
@@ -469,7 +503,7 @@
 				goodsMainList: [],//商品主图数据
 				specifications: [],//商品规格数据
 				specOption:[],
-				noSpecifications:[{kucun:'',sellPrice:'',cost:'',kg:'',sku:'',yulan:'',yulanId:'',flieList:[]}],//无商品规格数据
+				noSpecifications:[{kucun:'',sellPrice:'',cost:'',kg:'',sku:'',yulan:'',yulanId:'-1',flieList:[]}],//无商品规格数据
 				navData:['全部','全部'],
 				navKuncun:null,
 				navChengben:null,
@@ -509,7 +543,8 @@
 				quality:'1',//保质期
 				isQuality:false,
 				guigeList:[],
-				productId:''//商品Id
+				productId:'',//商品Id
+				imgSize:[]
 			};
 		},
 		computed: {
@@ -561,7 +596,10 @@
 			//获取商品Id
 			this.productId = this.$route.query.gId;
 			this.getEditGoodsType()
-			
+			setTimeout(()=>{
+				document.querySelector('.cnt').scrollTop = 0;
+				
+			},200)
 		},
 	
 		methods: {
@@ -710,7 +748,8 @@
 							});
 							
 						}
-						if(re.brand){
+						// console
+						if(re.brand!=null){
 							self.goodsBrandId = re.brand.brandId
 						}
 						
@@ -726,15 +765,23 @@
 							}).then(function(response){
 								if(response.data.code == 1){
 										self.goodsAttr.goodsAttrData = response.data.data;
-										
 										self.goodsAttr.goodsAttrData.forEach((e,i)=>{
-											if(re.sanv[i]){
-												self.goodsAttr.goodsAttrId.push({anId:re.sanv[i].anId,avId:re.sanv[i].avId});
-											}else{
-												self.goodsAttr.goodsAttrId.push({anId:e[0].anId,avId:''});
-											}
+											self.goodsAttr.goodsAttrId.push({anId:e[0].anId,avId:''});
 											
 										})
+										if(re.sanv.length>0){
+											re.sanv.forEach((e)=>{
+												self.goodsAttr.goodsAttrId.forEach((j)=>{
+													if(e.anId == j.anId){
+														j.avId = e.avId;
+													}
+												})
+											})
+										}else{
+											console.log(1111)
+										}
+										//
+										
 										
 										
 								}else{
@@ -753,9 +800,25 @@
 							re.descImgs.forEach((e)=>{
 								self.describeImg.push({
 									imgId:e.imgId,
-									imgUrl:e.imgAddr
+									imgUrl:e.imgAddr,
+									height:'',
+									width:'',
+									name:''
 								})
 							})
+							setTimeout(()=>{
+								let imgs = document.querySelectorAll('.describe_img_box img');
+								self.describeImg.forEach((e,i)=>{
+									if(imgs[i].height>imgs[i].width){
+										
+										e.height = 130;
+									}else{
+										e.width = 130;
+									}
+									
+								})
+								console.log(self.describeImg)
+							},300)
 						}
 						//获取商品类型
 						if(re.productType!=''){
@@ -794,7 +857,9 @@
 				
 				
 			},
+			
 			sizeReg(file){//检测上传l图片宽高
+				
 				let _this = this; 
 				return new Promise(function(resolve, reject) { 
 					var reader = new FileReader(); 
@@ -803,10 +868,15 @@
 						image.onload = function () { 
 							var width = this.width; 
 							var height = this.height; 
-							if (width<500||height<500){ 
-								_this.$alert('图片宽高尺寸必须大于500!', '提示', {confirmButtonText: '确定'}); 
+							if (width<10){ 
+								_this.$alert('图片宽度必须大于500!', '提示', {confirmButtonText: '确定'}); 
 								reject(); 
-							} 
+							}
+							 if(width<=height){
+							 	_this.imgSize.push({name:file.name,imgH:130,imgW:''});
+							 }else{
+							 	_this.imgSize.push({name:file.name,imgW:130,imgH:''});
+							 }
 							resolve(); 
 						}; 
 						image.src = event.target.result; 
@@ -838,9 +908,6 @@
 					if(this.selectedGoodsClass.length==0){
 						this.$message.error('请选择商品分类');
 						return false;
-					}else if(!this.goodsBrandId){
-						this.$message.error('请选择商品品牌');
-						return false;
 					}else if(!this.goodsNameInput){
 						this.$message.error('请填写商品名称');
 						return false;
@@ -868,7 +935,7 @@
 						guigeS = 1;
 						let isHttp = true;
 						this.guigeList.forEach((e)=>{
-							if(e.kucun==''||e.sellPrice==''||e.cost==''||e.kg==''||e.sku==''||e.yulanId==''){
+							if(e.kucun==''||e.sellPrice==''||e.cost==''||e.kg==''){
 							  isHttp = false;
 								return false;
 							}
@@ -908,7 +975,7 @@
 					}else{
 						guigeS = 0;
 						let  nospec = this.noSpecifications[0]
-						if(nospec.kucun==''||nospec.sellPrice==''||nospec.cost==''||nospec.kg==''||nospec.sku==''||nospec.yulanId==''){
+						if(nospec.kucun==''||nospec.sellPrice==''||nospec.cost==''||nospec.kg==''){
 							this.$message.error('请完善规格信息');
 							return false;
 						}else{
@@ -944,7 +1011,7 @@
 					}else{
 						guigeS = 0;
 						let  nospec = this.noSpecifications[0]
-						if(nospec.kucun==''||nospec.sellPrice==''||nospec.cost==''||nospec.kg==''||nospec.sku==''||nospec.yulanId==''){
+						if(nospec.kucun==''||nospec.sellPrice==''||nospec.cost==''||nospec.kg==''){
 							this.$message.error('请完善规格信息');
 							return false;
 						}else{
@@ -956,6 +1023,7 @@
 				
 				if(this.goodsAttr.goodsAttrData.length>0){
 					this.goodsAttr.goodsAttrData.forEach((e)=>{
+						
 						e.forEach((s)=>{
 							this.goodsAttr.goodsAttrId.forEach((j)=>{
 								if(s.avId == j.avId&&s.anId == j.anId){
@@ -1015,9 +1083,7 @@
 							message:'提交成功',
 							type: 'success',
 						});
-						setTimeout(()=>{
-							self.$router.go(0)
-						},500)
+						self.$router.push({name:'sell'});
 						
 						
 					}else{
@@ -1223,7 +1289,7 @@
 			},
 			//商品主图上传回调
 			handlePictureCardPreview(response, file, fileList) {
-				console.log(this.goodsAttr.goodsAttrId)
+				
 				this.goodsMainList.push({
 					imgId:file.response.data.imgId,
 					imgUrl:file.response.data.imgAddr
@@ -1274,15 +1340,25 @@
 				})
 			},
 			handleDescribe(response, file, fileList){ //商品描述图片上传
-				
+			
 				this.describeImg.push({
 					imgId:file.response.data.imgId,
-					imgUrl:file.response.data.imgAddr
+					imgUrl:file.response.data.imgAddr,
+					height:'',
+					width:'',
+					name:file.name
 				})
-				
+				this.imgSize.forEach((e)=>{
+					this.describeImg.forEach((j)=>{
+						if(e.name == j.name){
+							j.height = e.imgH;
+							j.width = e.imgW;
+						}
+					})
+				})
 			},
 			handleDescribeExceed(files, fileList){
-				this.$message.warning(`当前限制选择 9 个文件`);
+				this.$message.warning(`当前限制选择 20 个文件`);
 			},
 			tableImgRemove(scope){//table图片删除
 					
@@ -1627,7 +1703,7 @@
 							self.specifications[1].guigeName.forEach((s)=>{
 								self.guigeList.push({
 									idS1:p.parentId,idS2:s.parentId,idOne:p.subId,idTwo:s.subId,specOne:p.name,specTwo:s.name,
-									kucun:'',sellPrice:'',cost:'',kg:'',sku:'',yulan:'',yulanId:'',flieList:[]
+									kucun:'',sellPrice:'',cost:'',kg:'',sku:'',yulan:'',yulanId:'-1',flieList:[]
 								})
 								
 							})
@@ -1637,13 +1713,14 @@
 					self.specifications[0].guigeName.forEach((s)=>{
 						self.guigeList.push({
 							idS1:s.parentId,idOne:s.subId,specOne:s.name,
-							kucun:'',sellPrice:'',cost:'',kg:'',sku:'',yulan:'',yulanId:'',flieList:[]
+							kucun:'',sellPrice:'',cost:'',kg:'',sku:'',yulan:'',yulanId:'-1',flieList:[]
 						})
 						
 					})
 				}
-			}
+			},
 			
+		
 			
 		}
 	}
@@ -1686,7 +1763,7 @@
 					}
 				}
 				.add_goods_title {
-					font-size: 18px;
+					font-size: 16px;
 					color: #FF523D;
 					height: 22px;
 					line-height: 22px;
@@ -1699,7 +1776,7 @@
 					float: left;
 					height: 32px;
 					line-height: 32px;
-					font-size: 18px;
+					font-size: 14px;
 					color: #333;
 
 					span {
@@ -1721,6 +1798,7 @@
 						.el-input,.el-input__inner{
 							height: 32px;
 							line-height: 32px;
+							font-size: 14px;
 						}
 						
 					}
@@ -1741,6 +1819,7 @@
 
 					.el-cascader__label {
 						color: #333;
+						font-size: 14px;
 					}
 
 					.el-input__icon {
@@ -1805,7 +1884,7 @@
 								color: #333;
 								text-align: left;
 								padding-left: 15px;
-								font-size: 16px;
+								font-size: 14px;
 								color: #999;
 
 								span {
@@ -1835,7 +1914,7 @@
 						color: #333;
 						text-align: left;
 						padding-left: 15px;
-						font-size: 16px;
+						font-size: 14px;
 						color: #999;
 
 						span {
@@ -1867,7 +1946,7 @@
 								box-sizing: border-box;
 								border: 1px solid #ddd;
 								border-radius: 6px;
-
+								margin-top: 5px;
 								.el-input {
 									width: 200px;
 								}
@@ -1944,6 +2023,12 @@
 								
 							}
 						}
+						.tbHead{
+							span{
+								color: #FF523D;
+								font-size: 16px;
+							}
+						}
 						.el-table--enable-row-hover .el-table__body tr:hover>td{
 							background: none;
 						}
@@ -2014,14 +2099,20 @@
 							position: relative;
 							margin-right: 35px;
 							margin-bottom: 20px;
+							overflow: hidden;
 							img{
-								width: 130px;
-								height: 130px;
+								display: block;
+								position:absolute;
+								left: 50%;
+								top: 50%;
+								transform: translate(-50%,-50%);
+								// height: 130px;
+								
 							}
 							.el-icon-close{
 								position: absolute;
-								top:-5px;
-								right:-5px;
+								top:0px;
+								right:0px;
 								background: rgba(0, 0, 0, 0.5);
 								color: #fff;
 								border-radius: 50%;
@@ -2148,7 +2239,7 @@
 						padding-right: 5px;
 						.el-input__inner{
 							border: none;
-							font-size: 16px;
+							font-size: 14px;
 						}
 					}
 					.tx{

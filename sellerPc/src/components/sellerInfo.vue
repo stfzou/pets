@@ -198,6 +198,18 @@
 								</div>
 							</div>
 						</li>
+						<li>
+							<p>商家简介<span>*</span></p>
+							<div class="list_r">
+								
+								<el-input
+								  class="sellerTextarea"
+								  type="textarea"
+								  placeholder="请输入内容"
+								  v-model="sellerTextarea">
+								</el-input>
+							</div>
+						</li>
 					</ul>
 					<div class="pointer next_btn" @click="next">点击进入下一步</div>
 					
@@ -217,6 +229,7 @@
 			return {
 				varietiesData: [],
 				varietiesValue:[],//经营品类
+				sellerTextarea:'',//商家简介
 				markers:{
 					 dragend: (e) => {
 						var geocoder = new AMap.Geocoder();
@@ -493,7 +506,9 @@
 						return false;
 					}else if(this.sellerInfo.logoId == ''){
 						this.$message.error('请上传LOGO');
-						
+						return false;
+					}else if(this.sellerTextarea == ''){
+						this.$message.error('请填写商家简介');
 						return false;
 					}else{
 						let loading = this.$loading({
@@ -519,6 +534,7 @@
 							imgInStore:self.sellerInfo.inId,
 							latitude:self.mapCenter[1],
 							longitude:self.mapCenter[0],
+							shopDesc:self.sellerTextarea
 							
 						}), {
 							headers: {
@@ -652,6 +668,7 @@
 						color: #FF523D;
 					}
 				}
+				
 				.list_r{
 					float: left;
 					position: relative;
@@ -666,6 +683,17 @@
 						border-radius:6px;
 						padding-left: 20px;
 						box-sizing: border-box;
+					}
+					.sellerTextarea{
+						textarea{
+							width:620px;
+							outline: none;
+							height: 100px;
+							color: #333;
+							font-size: 16px;
+							border-color: #ddd;
+						}
+						
 					}
 					.active_input{
 						width: 420px;

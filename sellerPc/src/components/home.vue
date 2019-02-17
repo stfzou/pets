@@ -18,10 +18,10 @@
 			</header>
 			
 		</div>
-		<div class="main-cnt ">
+		<div class="main-cnt">
 			<div class="cnt-scroll container">
 				<el-container class="scrollWrapper">
-					<el-aside width="350px" class="navWapper">
+					<el-aside width="300px" class="navWapper">
 						
 							<GeminiScrollbar class="my-scroll-bar">
 								<div class="nav_left">
@@ -130,6 +130,7 @@
 				this.subNavIndex = index;
 			},
 			quit(){
+				
 				let self = this;
 				this.$confirm('是否要退出登录?', '提示', {
 						confirmButtonText: '确定',
@@ -148,6 +149,8 @@
 			this.navIndex = this.$store.state.nav.navNum;
 			this.subNavIndex = this.$store.state.nav.subNum;
 			this.subNavData = this.navData[this.navIndex].subData;
+			
+			
 		}
 			
 		
@@ -179,7 +182,7 @@
 				width: 100%;
 				.container{
 					background:#FF8677;
-					height: 120px;
+					height: 100px;
 					padding:0 28px;
 					box-sizing: border-box;
 					border-bottom: 2px solid #ff523d;
@@ -244,8 +247,8 @@
 			position: relative;
 			padding: 0;
 			.cnt-scroll{
-				height: calc(100% - 120px);
-				margin-top: 120px;
+				height: calc(100% - 100px);
+				margin-top: 100px;
 				.scrollWrapper{
 					height: 100%;
 					.navWapper{
@@ -257,7 +260,7 @@
 							right: 0;
 							top: 0;
 							height: 100%;
-							width: 240px;
+							width: 200px;
 							ul{
 								width: 130px;
 								margin: 0 auto;
@@ -272,7 +275,7 @@
 										vertical-align: center;
 									}
 									a{
-										font-size: 16px;
+										font-size: 14px;
 										color: #333;
 										margin-left: 10px;
 									}
@@ -298,12 +301,12 @@
 							  }
 							}
 							.nav_left{
-								width: 110px;
+								width: 100px;
 								background: #434343;
 								
 								ul{
 									li{
-										height: 90px;
+										height: 70px;
 										margin-bottom:20px;
 										padding: 0 14px;
 										margin-bottom: 40px;
@@ -315,10 +318,11 @@
 											width: 44px;
 											margin: 0 auto;
 											display: block;
-											margin-top: 15px;
+											margin-top: 6px;
 										}
 										p{
 											text-align:center;
+											font-size: 14px;
 										}
 									}
 									li:last-child{
@@ -333,9 +337,9 @@
 										.triangle-right{
 											width: 0;
 											height: 0;
-											border-top: 45px solid transparent;
+											border-top: 35px solid transparent;
 											border-left: 32px solid #ff523d;
-											border-bottom: 45px solid transparent;
+											border-bottom: 35px solid transparent;
 											position: absolute;
 											right: -32px;
 											top: 0;

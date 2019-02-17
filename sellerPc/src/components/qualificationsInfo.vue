@@ -188,7 +188,7 @@
 								placeholder="选择日期">
 							</el-date-picker> -->
 							<el-date-picker class="yxdate" v-model="yxDate" type="daterange" range-separator="至" start-placeholder="开始日期"
-							 end-placeholder="结束日期">
+							 end-placeholder="结束日期" value-format="yyyy-MM-dd">
 							</el-date-picker>
 							<el-checkbox v-model="checked">长期</el-checkbox>
 						</div>
@@ -390,7 +390,7 @@
 				let shopInfoData = {};
 				
 				if (self.shopTypeName == '医疗诊所') {
-					console.log(0)
+					
 					if (this.inputData.userNameVal == '') {
 
 						this.$message.error('真实姓名不能为空');
@@ -482,7 +482,7 @@
 					// 
 
 				} else {
-					console.log(1)
+					
 					if (this.inputData.userNameVal == '') {
 
 						this.$message.error('真实姓名不能为空');
