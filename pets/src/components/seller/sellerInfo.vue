@@ -3,18 +3,19 @@
 		<div class="seller_info">
 			<h2>商家信息</h2>
 			<div class="seller_pic">
-				<img src="../../assets/images/seller_pic.png" alt="">
-				<img src="../../assets/images/seller_pic.png" alt="">
+				<img v-show="shopImgFacade" :src="item.imgAddr" alt="" v-for="(item,index) in shopImgFacade">
+				<img v-show="shopImgInStore" :src="item.imgAddr" alt="" v-for="(item,index) in shopImgInStore">
+				
 			</div>
 			<div class="text">
-				商家简介：自由犬宠物用品主要针对宠物主粮、宠物零食宠物玩具等系列产品的线上及线下的销售服务，为消费者带来更好的购物体验。
+				商家简介：{{desc}}。
 			</div>
 		</div>
 		<div class="line"></div>
 		<div class="seller_info_list">
 			<div class="flex_r_s_b">
 				<span>商家名称</span>
-				<span>自由宠物犬用品</span>
+				<span>{{shopName}}</span>
 			</div>
 			<div class="flex_r_s_b">
 				<span>经营品类</span>
@@ -22,11 +23,11 @@
 			</div>
 			<div class="flex_r_s_b">
 				<span>商家地址</span>
-				<span>成都市东恒国际二栋</span>
+				<span>{{shopAddress}}</span>
 			</div>
 			<div class="flex_r_s_b none">
 				<span>经营时间</span>
-				<span>9:00-18:00</span>
+				<span>{{startTime}}-{{endTime}}</span>
 			</div>
 		</div>
 		<div class="line"></div>
@@ -44,8 +45,41 @@
 	export default {
 		data() {
 			return {
-				
+				desc:'',
+				shopName:'',
+				shopAddress:'',
+				startTime:'',
+				endTime:'',
+				shopImgFacade:'',
+				shopImgInStore:''
 			};
+		},
+		mounted() {
+			this.getInfo()
+		},
+		methods:{
+			getInfo(){
+				let self = this;
+				self.axios.post('/webShop/getShopsWholeById',self.qs.stringify({
+					shopId:23
+				}), {
+					headers: {
+						'Content-Type': 'application/x-www-form-urlencoded'
+					}
+				}).then((res)=>{
+					if(res.data.code == 1){
+						let re = res.data.data;
+						self.desc = re.shopDesc;
+						self.shopName = re.shopName;
+						self.shopAddress = re.shopAddress;
+						self.startTime = re.startTime;
+						self.endTime = re.endTime;
+						self.shopImgFacade = re.shopImgFacade;
+						self.shopImgInStore = re.shopImgInStore;
+						console.log(self.shopImgFacade)
+					}
+				})
+			}
 		}
 	}
 </script>
@@ -68,6 +102,7 @@
 					width: 150px;
 					border-radius: 6px;
 					margin-right: 16px;
+					margin-top: 10px;
 				}
 				
 			}

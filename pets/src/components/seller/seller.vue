@@ -11,10 +11,10 @@
 					<div class="flex_r_f_s intd_top">
 						<img class="head_icon" src="../../assets/icon/head_icon.png" alt="">
 						<div class="mid">
-							<div class="name">自由犬宠物物品</div>
+							<div class="name">{{goodsName}}</div>
 							<div class="flex_r_f_s distance">
 								<span class="dist_icon"></span>
-								<span class="juli">距离2.5公里</span>
+								<span class="juli">{{distance}}</span>
 							</div>
 							<div class="flex_r_f_s btom">
 								<span class="span1">送货上门</span>
@@ -62,12 +62,10 @@
 					</router-link>
 				</div>
 			</div>
-			<div class="load-warp flex_r_f_s" v-if="loading">
-				<cube-loading></cube-loading>
-			</div>
-			<transition name="fade">
+			
+			<!-- <transition name="fade"> -->
 				<router-view></router-view>
-			</transition>
+			<!-- </transition> -->
 		</div>
 		
 	</div>
@@ -85,7 +83,10 @@
 					{navName:'所有商品',link:{name:"sellerGoods"}},
 					{navName:'店铺评价',link:{name:"sellerEval"}},
 					{navName:'商家信息',link:{name:"sellerInfo"}},
-				]
+				],
+				goodsName:'',
+				distance:''
+				
 			}
 		},
 		components:{
@@ -112,6 +113,26 @@
 				setTimeout(()=>{
 					this.loading = false;
 				},500)
+			},
+			getStoreInfo(){
+				let self = this;
+				self.axios.post('/webShop/selectShopsInfoById',self.qs.stringify({
+					shopId:23,
+					lat:0,
+					lng:0
+				}), {
+					headers: {
+						'Content-Type': 'application/x-www-form-urlencoded'
+					}
+				}).then(function(res){
+					if(res.data.code == 1){
+						self.goodsName = res.data.data.shopName;
+						self.distance = res.data.data.distance;
+					}else{
+						// self.$message.error(res.data.msg);
+					}
+					
+				})
 			}
 		},
 		mounted() {
@@ -122,6 +143,8 @@
 				let currentLeft = a.offsetLeft+a.offsetWidth/2-pic.offsetWidth/2;
 				pic.style.left = currentLeft+'px';
 			});
+			//获取商家信息
+			this.getStoreInfo();
 		},
 		watch:{
 			'$route':'loadState'
