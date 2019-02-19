@@ -8,6 +8,7 @@ import EvalContent from '@/components/seller/evalContent.vue'
 import SellerActive from '@/components/seller/sellerActive.vue'
 import SellerVipCt from '@/components/seller/sellerVipCt.vue'
 import Tap from '@/components/seller/tap.vue'
+import GoodsDetails from '@/components/seller/goodsDetails'
 Vue.use(Router)
 export default new Router({
 	mode: 'history',
@@ -20,6 +21,11 @@ export default new Router({
 			path:'/tap',
 			name:'tap',
 			component:Tap,
+		},
+		{
+			path:'/goodsDetails',
+			name:'goodsDetails',
+			component:GoodsDetails,
 		},
 		{
 		 path:'/sellerActive',
