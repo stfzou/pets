@@ -9,6 +9,8 @@ import SellerActive from '@/components/seller/sellerActive.vue'
 import SellerVipCt from '@/components/seller/sellerVipCt.vue'
 import Tap from '@/components/seller/tap.vue'
 import GoodsDetails from '@/components/seller/goodsDetails'
+import GoodsComment from '@/components/seller/goodsComment'
+import BusinSelectAddr from '@/components/seller/businSelectAddr'
 Vue.use(Router)
 export default new Router({
 	mode: 'history',
@@ -26,6 +28,16 @@ export default new Router({
 			path:'/goodsDetails',
 			name:'goodsDetails',
 			component:GoodsDetails,
+		},
+		{
+			path:'/goodsComment',
+			name:'goodsComment',
+			component:GoodsComment,
+		},
+		{
+			path:'/businSelectAddr',
+			name:'businSelectAddr',
+			component:BusinSelectAddr,
 		},
 		{
 		 path:'/sellerActive',
