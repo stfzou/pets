@@ -11,6 +11,8 @@ import Tap from '@/components/seller/tap.vue'
 import GoodsDetails from '@/components/seller/goodsDetails'
 import GoodsComment from '@/components/seller/goodsComment'
 import BusinSelectAddr from '@/components/seller/businSelectAddr'
+import AddAddr from '@/components/seller/addAddr'
+import ConfirmAddr from '@/components/seller/confirmAddr'
 Vue.use(Router)
 export default new Router({
 	mode: 'history',
@@ -38,6 +40,16 @@ export default new Router({
 			path:'/businSelectAddr',
 			name:'businSelectAddr',
 			component:BusinSelectAddr,
+		},
+		{
+			path:'/confirmAddr',
+			name:'confirmAddr',
+			component:ConfirmAddr,
+		},
+		{
+			path:'/addAddr',
+			name:'addAddr',
+			component:AddAddr,
 		},
 		{
 		 path:'/sellerActive',
