@@ -108,7 +108,7 @@
 						txt:{
 							more: '加载更多', noMore: '没有更多数据了',
 						},
-						threshold:20,
+						threshold:30,
 						
 					}
 				},
@@ -126,13 +126,16 @@
 		methods: {
 			select(item,index){
 				this.evalList = [];
+				this.page = 0;
 				this.$refs.scroll.scrollTo(0,0)
 				this.curunt = index;
 				this.isImgCode = item.isImg;
 				this.isPraiseCode = item.isPraise;
-				this.page = 0;
-				this.getEval(item.isImg,item.isPraise);
-				// this.$refs.scroll.refresh();
+				setTimeout(()=>{
+					this.getEval(item.isImg,item.isPraise);
+				},100)
+				
+				 
 			},
 			getEval(isImg, isPraise) {
 				let self = this;
@@ -149,13 +152,18 @@
 				}).then((res) => {
 					if (res.data.code == 1) {
 						self.evalList = res.data.data;
+						setTimeout(()=>{
+							self.$refs.scroll.refresh();
+						},200)
 					}
 				})
 			},
 			  onPullingDown() {
 			// 模拟更新数据
 				this.page = 0;
+				console.log(this.page)
 				this.getEval(this.isImgCode,this.isPraiseCode);
+				
 				setTimeout(() => {
 			
 				  this.$refs.scroll.forceUpdate();
@@ -173,6 +181,7 @@
 				
 				let self = this;
 				this.page++;
+				console.log(this.page)
 				setTimeout(() => {
 					
 					self.axios.post('/webShop/selectShopAssessPage',self.qs.stringify({
@@ -186,6 +195,7 @@
 							'Content-Type': 'application/x-www-form-urlencoded'
 						}
 					}).then((res)=>{
+						
 						if(res.data.code == 1){
 							console.log(res)
 							
@@ -198,6 +208,8 @@
 									self.$refs.scroll.forceUpdate();
 									
 								},500)
+							}else{
+								self.$refs.scroll.forceUpdate();
 							}
 							
 							

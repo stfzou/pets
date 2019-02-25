@@ -74,25 +74,25 @@
 		<div class="addr">
 			<ul>
 				<li class="flex_r_f_s right_bg">
-					<div class="list_title">送至</div>
+					<div class="list_title w95">配送至</div>
 					<div class="address flex_r_f_s">
 						<img src="../../assets/icon/map@2x.png" alt="">
 						<span>四川成都市锦江区锦华路三段</span>
 					</div>
 				</li>
 				<li class="flex_r_f_s">
-					<div class="list_title">服务</div>
+					<div class="list_title active_title">商家送货</div>
 					<div class="service">
 						<div class="service_label flex_r_f_s">
 							<span>30分钟送达</span>
 							<span>2KM内免费送货上门</span>
 						</div>
-						<p>18:00下单，最快今日18：45送达;</p>
 						<p>该商家支持送货上门，订单金额未满88元将收取6元上门费；</p>
 					</div>
 				</li>
+				<div class="tip">您的地址已超过商家送货上门范围，推荐选择快递发货！</div>
 				<li class="flex_r_f_s">
-					<div class="list_title">运费</div>
+					<div class="list_title active_title">快递发货</div>
 					<div class="service">
 						<div class="service_label flex_r_f_s">
 							<span>同城快递5元</span>
@@ -103,7 +103,7 @@
 					</div>
 				</li>
 				<li class="flex_r_f_s">
-					<div class="list_title">自提</div>
+					<div class="list_title active_title">上门自提</div>
 					<div class="service">
 						<div class="service_label flex_r_f_s">
 							<span>该商家支持上门自提</span>
@@ -196,6 +196,16 @@
 			</ul>
 		</div>
 		<div class="foot flex_r_f_s">
+			<div class="collection flex_r_f_e">
+				<div class="collection_l">
+					<img src="../../assets/shoucang.png" alt="">
+					<p>收藏</p>
+				</div>
+				<div class="collection_r">
+					<img src="../../assets/icon_kefu.png" alt="">
+					<p>客服</p>
+				</div>
+			</div>
 			<div class="add_car flex_r_s_c" @click="specShow">加入购物车</div>
 			<div class="purchase flex_r_s_c" @click="specShow">立即购买</div>
 		</div>
@@ -705,7 +715,7 @@
 			font-size:26px;
 			color: #666;
 			margin-right: 30px;
-			width: 80px;
+			width: 70px;
 		}
 		.right_bg{
 			background: url(../../assets/icon/right_sjx.png) no-repeat 100% center;
@@ -741,9 +751,30 @@
 		.addr{
 			ul{
 				padding: 15px 20px;
+				.tip{
+					padding: 10px 0 10px 90px;
+					background: #fff1df url('../../assets/tip.png') no-repeat 50px center;
+					background-size: 30px;
+					font-size: 22px;
+					color: #ff523d;
+					margin-bottom: 25px;
+				}
+				.w95{
+					width: 100px;
+				}
 				li{
 					padding: 15px 0;
-					
+					.active_title{
+						width: 68px;
+						height: 68px;
+						box-sizing: border-box;
+						font-size: 26px;
+						background: #ff523d;
+						color: #fff;
+						border-radius: 10px;
+						text-align: center;
+						line-height: 36px;
+					}
 					.address{
 						height: 38px;
 						img{
@@ -972,12 +1003,28 @@
 			background: #fff;
 			border-top: 1px solid #ff523d;
 			div{
-				width: 50%;
+				width: 33.333%;
 				height: 98px;
 				font-size: 28px;
 			}
+			.collection{
+				padding-top: 10px;
+				box-sizing: border-box;
+				img{
+					display: block;
+					height: 56px;
+					margin: 0 auto;
+				}
+				p{
+					margin-top: 10px;
+					font-size: 24px;
+					color: #000;
+					text-align: center;
+				}
+			}
 			.add_car{
-				color: #000;
+				color: #ff523d;
+				background: #ffe7e7;
 			}
 			.purchase{
 				background: #ff523d;

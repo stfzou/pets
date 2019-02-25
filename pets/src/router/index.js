@@ -13,6 +13,7 @@ import GoodsComment from '@/components/seller/goodsComment'
 import BusinSelectAddr from '@/components/seller/businSelectAddr'
 import AddAddr from '@/components/seller/addAddr'
 import ConfirmAddr from '@/components/seller/confirmAddr'
+import UserAddr from '@/components/seller/userAddr'
 Vue.use(Router)
 export default new Router({
 	mode: 'history',
@@ -50,6 +51,11 @@ export default new Router({
 			path:'/addAddr',
 			name:'addAddr',
 			component:AddAddr,
+		},
+		{
+			path:'/userAddr',
+			name:'userAddr',
+			component:UserAddr,
 		},
 		{
 		 path:'/sellerActive',
