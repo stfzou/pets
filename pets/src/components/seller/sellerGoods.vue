@@ -2,7 +2,7 @@
 	<div class="sellerGoods_warp">
 		<cube-scroll ref="scroll"  @pulling-up="onPullingUp" @pulling-down="onPullingDown" :options="options">
 		<div class="goods_list flex_r_s_b">
-			<div class="goods" v-for="(item,index) in goodsData" :key="index">
+			<div class="goods" v-for="(item,index) in goodsData" :key="index" @click="goodsDetailLink(item)">
 				<img class="goods_pic" :src="item.pmainImgAddr" alt="">
 				<div class="goods_info">
 					<h3>{{item.productName}}</h3>
@@ -117,7 +117,6 @@
 				}).then((res)=>{
 					if(res.data.code == 1){
 						self.goodsData = res.data.data;
-						
 					}else{
 						  const toast = this.$createToast({
 							time: 1000,
@@ -126,6 +125,9 @@
 						  toast.show()
 					}
 				})
+			},
+			goodsDetailLink(item){
+				this.$router.push({name:'goodsDetails',query:{pId:item.productId}})
 			}
 		}
 	}

@@ -14,9 +14,9 @@
 				<div class="list_l">手机号</div>
 				<input class="phone" type="text" v-model="phone" placeholder="联系人号码">
 			</li>
-			<li class="flex_r_f_s list_bg">
-				<div class="list_l">收获地址</div>
-				<div class="mid">成都长宝大厦</div>
+			<li class="flex_r_f_s list_bg" @click="addrMap">
+				<div class="list_l">收货地址</div>
+				<div class="mid"></div>
 			</li>
 			<li class="flex_r_f_s">
 				<div class="list_l">门牌号</div>
@@ -35,7 +35,12 @@
 				addr:'',
 				houseNumber:''
 			}
-		}
+		},
+		methods: {
+			addrMap() {
+				this.$router.push({name:'confirmAddr'})
+			}
+		},
 	}
 </script>
 

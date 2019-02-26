@@ -1,7 +1,7 @@
 <template>
 	<div class="confirmAddr">
 		<div class="top_nav flex_r_s_b">
-			<div class="back"></div>
+			<div class="back" @click="back"></div>
 			<div class="nav_title">确认收货地址</div>
 		</div>
 		<div class="amap-page-container">
@@ -77,7 +77,12 @@
 			
 			let h = document.documentElement.clientHeight - document.querySelector("#serch_list").offsetTop;
 			document.querySelector("#serch_list").style.height = h+'px';
-		}
+		},
+		methods: {
+			back(){
+				this.$router.go(-1);//返回上一层
+			},
+		},
 	}
 </script>
 

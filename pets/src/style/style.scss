@@ -86,7 +86,7 @@ body {
 // flex样式
 .flex_r_s_c,.flex_r_s_b,.flex_r_f_s,.flex_r_f_e,.flex_c_f_s,.flex_c_f_e,.flex_c_s_b{
   width: 100%;
-  overflow: hidden;
+  // overflow: hidden;
   display: -webkit-box;      /* OLD - iOS 6-, Safari 3.1-6 */
   display: -moz-box;         /* OLD - Firefox 19- (buggy but mostly works) */
   display: -ms-flexbox;      /* TWEENER - IE 10 */

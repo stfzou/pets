@@ -1,5 +1,9 @@
 <template>
 	<div class="goodsDetails_warp">
+		<cube-popup type="my-popup" ref="myPopup">
+			定位失败
+		</cube-popup>
+		
 		<div class="goodsDetails_nav">
 			
 			<div class="back"></div>
@@ -14,25 +18,27 @@
 			<cube-slide ref="slide" :data="slidItems">
 				  <cube-slide-item v-for="(item, index) in slidItems" :key="index">
 					<a href="###">
-					  <img :src="item.url">
+					  <img :src="item.imgAddr">
 					</a>
 				  </cube-slide-item>
 			</cube-slide>
 		</div>
 		<div class="countdown flex_r_s_b">
 			<div class="countdown_l">
-				<span class="new">￥<b>75.00</b></span>
+				<span class="new">￥<b v-if="activePrice!=''">{{activePrice}}</b><b v-else>{{price}}</b></span>
 				
 			</div>
-			<div class="countdown_r">
+			<div class="countdown_r" :class="{flex_r_s_c:activePrice==''}">
 				<!-- <div class="countdown_time">距离结束<span>00:45:56</span></div> -->
-				<div class="old">￥105.00</div>
+				<div class="old" v-if="activePrice!=''">
+					<span>￥{{price}}</span>
+				</div>
 				<div class="progress_box flex_r_s_b">
 					<div class="progress">
-						<div class="progress_line" :style="'width:'+ 80 +'%;'"></div>
+						<div class="progress_line" :style="'width:'+ saleNum +'%;'"></div>
 					</div>
 					
-					<div class="sale">已售54%</div>
+					<div class="sale">已售{{saleNum}}件</div>
 				</div>
 			</div>
 			<div class="countdown_time_box">
@@ -42,7 +48,7 @@
 				</div>
 			</div>
 		</div>
-		<div class="product_name">疯狂的小狗博美专用狗粮1.5KG*2包幼犬成犬粮小型犬美毛去泪痕6斤</div>
+		<div class="product_name">{{productName}}</div>
 		<div class="line"></div>
 		<div class="discount">
 			<ul>
@@ -75,9 +81,9 @@
 			<ul>
 				<li class="flex_r_f_s right_bg">
 					<div class="list_title w95">配送至</div>
-					<div class="address flex_r_f_s">
+					<div class="address flex_r_f_s" @click="addrLink">
 						<img src="../../assets/icon/map@2x.png" alt="">
-						<span>四川成都市锦江区锦华路三段</span>
+						 <span>{{addr}}</span>
 					</div>
 				</li>
 				<li class="flex_r_f_s">
@@ -90,7 +96,7 @@
 						<p>该商家支持送货上门，订单金额未满88元将收取6元上门费；</p>
 					</div>
 				</li>
-				<div class="tip">您的地址已超过商家送货上门范围，推荐选择快递发货！</div>
+				<div class="tip" v-if="isDelivery">您的地址已超过商家送货上门范围，推荐选择快递发货！</div>
 				<li class="flex_r_f_s">
 					<div class="list_title active_title">快递发货</div>
 					<div class="service">
@@ -102,7 +108,7 @@
 						<p>商家承诺下单付款后12小时内完成发货</p>
 					</div>
 				</li>
-				<li class="flex_r_f_s">
+				<li class="flex_r_f_s" v-if="isExtract">
 					<div class="list_title active_title">上门自提</div>
 					<div class="service">
 						<div class="service_label flex_r_f_s">
@@ -121,32 +127,33 @@
 		<div class="line"></div>
 		<div class="store_info">
 			<div class="head_img flex_r_f_s">
-				<img class="head_pic" src="../../assets/head_icon.png" alt="">
+				<img class="head_pic" :src="shopImgAddr" alt="">
 				<div class="headImg_right">
 					<div class="store_name flex_r_s_b">
-						<div class="storeName_text">自由犬宠物用品</div>
+						<div class="storeName_text">{{shopName}}</div>
 						<div class="store_addr flex_r_f_s">
 							<img src="../../assets/icon/map@2x.png" alt="">
-							<span>距离2.5公里</span>
+							<span>{{distance}}</span>
 						</div>
 					</div>
 					<div class="service_item">
-						服务项目包含：用品销售、美容美发、寄养看护
+						服务项目包含：<!-- <span v-for="(item,index) in severItem" :key="index">{{item.typeName|severItemFilter(index)}}</span> -->
+						<span v-for="(item,index) in severItem" :key="index">{{item.typeName | severItemFilter(index,severItem.length-1)}}</span>
 					</div>
 				</div>
 			</div>
 			<div class="follow">
 				<ul class="flex_r_s_b">
 					<li>
-						<div>123</div>
+						<div>{{attentionNum}}</div>
 						<p>关注人数</p>
 					</li>
 					<li>
-						<div>123</div>
+						<div>{{productNum}}</div>
 						<p>商品数量</p>
 					</li>
 					<li>
-						<div>123</div>
+						<div>{{saleNum}}</div>
 						<p>累计销售</p>
 					</li>
 				</ul>
@@ -160,7 +167,7 @@
 			</div>
 		</div>
 		<div class="line"></div>
-		<div class="buyer_comment">
+		<div class="buyer_comment" v-if="evalList.length>0">
 			<div class="buyerCmment_title">
 				<div class="flex_r_f_s">
 					<img src="../../assets/icon/icon_xiaoxi.png" alt="">
@@ -214,38 +221,19 @@
 				<h3 class="flex_r_s_c">产品参数</h3>
 				<ul>
 					<cube-scroll ref="scroll">
-						<li class="flex_r_f_s">
+						<li class="flex_r_f_s" v-if="brand!=''">
 							<div class="parameter_l">品牌</div>
-							<div class="parameter_r">疯狂的小狗</div>
+							<div class="parameter_r">{{brand}}</div>
 						</li>
-						<li class="flex_r_f_s">
-							<div class="parameter_l">品牌</div>
-							<div class="parameter_r">疯狂的小狗</div>
+						<li class="flex_r_f_s" v-if="sortName!=''">
+							<div class="parameter_l">分类</div>
+							<div class="parameter_r">{{sortName}}</div>
 						</li>
-						<li class="flex_r_f_s">
-							<div class="parameter_l">品牌</div>
-							<div class="parameter_r">疯狂的小狗</div>
+						<li class="flex_r_f_s" v-show="sanv.length>0" v-for="(item,index) in sanv" :key="index">
+							<div class="parameter_l">{{item.anName}}</div>
+							<div class="parameter_r">{{item.avName}}</div>
 						</li>
-						<li class="flex_r_f_s">
-							<div class="parameter_l">品牌</div>
-							<div class="parameter_r">疯狂的小狗</div>
-						</li>
-						<li class="flex_r_f_s">
-							<div class="parameter_l">宠物体型</div>
-							<div class="parameter_r">疯狂的小狗</div>
-						</li>
-						<li class="flex_r_f_s">
-							<div class="parameter_l">宠物体型</div>
-							<div class="parameter_r">疯狂的小狗</div>
-						</li>
-						<li class="flex_r_f_s">
-							<div class="parameter_l">宠物体型</div>
-							<div class="parameter_r">疯狂的小狗</div>
-						</li>
-						<li class="flex_r_f_s">
-							<div class="parameter_l">宠物体型</div>
-							<div class="parameter_r">疯狂的小狗</div>
-						</li>
+						
 					</cube-scroll>
 				</ul>
 				<div class="parameterBtn_box">
@@ -260,8 +248,9 @@
 						<img src="../../assets/product.png" alt="">
 					</div>
 					<div class="goods_name">
-						<h4>疯狂的小狗博美专用狗粮1.5KG*2包幼犬成犬粮小型犬美毛去泪痕6斤</h4>
-						<div class="price">￥75.00</div>
+						<h4>{{productName}}</h4>
+						<div class="price" v-if="activePrice!=''">￥{{activePrice}}</div>
+						<div class="price" v-else>￥{{price}}</div>
 					</div>
 				</div>
 				<div class="selct_spec">
@@ -295,65 +284,161 @@
 			</div>
 			
 		</div>
+		<div class="amap-page-container" v-show="false">
+			<el-amap ref="map" vid="amapDemo" :plugin="plugin" class="amap-demo">
+			</el-amap>
+		
+		</div>
 	</div>
 </template>
 
 <script>
 	export default {
 		data(){
+			let self = this;
 			return{
-				slidItems:[
-					{
-						url: require('../../assets/banner.png')
-					},
-					{
-						url:require('../../assets/banner.png')
-					},
-					{
-						url:require('../../assets/banner.png')
-					}
-				],
+				slidItems:[],
+				brand:'',
+				sortName:'',
+				shopImgAddr:'',
+				shopName:'',
+				severItem:[],
+				saleNum:'',
+				productName:'',
+				productNum:'',
+				attentionNum:'',
+				isExtract:'',//上门自提
+				isShipping:'',//是否包邮
+				isDelivery:'',//是否支持送货上门
+				isAuthentic:'',//正品保证
 				evalList:[],
 				disabled:true,
 				isMask:false,
 				isSpec:false,
 				isParameter:false,
+				price:'',
+				activePrice:'',
+				lng:'',
+				lat:'',
+				addr:'',
+				distance:'',
+				sanv:[],
+				tipTxt:'',
 				specAttr:[
 					{selectId:'1',name:'重量',attr:[{anId:'1',anName:'0.5KG'},{anId:'2',anName:'1.5KG'}]},
 					{selectId:'3',name:'鸡肉味',attr:[{anId:'3',anName:'鸡肉味'},{anId:'4',anName:'牛肉味'}]}
 				],
-				num:1
+				num:1,
+				plugin: [
+
+					{
+						pName: 'Geolocation',
+						enableHighAccuracy: true,//是否使用高精度定位，默认:true
+						timeout: 100,          //超过10秒后停止定位，默认：无穷大
+						maximumAge: 0,           //定位结果缓存0毫秒，默认：0
+						convert: true,           //自动偏移坐标，偏移后的坐标为高德坐标，默认：true
+						showButton: true,        //显示定位按钮，默认：true
+						buttonPosition: 'RB',    //定位按钮停靠位置，默认：'LB'，左下角
+						showMarker: true,        //定位成功后在定位到的位置显示点标记，默认：true
+						showCircle: true,        //定位成功后用圆圈表示定位精度范围，默认：true
+						panToLocation: true,     //定位成功后将定位到的位置作为地图中心点，默认：true
+						zoomToAccuracy:true,//定位成功后调整地图视野范围使定位位置及精度范围视野内可见，默认：f
+						extensions:'all',
+						events: {
+							init(o) {
+								// o 是高德地图定位插件实例
+								o.getCurrentPosition((status, result) => {
+									
+									if (result && result.position) {
+ 										self.lng = result.position.lng;
+ 										self.lat = result.position.lat;
+// 										self.$nextTick();
+										// console.log(result)
+										self.addr = result.formattedAddress;
+										setTimeout(()=>{
+											
+											self.axios.post('/shop/selectShopsProductDetails',self.qs.stringify({
+												productId:146,
+												userId:29,
+												lat:self.lat,
+												lng:self.lng
+											}), {
+												headers: {
+													'Content-Type': 'application/x-www-form-urlencoded'
+												}
+											}).then((res)=>{
+												if(res.data.code == 1){
+													self.slidItems = res.data.data.pMainImgs;
+													self.distance = res.data.data.shopInfo.distance;
+													self.severItem = res.data.data.shopInfo.operateTypes;
+													self.shopName = res.data.data.shopInfo.shopName;
+													self.shopImgAddr = res.data.data.shopInfo.shopImgAddr;
+													self.price = res.data.data.skus[0].original;
+													if(res.data.data.activityPrice){
+														self.activePrice = res.data.data.activityPrice;
+													}
+													if(res.data.data.shopInfo.saleNum == 0){
+														self.saleNum = 0;
+													}else{
+														self.saleNum = Number(res.data.data.shopInfo.saleNum/res.data.data.shopInfo.productNum*100).toFixed();
+													}
+													self.productNum = res.data.data.shopInfo.productNum;
+													self.attentionNum = res.data.data.shopInfo.attentionNum;
+													self.isExtract = res.data.data.productDelivery.isExtract;
+													self.isDelivery = res.data.data.productDelivery.isDelivery;
+													self.productName = res.data.data.productName;
+													if(res.data.data.brand!=null){
+														self.brand = res.data.data.brand.brandName;
+													}
+													if(res.data.data.sortDto.sortName){
+														self.sortName = res.data.data.sortDto.sortName;
+													}
+													if(res.data.data.sanv.length>0){
+														self.sanv = res.data.data.sanv;
+													}
+													if(res.data.data.assessDto.length>0){
+														self.evalList = res.data.data.assessDto;
+													}
+													console.log(res)
+													
+												}else{
+													console.log(res)
+												}
+											})
+										},100)
+										
+									}else{
+										let component = self.$refs.myPopup;
+										component.show()
+										  setTimeout(() => {
+											component.hide()
+										  }, 1000)
+										
+									}
+								});
+							}
+						}
+					}
+				]
 			}
 		},
 		mounted() {
-			this.getEval(-1,-1);
+			
 			
 		},
+		filters:{
+			
+			severItemFilter(val,index,arrl){
+				if(arrl == index){
+					return val;
+				}else{
+					return val+'、'
+				}
+			}
+		},
 		methods:{
-			getEval(isImg,isPraise){
-				let self = this;
-				self.axios.post('/webShop/selectShopAssessPage',self.qs.stringify({
-					shopId:23,
-					isImg:isImg,
-					isPraise:isPraise,
-					pageNo:0,
-					pageSize:5
-				}), {
-					headers: {
-						'Content-Type': 'application/x-www-form-urlencoded'
-					}
-				}).then((res)=>{
-					if(res.data.code == 1){
-						if(res.data.data.length>2){
-							self.evalList = res.data.data.slice(0,2);
-						}else{
-							self.evalList = res.data.data;
-						}
-						
-					}
-				})
-			},
 			parameterShow(){
+				let self = this;
 				this.isMask = true;
 				this.isParameter = true;
 				setTimeout(()=>{
@@ -394,8 +479,12 @@
 				}else{
 					this.num--;
 				}
+			},
+			addrLink(){
+				this.$router.push({name:'businSelectAddr'})
 			}
-
+		
+			
 		}
 	}
 </script>
@@ -405,6 +494,13 @@
 	@import '../../style/mixin.scss';
 	.goodsDetails_warp{
 		padding-bottom: 98px;
+		.amap-page-container{
+			height: 300px;
+		}
+		.cube-popup-content{
+			font-size: 28px;
+			color: #fff;
+		}
 		.mask{
 			height: 100%;
 			width: 100%;
@@ -645,7 +741,8 @@
 				width: 210px;
 				.old{
 					text-decoration:line-through;
-					margin: 15px 0;
+					height: 50px;
+					line-height: 50px;
 					font-size: 24px;
 					color: #fff;
 				}
@@ -776,7 +873,9 @@
 						line-height: 36px;
 					}
 					.address{
-						height: 38px;
+						height: 50px;
+						padding-right: 20px;
+						box-sizing: border-box;
 						img{
 							width: 18px;
 							margin-right: 5px;
@@ -784,6 +883,7 @@
 						span{
 							font-size: 24px;
 							color: #000;
+							line-height: 28px;
 						}
 					}
 					.service{
@@ -850,8 +950,9 @@
 						
 					}
 					.store_addr{
-						width: 165px;
+						width: 180px;
 						height: 50px;
+						overflow:initial;
 						img{
 							width: 18px;
 							margin-right: 10px;
@@ -859,12 +960,14 @@
 						span{
 							font-size: 22px;
 							color: #666;
+							line-height: 28px;
 						}
 					}
 				}
 				.service_item{
 					color: #333;
 					font-size: 22px;
+					margin-top: 6px;
 				}
 			}
 			.follow{
