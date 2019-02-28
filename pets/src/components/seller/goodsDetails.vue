@@ -62,16 +62,16 @@
 				<li class="flex_r_f_s right_bg" @click="specShow">
 					<div class="list_title">选择</div>
 					<div class="parameter">
-						<span>1.5kg</span>,
-						<span>鸡肉味</span>
+						<span v-for="(item,index) in guige">{{item.anName | parameterFilter(index,guige.length-1)}}</span>
+						
 					</div>
 				</li>
 				<li class="flex_r_f_s right_bg" @click="parameterShow">
 					<div class="list_title">参数</div>
 					<div class="parameter">
-						<span>味道</span>
-						<span>颜色</span>
-						<span>尺寸</span>...
+						<span v-if="brand!=''">{{brand}}、</span>
+						<span>{{sortName}}</span>
+						<span v-if="sanv.length>1">{{sanv[0].anName}}</span>
 					</div>
 				</li>
 			</ul>
@@ -90,25 +90,26 @@
 					<div class="list_title active_title">商家送货</div>
 					<div class="service">
 						<div class="service_label flex_r_f_s">
-							<span>30分钟送达</span>
-							<span>2KM内免费送货上门</span>
+							<span v-if="deliveryTime">{{deliveryTime}}送达</span>
+							<span v-if="mostFar">{{mostFar}}免费送货上门</span>
 						</div>
 						<p>该商家支持送货上门，订单金额未满88元将收取6元上门费；</p>
 					</div>
 				</li>
-				<div class="tip" v-if="isDelivery">您的地址已超过商家送货上门范围，推荐选择快递发货！</div>
+				<div class="tip" v-if="isDelivery==0">您的地址已超过商家送货上门范围，推荐选择快递发货！</div>
 				<li class="flex_r_f_s">
 					<div class="list_title active_title">快递发货</div>
 					<div class="service">
 						<div class="service_label flex_r_f_s">
 							<span>同城快递5元</span>
-							<span>满88包邮</span>
-							<span>商家包邮</span>
+							<span v-if="isShipping==1">商家包邮</span>
+							<!-- <span>满88包邮</span> -->
+							
 						</div>
-						<p>商家承诺下单付款后12小时内完成发货</p>
+						<p>商家承诺下单付款后{{deliveryTime}}完成发货</p>
 					</div>
 				</li>
-				<li class="flex_r_f_s" v-if="isExtract">
+				<li class="flex_r_f_s" v-if="isExtract==1">
 					<div class="list_title active_title">上门自提</div>
 					<div class="service">
 						<div class="service_label flex_r_f_s">
@@ -121,7 +122,7 @@
 			</ul>
 			<div class="promise flex_r_f_s">
 				<div><span class="promise_icon">正</span>正品保证，假一赔十</div>
-				<div><span class="promise_icon">退</span>七天退换货（未拆封）</div>
+				<div><span class="promise_icon">退</span>{{returnService|returnServiceFilter}}</div>
 			</div>
 		</div>
 		<div class="line"></div>
@@ -245,7 +246,7 @@
 			<div class="product_spec" v-if="isSpec" @click.stop>
 				<div class="spec_head flex_r_f_s">
 					<div class="product_img">
-						<img src="../../assets/product.png" alt="">
+						<img :src="skuImg" alt="">
 					</div>
 					<div class="goods_name">
 						<h4>{{productName}}</h4>
@@ -257,10 +258,11 @@
 					
 					<ul>
 						<cube-scroll ref="scroll">
-							<li v-for="(item,index) in specAttr">
-								<div class="spec_name">{{item.name}}</div>
+							
+							<li v-for="(item,index) in guige">
+								<div class="spec_name">{{item.anName}}</div>
 								<div class="spec_attr flex_r_f_s">
-									<span @click="slectAttr(item,im)" :class="{active:item.selectId == im.anId}" class="flex_r_s_c" v-for="im in item.attr" :key="im.anid">{{im.anName}}</span>
+									<span @click="slectAttr(item,im)" :class="{active:item.selectId == im.attrValueId}" class="flex_r_s_c" v-for="im in item.avs" :key="im.attrValueId">{{im.attrValueName}}</span>
 								</div>
 							</li>
 						
@@ -324,11 +326,14 @@
 				distance:'',
 				sanv:[],
 				tipTxt:'',
-				specAttr:[
-					{selectId:'1',name:'重量',attr:[{anId:'1',anName:'0.5KG'},{anId:'2',anName:'1.5KG'}]},
-					{selectId:'3',name:'鸡肉味',attr:[{anId:'3',anName:'鸡肉味'},{anId:'4',anName:'牛肉味'}]}
-				],
+				specAttr:[],
+				guige:[],
 				num:1,
+				skuId:'',
+				skuImg:'',
+				deliveryTime:'',//多少时间内送到
+				mostFar:'',
+				returnService:'',
 				plugin: [
 
 					{
@@ -352,13 +357,14 @@
 									if (result && result.position) {
  										self.lng = result.position.lng;
  										self.lat = result.position.lat;
+										console.log(self.lng+'           '+self.lat)
 // 										self.$nextTick();
 										// console.log(result)
 										self.addr = result.formattedAddress;
 										setTimeout(()=>{
 											
 											self.axios.post('/shop/selectShopsProductDetails',self.qs.stringify({
-												productId:146,
+												productId:110,
 												userId:29,
 												lat:self.lat,
 												lng:self.lng
@@ -386,7 +392,17 @@
 													self.attentionNum = res.data.data.shopInfo.attentionNum;
 													self.isExtract = res.data.data.productDelivery.isExtract;
 													self.isDelivery = res.data.data.productDelivery.isDelivery;
+													self.isShipping = res.data.data.productDelivery.isShipping;
 													self.productName = res.data.data.productName;
+													self.specAttr = res.data.data.skus;
+													self.skuImg = res.data.data.skus[0].skuImgAddr;
+													self.returnService = res.data.data.productTips.returnService;
+													if(res.data.data.productDelivery.deliveryTime!=null){
+														self.deliveryTime = res.data.data.productDelivery.deliveryTime;
+													}
+													if(res.data.data.productDelivery.mostFar!=null){
+														self.mostFar = res.data.data.productDelivery.mostFar;
+													}
 													if(res.data.data.brand!=null){
 														self.brand = res.data.data.brand.brandName;
 													}
@@ -399,6 +415,22 @@
 													if(res.data.data.assessDto.length>0){
 														self.evalList = res.data.data.assessDto;
 													}
+													if(res.data.data.guige.length>0){
+														// self.guige = res.data.data.guige;
+														res.data.data.guige.forEach((e)=>{
+															self.guige.push({
+																anId:e.anId,
+																anName:e.anName,
+																avs:e.avs,
+																selectId:''
+															})
+														})
+														
+													}else if(res.data.data.guige.length==0){
+														self.skuId = res.data.data.skus[0].skuId;
+														self.skuImg = res.data.data.skus[0].skuImgAddr;
+													}
+													
 													console.log(res)
 													
 												}else{
@@ -426,6 +458,13 @@
 			
 			
 		},
+		computed: {
+			getSkuId() {
+				this.skus.forEach((e)=>{
+					
+				})
+			}
+		},
 		filters:{
 			
 			severItemFilter(val,index,arrl){
@@ -433,6 +472,22 @@
 					return val;
 				}else{
 					return val+'、'
+				}
+			},
+			parameterFilter(val,index,arrl){
+				if(arrl == index){
+					return val;
+				}else{
+					return val+'、'
+				}
+			},
+			returnServiceFilter(val){
+				if(val == 1){
+					return '三天退换货(未拆封)'
+				}else if(val == 2){
+					return '七天退换货(未拆封)'
+				}else if(val == 3){
+					return '不支持退换货'
 				}
 			}
 		},
@@ -468,7 +523,26 @@
 				this.isSpec = false;
 			},
 			slectAttr(item,im){
-				item.selectId = im.anId;
+				
+				item.selectId = im.attrValueId;
+				if(this.guige.length==2){
+					this.specAttr.forEach((e)=>{
+						if((e.anvs[0].avId == this.guige[0].selectId&&e.anvs[1].avId == this.guige[1].selectId)||(e.anvs[1].avId == this.guige[0].selectId&&e.anvs[0].avId == this.guige[1].selectId)){
+							this.skuId = e.skuId;
+							this.skuImg = e.skuImgAddr
+							return false;
+						}
+					})
+				}else if(this.guige.length==1){
+					this.specAttr.forEach((e)=>{
+						if(e.anvs[0].avId == this.guige[0].selectId){
+							this.skuId = e.skuId;
+							this.skuImg = e.skuImgAddr
+							return false;
+						}
+					})
+				}
+				console.log(this.skuId)
 			},
 			addGoods(){
 				this.num++;
@@ -712,6 +786,9 @@
 			}
 			.cube-slide-dots{
 				bottom: 20px;
+			}
+			img{
+				width: 720px;
 			}
 		}
 		.countdown{

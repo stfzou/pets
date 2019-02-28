@@ -14,6 +14,8 @@ import BusinSelectAddr from '@/components/seller/businSelectAddr'
 import AddAddr from '@/components/seller/addAddr'
 import ConfirmAddr from '@/components/seller/confirmAddr'
 import UserAddr from '@/components/seller/userAddr'
+import ShopCar from '@/components/seller/shopCar'
+import OrderAccounts from '@/components/seller/orderAccounts'
 Vue.use(Router)
 export default new Router({
 	mode: 'history',
@@ -31,6 +33,16 @@ export default new Router({
 			path:'/goodsDetails',
 			name:'goodsDetails',
 			component:GoodsDetails,
+		},
+		{
+			path:'/shopCar',
+			name:'shopCar',
+			component:ShopCar,
+		},
+		{
+			path:'/orderAccounts',
+			name:'orderAccounts',
+			component:OrderAccounts
 		},
 		{
 			path:'/goodsComment',
