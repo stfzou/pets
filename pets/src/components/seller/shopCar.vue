@@ -3,18 +3,18 @@
 		<div class="top_nav flex_r_s_b">
 			<div class="back" @click="back"></div>
 			<div class="nav_title">购物车</div>
-			<div class="text">编辑</div>
+			<div class="text" @click="edit">{{text}}</div>
 		</div>
-		<div class="shopCart_list">
+		<div class="shopCart_list" v-if="shopCarData.length>0">
 			<ul>
-				<li>
+				<li v-for="item in shopCarData" :key="item.shopId">
 					<div class="shopName_box flex_r_f_s">
 						<cube-checkbox v-model="checked" :option="option">
 							
 						</cube-checkbox>
 						<div class="shopName flex_r_f_s">
 							<img src="../../assets/icon_dianpu.png" alt="">
-							<span>自由犬宠物物品</span>
+							<span>{{item.shopName}}</span>
 						</div>
 					</div>
 					<div class="discount flex_r_f_s">
@@ -22,26 +22,35 @@
 						<span class="text">满99减5元</span>
 					</div>
 					<div class="goods_list">
-						<div class="goods_item flex_r_f_e">
+						<div class="goods_item flex_r_f_e"  v-for="subItem in item.carPs" :key="subItem.carId">
 							<cube-checkbox v-model="checked" :option="option"></cube-checkbox>
 							<div class="mid">
-								<img src="../../assets/head_icon.png" alt="">
+								<img :src="subItem.skuImgAddr" alt="">
 							</div>
 							<div class="goods_r">
-								<div class="goods_name">比瑞吉10kg小型犬成犬天然狗粮泰迪贵宾博美比熊犬主粮小狗粮20斤</div>
-								<div class="parameter">鸡肉味；1.5KG</div>
-								<div class="activity"><span class="flex_r_s_c">限时</span></div>
+								<div class="goods_name">{{subItem.productName}}</div>
+								<div class="parameter" v-if="subItem.anvs.length>0">
+									
+									<span v-for="(s,index) in subItem.anvs">{{s.avName|pNameFilter(index,subItem.anvs.length-1)}}</span>
+								</div>
+								<div class="activity">
+									<div>
+										<span>限时</span>
+									</div>
+									
+								</div>
 								<div class="price_box flex_r_s_b">
 									<div class="price_l">
-										<span class="new">￥92.00</span>
-										<span class="old">￥109</span>
+										<span class="new" v-if="subItem.activityPrice!=null">￥{{subItem.activityPrice}}</span>
+										<span class="new" v-else>￥{{subItem.original}}</span>
+										<span class="old" v-if="subItem.activityPrice!=null">￥{{subItem.original}}</span>
 									</div>
 									<div class="num_box flex_r_f_s">
-										<div class="add flex_r_s_c" style="width: 33.333%;" @click="reduce">
+										<div class="add flex_r_s_c" style="width: 33.333%;" @click="reduce(subItem)">
 											<img src="../../assets/reduce.png" alt="">
 										</div>
-										<input style="width: 33.333%;" type="text" v-model="val">
-										<div style="width: 33.333%;" class="reduce flex_r_s_c" @click="add">
+										<input style="width: 33.333%;" type="text" @change="number(subItem)" v-model="subItem.productNum">
+										<div style="width: 33.333%;" class="reduce flex_r_s_c" @click="add(subItem)">
 											<img src="../../assets/add.png" alt="">
 										</div>
 									</div>
@@ -49,79 +58,10 @@
 								
 							</div>
 						</div>
-						<div class="goods_item flex_r_f_e">
-							<cube-checkbox v-model="checked" :option="option"></cube-checkbox>
-							<div class="mid">
-								<img src="../../assets/head_icon.png" alt="">
-							</div>
-							<div class="goods_r">
-								<div class="goods_name">比瑞吉10kg小型犬成犬天然狗粮泰迪贵宾博美比熊犬主粮小狗粮20斤</div>
-								<div class="parameter">鸡肉味；1.5KG</div>
-								<div class="activity"><span class="flex_r_s_c">限时</span></div>
-								<div class="price_box flex_r_s_b">
-									<div class="price_l">
-										<span class="new">￥92.00</span>
-										<span class="old">￥109</span>
-									</div>
-									<div class="num_box flex_r_f_s">
-										<div class="add flex_r_s_c" style="width: 33.333%;" @click="reduce">
-											<img src="../../assets/reduce.png" alt="">
-										</div>
-										<input style="width: 33.333%;" type="text" v-model="val">
-										<div style="width: 33.333%;" class="reduce flex_r_s_c" @click="add">
-											<img src="../../assets/add.png" alt="">
-										</div>
-									</div>
-								</div>
-								
-							</div>
-						</div>
+						
 					</div>
 				</li>
-				<li>
-					<div class="shopName_box flex_r_f_s">
-						<cube-checkbox v-model="checked" :option="option">
-							
-						</cube-checkbox>
-						<div class="shopName flex_r_f_s">
-							<img src="../../assets/icon_dianpu.png" alt="">
-							<span>自由犬宠物物品</span>
-						</div>
-					</div>
-					<div class="discount flex_r_f_s">
-						<span class="discount_title flex_r_s_c">优惠</span>
-						<span class="text">满99减5元</span>
-					</div>
-					<div class="goods_list">
-						<div class="goods_item flex_r_f_e">
-							<cube-checkbox v-model="checked" :option="option"></cube-checkbox>
-							<div class="mid">
-								<img src="../../assets/head_icon.png" alt="">
-							</div>
-							<div class="goods_r">
-								<div class="goods_name">比瑞吉10kg小型犬成犬天然狗粮泰迪贵宾博美比熊犬主粮小狗粮20斤</div>
-								<div class="parameter">鸡肉味；1.5KG</div>
-								<div class="activity"><span class="flex_r_s_c">限时</span></div>
-								<div class="price_box flex_r_s_b">
-									<div class="price_l">
-										<span class="new">￥92.00</span>
-										<span class="old">￥109</span>
-									</div>
-									<div class="num_box flex_r_f_s">
-										<div class="add flex_r_s_c" style="width: 33.333%;" @click="reduce">
-											<img src="../../assets/reduce.png" alt="">
-										</div>
-										<input style="width: 33.333%;" type="text" v-model="val">
-										<div style="width: 33.333%;" class="reduce flex_r_s_c" @click="add">
-											<img src="../../assets/add.png" alt="">
-										</div>
-									</div>
-								</div>
-								
-							</div>
-						</div>
-					</div>
-				</li>
+				
 			</ul>
 		</div>
 		<div class="shopCart_foot flex_r_s_b">
@@ -129,7 +69,7 @@
 				<cube-checkbox v-model="checked" :option="option"></cube-checkbox>
 				<span class="text">全选</span>
 			</div>
-			<div class="count_price flex_r_s_b" v-if="false">
+			<div class="count_price flex_r_s_b" v-if="conuntStatus">
 				<div class="count_l">
 					合计:￥350.00
 				</div>
@@ -137,7 +77,7 @@
 					去结算(0)
 				</div>
 			</div>
-			<div class="delete_btn flex_r_s_c">
+			<div v-else class="delete_btn flex_r_s_c">
 				删除选中
 			</div>
 		</div>
@@ -145,6 +85,7 @@
 </template>
 
 <script>
+	import Api from '../common/apj.js'
 	export default{
 		data(){
 			return{
@@ -154,23 +95,176 @@
 					value: 'optionValue',
 					disabled: false
 				},
-				val:1
+				val:1,
+				shopCarData:[],
+				conuntStatus:true,
+				text:'编辑'
+				
 			}
+		},
+		mounted() {
+			
+			this.getShopCar();
+		},
+		filters:{
+			pNameFilter(val,index,arrl){
+				
+				if(arrl == index){
+					return val;
+				}else{
+					return val+' ; '
+				}
+			},
 		},
 		methods: {
 			back() {
 				this.$router.go(-1);//返回上一层
 			},
-			add(){
-				this.val++;
-			},
-			reduce(){
-				if(this.val<=1){
-					this.val = 1;
+			edit(){
+				this.conuntStatus = !this.conuntStatus;
+				if(this.conuntStatus){
+					this.text = '编辑'
 				}else{
-					this.val --;
+					this.text = '完成'
 				}
-			}
+			},
+			add(subItem){
+				let self = this;
+				if(subItem.productNum >= subItem.reserve){
+					self.$createDialog({
+						type: 'alert',
+						title: `警告`,
+						content: '库存不够了哦',
+						icon: 'cubeic-warn'
+					}).show()
+					subItem.productNum = subItem.productNum;
+				}else{
+					self.axios.post(Api.userApi+'/car/shopCarOperate',self.qs.stringify({
+						shopId:subItem.shopId,
+						productId:subItem.productId,
+						skuId:subItem.skuId,
+						userId:subItem.userId,
+						num:1
+					}), {
+						headers: {
+							'Content-Type': 'application/x-www-form-urlencoded'
+						}
+					}).then((res)=>{
+						
+						if(res.data.code == 1){
+							subItem.productNum++
+							subItem.skuImgId = subItem.productNum;
+						}else{
+							self.$createDialog({
+								type: 'error',
+								title: `失败`,
+								content: res.data.msg,
+								icon: 'cubeic-wrong'
+							}).show()
+						}
+					})
+				}
+				
+				
+			},
+			reduce(subItem){
+				if(subItem.productNum<=1){
+					console.log('不能再减了哦')
+				}else{
+					
+					let self = this;
+					self.axios.post(Api.userApi+'/car/shopCarOperate',self.qs.stringify({
+						shopId:subItem.shopId,
+						productId:subItem.productId,
+						skuId:subItem.skuId,
+						userId:subItem.userId,
+						num:-1
+					}), {
+						headers: {
+							'Content-Type': 'application/x-www-form-urlencoded'
+						}
+					}).then((res)=>{
+						
+						if(res.data.code == 1){
+							subItem.productNum = subItem.productNum-1;
+							subItem.skuImgId = subItem.productNum;
+							console.log(self.shopCarData)
+						}else{
+							self.$createDialog({
+								type: 'error',
+								title: `失败`,
+								content: res.data.msg,
+								icon: 'cubeic-wrong'
+							}).show()
+						}
+					})
+				}
+			},
+			getShopCar(){
+				let self = this;
+				self.axios.post(Api.userApi+'/car/selectShopCar',self.qs.stringify({
+					userId:24,
+				}), {
+					headers: {
+						'Content-Type': 'application/x-www-form-urlencoded'
+					}
+				}).then((res)=>{
+					
+					if(res.data.code == 1){
+						self.shopCarData = res.data.data.carShops;
+						self.shopCarData.forEach((e)=>{
+							e.carPs.forEach((j)=>{
+								j.skuImgId = j.productNum;
+							})
+						})
+						console.log(self.shopCarData)
+					}
+				})
+			},
+			number(subItem){　　
+				
+　　　 			subItem.productNum=subItem.productNum.replace(/[^\.\d]/g,'');
+				subItem.productNum=subItem.productNum.replace('.','');
+				if(subItem.productNum == ''||subItem.productNum == subItem.skuImgId){
+					subItem.productNum = subItem.skuImgId;
+				}else if(subItem.productNum>=subItem.reserve){
+					this.$createDialog({
+						type: 'alert',
+						title: `警告`,
+						content: '库存不够了哦',
+						icon: 'cubeic-warn'
+					}).show()
+					subItem.productNum = subItem.skuImgId;
+				}else{
+					// subItem.skuImgId = subItem.productNum;
+					let self = this;
+					self.axios.post(Api.userApi+'/car/shopCarOperate',self.qs.stringify({
+						shopId:subItem.shopId,
+						productId:subItem.productId,
+						skuId:subItem.skuId,
+						userId:subItem.userId,
+						num:subItem.productNum-subItem.skuImgId
+					}), {
+						headers: {
+							'Content-Type': 'application/x-www-form-urlencoded'
+						}
+					}).then((res)=>{
+						
+						if(res.data.code == 1){
+							// subItem.productNum = subItem.productNum-1;
+							subItem.skuImgId = subItem.productNum;
+							
+						}else{
+							self.$createDialog({
+								type: 'error',
+								title: `失败`,
+								content: res.data.msg,
+								icon: 'cubeic-wrong'
+							}).show()
+						}
+					})
+				}
+　　		}
 		},
 	}
 </script>
@@ -299,8 +393,7 @@
 										background: #c271fe;
 										color: #fff;
 										border-radius: 5px;
-										width: 50px;
-										height: 28px;
+										padding:2px 4px;
 									}
 								}
 								.price_box{
@@ -320,7 +413,7 @@
 									.num_box{
 										width: 160px;
 										height: 44px;
-										border-radius: 20px;
+										border-radius: 40px;
 										background: #FF523D;
 										div{
 											img{
@@ -346,6 +439,8 @@
 							border: none;
 						}
 					}
+					
+						
 				}
 			}
 		}

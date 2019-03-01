@@ -6,6 +6,7 @@ import router from './router'
 import 'lib-flexible/flexible.js'
 import '@/style/style.scss'
 import axios from "axios"
+import http from "axios"
 import Qs from 'qs'
 import Cube from 'cube-ui'
 import store from './store/store.js'
@@ -14,9 +15,11 @@ import AMap from 'vue-amap'
 Vue.use(Cube)
 Vue.use(AMap)
 Vue.prototype.axios = axios;
+Vue.prototype.http = http;
 Vue.prototype.qs = Qs;
 Vue.config.productionTip = false
-axios.defaults.baseURL = 'http://192.168.0.109:8084'
+// axios.defaults.baseURL = 'http://192.168.0.109:8084'
+// http.defaults.baseURL = 'http://192.168.0.109:8082'
 
 AMap.initAMapApiLoader({
   key: 'fe2312e4704c6f8f7787c7864ecebae6',

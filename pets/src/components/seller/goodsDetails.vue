@@ -69,7 +69,7 @@
 				<li class="flex_r_f_s right_bg" @click="parameterShow">
 					<div class="list_title">参数</div>
 					<div class="parameter">
-						<span v-if="brand!=''">{{brand}}、</span>
+						<span v-if="brand!=''">{{brand+'、'}}</span>
 						<span>{{sortName}}</span>
 						<span v-if="sanv.length>1">{{sanv[0].anName}}</span>
 					</div>
@@ -86,7 +86,7 @@
 						 <span>{{addr}}</span>
 					</div>
 				</li>
-				<li class="flex_r_f_s">
+				<li class="flex_r_f_s" v-if="isDelivery == 1">
 					<div class="list_title active_title">商家送货</div>
 					<div class="service">
 						<div class="service_label flex_r_f_s">
@@ -96,7 +96,7 @@
 						<p>该商家支持送货上门，订单金额未满88元将收取6元上门费；</p>
 					</div>
 				</li>
-				<div class="tip" v-if="isDelivery==0">您的地址已超过商家送货上门范围，推荐选择快递发货！</div>
+				<div class="tip" v-if="isWithin==0">您的地址已超过商家送货上门范围，推荐选择快递发货！</div>
 				<li class="flex_r_f_s">
 					<div class="list_title active_title">快递发货</div>
 					<div class="service">
@@ -115,7 +115,7 @@
 						<div class="service_label flex_r_f_s">
 							<span>该商家支持上门自提</span>
 						</div>
-						<p>商家营业时间9：30--22：00</p>
+						<p>商家营业时间{{startTime}}--{{endTime}}</p>
 					</div>
 				</li>
 				
@@ -272,13 +272,18 @@
 					<div class="select_num flex_r_s_b">
 						<div class="select_title">数量选择</div>
 						<div class="num_box flex_r_f_e">
-							<img @click="reduceGoods" class="reduce" src="../../assets/reduce.png" alt="">
-							<span class="num flex_r_s_c">{{num}}</span>
-							<img @click="addGoods" class="add" src="../../assets/add.png" alt="">
+							<div @click="reduceGoods" class="reduce flex_r_s_c">
+								<img  src="../../assets/reduce.png" alt="">
+							</div>
+							<input style="width: 33.333%;" class="flex_r_s_c num" type="text" v-model="num" />
+							<div @click="addGoods" class="add flex_r_s_c">
+								<img src="../../assets/add.png" alt="">
+							</div>
+							
 						</div>
 					</div>
 					<div class="spec_foot flex_r_f_s">
-						<div class="add_car flex_r_s_c">加入购物车</div>
+						<div class="add_car flex_r_s_c" @click="addShopCar">加入购物车</div>
 						<div class="purchase flex_r_s_c">立即购买</div>
 					</div>
 				</div>
@@ -295,10 +300,13 @@
 </template>
 
 <script>
+	import Api from '../common/apj.js'
 	export default {
 		data(){
 			let self = this;
 			return{
+				endTime:'',
+				startTime:'',
 				slidItems:[],
 				brand:'',
 				sortName:'',
@@ -311,6 +319,7 @@
 				attentionNum:'',
 				isExtract:'',//上门自提
 				isShipping:'',//是否包邮
+				isWithin:'',//是否在配送范围内
 				isDelivery:'',//是否支持送货上门
 				isAuthentic:'',//正品保证
 				evalList:[],
@@ -363,8 +372,8 @@
 										self.addr = result.formattedAddress;
 										setTimeout(()=>{
 											
-											self.axios.post('/shop/selectShopsProductDetails',self.qs.stringify({
-												productId:110,
+											self.axios.post(Api.shopApi+'/shop/selectShopsProductDetails',self.qs.stringify({
+												productId:146,
 												userId:29,
 												lat:self.lat,
 												lng:self.lng
@@ -392,19 +401,27 @@
 													self.attentionNum = res.data.data.shopInfo.attentionNum;
 													self.isExtract = res.data.data.productDelivery.isExtract;
 													self.isDelivery = res.data.data.productDelivery.isDelivery;
+													self.isWithin = res.data.data.isWithin;
 													self.isShipping = res.data.data.productDelivery.isShipping;
 													self.productName = res.data.data.productName;
 													self.specAttr = res.data.data.skus;
 													self.skuImg = res.data.data.skus[0].skuImgAddr;
 													self.returnService = res.data.data.productTips.returnService;
+													if(res.data.data.shopInfo.startTime!=null){
+														self.startTime = res.data.data.shopInfo.startTime;
+													}
+													if(res.data.data.shopInfo.endTime!=null){
+														self.endTime = res.data.data.shopInfo.endTime;
+													}
 													if(res.data.data.productDelivery.deliveryTime!=null){
 														self.deliveryTime = res.data.data.productDelivery.deliveryTime;
 													}
 													if(res.data.data.productDelivery.mostFar!=null){
 														self.mostFar = res.data.data.productDelivery.mostFar;
 													}
-													if(res.data.data.brand!=null){
+													if(res.data.data.brand.brandName!= null){
 														self.brand = res.data.data.brand.brandName;
+														
 													}
 													if(res.data.data.sortDto.sortName){
 														self.sortName = res.data.data.sortDto.sortName;
@@ -556,6 +573,38 @@
 			},
 			addrLink(){
 				this.$router.push({name:'businSelectAddr'})
+			},
+			addShopCar(){//加入购物车
+				let self = this;
+				self.axios.post(Api.userApi+'/car/shopCarOperate',self.qs.stringify({
+					shopId:23,
+					productId:146,
+					skuId:self.skuId,
+					userId:24,
+					num:self.num
+				}), {
+					headers: {
+						'Content-Type': 'application/x-www-form-urlencoded'
+					}
+				}).then((res)=>{
+					if(res.data.code == 1){
+						console.log(res);
+						self.$createDialog({
+							type: 'warn',
+							title: `成功`,
+							content: `加入购物车成功`,
+							icon: 'cubeic-right'
+						}).show()
+						self.isMask = false;
+					}else{
+						self.$createDialog({
+							type: 'error',
+							title: `失败`,
+							content: res.data.msg,
+							icon: 'cubeic-wrong'
+						}).show()
+					}
+				})
 			}
 		
 			
@@ -568,6 +617,9 @@
 	@import '../../style/mixin.scss';
 	.goodsDetails_warp{
 		padding-bottom: 98px;
+		.cube-dialog-icon i {
+			color: red;
+		}
 		.amap-page-container{
 			height: 300px;
 		}
@@ -582,7 +634,7 @@
 			left: 0;
 			top: 0;
 			background: rgba(0,0,0,0.5);
-			z-index: 10000;
+			z-index: 100;
 			.mask_parameter{
 				position: absolute;
 				left: 0;
@@ -711,17 +763,23 @@
 							border-radius: 40px;
 							height: 44px;
 							.reduce{
-								width: 24px;
+								width: 33.333%;
+								img{
+									width: 24px;
+								}
 							}
 							.add{
-								width: 24px;
+								width: 33.333%;
+								img{
+									width: 24px;
+								}
 							}
 							.num{
-								height: 40px;
-								width: 50px;
+								height: 42px;
 								background:#fff;
 								color: #ff523d;
 								font-size: 24px;
+								text-align: center;
 							}
 						}
 					}

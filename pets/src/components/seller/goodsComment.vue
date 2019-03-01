@@ -75,9 +75,14 @@
 					<div class="select_num flex_r_s_b">
 						<div class="select_title">数量选择</div>
 						<div class="num_box flex_r_f_e">
-							<img @click="reduceGoods" class="reduce" src="../../assets/reduce.png" alt="">
-							<span class="num flex_r_s_c">{{num}}</span>
-							<img @click="addGoods" class="add" src="../../assets/add.png" alt="">
+							<div @click="reduceGoods" class="reduce flex_r_s_c">
+								<img  src="../../assets/reduce.png" alt="">
+							</div>
+							<input style="width: 33.333%;" class="flex_r_s_c num" type="text" v-model="num" />
+							<div @click="addGoods" class="add flex_r_s_c">
+								<img src="../../assets/add.png" alt="">
+							</div>
+							
 						</div>
 					</div>
 					<div class="spec_foot flex_r_f_s">
@@ -90,6 +95,16 @@
 			
 		</div>
 		<div class="foot flex_r_f_s">
+			<div class="collection flex_r_f_e">
+				<div class="collection_l">
+					<img src="../../assets/shoucang.png" alt="">
+					<p>收藏</p>
+				</div>
+				<div class="collection_r">
+					<img src="../../assets/icon_kefu.png" alt="">
+					<p>客服</p>
+				</div>
+			</div>
 			<div class="add_car flex_r_s_c" @click="maskShow">加入购物车</div>
 			<div class="purchase flex_r_s_c" @click="maskShow">立即购买</div>
 		</div>
@@ -150,7 +165,7 @@
 						txt:{
 							more: '加载更多', noMore: '没有更多数据了',
 						},
-						threshold:30,
+						threshold:40,
 						
 					}
 				},
@@ -179,6 +194,7 @@
 		},
 		methods: {
 			select(item,index){
+				this.$refs.scroll.refresh();
 				this.evalList = [];
 				this.page = 0;
 				this.$refs.scroll.scrollTo(0,0)
@@ -206,9 +222,11 @@
 				}).then((res) => {
 					if (res.data.code == 1) {
 						self.evalList = res.data.data;
-						setTimeout(()=>{
-							self.$refs.scroll.refresh();
-						},200)
+						
+						setTimeout(() => {
+						  self.$refs.scroll.forceUpdate();
+						
+						}, 1000)
 					}
 				})
 			},
@@ -217,17 +235,6 @@
 				this.page = 0;
 				console.log(this.page)
 				this.getEval(this.isImgCode,this.isPraiseCode);
-				
-				setTimeout(() => {
-			
-				  this.$refs.scroll.forceUpdate();
-				  
-			    }, 500)
-				setTimeout(() => {
-				
-				  this.$refs.scroll.refresh();
-				  
-				}, 1000)
 				
 			},
 			onPullingUp() {
@@ -258,8 +265,8 @@
 									self.evalList.push(e)
 								})
 								setTimeout(()=>{
-									self.$refs.scroll.refresh();
 									self.$refs.scroll.forceUpdate();
+									self.$refs.scroll.refresh();
 									
 								},500)
 							}else{
@@ -458,17 +465,23 @@
 							border-radius: 40px;
 							height: 44px;
 							.reduce{
-								width: 24px;
+								width: 33.333%;
+								img{
+									width: 24px;
+								}
 							}
 							.add{
-								width: 24px;
+								width: 33.333%;
+								img{
+									width: 24px;
+								}
 							}
 							.num{
-								height: 40px;
-								width: 50px;
+								height: 42px;
 								background:#fff;
 								color: #ff523d;
 								font-size: 24px;
+								text-align: center;
 							}
 						}
 					}
@@ -628,17 +641,31 @@
 			bottom: 0;
 			width: 100%;
 			background: #fff;
-			border-top: 1px solid #ff523d;/*no*/
+			border-top: 1px solid #ff523d;
 			z-index: 1000;
 			div{
-				width: 50%;
+				width: 33.333%;
 				height: 98px;
 				font-size: 28px;
-				
+			}
+			.collection{
+				padding-top: 10px;
+				box-sizing: border-box;
+				img{
+					display: block;
+					height: 56px;
+					margin: 0 auto;
+				}
+				p{
+					margin-top: 10px;
+					font-size: 24px;
+					color: #000;
+					text-align: center;
+				}
 			}
 			.add_car{
-				color: #000;
-				background: #fff;
+				color: #ff523d;
+				background: #ffe7e7;
 			}
 			.purchase{
 				background: #ff523d;
