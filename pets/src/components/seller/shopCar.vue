@@ -9,9 +9,10 @@
 			<ul>
 				<li v-for="item in shopCarData" :key="item.shopId">
 					<div class="shopName_box flex_r_f_s">
-						<cube-checkbox v-model="checked" :option="option">
-							
-						</cube-checkbox>
+						<div class="select_cir">
+							<i class="cubeic-right" v-if="item.select" @click="shopCancel(item)"></i>
+							<i class="cubeic-round-border" v-else  @click="shopSelect(item)"></i>
+						</div>
 						<div class="shopName flex_r_f_s">
 							<img src="../../assets/icon_dianpu.png" alt="">
 							<span>{{item.shopName}}</span>
@@ -23,7 +24,11 @@
 					</div>
 					<div class="goods_list">
 						<div class="goods_item flex_r_f_e"  v-for="subItem in item.carPs" :key="subItem.carId">
-							<cube-checkbox v-model="checked" :option="option"></cube-checkbox>
+							<!-- <cube-checkbox v-model="checked" @click.stop="selectCar"></cube-checkbox> -->
+							<div class="goods_l select_cir">
+								<i class="cubeic-round-border" v-if="subItem.isSelect == 0" @click="selectCar(subItem,item)"></i>
+								<i class="cubeic-right" v-else @click="cancel(subItem,item)"></i>
+							</div>
 							<div class="mid">
 								<img :src="subItem.skuImgAddr" alt="">
 							</div>
@@ -66,18 +71,21 @@
 		</div>
 		<div class="shopCart_foot flex_r_s_b">
 			<div class="selct_all flex_r_f_s">
-				<cube-checkbox v-model="checked" :option="option"></cube-checkbox>
+				<div class="select_cir">
+					<i class="cubeic-right" v-if="allSelect" @click="cancelSelectAll"></i>
+					<i class="cubeic-round-border" v-else @click="selectAll"></i>
+				</div>
 				<span class="text">全选</span>
 			</div>
 			<div class="count_price flex_r_s_b" v-if="conuntStatus">
 				<div class="count_l">
-					合计:￥350.00
+					合计:￥{{price}}
 				</div>
 				<div class="count_btn flex_r_s_c">
 					去结算(0)
 				</div>
 			</div>
-			<div v-else class="delete_btn flex_r_s_c">
+			<div v-else class="delete_btn flex_r_s_c" @click="deleteCar">
 				删除选中
 			</div>
 		</div>
@@ -90,15 +98,17 @@
 		data(){
 			return{
 				checked:true,
-				 option: {
-					label: '',
+				option: {
+					label: '全选',
 					value: 'optionValue',
 					disabled: false
 				},
 				val:1,
 				shopCarData:[],
 				conuntStatus:true,
-				text:'编辑'
+				text:'编辑',
+				allSelect:false,
+				price:''
 				
 			}
 		},
@@ -211,13 +221,47 @@
 				}).then((res)=>{
 					
 					if(res.data.code == 1){
-						self.shopCarData = res.data.data.carShops;
-						self.shopCarData.forEach((e)=>{
-							e.carPs.forEach((j)=>{
-								j.skuImgId = j.productNum;
+						// self.shopCarData = res.data.data.carShops;
+						self.allSelect = true;
+						res.data.data.carShops.forEach((e)=>{
+							self.shopCarData.push({
+								carPs:e.carPs,
+								select:true,
+								shopId:e.shopId,
+								shopImgAddr:e.shopImgAddr,
+								shopName:e.shopName
 							})
 						})
-						console.log(self.shopCarData)
+						self.shopCarData.forEach((e)=>{
+							// e.select = true;
+							e.carPs.forEach((j)=>{
+								j.skuImgId = j.productNum;
+								if(j.isSelect == 0){
+									e.select = false;
+									self.allSelect = false;
+								}
+							})
+						})
+						self.price = Math.floor(res.data.data.selectPrice * 100) / 100;
+						console.log(res)
+					}
+				})
+			},
+			upGetShopCar(){
+				let self = this;
+				self.axios.post(Api.userApi+'/car/selectShopCar',self.qs.stringify({
+					userId:24,
+				}), {
+					headers: {
+						'Content-Type': 'application/x-www-form-urlencoded'
+					}
+				}).then((res)=>{
+					
+					if(res.data.code == 1){
+						// self.shopCarData = res.data.data.carShops;
+						
+						self.price = Math.floor(res.data.data.selectPrice * 100) / 100;
+						console.log(res)
 					}
 				})
 			},
@@ -264,7 +308,210 @@
 						}
 					})
 				}
-　　		}
+　　		},
+			selectCar(subItem,item){
+				let self = this;
+				self.axios.post(Api.userApi+'/car/updateShopSelect ',self.qs.stringify({
+					carId:subItem.carId,
+					select:1
+				}), {
+					headers: {
+						'Content-Type': 'application/x-www-form-urlencoded'
+					}
+				}).then((res)=>{
+					if(res.data.code == 1){
+						self.upGetShopCar();
+						subItem.isSelect = 1;
+						item.select = true;
+						self.allSelect = true;
+						item.carPs.forEach((e)=>{
+							
+							if(e.isSelect == 0){
+								item.select = false;
+								return false;
+							}
+						})
+						self.shopCarData.forEach((e)=>{
+							e.carPs.forEach((j)=>{
+								if(j.isSelect == 0){
+									this.allSelect = false;
+									return false;
+								}
+							})
+						})
+						
+					}
+				})
+				
+			},
+			cancel(subItem,item){
+				let self = this;
+				self.axios.post(Api.userApi+'/car/updateShopSelect ',self.qs.stringify({
+					carId:subItem.carId,
+					select:0
+				}), {
+					headers: {
+						'Content-Type': 'application/x-www-form-urlencoded'
+					}
+				}).then((res)=>{
+					if(res.data.code == 1){
+						self.upGetShopCar();
+						subItem.isSelect = 0;
+						item.select = false;
+						self.allSelect = false;
+					}
+				})
+				
+			},
+			shopSelect(item){
+				
+				let self = this;
+				self.axios.post(Api.userApi+'/car/updateShopSelectAll',self.qs.stringify({
+					shopId:item.carPs[0].shopId,
+					select:1,
+					userId:item.carPs[0].userId
+				}), {
+					headers: {
+						'Content-Type': 'application/x-www-form-urlencoded'
+					}
+				}).then((res)=>{
+					if(res.data.code == 1){
+						self.upGetShopCar();
+						item.select = true;
+						self.allSelect = true;
+						item.carPs.forEach((e)=>{
+							e.isSelect = 1;
+						})
+						self.shopCarData.forEach((s)=>{
+							s.carPs.forEach((j)=>{
+								if(j.isSelect == 0){
+									self.allSelect = false;
+									return false;
+								}
+							})
+						})
+					}
+				})
+				
+				
+			},
+			shopCancel(item){
+				let self = this;
+				
+				self.axios.post(Api.userApi+'/car/updateShopSelectAll',self.qs.stringify({
+					shopId:item.carPs[0].shopId,
+					select:0,
+					userId:item.carPs[0].userId
+				}), {
+					headers: {
+						'Content-Type': 'application/x-www-form-urlencoded'
+					}
+				}).then((res)=>{
+					if(res.data.code == 1){
+						self.upGetShopCar();
+						item.select = false;
+						self.allSelect = false;
+						item.carPs.forEach((e)=>{
+							e.isSelect = 0;
+						})
+						
+					}
+				})
+				
+				
+			},
+			selectAll(){
+				let self = this;
+				self.axios.post(Api.userApi+'/car/updateShopSelectAll',self.qs.stringify({
+					shopId:-1,
+					select:1,
+					userId:24
+				}), {
+					headers: {
+						'Content-Type': 'application/x-www-form-urlencoded'
+					}
+				}).then((res)=>{
+					if(res.data.code == 1){
+						self.allSelect = true;
+						self.upGetShopCar();
+						self.shopCarData.forEach((e)=>{
+							e.select = true;
+							e.carPs.forEach((j)=>{
+								j.isSelect = 1;
+							})
+						})
+						
+					}
+				})
+				
+			},
+			cancelSelectAll(){
+				let self = this;
+				self.axios.post(Api.userApi+'/car/updateShopSelectAll',self.qs.stringify({
+					shopId:-1,
+					select:0,
+					userId:24
+				}), {
+					headers: {
+						'Content-Type': 'application/x-www-form-urlencoded'
+					}
+				}).then((res)=>{
+					if(res.data.code == 1){
+						self.allSelect = false;
+						self.upGetShopCar();
+						self.shopCarData.forEach((e)=>{
+							e.select = false;
+							e.carPs.forEach((j)=>{
+								j.isSelect = 0;
+							})
+						})
+						
+					}
+				})
+			},
+			deleteCar(){
+				let clearCarData = [];
+				let self = this;
+				if(this.allSelect){
+					self.axios.post(Api.userApi+'/car/deleteShopCar',self.qs.stringify({
+						userId:24
+					}), {
+						headers: {
+							'Content-Type': 'application/x-www-form-urlencoded'
+						}
+					}).then((res)=>{
+						if(res.data.code == 1){
+							self.shopCarData = [];
+							self.getShopCar();
+							// window.location.search+100*Math.random()
+						}
+					})
+				}else{
+					this.shopCarData.forEach((e)=>{
+						
+						e.carPs.forEach((j)=>{
+							if(j.isSelect == 1){
+								clearCarData.push(j.carId)
+							}
+						})
+					})
+					self.axios.post(Api.userApi+'/car/deleteShopSkus',self.qs.stringify({
+						carIds:clearCarData.join(',')
+					}), {
+						headers: {
+							'Content-Type': 'application/x-www-form-urlencoded'
+						}
+					}).then((res)=>{
+						if(res.data.code == 1){
+							self.shopCarData = [];
+							self.getShopCar();
+							// window.location.search+100*Math.random()
+						}
+					})
+				}
+				
+			}
+			
 		},
 	}
 </script>
@@ -274,6 +521,7 @@
 	@import '../../style/mixin.scss';
 	.shopcar_warp{
 		padding: 88px 0 86px 0;
+		
 		.top_nav {
 			padding: 0 20px;
 			height: 88px;
@@ -307,22 +555,21 @@
 				color: #FF523D;
 			}
 		}
-		.cube-checkbox_checked .cube-checkbox-ui i{
-			color: #FF523D;
-		}
-		.cube-checkbox-ui:before, .cube-checkbox-ui i{
-			font-size: 36px;
-		}
-		.cube-checkbox{
-			padding: 0;
-		}
-		.cube-checkbox-ui{
-			height:initial;
+		.select_cir{
+			.cubeic-round-border{
+				font-size: 24px;/*no*/
+				color: #e8e8e8;
+			}
+			.cubeic-right{
+				color: #FF523D;
+				font-size: 24px;/*no*/
+			}
 		}
 		.shopCart_list{
 			ul{
 				li{
 					border-bottom: 10px solid #e8e8e8;
+					
 					.shopName_box{
 						padding: 0 20px;
 						height: 86px;
@@ -369,6 +616,7 @@
 						.goods_item{
 							padding: 30px 0;
 							border-top: 1px solid #e8e8e8;/*no*/
+							
 							.mid{
 								img{
 									width: 104px;
@@ -485,6 +733,7 @@
 				border-radius:7px;
 				color: #FF523D;
 				font-size: 28px;
+				
 			}
 		}
 	}

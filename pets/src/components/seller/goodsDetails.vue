@@ -374,7 +374,7 @@
 											
 											self.axios.post(Api.shopApi+'/shop/selectShopsProductDetails',self.qs.stringify({
 												productId:146,
-												userId:29,
+												userId:21,
 												lat:self.lat,
 												lng:self.lng
 											}), {
