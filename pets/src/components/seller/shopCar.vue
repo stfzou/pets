@@ -81,7 +81,7 @@
 				<div class="count_l">
 					合计:￥{{price}}
 				</div>
-				<div class="count_btn flex_r_s_c">
+				<div class="count_btn flex_r_s_c" @click="settlement">
 					去结算(0)
 				</div>
 			</div>
@@ -144,7 +144,7 @@
 					self.$createDialog({
 						type: 'alert',
 						title: `警告`,
-						content: '库存不够了哦',
+						content: '商品只有'+subItem.reserve+'件了哦',
 						icon: 'cubeic-warn'
 					}).show()
 					subItem.productNum = subItem.productNum;
@@ -164,6 +164,7 @@
 						if(res.data.code == 1){
 							subItem.productNum++
 							subItem.skuImgId = subItem.productNum;
+							self.upGetShopCar();
 						}else{
 							self.$createDialog({
 								type: 'error',
@@ -198,6 +199,7 @@
 						if(res.data.code == 1){
 							subItem.productNum = subItem.productNum-1;
 							subItem.skuImgId = subItem.productNum;
+							self.upGetShopCar();
 							console.log(self.shopCarData)
 						}else{
 							self.$createDialog({
@@ -260,13 +262,13 @@
 					if(res.data.code == 1){
 						// self.shopCarData = res.data.data.carShops;
 						
-						self.price = Math.floor(res.data.data.selectPrice * 100) / 100;
+						//self.price = Math.floor(res.data.data.selectPrice * 100) / 100;
+						self.price = res.data.data.selectPrice;
 						console.log(res)
 					}
 				})
 			},
-			number(subItem){　　
-				
+			number(subItem){　
 　　　 			subItem.productNum=subItem.productNum.replace(/[^\.\d]/g,'');
 				subItem.productNum=subItem.productNum.replace('.','');
 				if(subItem.productNum == ''||subItem.productNum == subItem.skuImgId){
@@ -275,7 +277,7 @@
 					this.$createDialog({
 						type: 'alert',
 						title: `警告`,
-						content: '库存不够了哦',
+						content: '商品只有'+subItem.reserve+'件了哦',
 						icon: 'cubeic-warn'
 					}).show()
 					subItem.productNum = subItem.skuImgId;
@@ -297,11 +299,11 @@
 						if(res.data.code == 1){
 							// subItem.productNum = subItem.productNum-1;
 							subItem.skuImgId = subItem.productNum;
-							
+							self.upGetShopCar();
 						}else{
 							self.$createDialog({
 								type: 'error',
-								title: `失败`,
+								title: res.data.msg,
 								content: res.data.msg,
 								icon: 'cubeic-wrong'
 							}).show()
@@ -510,8 +512,52 @@
 					})
 				}
 				
+			},
+			settlement(){
+				let self = this;
+				let isHttp = false;
+				self.shopCarData.forEach((e)=>{
+					e.carPs.forEach((j)=>{
+						if(j.isSelect == 1){
+							isHttp = true;
+							return false;
+						}
+					})
+				})
+				
+				if(isHttp){
+					self.axios.post(Api.userApi+'/order/orderSettlement',self.qs.stringify({
+					
+						userId:24
+						
+					}), {
+						headers: {
+							'Content-Type': 'application/x-www-form-urlencoded'
+						}
+					}).then((res)=>{
+						if(res.data.code == 1){
+							self.$router.push({
+								name:'orderAccounts'
+							})
+						}else{
+							self.$createDialog({
+								type: 'alert',
+								title: `警告`,
+								content:res.data.msg,
+								icon: 'cubeic-warn'
+							}).show()
+						}
+					})
+				}else{
+					self.$createDialog({
+						type: 'alert',
+						title: `警告`,
+						content:'请选择要结算的商品',
+						icon: 'cubeic-warn'
+					}).show()
+				}
+				
 			}
-			
 		},
 	}
 </script>

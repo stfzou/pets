@@ -112,7 +112,9 @@
 </template>
 
 <script>
+	import Api from '../common/apj.js'
 	export default {
+		
 		data() {
 			return {
 				evalNav:[
@@ -159,7 +161,7 @@
 				options:{
 					pullDownRefresh:{
 						txt:'更新成功',
-						threshold:60
+						threshold:40
 					},
 					pullUpLoad:{
 						txt:{
@@ -188,14 +190,14 @@
 		},
 		mounted() {
 			let h = document.documentElement.clientHeight - document.querySelector(".comment_cnt").offsetTop;
-			document.querySelector(".comment_cnt").style.height = h+'px';
+			document.querySelector(".comment_cnt").style.height = (h-56)+'px';
 			this.getEval(-1, -1);
 			this.getSpec();
 		},
 		methods: {
 			select(item,index){
-				this.$refs.scroll.refresh();
 				this.evalList = [];
+				this.$refs.scroll.refresh();
 				this.page = 0;
 				this.$refs.scroll.scrollTo(0,0)
 				this.curunt = index;
@@ -209,7 +211,7 @@
 			},
 			getEval(isImg, isPraise) {
 				let self = this;
-				self.axios.post('/webShop/selectShopAssessPage', self.qs.stringify({
+				self.axios.post(Api.shopApi+'/webShop/selectShopAssessPage', self.qs.stringify({
 					shopId: 23,
 					isImg: isImg,
 					isPraise: isPraise,
@@ -224,9 +226,10 @@
 						self.evalList = res.data.data;
 						
 						setTimeout(() => {
-						  self.$refs.scroll.forceUpdate();
+							self.$refs.scroll.forceUpdate();
+							
+						}, 500)
 						
-						}, 1000)
 					}
 				})
 			},
@@ -235,7 +238,9 @@
 				this.page = 0;
 				console.log(this.page)
 				this.getEval(this.isImgCode,this.isPraiseCode);
-				
+				setTimeout(() => {
+					self.$refs.scroll.refresh();
+				}, 1000)
 			},
 			onPullingUp() {
 			// 模拟更新数据
@@ -245,7 +250,7 @@
 				console.log(this.page)
 				setTimeout(() => {
 					
-					self.axios.post('/webShop/selectShopAssessPage',self.qs.stringify({
+					self.axios.post(Api.shopApi+'/webShop/selectShopAssessPage',self.qs.stringify({
 						shopId:23,
 						isImg:self.isImgCode,
 						isPraise:self.isPraiseCode,
@@ -266,9 +271,12 @@
 								})
 								setTimeout(()=>{
 									self.$refs.scroll.forceUpdate();
-									self.$refs.scroll.refresh();
 									
 								},500)
+								setTimeout(()=>{
+									
+									self.$refs.scroll.refresh();
+								},800)
 							}else{
 								self.$refs.scroll.forceUpdate();
 							}
@@ -321,7 +329,7 @@
 			},
 			getSpec(){
 				let self = this;
-				self.axios.post('/shop/selectShopsProductDetails',self.qs.stringify({
+				self.axios.post(Api.shopApi+'/shop/selectShopsProductDetails',self.qs.stringify({
 					productId:146,
 					userId:29,
 					lat:self.lat,

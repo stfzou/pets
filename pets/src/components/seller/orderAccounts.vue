@@ -5,40 +5,43 @@
 			<div class="nav_title">订单结算</div>
 
 		</div>
-		<div class="addr_box">
+		<div class="addr_box" @click="addrUrl">
 			<div class="addr">
 				<div class="addr_name">
 					<span>自由犬</span>
 					<span class="phone">183******4123</span>
 				</div>
-				<div class="addr_text flex_r_f_s">
+				<div class="addr_text flex_r_f_s" v-if="addrStatus">
 					<img src="../../assets/icon/map@2x.png" alt="">
 					<span class="addr_cnt">四川省成都市成华区牛王庙东恒国际</span>
 					<div class="mr flex_r_s_c">默认</div>
 				</div>
+				<div class="noAddr" v-else>您还没有设置地址，点击设置地址</div>
 			</div>
+			
 			<div class="addr_line"></div>
 		</div>
 		<div class="orderList_box">
 			<ul class="order_list">
-				<li>
+				<li v-for="item in orderData">
 					<div class="shopName flex_r_f_s">
 						<img src="../../assets/icon_dianpu.png" alt="">
-						<span>成都自由犬</span>
+						<span>{{item.shopName}}</span>
 					</div>
-					<div class="goodsInfo flex_r_s_b">
-						<img class="goods_img" src="../../assets/head_icon.png" alt="">
+					<div class="goodsInfo flex_r_s_b" v-for="subItem in item.carPs">
+						<img class="goods_img" :src="subItem.skuImgAddr" alt="">
 						<div class="goodsInfo_r">
-							<div class="goodsName">比瑞吉10kg小型犬成犬天然狗粮泰迪贵宾博美比熊犬主粮小狗粮20斤</div>
+							<div class="goodsName">{{subItem.productName}}</div>
+							<div class="attr">商品属性:<span v-for="(spanItem,i) in subItem.anvs">{{spanItem.avName|spanFilter(i,subItem.anvs.length-1)}}</span></div>
 							<div class="one_price flex_r_s_b">
-								<span class="price_l">￥420.00</span>
-								<span class="price_r">x1</span>
+								<span class="price_l">￥{{subItem.original}}</span>
+								<span class="price_r">x{{subItem.productNum}}</span>
 							</div>
 						</div>
 					</div>
 					<div class="delivery_style flex_r_s_b">
 						<span>配送方式</span>
-						<span>快递，费用￥6.00</span>
+						<span>{{item.delivery}}</span>
 					</div>
 					<div class="yuyue flex_r_s_b" @click="showTimePicker">
 						<span>预约送货上门时间</span>
@@ -51,11 +54,21 @@
 					</div>
 				</li>
 			</ul>
-			<div class="integral flex_r_s_b">
-				<span class="integral_l">使用100积分，抵用1.00元</span>
-				<cube-switch v-model="val">
-
-				</cube-switch>
+			<div class="integral_box">
+				<div class="pt_integral flex_r_s_b">
+					<span class="pt_l">平台优惠</span>
+					<span class="pt_r">满200减15</span>
+				</div>
+				<div class="integral flex_r_s_b">
+					<span class="">使用100积分，抵用1.00元</span>
+					<cube-switch v-model="val">
+					
+					</cube-switch>
+				</div>
+				<div class="integral flex_r_s_b">
+					<span class="">共有578积分,满100可用</span>
+				</div>
+				<div class="integral_tx">使用积分为100的整数倍，不可超过订单支付金额的50%。</div>
 			</div>
 			<div class="detailed_list">
 				<div class="detailed_box flex_r_s_b">
@@ -80,15 +93,31 @@
 </template>
 
 <script>
+	import Api from '../common/apj.js'
 	export default {
 		data() {
 			return {
-				val: ''
+				val: '',
+				orderData:[],
+				addrStatus:true
 			}
+		},
+		mounted(){
+			this.getOrder();
+		},
+		filters:{
+			spanFilter(val,index,arrl){
+				if(arrl == index){
+					return val;
+				}else{
+					return val+'、';
+				}
+			},
 		},
 		methods: {
 			back() {
 				this.$router.go(-1); //返回上一层
+			
 			},
 			showTimePicker() {
 				this.$createTimePicker({
@@ -106,11 +135,38 @@
 					onCancel: () => {
 						this.$createToast({
 							type: 'correct',
-							txt: 'Picker canceled',
+							txt: '取消选择',
 							time: 1000
 						}).show()
 					}
 				}).show()
+			},
+			getOrder(){
+				let self = this;
+				self.axios.post(Api.userApi+'/order/orderSettlement',self.qs.stringify({
+					userId:24
+				}), {
+					headers: {
+						'Content-Type': 'application/x-www-form-urlencoded'
+					}
+				}).then((res)=>{
+					if(res.data.code == 1){
+						self.orderData = res.data.data.orderShops;
+						console.log(self.orderData)
+					}else{
+						self.$createDialog({
+							type: 'alert',
+							title: `警告`,
+							content:res.data.msg,
+							icon: 'cubeic-warn'
+						}).show()
+					}
+				})
+			},
+			addrUrl(){
+				this.$router.push({
+					name:'userAddr'
+				})
 			}
 		},
 	}
@@ -159,7 +215,12 @@
 				background: url("../../assets/bg_line.png") no-repeat center 0;
 				background-size: cover;
 			}
-
+			.noAddr{
+				font-size: 28px;
+				color: #FF523D;
+				
+				padding: 30px 0;
+			}
 			.addr {
 				padding: 40px;
 				background: url('../../assets/icon/right_sjx.png') no-repeat 646px center;
@@ -237,7 +298,7 @@
 						background: #fef7f6;
 						padding: 15px 24px 15px 30px;
 						box-sizing: border-box;
-
+						margin-bottom: 20px;
 						.goods_img {
 							width: 100px;
 							margin-right: 60px;
@@ -249,10 +310,19 @@
 								color: #000;
 								font-size: 26px;
 							}
-
+							
+							.attr{
+								margin: 10px 0 30px 0;
+								font-size: 24px;
+								color: #000;
+								span{
+									color: #666;
+									font-size: 24px;
+								}
+							}
 							.one_price {
 								font-size: 28px;
-								margin-top: 50px;
+								// margin-top: 50px;
 
 								.price_l {
 									color: #FF523D;
@@ -320,14 +390,35 @@
 				}
 			}
 
-			.integral {
-				padding: 30px 40px 30px 10px;
+			.integral_box {
+				padding: 30px 0 30px 0;
 				box-shadow: 0px 0px 7px 0px rgba(104, 104, 104, 0.12);
 				border-radius: 10px;
-				font-size: 26px;
+				font-size: 28px;
 				color: #000;
 				box-sizing: border-box;
 				margin-top: 30px;
+				.cube-switch .cube-switch-ui{
+					height: 30px;
+					
+				}
+				.pt_integral{
+					margin-bottom: 30px;
+					padding: 0 40px 0 10px;
+					box-sizing: border-box;
+					background: url("../../assets/icon/right_sjx.png") no-repeat 98% center;
+					background-size: 14px;
+				}
+				.integral{
+					padding: 0 20px 0 10px;
+					box-sizing: border-box;
+					margin-bottom: 15px;
+				}
+				.integral_tx{
+					font-size: 24px;
+					color: #666;
+					padding: 0 40px 0 10px;
+				}
 			}
 
 			.detailed_list {

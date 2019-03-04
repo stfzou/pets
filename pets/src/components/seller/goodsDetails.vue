@@ -576,35 +576,45 @@
 			},
 			addShopCar(){//加入购物车
 				let self = this;
-				self.axios.post(Api.userApi+'/car/shopCarOperate',self.qs.stringify({
-					shopId:23,
-					productId:146,
-					skuId:self.skuId,
-					userId:24,
-					num:self.num
-				}), {
-					headers: {
-						'Content-Type': 'application/x-www-form-urlencoded'
-					}
-				}).then((res)=>{
-					if(res.data.code == 1){
-						console.log(res);
-						self.$createDialog({
-							type: 'warn',
-							title: `成功`,
-							content: `加入购物车成功`,
-							icon: 'cubeic-right'
-						}).show()
-						self.isMask = false;
-					}else{
-						self.$createDialog({
-							type: 'error',
-							title: `失败`,
-							content: res.data.msg,
-							icon: 'cubeic-wrong'
-						}).show()
-					}
-				})
+				if(self.skuId == ''){
+					self.$createDialog({
+						type: 'warn',
+						title: `提示`,
+						content: `请选择属性`,
+						icon: 'cubeic-warn'
+					}).show()
+				}else{
+					self.axios.post(Api.userApi+'/car/shopCarOperate',self.qs.stringify({
+						shopId:23,
+						productId:146,
+						skuId:self.skuId,
+						userId:24,
+						num:self.num
+					}), {
+						headers: {
+							'Content-Type': 'application/x-www-form-urlencoded'
+						}
+					}).then((res)=>{
+						if(res.data.code == 1){
+							console.log(res);
+							self.$createDialog({
+								type: 'warn',
+								title: `成功`,
+								content: `加入购物车成功`,
+								icon: 'cubeic-right'
+							}).show()
+							self.isMask = false;
+						}else{
+							self.$createDialog({
+								type: 'error',
+								title: `失败`,
+								content: res.data.msg,
+								icon: 'cubeic-wrong'
+							}).show()
+						}
+					})
+				}
+				
 			}
 		
 			

@@ -5,7 +5,7 @@
 			<div class="nav_title">确认收货地址</div>
 		</div>
 		<div class="amap-page-container">
-			<el-amap ref="map" vid="amapDemo" :center="center" :zoom="zoom" :plugin="plugin" class="amap-demo" :events="events">
+			<el-amap ref="map" vid="amapDemo" :center="center" :zoom="zoom" :plugin="plugin" class="amap-demo">
 				<el-amap-marker :icon="require('../../assets/icon/map@2x.png')"  vid="component-marker" :position="center"></el-amap-marker>
 				
 			</el-amap>
@@ -35,7 +35,8 @@
 			return {
 				center:[104.0647600000, 30.5702000000],
 				zoom: 14,
-				city: '',
+				lat:'',
+				lng:'',
 				activeIndex:0,
 				serchText:'',
 				searchList:[],
@@ -48,29 +49,40 @@
 							console.log(e)
 						}
 					}
-				},{
-					pName:'PlaceSearch',
-					events:{
-						init(o){
-							o.searchNearBy('',self.center,2000,function(status,result){
+				},
+				{
+					pName: 'Geolocation',
+					enableHighAccuracy: true,//是否使用高精度定位，默认:true
+					timeout: 100,          //超过10秒后停止定位，默认：无穷大
+					maximumAge: 0,           //定位结果缓存0毫秒，默认：0
+					convert: true,           //自动偏移坐标，偏移后的坐标为高德坐标，默认：true
+					showButton: true,        //显示定位按钮，默认：true
+					buttonPosition: 'RB',    //定位按钮停靠位置，默认：'LB'，左下角
+					showMarker: false,        //定位成功后在定位到的位置显示点标记，默认：true
+					showCircle: false,        //定位成功后用圆圈表示定位精度范围，默认：true
+					panToLocation: true,     //定位成功后将定位到的位置作为地图中心点，默认：true
+					zoomToAccuracy:true,//定位成功后调整地图视野范围使定位位置及精度范围视野内可见，默认：f
+					extensions:'all',
+					events: {
+						init(o) {
+							// o 是高德地图定位插件实例
+							o.getCurrentPosition((status, result) => {
 								
-								self.searchList = result.poiList.pois;
-							})
+								
+								if (result && result.position) {
+ 										self.lng = result.position.lng;
+ 										self.lat = result.position.lat;
+										self.center = [self.lng, self.lat];
+										self.searchList = result.pois;
+										self.plugin[0].city = result.addressComponent.city
+										console.log(result)
+									// self.nearbyData = result.pois.slice(0,5);
+								}
+							});
 						}
-					}
-				}],
-				events: {
-					init: (o) => {
-						
-						o.getCity(result => {
-							console.log(result)
-							self.plugin[0].city = result.city
-							setTimeout(()=>{
-								 self.$refs.scroll.refresh();
-							},200)
-						})
-					},
-				}
+						}
+					}],
+			
 			}
 		},
 		mounted() {

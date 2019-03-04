@@ -1,9 +1,9 @@
 <template>
 	<div class="userAddr">
 		<div class="top_nav flex_r_s_b">
-			<div class="back"></div>
+			<div class="back" @click="back"></div>
 			<div class="nav_title">选择收货地址</div>
-			<div class="text">新增地址</div>
+			<div class="text" @click="newAddr">新增地址</div>
 		</div>
 		<ul class="userAddr_list">
 			<li>
@@ -71,6 +71,14 @@
 			},
 			maskShow(){
 				this.isMask = true;
+			},
+			back() {
+				this.$router.go(-1); //返回上一层
+			},
+			newAddr(){
+				this.$router.push({
+					name:'addAddr'
+				})
 			}
 		},
 	}
