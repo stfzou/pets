@@ -329,8 +329,8 @@
 				isParameter:false,
 				price:'',
 				activePrice:'',
-				lng:'',
-				lat:'',
+				lng:104.0647600000,
+				lat:30.5702000000,
 				addr:'',
 				distance:'',
 				sanv:[],
@@ -364,105 +364,13 @@
 								o.getCurrentPosition((status, result) => {
 									
 									if (result && result.position) {
- 										self.lng = result.position.lng;
- 										self.lat = result.position.lat;
-										console.log(self.lng+'           '+self.lat)
-// 										self.$nextTick();
-										// console.log(result)
-										self.addr = result.formattedAddress;
-										setTimeout(()=>{
+ 										
+										if(self.addr == ''){
+											self.lng = result.position.lng;
+											self.lat = result.position.lat;
+											self.addr = result.formattedAddress;
 											
-											self.axios.post(Api.shopApi+'/shop/selectShopsProductDetails',self.qs.stringify({
-												productId:146,
-												userId:21,
-												lat:self.lat,
-												lng:self.lng
-											}), {
-												headers: {
-													'Content-Type': 'application/x-www-form-urlencoded'
-												}
-											}).then((res)=>{
-												if(res.data.code == 1){
-													self.slidItems = res.data.data.pMainImgs;
-													self.distance = res.data.data.shopInfo.distance;
-													self.severItem = res.data.data.shopInfo.operateTypes;
-													self.shopName = res.data.data.shopInfo.shopName;
-													self.shopImgAddr = res.data.data.shopInfo.shopImgAddr;
-													self.price = res.data.data.skus[0].original;
-													if(res.data.data.activityPrice){
-														self.activePrice = res.data.data.activityPrice;
-													}
-													if(res.data.data.shopInfo.saleNum == 0){
-														self.saleNum = 0;
-													}else{
-														self.saleNum = Number(res.data.data.shopInfo.saleNum/res.data.data.shopInfo.productNum*100).toFixed();
-													}
-													self.productNum = res.data.data.shopInfo.productNum;
-													self.attentionNum = res.data.data.shopInfo.attentionNum;
-													self.isExtract = res.data.data.productDelivery.isExtract;
-													self.isDelivery = res.data.data.productDelivery.isDelivery;
-													self.isWithin = res.data.data.isWithin;
-													self.isShipping = res.data.data.productDelivery.isShipping;
-													self.productName = res.data.data.productName;
-													self.specAttr = res.data.data.skus;
-													self.skuImg = res.data.data.skus[0].skuImgAddr;
-													self.returnService = res.data.data.productTips.returnService;
-													if(res.data.data.shopInfo.startTime!=null){
-														self.startTime = res.data.data.shopInfo.startTime;
-													}
-													if(res.data.data.shopInfo.endTime!=null){
-														self.endTime = res.data.data.shopInfo.endTime;
-													}
-													if(res.data.data.productDelivery.deliveryTime!=null){
-														self.deliveryTime = res.data.data.productDelivery.deliveryTime;
-													}
-													if(res.data.data.productDelivery.mostFar!=null){
-														self.mostFar = res.data.data.productDelivery.mostFar;
-													}
-													if(res.data.data.brand.brandName!= null){
-														self.brand = res.data.data.brand.brandName;
-														
-													}
-													if(res.data.data.sortDto.sortName){
-														self.sortName = res.data.data.sortDto.sortName;
-													}
-													if(res.data.data.sanv.length>0){
-														self.sanv = res.data.data.sanv;
-													}
-													if(res.data.data.assessDto.length>0){
-														self.evalList = res.data.data.assessDto;
-													}
-													if(res.data.data.guige.length>0){
-														// self.guige = res.data.data.guige;
-														res.data.data.guige.forEach((e)=>{
-															self.guige.push({
-																anId:e.anId,
-																anName:e.anName,
-																avs:e.avs,
-																selectId:''
-															})
-														})
-														
-													}else if(res.data.data.guige.length==0){
-														self.skuId = res.data.data.skus[0].skuId;
-														self.skuImg = res.data.data.skus[0].skuImgAddr;
-													}
-													
-													console.log(res)
-													
-												}else{
-													console.log(res)
-												}
-											})
-										},100)
-										
-									}else{
-										let component = self.$refs.myPopup;
-										component.show()
-										  setTimeout(() => {
-											component.hide()
-										  }, 1000)
-										
+										}
 									}
 								});
 							}
@@ -472,8 +380,17 @@
 			}
 		},
 		mounted() {
+			//
 			
-			
+			if(this.$store.state.loginInfo.token == ''){
+				this.$store.commit('setRouterName','goodsDetails');
+				this.$router.push({
+					name:'login'
+				})
+				return false;
+			}
+			this.getAddr();
+			this.getGoodsInfo();
 		},
 		computed: {
 			getSkuId() {
@@ -572,7 +489,12 @@
 				}
 			},
 			addrLink(){
-				this.$router.push({name:'businSelectAddr'})
+				this.$router.push({
+					name:'userAddr',
+					query:{
+						name:'goodsDetails'
+					}
+				})
 			},
 			addShopCar(){//加入购物车
 				let self = this;
@@ -615,8 +537,119 @@
 					})
 				}
 				
+			},
+			getAddr(){
+				let self = this;
+				self.axios.post(Api.userApi+'/user/selectUserAddr',self.qs.stringify({
+					userId:29,
+				}), {
+					headers: {
+						'Content-Type': 'application/x-www-form-urlencoded',
+						"token":'063EC71B3F82EAB5EC46C94E2803D6E6'
+					}
+				}).then((res)=>{
+					if(res.data.code == 1){
+						
+						res.data.data.forEach((e)=>{
+							if(e.isDefault == 1){
+								self.addr = e.addrProvince+''+e.addrCity+''+e.addrArea+e.address+e.addressTitle;
+								self.lat = e.latitude;
+								self.lng = e.longitude;
+								// console.log(e)
+								return false;
+							}
+						})
+					}
+				})
+			},
+			getGoodsInfo(){
+				let self = this;
+				setTimeout(()=>{
+					
+					self.axios.post(Api.shopApi+'/shop/selectShopsProductDetails',self.qs.stringify({
+						productId:146,
+						userId:21,
+						lat:self.lat,
+						lng:self.lng
+					}), {
+						headers: {
+							'Content-Type': 'application/x-www-form-urlencoded'
+						}
+					}).then((res)=>{
+						if(res.data.code == 1){
+							self.slidItems = res.data.data.pMainImgs;
+							self.distance = res.data.data.shopInfo.distance;
+							self.severItem = res.data.data.shopInfo.operateTypes;
+							self.shopName = res.data.data.shopInfo.shopName;
+							self.shopImgAddr = res.data.data.shopInfo.shopImgAddr;
+							self.price = res.data.data.skus[0].original;
+							if(res.data.data.activityPrice){
+								self.activePrice = res.data.data.activityPrice;
+							}
+							if(res.data.data.shopInfo.saleNum == 0){
+								self.saleNum = 0;
+							}else{
+								self.saleNum = Number(res.data.data.shopInfo.saleNum/res.data.data.shopInfo.productNum*100).toFixed();
+							}
+							self.productNum = res.data.data.shopInfo.productNum;
+							self.attentionNum = res.data.data.shopInfo.attentionNum;
+							self.isExtract = res.data.data.productDelivery.isExtract;
+							self.isDelivery = res.data.data.productDelivery.isDelivery;
+							self.isWithin = res.data.data.isWithin;
+							self.isShipping = res.data.data.productDelivery.isShipping;
+							self.productName = res.data.data.productName;
+							self.specAttr = res.data.data.skus;
+							self.skuImg = res.data.data.skus[0].skuImgAddr;
+							self.returnService = res.data.data.productTips.returnService;
+							if(res.data.data.shopInfo.startTime!=null){
+								self.startTime = res.data.data.shopInfo.startTime;
+							}
+							if(res.data.data.shopInfo.endTime!=null){
+								self.endTime = res.data.data.shopInfo.endTime;
+							}
+							if(res.data.data.productDelivery.deliveryTime!=null){
+								self.deliveryTime = res.data.data.productDelivery.deliveryTime;
+							}
+							if(res.data.data.productDelivery.mostFar!=null){
+								self.mostFar = res.data.data.productDelivery.mostFar;
+							}
+							if(res.data.data.brand.brandName!= null){
+								self.brand = res.data.data.brand.brandName;
+								
+							}
+							if(res.data.data.sortDto.sortName){
+								self.sortName = res.data.data.sortDto.sortName;
+							}
+							if(res.data.data.sanv.length>0){
+								self.sanv = res.data.data.sanv;
+							}
+							if(res.data.data.assessDto.length>0){
+								self.evalList = res.data.data.assessDto;
+							}
+							if(res.data.data.guige.length>0){
+								// self.guige = res.data.data.guige;
+								res.data.data.guige.forEach((e)=>{
+									self.guige.push({
+										anId:e.anId,
+										anName:e.anName,
+										avs:e.avs,
+										selectId:''
+									})
+								})
+								
+							}else if(res.data.data.guige.length==0){
+								self.skuId = res.data.data.skus[0].skuId;
+								self.skuImg = res.data.data.skus[0].skuImgAddr;
+							}
+							
+							console.log(res)
+							
+						}else{
+							console.log(res)
+						}
+					})
+				},100)
 			}
-		
 			
 		}
 	}
@@ -627,6 +660,7 @@
 	@import '../../style/mixin.scss';
 	.goodsDetails_warp{
 		padding-bottom: 98px;
+		padding-top: 88px;
 		.cube-dialog-icon i {
 			color: red;
 		}
@@ -785,7 +819,7 @@
 								}
 							}
 							.num{
-								height: 42px;
+								height: 40px;
 								background:#fff;
 								color: #ff523d;
 								font-size: 24px;
@@ -817,6 +851,12 @@
 			height: 88px;
 			position: relative;
 			border-bottom: 1px solid #ff523d;
+			position: fixed;
+			left: 0;
+			top: 0;
+			width: 100%;
+			background: #fff;
+			z-index: 100;
 			.back{
 				width: 26px;
 				height: 42px;

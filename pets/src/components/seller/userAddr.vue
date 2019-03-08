@@ -6,40 +6,22 @@
 			<div class="text" @click="newAddr">新增地址</div>
 		</div>
 		<ul class="userAddr_list">
-			<li>
+			<li v-for="(item,index) in addrData">
 				<div class="user_name">
-					<span>自由犬</span>
-					<span class="phone">13990413795</span>
+					<span>{{item.receiveName}}</span>
+					<span class="phone">{{item.receivePhone}}</span>
 				</div>
 				<div class="address">
-					
-					四川省成都市成华区牛王庙东恒国际二栋二单元1104
+					{{item.addrProvince}}{{item.addrCity}}{{item.addrArea}}{{item.addressTitle}}
 				</div>
 				<div class="select_box flex_r_s_b">
-					<div class="select_l flex_r_s_b">
-						<div class="cir"></div>
+					<div class="select_l flex_r_s_b" @click="setDefaultAddr(item)">
+						<div class="cir" :class="{active_cir:item.userAddrId == defaultIndex}"></div>
 						<span>默认地址</span>
 					</div>
 					<div class="select_r flex_r_s_b">
-						<div class="edit flex_r_f_e"><img src="../../assets/edit.png" alt=""><span>编辑</span></div>
-						<div class="delete flex_r_f_e" @click="maskShow"><img src="../../assets/delete.png" alt=""><span>删除</span></div>
-					</div>
-				</div>
-			</li>
-			<li>
-				<div class="user_name">
-					<span>自由犬</span>
-					<span class="phone">13990413795</span>
-				</div>
-				<div class="address">四川省成都市成华区牛王庙东恒国际二栋二单元1104</div>
-				<div class="select_box flex_r_s_b">
-					<div class="select_l flex_r_s_b">
-						<div class="cir active_cir"></div>
-						<span>默认地址</span>
-					</div>
-					<div class="select_r flex_r_s_b">
-						<div class="edit flex_r_f_e"><img src="../../assets/edit.png" alt=""><span>编辑</span></div>
-						<div class="delete flex_r_f_e" @click="maskShow"><img src="../../assets/delete.png" alt=""><span>删除</span></div>
+						<div class="edit flex_r_f_e" @click="edit(item)"><img src="../../assets/edit.png" alt=""><span>编辑</span></div>
+						<div class="delete flex_r_f_e" @click="maskShow(item)"><img src="../../assets/delete.png" alt=""><span>删除</span></div>
 					</div>
 				</div>
 			</li>
@@ -51,7 +33,7 @@
 				<p>确定删除地址?</p>
 				<div class="msk_btn flex_r_f_s">
 					<span class="cancel" @click="maskHide">取消</span>
-					<span class="confirm">确定</span>
+					<span class="confirm" @click="confirmDelete">确定</span>
 				</div>
 			</div>
 		</div>
@@ -59,18 +41,28 @@
 </template>
 
 <script>
+	import Api from '../common/apj.js'
 	export default{
 		data(){
 			return{
-				isMask:false
+				isMask:false,
+				addrData:[],
+				defaultIndex:'',
+				deleteAddrData:''
 			}
+		},
+		mounted(){
+			this.getAddr();
+			// console.log(this.$router.query.id)
+			
 		},
 		methods: {
 			maskHide() {
 				this.isMask = false;
 			},
-			maskShow(){
+			maskShow(item){
 				this.isMask = true;
+				this.deleteAddrData = item;
 			},
 			back() {
 				this.$router.go(-1); //返回上一层
@@ -78,6 +70,96 @@
 			newAddr(){
 				this.$router.push({
 					name:'addAddr'
+				})
+			},
+			confirmDelete(){
+				let self = this;
+				console.log(self.deleteAddrData)
+				self.axios.post(Api.userApi+'/user/deleteAddr',self.qs.stringify({
+					userAddrId:self.deleteAddrData.userAddrId
+				}), {
+					headers: {
+						'Content-Type': 'application/x-www-form-urlencoded',
+						"token":'063EC71B3F82EAB5EC46C94E2803D6E6'
+					}
+				}).then((res)=>{
+					if(res.data.code == 1){
+						self.isMask = false;
+						self.deleteAddrData = '';
+						self.getAddr();
+					}
+				})
+			},
+			getAddr(){
+				let self = this;
+				self.axios.post(Api.userApi+'/user/selectUserAddr',self.qs.stringify({
+					userId:29,
+				}), {
+					headers: {
+						'Content-Type': 'application/x-www-form-urlencoded',
+						"token":'063EC71B3F82EAB5EC46C94E2803D6E6'
+					}
+				}).then((res)=>{
+					if(res.data.code == 1){
+						console.log(res)
+						self.addrData = res.data.data;
+						self.addrData.forEach((e)=>{
+							if(e.isDefault == 1){
+								self.defaultIndex = e.userAddrId;
+								return false;
+							}
+						})
+					}
+				})
+			},
+			setDefaultAddr(item){
+				let self = this;
+				if(self.defaultIndex == item.userAddrId){
+					let toast = this.$createToast({
+						txt: '已经是默认地址了',
+						type: 'warn',
+						time: 500,
+					  })
+					toast.show()
+				}else{
+					self.axios.post(Api.userApi+'/user/updateAddrDefault',self.qs.stringify({
+						userId:29,
+						userAddrId:item.userAddrId
+					}), {
+						headers: {
+							'Content-Type': 'application/x-www-form-urlencoded',
+							"token":'063EC71B3F82EAB5EC46C94E2803D6E6'
+						}
+					}).then((res)=>{
+						if(res.data.code == 1){
+							self.defaultIndex = item.userAddrId;
+							self.$router.push({
+								name:self.$route.query.name
+							})
+
+						}
+					})
+				}
+				
+			},
+			edit(item){
+// 				let selectData = item;
+// 				sessionStorage.setItem('editAddr', JSON.stringify(selectData));
+				let self = this;
+				self.$router.push({
+					name:'addAddr',
+					params:{
+						addrName:item.addressTitle,
+						lat:item.latitude,
+						lng:item.longitude,
+						city:item.addrCity,
+						province:item.addrProvince,
+						district:item.addrArea,
+						userAddrId:item.userAddrId,
+						userName:item.receiveName,
+						houseNumber:item.address,
+						phone:item.receivePhone
+					}
 				})
 			}
 		},
@@ -88,13 +170,20 @@
 	@import '../../style/common.scss';
 	@import '../../style/mixin.scss';
 	.userAddr{
+		padding-top: 88px;
+		.cube-toast .cube-popup-content{
+			background-color: rgba(0,0,0,0.6)
+		}
 		.top_nav {
 			padding: 0 20px;
 			height: 88px;
 			box-sizing: border-box;
-			position: relative;
+			position:fixed;
 			border-bottom: 1px solid #FF523D;
-		
+			background: #fff;
+			left: 0;
+			top: 0;
+			z-index: 100;
 			.back {
 				width: 26px;
 				height: 42px;

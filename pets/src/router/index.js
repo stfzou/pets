@@ -16,6 +16,10 @@ import ConfirmAddr from '@/components/seller/confirmAddr'
 import UserAddr from '@/components/seller/userAddr'
 import ShopCar from '@/components/seller/shopCar'
 import OrderAccounts from '@/components/seller/orderAccounts'
+import Login from '@/components/login/login'
+import Register from '@/components/login/register'
+import vLogin from '@/components/login/vLogin'
+import ForgetPw from '@/components/login/forgetPw'
 Vue.use(Router)
 export default new Router({
 	mode: 'history',
@@ -25,9 +29,29 @@ export default new Router({
 		  redirect:'seller/sellerGoods'
 		},
 		{
+			path:'/vLogin',
+			name:'vLogin',
+			component:vLogin,
+		},
+		{
+			path:'/forgetPw',
+			name:'forgetPw',
+			component:ForgetPw,
+		},
+		{
 			path:'/tap',
 			name:'tap',
 			component:Tap,
+		},
+		{
+			path:'/register',
+			name:'register',
+			component:Register,
+		},
+		{
+			path:'/login',
+			name:'login',
+			component:Login,
 		},
 		{
 			path:'/goodsDetails',
@@ -57,7 +81,7 @@ export default new Router({
 		{
 			path:'/confirmAddr',
 			name:'confirmAddr',
-			component:ConfirmAddr,
+			component:ConfirmAddr
 		},
 		{
 			path:'/addAddr',

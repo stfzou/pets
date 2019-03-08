@@ -47,6 +47,7 @@
 </template>
 
 <script>
+	import Api from '../common/apj.js'
 	export default {
 		data() {
 			return {
@@ -115,16 +116,12 @@
 			let h = document.documentElement.clientHeight - document.querySelector(".eval_content").offsetTop;
 			document.querySelector(".eval_content").style.height = h+'px';
 			this.getEval(-1,-1);
-			setTimeout(() => {
 			
-			  this.$refs.scroll.forceUpdate();
-			  
-			}, 500)
-			setTimeout(() => {
-			
-			  this.$refs.scroll.refresh();
-			  
-			}, 1000)
+// 			setTimeout(() => {
+// 			
+// 			  this.$refs.scroll.refresh();
+// 			  
+// 			}, 1000)
 		},
 		methods:{
 			select(item,index){
@@ -139,7 +136,7 @@
 			},
 			getEval(isImg,isPraise){
 				let self = this;
-				self.axios.post('/webShop/selectShopAssessPage',self.qs.stringify({
+				self.axios.post(Api.shopApi+'/webShop/selectShopAssessPage',self.qs.stringify({
 					shopId:23,
 					isImg:isImg,
 					isPraise:isPraise,
@@ -152,7 +149,13 @@
 				}).then((res)=>{
 					if(res.data.code == 1){
 						self.evalList = res.data.data;
-						console.log(res)
+						
+						setTimeout(() => {
+						
+						 this.$refs.scroll.forceUpdate();
+						  
+						}, 500)
+						
 					}
 				})
 			},
@@ -161,16 +164,10 @@
 				this.page = 0;
 				this.getEval(this.isImgCode,this.isPraiseCode);
 				setTimeout(() => {
-
-				  this.$refs.scroll.forceUpdate();
-				  
-			    }, 500)
-				setTimeout(() => {
 				
 				  this.$refs.scroll.refresh();
 				  
 				}, 1000)
-				
 		    },
 		    onPullingUp() {
 			// 模拟更新数据
@@ -179,7 +176,7 @@
 				this.page++;
 				setTimeout(() => {
 					
-					self.axios.post('/webShop/selectShopAssessPage',self.qs.stringify({
+					self.axios.post(Api.shopApi+'/webShop/selectShopAssessPage',self.qs.stringify({
 						shopId:23,
 						isImg:self.isImgCode,
 						isPraise:self.isPraiseCode,
@@ -192,16 +189,16 @@
 					}).then((res)=>{
 						if(res.data.code == 1){
 							console.log(res)
+							
 							if(res.data.data.length>0){
 								res.data.data.forEach((e)=>{
 									self.evalList.push(e)
 								})
-								setTimeout(()=>{
-									self.$refs.scroll.refresh();
-									self.$refs.scroll.forceUpdate();
-									
-								},500)
 							}
+							self.$refs.scroll.forceUpdate();
+							setTimeout(()=>{
+								self.$refs.scroll.refresh();
+							},500)
 						}else{
 							self.$refs.scroll.forceUpdate()
 						}

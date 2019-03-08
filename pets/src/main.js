@@ -19,6 +19,8 @@ Vue.prototype.http = http;
 Vue.prototype.qs = Qs;
 Vue.config.productionTip = false
 // axios.defaults.baseURL = 'http://192.168.0.109:8084'
+// axios.defaults.headers.common['token'] = "B99FE190CB62097255E01FE911A271D4"
+
 // http.defaults.baseURL = 'http://192.168.0.109:8082'
 
 AMap.initAMapApiLoader({

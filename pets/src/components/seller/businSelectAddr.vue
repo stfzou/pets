@@ -59,8 +59,7 @@
 // 										self.lng = result.position.lng;
 // 										self.lat = result.position.lat;
 // 										self.center = [self.lng, self.lat];
-// 										self.loaded = true;
-// 										self.$nextTick();
+
 										console.log(result)
 										self.nearbyData = result.pois.slice(0,5);
 									}

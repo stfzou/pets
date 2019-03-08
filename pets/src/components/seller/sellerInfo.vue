@@ -42,6 +42,7 @@
 </template>
 
 <script>
+	import Api from '../common/apj.js'
 	export default {
 		data() {
 			return {
@@ -60,7 +61,7 @@
 		methods:{
 			getInfo(){
 				let self = this;
-				self.axios.post('/webShop/getShopsWholeById',self.qs.stringify({
+				self.axios.post(Api.shopApi+'/webShop/getShopsWholeById',self.qs.stringify({
 					shopId:23
 				}), {
 					headers: {

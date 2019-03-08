@@ -1,7 +1,7 @@
 <template>
 	
 		<div class="topNav flex_r_s_b">
-			<div class="back"></div>
+			<div class="back" @click="back"></div>
 			<span>商家店铺</span>
 			
 			<div class="share"></div>
@@ -17,7 +17,12 @@
 				
 			};
 		},
-		props:[]
+		methods: {
+			back() {
+				this.$router.go(-1);//返回上一层
+			},
+		},
+		
 	}
 </script>
 

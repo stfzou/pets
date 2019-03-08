@@ -74,6 +74,7 @@
 <script>
 	import {mapState} from 'vuex'
 	import TopNav from '../common/topNav.vue'
+	import Api from '../common/apj.js'
 	export default {
 		data() {
 			return {
@@ -116,7 +117,7 @@
 			},
 			getStoreInfo(){
 				let self = this;
-				self.axios.post('/webShop/selectShopsInfoById',self.qs.stringify({
+				self.axios.post(Api.shopApi+'/webShop/selectShopsInfoById',self.qs.stringify({
 					shopId:23,
 					lat:0,
 					lng:0

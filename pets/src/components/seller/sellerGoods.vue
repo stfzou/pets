@@ -26,6 +26,7 @@
 </template>
 
 <script>
+	import Api from '../common/apj.js'
 	export default {
 		data() {
 			return {
@@ -49,22 +50,22 @@
 		mounted() {
 			let h = document.documentElement.clientHeight - document.querySelector(".sellerGoods_warp").offsetTop;
 			document.querySelector(".sellerGoods_warp").style.height = h+'px';
+			
+			console.log(sessionStorage.getItem('user'))
 			this.getGoods()
 		},
 		methods:{
+			
 			 onPullingDown() {
 			// 模拟更新数据
 				// this.page = 0;
 				this.page = 0;
 				this.getGoods()
-				setTimeout(() => {
-					this.$refs.scroll.forceUpdate();
-					
-				}, 500)
+				
 				setTimeout(() => {
 					this.$refs.scroll.refresh();
 					
-			    }, 1000)
+			    }, 800)
 			},
 			onPullingUp() {
 			// 模拟更新数据
@@ -73,7 +74,7 @@
 				this.page++;
 				setTimeout(() => {
 					let self = this;
-					self.axios.post('/webShop/selectProductBasicByShopId',self.qs.stringify({
+					self.axios.post(Api.shopApi+'/webShop/selectProductBasicByShopId',self.qs.stringify({
 						shopId:23,
 						pageNo:self.page,
 						pageSize:8
@@ -106,7 +107,7 @@
 			},
 			getGoods(){
 				let self = this;
-				self.axios.post('/webShop/selectProductBasicByShopId',self.qs.stringify({
+				self.axios.post(Api.shopApi+'/webShop/selectProductBasicByShopId',self.qs.stringify({
 					shopId:23,
 					pageNo:self.page,
 					pageSize:8
@@ -117,6 +118,9 @@
 				}).then((res)=>{
 					if(res.data.code == 1){
 						self.goodsData = res.data.data;
+						setTimeout(() => {
+							this.$refs.scroll.forceUpdate();
+						}, 500)
 					}else{
 						  const toast = this.$createToast({
 							time: 1000,

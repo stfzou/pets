@@ -7,15 +7,18 @@
 		</div>
 		<div class="addr_box" @click="addrUrl">
 			<div class="addr">
-				<div class="addr_name">
-					<span>自由犬</span>
-					<span class="phone">183******4123</span>
+				<div v-if="addr.isDefault == 1">
+					 <div class="addr_name">
+						<span>{{addr.receiveName}}</span>
+						<span class="phone">{{addr.receivePhone.replace(/^(\d{3})\d{4}(\d+)/,"$1****$2")}}</span>
+					</div> 
+					 <div class="addr_text flex_r_f_s">
+						<img src="../../assets/icon/map@2x.png" alt="">
+						<span class="addr_cnt">{{addr.addrProvince}}{{addr.addrCity}}{{addr.addrArea}}{{addr.addressTitle}}</span>
+						<div class="mr flex_r_s_c">默认</div>
+					</div>
 				</div>
-				<div class="addr_text flex_r_f_s" v-if="addrStatus">
-					<img src="../../assets/icon/map@2x.png" alt="">
-					<span class="addr_cnt">四川省成都市成华区牛王庙东恒国际</span>
-					<div class="mr flex_r_s_c">默认</div>
-				</div>
+				
 				<div class="noAddr" v-else>您还没有设置地址，点击设置地址</div>
 			</div>
 			
@@ -28,11 +31,11 @@
 						<img src="../../assets/icon_dianpu.png" alt="">
 						<span>{{item.shopName}}</span>
 					</div>
-					<div class="goodsInfo flex_r_s_b" v-for="subItem in item.carPs">
+					<div class="goodsInfo flex_r_s_b" v-for="subItem in item.orderSkuProducts[0].skuProducts">
 						<img class="goods_img" :src="subItem.skuImgAddr" alt="">
 						<div class="goodsInfo_r">
 							<div class="goodsName">{{subItem.productName}}</div>
-							<div class="attr">商品属性:<span v-for="(spanItem,i) in subItem.anvs">{{spanItem.avName|spanFilter(i,subItem.anvs.length-1)}}</span></div>
+							<div class="attr" v-show="subItem.anvs.length>0">商品属性:<span v-for="(spanItem,i) in subItem.anvs">{{spanItem.avName|spanFilter(i,subItem.anvs.length-1)}}</span></div>
 							<div class="one_price flex_r_s_b">
 								<span class="price_l">￥{{subItem.original}}</span>
 								<span class="price_r">x{{subItem.productNum}}</span>
@@ -50,7 +53,7 @@
 					<div class="bz">（备注:营业时间为9:00-18:00）</div>
 					<div class="discount flex_r_f_s">
 						<span>优惠券</span>
-						<span class="discount_ridus flex_r_s_c">暂无可用优惠券</span>
+						<!-- <span class="discount_ridus flex_r_s_c">暂无可用优惠券</span> -->
 					</div>
 				</li>
 			</ul>
@@ -73,11 +76,11 @@
 			<div class="detailed_list">
 				<div class="detailed_box flex_r_s_b">
 					<div class="detailed_l">商品总价</div>
-					<div class="detailed_r">￥420.00</div>
+					<div class="detailed_r">￥{{totalPrice}}</div>
 				</div>
 				<div class="detailed_box flex_r_s_b">
 					<div class="detailed_l">运费</div>
-					<div class="detailed_r"><span>+</span>￥8.00</div>
+					<div class="detailed_r"><span>+</span>￥{{fare}}</div>
 				</div>
 				<div class="detailed_box flex_r_s_b">
 					<div class="detailed_l">立减</div>
@@ -86,7 +89,7 @@
 			</div>
 		</div>
 		<div class="order_foot flex_r_s_b">
-			<div class="foot_l">待支付:￥413.00</div>
+			<div class="foot_l">待支付:￥{{payPrice}}</div>
 			<div class="c_btn flex_r_s_c">确认订单</div>
 		</div>
 	</div>
@@ -99,11 +102,15 @@
 			return {
 				val: '',
 				orderData:[],
-				addrStatus:true
+				addr:'',
+				payPrice :'',
+				totalPrice:'',
+				fare:''
 			}
 		},
 		mounted(){
 			this.getOrder();
+			this.getAddr();
 		},
 		filters:{
 			spanFilter(val,index,arrl){
@@ -152,6 +159,9 @@
 				}).then((res)=>{
 					if(res.data.code == 1){
 						self.orderData = res.data.data.orderShops;
+						self.payPrice = res.data.data.payPrice;
+						self.totalPrice = res.data.data.totalPrice;
+						self.fare = res.data.data.fare;
 						console.log(self.orderData)
 					}else{
 						self.$createDialog({
@@ -164,8 +174,35 @@
 				})
 			},
 			addrUrl(){
-				this.$router.push({
-					name:'userAddr'
+				let self = this; 
+				self.$router.push({
+					name:'userAddr',
+					query:{
+						name:'orderAccounts'
+					}
+				})
+			},
+			getAddr(){
+				let self = this;
+				self.axios.post(Api.userApi+'/user/selectUserAddr',self.qs.stringify({
+					userId:29,
+				}), {
+					headers: {
+						'Content-Type': 'application/x-www-form-urlencoded',
+						"token":'063EC71B3F82EAB5EC46C94E2803D6E6'
+					}
+				}).then((res)=>{
+					if(res.data.code == 1){
+						
+						// self.addrData = ;
+						res.data.data.forEach((e)=>{
+							if(e.isDefault == 1){
+								self.addr = e;
+								console.log(e)
+								return false;
+							}
+						})
+					}
 				})
 			}
 		},
@@ -178,14 +215,17 @@
 
 	.orderAccounts {
 		padding-bottom: 126px;
-
+		padding-top:88px; 
 		.top_nav {
 			padding: 0 20px;
 			height: 88px;
 			box-sizing: border-box;
-			position: relative;
 			border-bottom: 1px solid #FF523D;
-
+			position: fixed;
+			background: #fff;
+			z-index: 100;
+			left: 0;
+			top: 0;
 			.back {
 				width: 26px;
 				height: 42px;
@@ -218,14 +258,13 @@
 			.noAddr{
 				font-size: 28px;
 				color: #FF523D;
-				
+				text-align: center;
 				padding: 30px 0;
 			}
 			.addr {
 				padding: 40px;
-				background: url('../../assets/icon/right_sjx.png') no-repeat 646px center;
+				background: url('../../assets/icon/right_sjx.png') no-repeat 95% center;
 				background-size: 15px;
-
 				.addr_name {
 					span {
 						font-size: 30px;
@@ -239,13 +278,13 @@
 
 				.addr_text {
 					margin-top: 22px;
-
+					width: 600px;
 					.addr_cnt {
 						font-size: 24px;
 						color: #FF523D;
 						margin-left: 18px;
 						margin-right: 28px;
-
+						line-height: 34px;
 					}
 
 					img {
@@ -301,10 +340,11 @@
 						margin-bottom: 20px;
 						.goods_img {
 							width: 100px;
-							margin-right: 60px;
+							
 						}
 
 						.goodsInfo_r {
+							width: 460px;
 							.goodsName {
 								line-height: 34px;
 								color: #000;
@@ -312,7 +352,7 @@
 							}
 							
 							.attr{
-								margin: 10px 0 30px 0;
+								margin-top: 10px;
 								font-size: 24px;
 								color: #000;
 								span{
@@ -322,7 +362,7 @@
 							}
 							.one_price {
 								font-size: 28px;
-								// margin-top: 50px;
+								margin-top: 30px;
 
 								.price_l {
 									color: #FF523D;
