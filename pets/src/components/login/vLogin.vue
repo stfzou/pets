@@ -144,6 +144,10 @@
 									self.$router.push({
 										name:self.$store.state.loginInfo.routerName
 									})
+								}else{
+									self.$router.push({
+										name:'sellerGoods'
+									})
 								}
 									
 							},500)

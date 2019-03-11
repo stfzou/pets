@@ -216,7 +216,7 @@
 			getShopCar(){
 				let self = this;
 				self.axios.post(Api.userApi+'/car/selectShopCar',self.qs.stringify({
-					userId:24,
+					userId:31,
 				}), {
 					headers: {
 						'Content-Type': 'application/x-www-form-urlencoded'
@@ -225,6 +225,7 @@
 					
 					if(res.data.code == 1){
 						// self.shopCarData = res.data.data.carShops;
+						console.log(res)
 						self.allSelect = true;
 						res.data.data.carShops.forEach((e)=>{
 							self.shopCarData.push({
@@ -246,14 +247,16 @@
 							})
 						})
 						self.price = Math.floor(res.data.data.selectPrice * 100) / 100;
-						console.log(res)
+						
+					}else{
+						console.log(res.data.msg)
 					}
 				})
 			},
 			upGetShopCar(){
 				let self = this;
 				self.axios.post(Api.userApi+'/car/selectShopCar',self.qs.stringify({
-					userId:24,
+					userId:31,
 				}), {
 					headers: {
 						'Content-Type': 'application/x-www-form-urlencoded'
@@ -261,9 +264,7 @@
 				}).then((res)=>{
 					
 					if(res.data.code == 1){
-						// self.shopCarData = res.data.data.carShops;
-						
-						//self.price = Math.floor(res.data.data.selectPrice * 100) / 100;
+					
 						self.price = res.data.data.selectPrice;
 						console.log(res)
 					}
@@ -529,7 +530,7 @@
 				if(isHttp){
 					self.axios.post(Api.userApi+'/order/orderSettlement',self.qs.stringify({
 					
-						userId:24
+						userId:31
 						
 					}), {
 						headers: {

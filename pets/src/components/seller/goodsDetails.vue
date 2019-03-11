@@ -343,6 +343,8 @@
 				deliveryTime:'',//多少时间内送到
 				mostFar:'',
 				returnService:'',
+				shopId:'',
+				productId:'',
 				plugin: [
 
 					{
@@ -382,22 +384,15 @@
 		mounted() {
 			//
 			
-			if(this.$store.state.loginInfo.token == ''){
-				this.$store.commit('setRouterName','goodsDetails');
-				this.$router.push({
-					name:'login'
-				})
-				return false;
-			}
+// 			if(this.$store.state.loginInfo.token == ''){
+// 				this.$store.commit('setRouterName','goodsDetails');
+// 				this.$router.push({
+// 					name:'login'
+// 				})
+// 				return false;
+// 			}
 			this.getAddr();
 			this.getGoodsInfo();
-		},
-		computed: {
-			getSkuId() {
-				this.skus.forEach((e)=>{
-					
-				})
-			}
 		},
 		filters:{
 			
@@ -507,10 +502,10 @@
 					}).show()
 				}else{
 					self.axios.post(Api.userApi+'/car/shopCarOperate',self.qs.stringify({
-						shopId:23,
-						productId:146,
+						shopId:self.shopId,
+						productId:self.productId,
 						skuId:self.skuId,
-						userId:24,
+						userId:31,
 						num:self.num
 					}), {
 						headers: {
@@ -541,7 +536,7 @@
 			getAddr(){
 				let self = this;
 				self.axios.post(Api.userApi+'/user/selectUserAddr',self.qs.stringify({
-					userId:29,
+					userId:31,
 				}), {
 					headers: {
 						'Content-Type': 'application/x-www-form-urlencoded',
@@ -577,6 +572,8 @@
 						}
 					}).then((res)=>{
 						if(res.data.code == 1){
+							self.productId = res.data.data.productId;
+							self.shopId = res.data.data.shopId;
 							self.slidItems = res.data.data.pMainImgs;
 							self.distance = res.data.data.shopInfo.distance;
 							self.severItem = res.data.data.shopInfo.operateTypes;
