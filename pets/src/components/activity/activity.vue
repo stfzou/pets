@@ -1,75 +1,82 @@
 <template>
 	<div class="activity_warp">
-		<div class="top_nav flex_r_s_b">
+		<div class="top_nav flex_r_s_b" :class="{active_nav:isActiveColor}">
 			<div class="back" @click="back"></div>
-			<div class="nav_title">打卡请流浪猫狗吃年饭</div>
+			<div class="nav_title">{{activityTitle}}</div>
 			<div class="share"></div>
 		</div>
 		<div class="activity_filter">
-			<img src="../../../../kugou/src/assets/banner2.jpg" alt="">
+			<img :src="mainImg" alt="">
 		</div>
 		<div class="activity_img">
-			<img src="../../../../kugou/src/assets/banner2.jpg" alt="">
+			<img :src="mainImg" alt="">
 		</div>
 		<div class="activity_info">
-			<div class="activity_name">关爱萌宠给它一个宠物智能“芯身份证”</div>
+			<div class="activity_name">{{activityTitle}}</div>
 			<div class="footprint">
-				<span>浏览13.0万</span>
-				<span>收藏1.3万</span>
-				<span>留言65</span>
+				<span>浏览{{browse}}条</span>
+				<span>收藏{{keep}}条</span>
+				<span>留言{{commentNum}}</span>
 			</div>
-			<div class="cost">免费</div>
+			<div class="cost">{{activityPrice}}</div>
 			<ul class="info_list">
 				<li class="flex_r_f_s richeng">
 					<img class="info_l" src="../../assets/icon_time.png" alt="">
-					<p>04/19 9:00~04/22 18:00</p>
+					<p>{{startTime}}~{{endTime}}</p>
 				</li>
-				<li class="flex_r_f_s right_sjx">
+				<li class="flex_r_f_s right_sjx" @click="goMap">
 					<img class="info_l" src="../../assets/icon/map@1x.png" alt="">
-					<p>成都锦江区东恒国际二栋二单元</p>
+					<p>{{activityAddr}}</p>
 				</li>
 				<li class="flex_r_f_s">
 					<img class="info_l" src="../../assets/icon_renshu.png" alt="">
-					<p>已报名20人/限100人报名</p>
+					<p>已报名{{joinNum}}人/限{{limitNum}}人报名</p>
 				</li>
 			</ul>
 		</div>
 		<div class="line"></div>
 		<div class="activity_cnt">
-			<img src="../../assets/active_bg.png" alt="">
+			<!-- <img src="../../assets/active_bg.png" alt=""> -->
+			
 		</div>
 		<div class="line"></div>
 		<div class="message_cnt">
 			<div class="title">
-				<p>留言(57)</p>
+				<p>留言({{commentNum}})</p>
 			</div>
-			<ul class="eval_list">
-				<li class="flex_r_s_b list_item" v-for="(item,index) in evalList" :key="index">
-					<div class="head_icon">
-						<!-- <img :src="item.userHeadImgAddr" alt=""> -->
-					</div>
-					<div class="right">
-						<div class="r_top flex_r_s_b">
-							<div class="r_top_l">
-								<div class="user_name">
-									<span v-if="item.userName1!=null">{{item.userName}}</span>
-									<span v-else>未设置</span>
-								</div>
-								<div class="text">{{item.assessContent}}</div>
+			<div class="msg_box">
+				<cube-scroll ref="scroll" @pulling-up="onPullingUp" @pulling-down="onPullingDown" :options="options">
+					<ul class="eval_list">
+						<li class="flex_r_s_b list_item" v-for="(item,index) in evalList" :key="index">
+							<div class="head_icon">
+								<img :src="item.userHeadImgAddr" alt="">
+								
 							</div>
+							<div class="right">
+								<div class="r_top flex_r_s_b">
+									<div class="r_top_l">
+										<div class="user_name">
+											<span v-if="item.userName!=null">{{item.userName}}</span>
+											<span v-else>未设置</span>
+										</div>
+										<div class="text">{{item.content}}</div>
+									</div>
+								
+								</div>
+								
+								<div class="data">{{item.createTime}}</div>
+							</div>
+						</li>
 						
-						</div>
-						
-						<div class="data">{{item.createTime}}</div>
-					</div>
-				</li>
-				
-			</ul>
+					</ul>
+				</cube-scroll>
+			</div>
+			
 		</div>
 		<div class="active_foot">
 			<div class="message_input flex_r_s_b">
 				<input type="text" v-model="msg" placeholder="留言">
-				<span class="send_msg">发送</span>
+				<span class="send_msg" @click="commitComment">发送</span>
 			</div>
 			<div class="bottom flex_r_f_s">
 				<div class="bot_l flex_r_f_e" style="width: 50%;">
@@ -96,23 +103,73 @@
 		data(){
 			return {
 				evalList:[],
-				msg:''
+				msg:'',
+				mainImg:'',//活动主图
+				isActiveColor:false,
+				center:[],
+				activityTitle:'',
+				browse:'',
+				commentNum:'',
+				keep:'',
+				activityAddr:'',
+				endTime:'',
+				startTime:'',
+				activityPrice:'',
+				joinNum:'',
+				limitNum:'',
+				lat:'',
+				lng:'',
+				page:0,
+				options:{
+					pullDownRefresh:{
+						txt:'更新成功',
+						threshold:40
+					},
+					pullUpLoad:{
+						txt:{
+							more: '加载更多', noMore: '没有更多数据了',
+						},
+						threshold:40,
+						
+					}
+				},
+				collectionImg:'',
+				isCollection:''
+				
 			}
 		},
 		mounted() {
-			this.getEval(-1,-1);
+			if(JSON.parse(sessionStorage.getItem('user')) == null){
+				this.$store.commit('setRouterName','activity');
+				this.$router.push({
+					name:'login'
+				})
+				return false;
+			}
+			// console.log(JSON.parse(sessionStorage.getItem('user')))
+			this.getActivity();
+			this.getEval();
+			window.addEventListener('scroll', this.handleScroll)
+			
 		},
 		methods:{
 			back() {
 				this.$router.go(-1); //返回上一层
 			},
-			getEval(isImg,isPraise){
+			handleScroll () {
+			  var scrollTop = window.scrollY;
+			  let elHeight = document.querySelector(".activity_filter").offsetHeight
+			  if(scrollTop>elHeight){
+				  this.isActiveColor = true;
+			  }else{
+				  this.isActiveColor = false;
+			  }
+			},
+			getEval(){
 				let self = this;
-				self.axios.post(Api.shopApi+'/webShop/selectShopAssessPage',self.qs.stringify({
-					shopId:18,
-					isImg:isImg,
-					isPraise:isPraise,
-					pageNo:0,
+				self.axios.post(Api.userApi+'/ca/selectCommunityActivityComment',self.qs.stringify({
+					id:2,
+					pageNo:self.page,
 					pageSize:5
 				}), {
 					headers: {
@@ -120,12 +177,157 @@
 					}
 				}).then((res)=>{
 					if(res.data.code == 1){
-						self.evalList = res.data.data;
-						console.log(res)
-						
+						setTimeout(() => {
+							self.$refs.scroll.forceUpdate()
+							self.evalList = res.data.data.doList;
+							self.commentNum = res.data.data.commentNum;
+						}, 500)
+					}else{
+						let toast = self.$createToast({
+							txt:res.data.msg,
+							type: 'error'
+						  })
+						toast.show()
 					}
 				})
 			},
+			goMap(){
+				let self = this;
+				this.$router.push({
+					name:'activityMap',
+					params:{
+						lat:self.lat,
+						lng:self.lng
+					}
+				})
+			},
+			getActivity(){
+				let self = this;
+				self.axios.post(Api.userApi+'/ca/selectCommunityActivityDetails',self.qs.stringify({
+					id:3,
+					latitude:0,
+					longitude:0
+				}), {
+					headers: {
+						'Content-Type': 'application/x-www-form-urlencoded'
+					}
+				}).then((res)=>{
+					if(res.data.code == 1){
+						console.log(res)
+						self.mainImg = res.data.data.activityCover;
+						self.activityTitle = res.data.data.activityTitel;
+						self.browse = res.data.data.browse;
+						self.keep = res.data.data.keep;
+						self.activityAddr = res.data.data.activityAddr;
+						self.startTime = res.data.data.startTime;
+						self.endTime = res.data.data.endTime;
+						if(res.data.data.isToll == 0){
+							self.activityPrice = '免费'
+						}else{
+							self.activityPrice = '活动费用最少'+ res.data.data.minPrice+'元'
+						}
+						self.limitNum = res.data.data.limitNum;
+						self.joinNum = res.data.data.joinNum;
+						self.lat = res.data.data.latitude;
+						self.lng = res.data.data.longitude;
+						document.querySelector(".activity_cnt").innerHTML = res.data.data.description;
+						// self.evalList = res.data.data.commentVos;
+					}else{
+						let toast = self.$createToast({
+							txt:res.data.msg,
+							type: 'error'
+						  })
+						toast.show()
+					}
+				})
+			},
+			onPullingDown() {
+			// 模拟更新数据
+				this.page = 0;
+				this.getEval();
+				
+				setTimeout(() => {
+					this.$refs.scroll.refresh();
+				}, 1000)
+			},
+			onPullingUp() {
+			// 模拟更新数据
+				
+				let self = this;
+				this.page++;
+				self.axios.post(Api.userApi+'/ca/selectCommunityActivityComment',self.qs.stringify({
+					id:2,
+					pageNo:self.page,
+					pageSize:5
+				}), {
+					headers: {
+						'Content-Type': 'application/x-www-form-urlencoded'
+					}
+				}).then((res)=>{
+					
+					if(res.data.code == 1){
+						console.log(res)
+						
+						if(res.data.data.doList.length>0){
+							
+							setTimeout(()=>{
+								self.$refs.scroll.forceUpdate();
+								res.data.data.doList.forEach((e)=>{
+									self.evalList.push(e)
+								})
+								
+							},500)
+							setTimeout(() => {
+								self.$refs.scroll.refresh();
+							}, 600)
+							
+						}else{
+							
+							setTimeout(()=>{
+								self.$refs.scroll.forceUpdate();
+								
+							},500)
+						}
+						
+					}else{
+						self.$refs.scroll.forceUpdate()
+					}
+				})
+			
+			},
+			commitComment(){
+				let self = this;
+				self.axios.post(Api.userApi+'/ca/addCommunityActivityComment',self.qs.stringify({
+					userId:JSON.parse(sessionStorage.getItem('user')).userId,
+					communityActivityId:2,
+					content:self.msg
+				}), {
+					headers: {
+						'Content-Type': 'application/x-www-form-urlencoded'
+					}
+				}).then((res)=>{
+					if(res.data.code == 1){
+						self.msg = '';
+						self.page = 0;
+						self.getEval();
+						setTimeout(() => {
+							this.$refs.scroll.refresh();
+						}, 1000)
+						let toast = self.$createToast({
+							txt: '提交成功',
+							type: 'correct'
+						  })
+						toast.show()
+					}else{
+						
+						let toast = self.$createToast({
+							txt:res.data.msg,
+							type: 'error'
+						  })
+						toast.show()
+					}
+				})
+			}
 		}
 	}
 </script>
@@ -165,6 +367,20 @@
 				height: 40px;
 				background: url('../../assets/icon/share@2x.png') no-repeat center 0;
 				background-size: 100%;
+			}
+		}
+		.active_nav{
+			background: #fff;
+			.back{
+				background: url(../../assets/icon/backColory.png) no-repeat center 0;
+				background-size: cover;
+			}
+			.share{
+				background: url('../../assets/icon/active_share.png') no-repeat center 0;
+				background-size: 100%;
+			}
+			.nav_title{
+				color: #ff523d;
 			}
 		}
 		.activity_filter{
@@ -240,6 +456,12 @@
 		}
 		.activity_cnt{
 			padding: 30px;
+			div{
+				font-size: 24px;
+				line-height: 34px;
+				color: #000;
+				margin-bottom: 10px;
+			}
 			img{
 				width: 100%;
 			}
@@ -254,6 +476,9 @@
 					border-left: 4px solid #ff523d;
 					padding-left: 14px;
 				}
+			}
+			.msg_box{
+				height: 400px;
 			}
 			.eval_list{
 				height: auto;

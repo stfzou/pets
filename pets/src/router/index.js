@@ -21,6 +21,8 @@ import Register from '@/components/login/register'
 import vLogin from '@/components/login/vLogin'
 import ForgetPw from '@/components/login/forgetPw'
 import Activity from '@/components/activity/activity'
+import ActivityMap from '@/components/activity/activityMap'
+
 Vue.use(Router)
 export default new Router({
 	mode: 'history',
@@ -38,6 +40,11 @@ export default new Router({
 			path:'/activity',
 			name:'activity',
 			component:Activity
+		},
+		{
+			path:'/activityMap',
+			name:'activityMap',
+			component:ActivityMap
 		},
 		{
 			path:'/forgetPw',

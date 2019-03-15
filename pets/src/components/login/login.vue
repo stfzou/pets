@@ -96,9 +96,9 @@
 								token:res.data.token
 								
 							};
-							self.$store.commit('setUserInfo',userEntity);
+							// self.$store.commit('setUserInfo',userEntity);
 							
-							// sessionStorage.setItem('user', JSON.stringify(userEntity));
+							sessionStorage.setItem('user', JSON.stringify(userEntity));
 							let toast = self.$createToast({
 								txt: '登录成功',
 								type: 'correct'
