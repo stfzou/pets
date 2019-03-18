@@ -3,7 +3,7 @@
 		<div class="top_nav flex_r_s_b" :class="{active_nav:isActiveColor}">
 			<div class="back" @click="back"></div>
 			<div class="nav_title">{{activityTitle}}</div>
-			<div class="share"></div>
+			<div class="share" @click="wxPay"></div>
 		</div>
 		<div class="activity_filter">
 			<img :src="mainImg" alt="">
@@ -81,7 +81,8 @@
 			<div class="bottom flex_r_f_s">
 				<div class="bot_l flex_r_f_e" style="width: 50%;">
 					<div class="collection">
-						<img src="../../assets/shoucang.png" alt="">
+						<img v-if="isCollection == 0" src="../../assets/shoucang.png" alt="" @click="collection">
+						<img v-else src="../../assets/collection.png" alt="" @click="cancelCollection">
 						<p>收藏</p>
 					</div>
 					<div class="collection">
@@ -98,6 +99,7 @@
 </template>
 
 <script>
+	import weixinPay from '../common/weixinPay.js'
 	import Api from '../common/apj.js'
 	export default{
 		data(){
@@ -139,6 +141,7 @@
 			}
 		},
 		mounted() {
+			this.getUrlData();
 			if(JSON.parse(sessionStorage.getItem('user')) == null){
 				this.$store.commit('setRouterName','activity');
 				this.$router.push({
@@ -146,6 +149,8 @@
 				})
 				return false;
 			}
+			
+			
 			// console.log(JSON.parse(sessionStorage.getItem('user')))
 			this.getActivity();
 			this.getEval();
@@ -156,19 +161,43 @@
 			back() {
 				this.$router.go(-1); //返回上一层
 			},
+			getUrlData() {// 截取url中的数据
+			    if(JSON.parse(sessionStorage.getItem('id'))==undefined){
+				   let tempStr = window.location.href
+				   /**
+				   * tempArr 是一个字符串数组 格式是["key=value", "key=value", ...]
+				   */
+				   let tempArr = tempStr.split('?')[1] ? tempStr.split('?')[1].split('&') : []
+				   /**
+				   * returnArr 是要返回出去的数据对象 格式是 { key: value, key: value, ... }
+				   */
+				   let returnArr = {}
+				   tempArr.forEach(element => {
+				   returnArr[element.split('=')[0]] = element.split('=')[1]
+				   })
+				  /*输出日志*/
+				   
+				   sessionStorage.setItem('id',JSON.stringify(returnArr.id));
+			    }
+			  
+			  },
+	
 			handleScroll () {
-			  var scrollTop = window.scrollY;
-			  let elHeight = document.querySelector(".activity_filter").offsetHeight
-			  if(scrollTop>elHeight){
-				  this.isActiveColor = true;
-			  }else{
-				  this.isActiveColor = false;
-			  }
+				setTimeout(()=>{
+					var scrollTop = window.scrollY;
+					let elHeight = document.querySelector(".activity_filter").offsetHeight
+					if(scrollTop>elHeight){
+									  this.isActiveColor = true;
+					}else{
+									  this.isActiveColor = false;
+					}
+				},200)
+			  
 			},
 			getEval(){
 				let self = this;
 				self.axios.post(Api.userApi+'/ca/selectCommunityActivityComment',self.qs.stringify({
-					id:2,
+					id:JSON.parse(sessionStorage.getItem('id')),
 					pageNo:self.page,
 					pageSize:5
 				}), {
@@ -204,7 +233,8 @@
 			getActivity(){
 				let self = this;
 				self.axios.post(Api.userApi+'/ca/selectCommunityActivityDetails',self.qs.stringify({
-					id:3,
+					id:JSON.parse(sessionStorage.getItem('id')),
+					userId:JSON.parse(sessionStorage.getItem('user')).userId,
 					latitude:0,
 					longitude:0
 				}), {
@@ -230,6 +260,10 @@
 						self.joinNum = res.data.data.joinNum;
 						self.lat = res.data.data.latitude;
 						self.lng = res.data.data.longitude;
+						console.log('lat:'+res.data.data.latitude + 'lng:'+res.data.data.longitude)
+						
+						self.isCollection = res.data.data.isKeep;
+						console.log(self.isCollection)
 						document.querySelector(".activity_cnt").innerHTML = res.data.data.description;
 						// self.evalList = res.data.data.commentVos;
 					}else{
@@ -256,7 +290,7 @@
 				let self = this;
 				this.page++;
 				self.axios.post(Api.userApi+'/ca/selectCommunityActivityComment',self.qs.stringify({
-					id:2,
+					id:JSON.parse(sessionStorage.getItem('id')),
 					pageNo:self.page,
 					pageSize:5
 				}), {
@@ -299,7 +333,7 @@
 				let self = this;
 				self.axios.post(Api.userApi+'/ca/addCommunityActivityComment',self.qs.stringify({
 					userId:JSON.parse(sessionStorage.getItem('user')).userId,
-					communityActivityId:2,
+					communityActivityId:JSON.parse(sessionStorage.getItem('id')),
 					content:self.msg
 				}), {
 					headers: {
@@ -310,9 +344,7 @@
 						self.msg = '';
 						self.page = 0;
 						self.getEval();
-						setTimeout(() => {
-							this.$refs.scroll.refresh();
-						}, 1000)
+						self.$refs.scroll.scrollTo(0,0);
 						let toast = self.$createToast({
 							txt: '提交成功',
 							type: 'correct'
@@ -327,8 +359,66 @@
 						toast.show()
 					}
 				})
+			},
+			collection(){
+				let self = this;
+				self.axios.post(Api.userApi+'/ca/updateCommunityActivityKeep',self.qs.stringify({
+					userId:JSON.parse(sessionStorage.getItem('user')).userId,
+					id:JSON.parse(sessionStorage.getItem('id')),
+					status:1
+				}), {
+					headers: {
+						'Content-Type': 'application/x-www-form-urlencoded'
+					}
+				}).then((res)=>{
+					if(res.data.code == 1){
+						self.isCollection = 1;
+						let toast = self.$createToast({
+							txt: '收藏成功',
+							type: 'correct'
+						  })
+						toast.show()
+					}else{
+						let toast = self.$createToast({
+							txt:res.data.msg,
+							type: 'error'
+						  })
+						toast.show()
+					}
+				})
+			},
+			cancelCollection(){
+				let self = this;
+				self.axios.post(Api.userApi+'/ca/updateCommunityActivityKeep',self.qs.stringify({
+					userId:JSON.parse(sessionStorage.getItem('user')).userId,
+					id:JSON.parse(sessionStorage.getItem('id')),
+					status:0
+				}), {
+					headers: {
+						'Content-Type': 'application/x-www-form-urlencoded'
+					}
+				}).then((res)=>{
+					if(res.data.code == 1){
+						self.isCollection = 0;
+						let toast = self.$createToast({
+							txt: '取消收藏',
+							type: 'correct'
+						  })
+						toast.show()
+					}else{
+						let toast = self.$createToast({
+							txt:res.data.msg,
+							type: 'error'
+						  })
+						toast.show()
+					}
+				})
+			},
+			wxPay(){
+				weixinPay();
 			}
 		}
+	
 	}
 </script>
 

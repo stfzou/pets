@@ -1,0 +1,342 @@
+<template>
+	<div class="activityOrder">
+		<div class="top_nav flex_r_s_b">
+			<div class="back" @click="back"></div>
+			<div class="nav_title">订单结算</div>
+		</div>
+		<div class="couponInfo flex_r_s_b">
+			<div class="c_l">
+				<img src="../../assets/images/seller_pic.png" alt="">
+			</div>
+			<div class="c_r">
+				<div class="activiName">关爱萌宠给它一个宠物智能“芯身份证”</div>
+				<div class="time">04/19~04/22</div>
+				<div class="address flex_r_f_s">
+					<span>成都市锦江区东恒国际</span>
+				</div>
+			</div>
+		</div>
+		<div class="ticket_box">
+			<div class="ticketInfo">
+				<div class="ticket">
+					<div class="title">票劵信息</div>
+					<div class="name">关爱萌宠给它一个宠物智能“芯身份证”外场票</div>
+					<div class="price flex_r_s_b"><span class="price_l">￥100</span><span class="price_r">x1</span></div>
+				</div>
+				<div class="user">
+					<div class="title">报名信息</div>
+					<div class="userInfo">
+						<span class="userName">沈悦</span>
+						<span class="phone">15283133594</span>
+					</div>
+				</div>
+			</div>
+			<div class="buyTx">
+				<div class="title">购买须知</div>
+				<div class="cnt">
+					<p>1、请确认活动票券和时间地址无误，购票成功后将不予退换</p>
+					<p>2、购票成功后，会收到购票信息短信</p>
+					<p>3、下单即代表你同意<a href="###">《自由犬用户服务协议》</a></p>
+				</div>
+			</div>
+		</div>
+		<div class="activityOderFoot flex_r_s_b">
+			<div class="payMoney">待支付:￥100.00</div>
+			<div class="payBtn flex_r_s_c" @click="popupShow">立即支付</div>
+		</div>
+		<div class="popup" @click.stop="popuphide" v-if="isPopup">
+			<div class="payBox" @click.stop>
+				<div class="popupTitle flex_r_s_c">在线支付</div>
+				<div class="payment flex_r_s_b">
+					<span class="payment_l">需付款</span>
+					<span class="payment_r">￥100.00</span>
+				</div>
+				<div class="payStyle flex_r_f_e">
+					<div class="flex_c_f_e">
+						<div class="payImg">
+							<img src="../../assets/zfb.png" alt="">
+							<div class="select"></div>
+						</div>
+						<p>支付宝支付</p>
+					</div>
+					<div class="flex_c_f_e">
+						<div class="payImg">
+							<img src="../../assets/weixin.png" alt="">
+							<div class="select"></div>
+						</div>
+						<p>微信支付</p>
+						
+					</div>
+				</div>
+				<div class="payBtn flex_r_s_c">确认支付</div>
+			</div>
+		</div>
+	</div>
+</template>
+
+<script>
+	export default{
+		data(){
+			return{
+				val:'',
+				isPopup:false
+			}
+		},
+		methods:{
+			back() {
+				this.$router.go(-1); //返回上一层
+			},
+			popupShow(){
+				this.isPopup = true;
+			},
+			popuphide(){
+				this.isPopup = false;
+			}
+		}
+	}
+</script>
+
+<style lang="scss">
+	@import '../../style/common.scss';
+	@import '../../style/mixin.scss';
+	html,
+	body {
+		height: 100%;
+		background: #f5f5f5;
+	}
+	.activityOrder{
+		padding: 88px 0 96px 0;
+		.popup{
+			position: fixed;
+			left: 0;
+			bottom: 0;
+			z-index: 1000;
+			width: 100%;
+			height: 100%;
+			background: rgba(0,0,0,0.6);
+			.payBox{
+				position: absolute;
+				left: 0;
+				bottom: 0;
+				background: #fff;
+				width: 100%;
+				.payBtn{
+					height: 96px;
+					background: #FF523D;
+					color: #fff;
+					font-size: 28px;
+				}
+				.payStyle{
+					height: 286px;
+					&>div{
+						position: relative;
+						.payImg{
+							position: relative;
+							img{
+								width: 80px;
+							}
+							.select{
+								width: 34px;
+								height: 34px;
+								background:url('../../assets/select.png') no-repeat center 0;
+								background-size: cover;
+								position: absolute;
+								right: -10px;
+								top: -10px;
+							}
+						}
+						
+						p{
+							margin-top: 10px;
+							font-size: 28px;
+							color: #000;
+						}
+						
+					}
+				}
+				.popupTitle{
+					height: 72px;
+					border-bottom: 1px solid #FF523D;/*no*/
+					font-size: 28px;
+					color: #000;
+				}
+				.payment{
+					height: 68px;
+					padding: 0 20px;
+					box-sizing: border-box;
+					.payment_l{
+						font-size: 28px;
+						color: #000;
+					}
+					.payment_r{
+						font-size: 28px;
+						color: #FF523D;
+					}
+				}
+			}
+		}
+		.top_nav {
+			padding: 0 20px;
+			height: 88px;
+			box-sizing: border-box;
+			position: fixed;
+			border-bottom: 1px solid #FF523D;
+			background: #fff;
+			left: 0;
+			top: 0;
+			z-index: 100;
+		
+			.back {
+				width: 26px;
+				height: 42px;
+				background: url(../../assets/icon/backColory.png) no-repeat center 0;
+				background-size: cover;
+			}
+		
+			.nav_title {
+				font-size: 30px;
+				color: #000;
+				position: absolute;
+				left: 50%;
+				top: 50%;
+				transform: translate(-50%, -50%);
+		
+			}
+		
+		}
+		.couponInfo {
+			background: #fff;
+			padding: 20px;
+			box-sizing: border-box;
+		
+			.c_l {
+				width: 270px;
+				height: 180px;
+		
+				img {
+					width: 100%;
+					height: 100%;
+				}
+			}
+		
+			.c_r {
+				width: 390px;
+		
+				.activiName {
+					font-size: 28px;
+					color: #000;
+					line-height: 34px;
+				}
+				
+				.time {
+					font-size: 22px;
+					color: #666;
+					margin-top: 50px;
+				}
+		
+				.address {
+					margin-top: 10px;
+		
+					img {
+						width: 18px;
+						margin-right: 10px;
+					}
+		
+					span {
+						font-size: 22px;
+						color: #666;
+					}
+				}
+			}
+		}
+		.ticket_box{
+			padding: 0 20px;
+			overflow: hidden;
+			.ticketInfo{
+				background: #fff;
+				padding: 20px;
+				margin-top: 30px;
+				box-shadow:0px 0px 7px 0px rgba(104,104,104,0.12);
+				border-radius:10px;
+				.title{
+					font-size: 26px;
+					color: #666;
+					border-left: 4px solid #FF523D;
+					padding-left: 12px;
+					margin-bottom: 30px;
+				}
+				.ticket{
+					margin-bottom: 50px;
+					
+					.name{
+						font-size: 28px;
+						color: #000;
+						margin-bottom: 30px;
+					}
+					.price{
+						font-size: 28px;
+						color: #000;
+						.price_l{
+							color: #FF523D;
+						}
+					}
+				}
+				.user{
+					.userInfo{
+						font-size: 30px;
+						color: #000;
+						.userName{
+							margin-right: 100px;
+						}
+					}
+				}
+			}
+			.buyTx{
+				margin-top: 30px;
+				padding: 20px;
+				background: #fff;
+				box-shadow:0px 0px 7px 0px rgba(104,104,104,0.12);
+				border-radius:10px;
+				.title{
+					font-size: 26px;
+					color: #666;
+					border-left: 4px solid #FF523D;
+					padding-left: 12px;
+					margin-bottom: 30px;
+				}
+				.cnt{
+					p{	
+						font-size: 24px;
+						color: #666;
+						line-height: 48px;
+						a{
+							color: #FF523D;
+						}
+					}
+				}
+			}
+		}
+		.activityOderFoot{
+			height: 96px;
+			border-top: 1px solid #FF523D;/*no*/
+			background: #fff;
+			padding: 0 20px;
+			position: fixed;
+			left: 0;
+			bottom: 0;
+			box-sizing: border-box;
+			.payMoney{
+				font-size: 28px;
+				color: #000;
+			}
+			.payBtn{
+				width:182px;
+				height:70px;
+				background:#FF523D;
+				border-radius:7px;
+				color: #fff;
+				font-size: 28px;
+			}
+		}
+	}
+</style>

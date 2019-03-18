@@ -25,12 +25,19 @@
 		},
 		mounted() {
 			let self = this;
-			this.center = [parseInt(self.$route.params.lng),parseInt(self.$route.params.lat)] ;
+			this.center = [self.$route.params.lng,self.$route.params.lat] ;
+			console.log(this.center)
 			// console.log(self.$route.params)
 		},
 		methods: {
 			back() {
-				this.$router.go(-1); //返回上一层
+				 this.$router.go(-1); //返回上一层
+// 				this.$router.push({
+// 					name:'activity',
+// 					query:{
+// 						id:'2'
+// 					}
+// 				})
 			},
 		
 		},

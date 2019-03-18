@@ -106,9 +106,19 @@
 							toast.show()
 							setTimeout(()=>{
 								if(self.$store.state.loginInfo.routerName!=''){
-									self.$router.push({
-										name:self.$store.state.loginInfo.routerName
-									})
+									if(JSON.parse(sessionStorage.getItem('id'))!=undefined){
+										self.$router.push({
+											name:self.$store.state.loginInfo.routerName,
+											query:{
+												id:JSON.parse(sessionStorage.getItem('id'))
+											}
+										})
+									}else{
+										self.$router.push({
+											name:self.$store.state.loginInfo.routerName
+										})
+									}
+									
 								}else{
 									self.$router.push({
 										name:'sellerGoods'
