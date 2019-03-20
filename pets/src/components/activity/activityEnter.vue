@@ -8,39 +8,117 @@
 			<ul>
 				<li>
 					<div class="title">姓名<span>*</span></div>
-					<input type="text" v-model="val" placeholder="请输入您的姓名" />
+					<input type="text" v-model="userName" maxlength="10" placeholder="请输入您的姓名" />
 				</li>
 				<li>
 					<div class="title">昵称</div>
-					<input type="text" v-model="val" placeholder="请输入您的昵称" />
+					<input type="text" maxlength="10" v-model="nickName" placeholder="请输入您的昵称" />
 				</li>
 				<li>
 					<div class="title">电话<span>*</span></div>
-					<input type="text" v-model="val" placeholder="请输入您的电话" />
+					<input type="text" v-model="phone" placeholder="请输入您的电话" />
 				</li>
 				<li>
 					<div class="title">邮箱<span>*</span></div>
-					<input type="text" v-model="val" placeholder="请输入您的邮箱" />
+					<input type="text" v-model="eMail" placeholder="请输入您的邮箱" />
 				</li>
 			</ul>
 			
 			
 		</div>
-		<div class="couponBtn flex_r_s_c">确定报名</div>
+		<div class="couponBtn flex_r_s_c" @click="joinActivity">确定报名</div>
 	</div>
 </template>
 
 <script>
+	import Api from '../common/apj.js'
 	export default{
 		data(){
 			return{
-				val:''
+				userName:'',
+				nickName:'',
+				phone:'',
+				eMail:'',
+				
 			}
 		},
 		methods:{
 			back() {
 				this.$router.go(-1); //返回上一层
 			},
+			joinActivity(){
+				let reg = /^1[3456789]\d{9}$/;
+				let regEmail = new RegExp("^[a-z0-9]+([._\\-]*[a-z0-9])*@([a-z0-9]+[-a-z0-9]*[a-z0-9]+.){1,63}[a-z0-9]+$");
+				if(this.userName == ''){
+					let toast = this.$createToast({
+						txt: '姓名不能为空',
+						type: 'error'
+					  })
+					toast.show()
+					return false;
+				}else if(this.phone == ''){
+					let toast = this.$createToast({
+						txt: '电话号码不能为空',
+						type: 'error'
+					  })
+					toast.show()
+					return false;
+				}else if(!reg.test(this.phone)){
+					let toast = this.$createToast({
+						txt: '手机号码格式错误',
+						type: 'error'
+					  })
+					toast.show()
+					return false;
+				}else if(this.eMail == ''){
+					let toast = this.$createToast({
+						txt: '邮箱不能为空',
+						type: 'error'
+					  })
+					toast.show()
+					return false;
+				}else if(!regEmail.test(this.eMail)){
+					let toast = this.$createToast({
+						txt: '邮箱格式错误',
+						type: 'error'
+					  })
+					toast.show()
+					return false;
+				}else{
+					let self = this;
+					self.axios.post(Api.userApi+'/ca/settlementCommunityActivityOrder',self.qs.stringify({
+						cAId:JSON.parse(sessionStorage.getItem('id')),
+						userId:JSON.parse(sessionStorage.getItem('user')).userId,
+						ticketId:self.$store.state.activityInfo.ticketId,
+						ticketNum:self.$store.state.activityInfo.ticketNum,
+						name:self.userName,
+						nickname:self.nickName,
+						phone:self.phone,
+						mailbox:self.eMail
+					}), {
+						headers: {
+							'Content-Type': 'application/x-www-form-urlencoded'
+						}
+					}).then((res)=>{
+						if(res.data.code == 1){
+							let toast = self.$createToast({
+								txt: '提交成功',
+								type: 'correct'
+							  })
+							toast.show()
+							console.log(res);
+							setTimeout(()=>{
+								self.$router.push({
+									name:'activityOrder',
+									params:{
+										data:res.data.data
+									}
+								})
+							},1000)
+						}
+					})
+				}
+			}
 		}
 	}
 </script>
@@ -50,8 +128,11 @@
 	@import '../../style/mixin.scss';
 	
 	.activityEnter{
+		height: 100%;
+		box-sizing: border-box;
 		padding-top: 88px;
 		padding-bottom: 96px;
+		background: #fff;
 		.top_nav {
 			padding: 0 20px;
 			height: 88px;

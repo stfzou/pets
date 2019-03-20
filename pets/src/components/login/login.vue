@@ -138,7 +138,12 @@
 						}
 			
 					}).catch(function(err) {
-						console.log(err)
+						let toast = self.$createToast({
+							txt:err,
+							type: 'error'
+						  })
+						toast.show()
+						// console.log(err)
 					})
 			
 			
@@ -202,10 +207,16 @@
 						outline: none;
 						font-size: 28px;
 						color: #fff;
+						// background: #FF523D;
 					}
+					
 					input::-webkit-input-placeholder {
 			         /* placeholder颜色  */
 						color: #fff;
+					}
+					input:-webkit-autofill {
+					 -webkit-text-fill-color: #fff !important;
+					 transition: background-color 5000s ease-in-out 0s;
 					}
 				}
 				li:first-child{

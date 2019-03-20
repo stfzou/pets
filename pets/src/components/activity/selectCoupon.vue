@@ -6,69 +6,43 @@
 		</div>
 		<div class="couponInfo flex_r_s_b">
 			<div class="c_l">
-				<img src="../../assets/images/seller_pic.png" alt="">
+				<img :src="activityCover" alt="">
 			</div>
 			<div class="c_r">
-				<div class="activiName">关爱萌宠给它一个宠物智能“芯身份证”</div>
-				<div class="price">￥100~200</div>
-				<div class="time">04/19~04/22</div>
+				<div class="activiName">{{activiName}}</div>
+				<div class="price">{{priceInterval}}</div>
+				<div class="time">{{startTime}}~{{endTime}}</div>
 				<div class="address flex_r_f_s">
 					<img src="../../assets/icon/map@2x.png" alt="">
-					<span>牛王庙 &nbsp;&nbsp;&nbsp;1.3km</span>
+					<span>{{address}} &nbsp;&nbsp;&nbsp;{{distance}}</span>
 				</div>
 			</div>
 		</div>
 		<div class="couponList">
 			<ul>
-				<li class="active">
-					 <img class="select" src="../../assets/icon/selectCoupon.png" alt="">
-					<div class="couponName">关爱萌宠给它一个宠物智能“芯身份证”外场票</div>
+				<li :class="{active:index == activeIndex}" v-for="(item,index) in ticketList" @click="selectTicket(item,index)">
+					<img class="select" src="../../assets/icon/selectCoupon.png" alt="" v-if="index == activeIndex">
+					<div class="couponName">{{item.ticketName}}</div>
 					<div class="couponBox flex_r_s_b">
 						<div class="couponBox_l">
-							<div class="price">￥100</div>
+							<div class="price" v-if="item.ticketType == 1">￥{{item.ticketPrice}}</div>
+							<div class="price" v-else="">￥0</div>
 							<div class="couponNum">
-								<span>剩余50张</span>
-								<span>每人限购1张</span>
+								<span class="sy">剩余{{item.ticketNum}}张</span>
+								<span>每人限购{{item.limitNum}}张</span>
 							</div>
 							<div class="special_tx">
-								购买此票券可获得额外奖品
+								{{item.ticketDescription}}
 							</div>
 							<div class="tx">【购买此票券需经过主办方审核】</div>
 						</div>
 						<div class="couponBox_r">
 							<div class="num_box flex_r_f_s">
-								<div class="add flex_r_s_c" style="width: 33.333%;">
+								<div class="add flex_r_s_c" style="width: 33.333%;" @click.stop="reduce(item,index)">
 									<img src="../../assets/reduce.png" alt="">
 								</div>
-								<input style="width: 33.333%;" type="text" v-model="val">
-								<div style="width: 33.333%;" class="reduce flex_r_s_c">
-									<img src="../../assets/add.png" alt="">
-								</div>
-							</div>
-						</div>
-					</div>
-				</li>
-				<li>
-					<div class="couponName">关爱萌宠给它一个宠物智能“芯身份证”外场票</div>
-					<div class="couponBox flex_r_s_b">
-						<div class="couponBox_l">
-							<div class="price">￥100</div>
-							<div class="couponNum">
-								<span>剩余50张</span>
-								<span>每人限购1张</span>
-							</div>
-							<div class="special_tx">
-								购买此票券可获得额外奖品
-							</div>
-							<div class="tx">【购买此票券需经过主办方审核】</div>
-						</div>
-						<div class="couponBox_r">
-							<div class="num_box flex_r_f_s">
-								<div class="add flex_r_s_c" style="width: 33.333%;">
-									<img src="../../assets/reduce.png" alt="">
-								</div>
-								<input style="width: 33.333%;" type="text" v-model="val">
-								<div style="width: 33.333%;" class="reduce flex_r_s_c">
+								<input style="width: 33.333%;" type="text" v-model="item.isUse" @change="number(item,index)">
+								<div style="width: 33.333%;" class="reduce flex_r_s_c" @click.stop="add(item,index)">
 									<img src="../../assets/add.png" alt="">
 								</div>
 							</div>
@@ -77,137 +51,184 @@
 				</li>
 			</ul>
 		</div>
-		<div class="couponBtn flex_r_s_c">下一步</div>
+		<div class="amap-page-container" v-show="false">
+			<el-amap ref="map" vid="amapDemo" :plugin="plugin" class="amap-demo">
+			</el-amap>
+		</div>
+		<div class="couponBtn flex_r_s_c" @click="commit">下一步</div>
 	</div>
 </template>
 
 <script>
+	import Api from '../common/apj.js'
 	export default {
 		data() {
+			let self = this;
 			return {
-				val:'1'
+				activeIndex:0,
+				ticketList:[],
+				activiName:'',
+				priceRange:'',
+				startTime:'',
+				endTime:'',
+				address:'',
+				priceInterval:'',
+				distance:'',
+				activityCover:'',
+				ticketInfo:null,
+				plugin: [
+				
+					{
+						pName: 'Geolocation',
+						enableHighAccuracy: true,//是否使用高精度定位，默认:true
+						timeout: 100,          //超过10秒后停止定位，默认：无穷大
+						maximumAge: 0,           //定位结果缓存0毫秒，默认：0
+						convert: true,           //自动偏移坐标，偏移后的坐标为高德坐标，默认：true
+						showButton: true,        //显示定位按钮，默认：true
+						buttonPosition: 'RB',    //定位按钮停靠位置，默认：'LB'，左下角
+						showMarker: true,        //定位成功后在定位到的位置显示点标记，默认：true
+						showCircle: true,        //定位成功后用圆圈表示定位精度范围，默认：true
+						panToLocation: true,     //定位成功后将定位到的位置作为地图中心点，默认：true
+						zoomToAccuracy:true,//定位成功后调整地图视野范围使定位位置及精度范围视野内可见，默认：f
+						extensions:'all',
+						events: {
+							init(o) {
+								// o 是高德地图定位插件实例
+								o.getCurrentPosition((status, result) => {
+									
+									if (result && result.position) {
+										
+// 										self.lng = result.position.lng;
+// 										self.lat = result.position.lat;
+										
+										
+									}
+								});
+							}
+						}
+					}
+				]
 			}
+		},
+		mounted() {
+			// this.format("2019-03-14 11:56:00",'123')
+			this.getTicket(0,0);
+			
 		},
 		methods: {
 			back() {
 				this.$router.go(-1); //返回上一层
 			},
-			add(subItem) {
+			add(item,index) {
+				if(index == this.activeIndex){
+					if(item.isUse>=item.limitNum){
+						item.isUse = item.limitNum;;
+						this.ticketInfo.ticketNum = item.limitNum;
+					}else{
+						item.isUse++;
+						this.ticketInfo.ticketNum = item.isUse;
+					}
+				}else{
+					if(item.isUse>=item.limitNum){
+						item.isUse = item.limitNum;
+					}else{
+						item.isUse++;
+					}
+				}
+			},
+			reduce(item,index) {
+				console.log(index == this.activeIndex)
+				if(index == this.activeIndex){
+					if(item.isUse<=1){
+						item.isUse = 1;
+						this.ticketInfo.ticketNum = item.isUse;
+						
+					}else{
+						item.isUse--;
+						this.ticketInfo.ticketNum = item.isUse;
+					}
+				}else{
+					if(item.isUse<=1){
+						item.isUse = 1;
+					}else{
+						item.isUse--;
+						
+					}
+				}
+			},
+			number(item,index) {
+				item.isUse = item.isUse.replace(/[^\.\d]/g, '');
+				item.isUse = item.isUse.replace('.', '');
+				if(index == this.activeIndex){
+					if(item.isUse>=item.limitNum){
+						item.isUse = item.limitNum;;
+						this.ticketInfo.ticketNum = item.limitNum;
+					}else{
+						this.ticketInfo.ticketNum = item.isUse;
+					}
+				}else{
+					if(item.isUse>=item.limitNum){
+						item.isUse = item.limitNum;
+					}
+				}
+			},
+			getTicket(lng,lat){
 				let self = this;
-				if (subItem.productNum >= subItem.reserve) {
-					self.$createDialog({
-						type: 'alert',
-						title: `警告`,
-						content: '商品只有' + subItem.reserve + '件了哦',
-						icon: 'cubeic-warn'
-					}).show()
-					subItem.productNum = subItem.productNum;
-				} else {
-					self.axios.post(Api.userApi + '/car/shopCarOperate', self.qs.stringify({
-						shopId: subItem.shopId,
-						productId: subItem.productId,
-						skuId: subItem.skuId,
-						userId: subItem.userId,
-						num: 1
-					}), {
-						headers: {
-							'Content-Type': 'application/x-www-form-urlencoded'
-
+				self.axios.post(Api.userApi+'/ca/selectCommunityActivityJoinVo',self.qs.stringify({
+					id:JSON.parse(sessionStorage.getItem('id')),
+					latitude:lat,
+					longitude:lng
+				}), {
+					headers: {
+						'Content-Type': 'application/x-www-form-urlencoded'
+					}
+				}).then((res)=>{
+					if(res.data.code == 1){
+						console.log(res)
+						self.activiName = res.data.data.activityTitel;
+						self.priceRange = res.data.data.priceInterval;
+						self.address = res.data.data.activityAddr;
+						self.distance = res.data.data.distance;
+						self.startTime = self.format(res.data.data.startTime);
+						self.endTime = self.format(res.data.data.endTime);
+						self.ticketList = res.data.data.tickets;
+						self.activityCover = res.data.data.activityCover;
+						self.ticketList.forEach((e)=>{
+							e.isUse = 1;
+						})
+						self.ticketInfo = {
+							cAId:JSON.parse(sessionStorage.getItem('id')),
+							userId:JSON.parse(sessionStorage.getItem('user')).userId,
+							ticketId:self.ticketList[0].ticketId,
+							ticketNum:self.ticketList[0].isUse,
+							ticketType:self.ticketList[0].ticketType
 						}
-					}).then((res) => {
-
-						if (res.data.code == 1) {
-							subItem.productNum++
-							subItem.skuImgId = subItem.productNum;
-							self.upGetShopCar();
-						} else {
-							self.$createDialog({
-								type: 'error',
-								title: `失败`,
-								content: res.data.msg,
-								icon: 'cubeic-wrong'
-							}).show()
-						}
-					})
+						self.priceInterval = res.data.data.priceInterval;
+					}
+				})
+			},
+			format(str){
+				let tmp = str.split(" ");
+				let arrr = tmp[0].split("-");
+				return arrr.slice(1,3).join("/");
+			},
+			selectTicket(item,index){
+				this.activeIndex = index;
+				this.ticketInfo = {
+					cAId:2,
+					userId:2,
+					ticketId:item.ticketId,
+					ticketNum:item.isUse,
+					ticketType:item.ticketType
 				}
 			},
-			reduce(subItem) {
-				if (subItem.productNum <= 1) {
-					console.log('不能再减了哦')
-				} else {
-
-					let self = this;
-					self.axios.post(Api.userApi + '/car/shopCarOperate', self.qs.stringify({
-						shopId: subItem.shopId,
-						productId: subItem.productId,
-						skuId: subItem.skuId,
-						userId: subItem.userId,
-						num: -1
-					}), {
-						headers: {
-							'Content-Type': 'application/x-www-form-urlencoded'
-						}
-					}).then((res) => {
-
-						if (res.data.code == 1) {
-							subItem.productNum = subItem.productNum - 1;
-							subItem.skuImgId = subItem.productNum;
-							self.upGetShopCar();
-							console.log(self.shopCarData)
-						} else {
-							self.$createDialog({
-								type: 'error',
-								title: `失败`,
-								content: res.data.msg,
-								icon: 'cubeic-wrong'
-							}).show()
-						}
-					})
-				}
-			},
-			number(subItem) {
-				subItem.productNum = subItem.productNum.replace(/[^\.\d]/g, '');
-				subItem.productNum = subItem.productNum.replace('.', '');
-				if (subItem.productNum == '' || subItem.productNum == subItem.skuImgId) {
-					subItem.productNum = subItem.skuImgId;
-				} else if (subItem.productNum >= subItem.reserve) {
-					this.$createDialog({
-						type: 'alert',
-						title: `警告`,
-						content: '商品只有' + subItem.reserve + '件了哦',
-						icon: 'cubeic-warn'
-					}).show()
-					subItem.productNum = subItem.skuImgId;
-				} else {
-					// subItem.skuImgId = subItem.productNum;
-					let self = this;
-					self.axios.post(Api.userApi + '/car/shopCarOperate', self.qs.stringify({
-						shopId: subItem.shopId,
-						productId: subItem.productId,
-						skuId: subItem.skuId,
-						userId: subItem.userId,
-						num: subItem.productNum - subItem.skuImgId
-					}), {
-						headers: {
-							'Content-Type': 'application/x-www-form-urlencoded'
-						}
-					}).then((res) => {
-
-						if (res.data.code == 1) {
-							// subItem.productNum = subItem.productNum-1;
-							subItem.skuImgId = subItem.productNum;
-							self.upGetShopCar();
-						} else {
-							self.$createDialog({
-								type: 'error',
-								title: res.data.msg,
-								content: res.data.msg,
-								icon: 'cubeic-wrong'
-							}).show()
-						}
-					})
-				}
-			},
+			commit(){
+				this.$store.commit('setTicket',this.ticketInfo);
+				this.$router.push({
+					name:'activityEnter'
+				})
+			}
+		
 		}
 	}
 </script>
@@ -215,16 +236,12 @@
 <style lang="scss">
 	@import '../../style/common.scss';
 	@import '../../style/mixin.scss';
-
-	html,
-	body {
-		height: 100%;
-		background: #f5f5f5;
-	}
-
 	.selectCoupon {
 		padding-top: 88px;
 		padding-bottom: 96px;
+		background: #f5f5f5;
+		height: 100%;
+		box-sizing: border-box;
 		.top_nav {
 			padding: 0 20px;
 			height: 88px;
@@ -267,6 +284,7 @@
 				img {
 					width: 100%;
 					height: 100%;
+					border-radius: 7px;
 				}
 			}
 
@@ -321,8 +339,8 @@
 					position: relative;
 					.select{
 						position: absolute;
-						top: 0;
-						right: 0;
+						top: -1px;
+						right: -1px;
 						width: 40px;
 					}
 					.couponName{
@@ -339,18 +357,22 @@
 								margin-bottom: 10px;
 							}
 							.couponNum{
-								line-height: 32px;
+								line-height: 34px;
 								color: #666;
 								font-size: 24px;
+								.sy{
+									margin-right: 30px;
+								}
 							}
 							.special_tx{
-								line-height: 32px;
+								line-height: 34px;
 								color: #666;
 								font-size: 24px;
 							}
 							.tx{
 								font-size: 24px;
 								color: #999;
+								line-height: 34px;
 							}
 						}
 						.couponBox_r {

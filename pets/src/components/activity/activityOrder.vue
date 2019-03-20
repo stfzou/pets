@@ -6,13 +6,13 @@
 		</div>
 		<div class="couponInfo flex_r_s_b">
 			<div class="c_l">
-				<img src="../../assets/images/seller_pic.png" alt="">
+				<img :src="activityImg" alt="">
 			</div>
 			<div class="c_r">
-				<div class="activiName">关爱萌宠给它一个宠物智能“芯身份证”</div>
-				<div class="time">04/19~04/22</div>
+				<div class="activiName">{{typeName}}</div>
+				<div class="time">{{startTime}}~{{endTime}}</div>
 				<div class="address flex_r_f_s">
-					<span>成都市锦江区东恒国际</span>
+					<span>{{addr}}</span>
 				</div>
 			</div>
 		</div>
@@ -20,14 +20,14 @@
 			<div class="ticketInfo">
 				<div class="ticket">
 					<div class="title">票劵信息</div>
-					<div class="name">关爱萌宠给它一个宠物智能“芯身份证”外场票</div>
-					<div class="price flex_r_s_b"><span class="price_l">￥100</span><span class="price_r">x1</span></div>
+					<div class="name">{{ticketName}}</div>
+					<div class="price flex_r_s_b"><span class="price_l">￥{{ticketPrice}}</span><span class="price_r">x{{ticketNum}}</span></div>
 				</div>
 				<div class="user">
 					<div class="title">报名信息</div>
 					<div class="userInfo">
-						<span class="userName">沈悦</span>
-						<span class="phone">15283133594</span>
+						<span class="userName">{{userName}}</span>
+						<span class="phone">{{phone}}</span>
 					</div>
 				</div>
 			</div>
@@ -41,7 +41,7 @@
 			</div>
 		</div>
 		<div class="activityOderFoot flex_r_s_b">
-			<div class="payMoney">待支付:￥100.00</div>
+			<div class="payMoney">待支付:￥{{totalPrice}}</div>
 			<div class="payBtn flex_r_s_c" @click="popupShow">立即支付</div>
 		</div>
 		<div class="popup" @click.stop="popuphide" v-if="isPopup">
@@ -49,7 +49,7 @@
 				<div class="popupTitle flex_r_s_c">在线支付</div>
 				<div class="payment flex_r_s_b">
 					<span class="payment_l">需付款</span>
-					<span class="payment_r">￥100.00</span>
+					<span class="payment_r">￥{{totalPrice}}</span>
 				</div>
 				<div class="payStyle flex_r_f_e">
 					<div class="flex_c_f_e">
@@ -75,12 +75,43 @@
 </template>
 
 <script>
+	// import weixinPay from '../common/weixinPay.js'
 	export default{
 		data(){
 			return{
 				val:'',
-				isPopup:false
+				activityImg:'',
+				addr:'',
+				endTime:'',
+				startTime:'',
+				typeName:'',
+				ticketName:'',
+				isPopup:false,
+				ticketNum:'',
+				ticketPrice:'',
+				totalPrice:'',
+				phone:'',
+				userName:''
 			}
+		},
+		mounted() {
+			if(this.$route.params.data!=undefined){
+				let d = this.$route.params.data;
+				this.activityImg = d.communityActivityVo.activityCover;
+				this.addr = d.communityActivityVo.activityAddr;
+				this.typeName = d.communityActivityVo.typeName;
+				this.startTime = this.format(d.communityActivityVo.startTime);
+				this.endTime = this.format(d.communityActivityVo.endTime);
+				this.ticketName = d.ticketName;
+				this.ticketNum = d.ticketNum;
+				this.ticketPrice = d.ticketPrice;
+				this.totalPrice = d.totalPrice;
+				this.ticketNum = d.ticketNum;
+				this.userName = d.name;
+				this.phone = d.phone;
+				console.log(this.$route.params.data)
+			}
+			
 		},
 		methods:{
 			back() {
@@ -91,7 +122,15 @@
 			},
 			popuphide(){
 				this.isPopup = false;
+			},
+			format(str){
+				let tmp = str.split(" ");
+				let arrr = tmp[0].split("-");
+				return arrr.slice(1,3).join("/");
 			}
+// 			wxPay(){
+// 				weixinPay();
+// 			}
 		}
 	}
 </script>
@@ -216,6 +255,7 @@
 				img {
 					width: 100%;
 					height: 100%;
+					border-radius: 7px;
 				}
 			}
 		

@@ -3,7 +3,7 @@
 		<div class="top_nav flex_r_s_b" :class="{active_nav:isActiveColor}">
 			<div class="back" @click="back"></div>
 			<div class="nav_title">{{activityTitle}}</div>
-			<div class="share" @click="wxPay"></div>
+			<div class="share"></div>
 		</div>
 		<div class="activity_filter">
 			<img :src="mainImg" alt="">
@@ -34,8 +34,8 @@
 				</li>
 			</ul>
 		</div>
-		<div class="line"></div>
-		<div class="activity_cnt">
+		<div class="line" v-if="isInnerHtml"></div>
+		<div class="activity_cnt" v-if="isInnerHtml">
 			<!-- <img src="../../assets/active_bg.png" alt=""> -->
 			
 		</div>
@@ -91,7 +91,7 @@
 					</div>
 				</div>
 				<div class="bot_r flex_r_s_c" style="width: 50%;">
-					<div class="partake flex_r_s_c">立即参加</div>
+					<div class="partake flex_r_s_c" @click="join">立即参加</div>
 				</div>
 			</div>
 		</div>
@@ -99,7 +99,7 @@
 </template>
 
 <script>
-	import weixinPay from '../common/weixinPay.js'
+	
 	import Api from '../common/apj.js'
 	export default{
 		data(){
@@ -121,6 +121,7 @@
 				limitNum:'',
 				lat:'',
 				lng:'',
+				isInnerHtml:true,
 				page:0,
 				options:{
 					pullDownRefresh:{
@@ -162,7 +163,7 @@
 				this.$router.go(-1); //返回上一层
 			},
 			getUrlData() {// 截取url中的数据
-			    if(JSON.parse(sessionStorage.getItem('id'))==undefined){
+			    
 				   let tempStr = window.location.href
 				   /**
 				   * tempArr 是一个字符串数组 格式是["key=value", "key=value", ...]
@@ -178,18 +179,18 @@
 				  /*输出日志*/
 				   
 				   sessionStorage.setItem('id',JSON.stringify(returnArr.id));
-			    }
+			    
 			  
 			  },
 	
 			handleScroll () {
 				setTimeout(()=>{
 					var scrollTop = window.scrollY;
-					let elHeight = document.querySelector(".activity_filter").offsetHeight
+					let elHeight = document.querySelector(".activity_filter").offsetHeight;
 					if(scrollTop>elHeight){
-									  this.isActiveColor = true;
+						this.isActiveColor = true;
 					}else{
-									  this.isActiveColor = false;
+						this.isActiveColor = false;
 					}
 				},200)
 			  
@@ -260,11 +261,16 @@
 						self.joinNum = res.data.data.joinNum;
 						self.lat = res.data.data.latitude;
 						self.lng = res.data.data.longitude;
-						console.log('lat:'+res.data.data.latitude + 'lng:'+res.data.data.longitude)
-						
 						self.isCollection = res.data.data.isKeep;
-						console.log(self.isCollection)
-						document.querySelector(".activity_cnt").innerHTML = res.data.data.description;
+						
+						if(res.data.data.description==''){
+							self.isInnerHtml = false;
+						}else{
+							document.querySelector(".activity_cnt").innerHTML = res.data.data.description;
+							self.isInnerHtml = true;
+						}
+						console.log(res.data.data.description)
+						// console.log(res.data.data.description)
 						// self.evalList = res.data.data.commentVos;
 					}else{
 						let toast = self.$createToast({
@@ -414,8 +420,10 @@
 					}
 				})
 			},
-			wxPay(){
-				weixinPay();
+			join(){
+				this.$router.push({
+					name:'selectCoupon'
+				})
 			}
 		}
 	

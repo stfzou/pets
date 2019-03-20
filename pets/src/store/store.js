@@ -6,21 +6,21 @@ Vue.use(Vuex);
 export default new Vuex.Store({
   state:{
 			loginInfo:{
-				userName:'',
-				userId:'',
-				token:'',
 				shopId:'',
 				routerName:'',
 				productId:''
 			},
+			activityInfo:{
+				cAId:'',
+				userId:'',
+				ticketId:'',
+				ticketNum:'',
+				ticketType:''
+			}
 			
   },
   mutations:{
-		setUserInfo(state,payload){//保存登录时的状态
-			state.loginInfo.userId = payload.userId;
-			state.loginInfo.userName = payload.userName;
-			state.loginInfo.token = payload.token;
-		},
+		
 		setShopId(state,shopId){//保存商家id
 			state.loginInfo.shopId = shopId;
 		},
@@ -29,6 +29,13 @@ export default new Vuex.Store({
 		},
 		setRouterName(state,name){//保存routerName
 			state.loginInfo.routerName = name;
+		},
+		setTicket(state,el){//保存活动票券信息
+			state.activityInfo.cAId = el.cAId;
+			state.activityInfo.userId = el.userId;
+			state.activityInfo.ticketId = el.ticketId;
+			state.activityInfo.ticketType = el.ticketType;
+			state.activityInfo.ticketNum = el.ticketNum;
 		}
   },
   
