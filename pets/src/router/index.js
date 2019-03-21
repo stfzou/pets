@@ -25,6 +25,7 @@ import ActivityMap from '@/components/activity/activityMap'
 import SelectCoupon from '@/components/activity/selectCoupon'
 import ActivityEnter from '@/components/activity/activityEnter'
 import ActivityOrder from '@/components/activity/activityOrder'
+import Trend from '@/components/activity/trend'
 
 Vue.use(Router)
 export default new Router({
@@ -48,6 +49,11 @@ export default new Router({
 			path:'/activityEnter',
 			name:'activityEnter',
 			component:ActivityEnter
+		},
+		{
+			path:'/trend',
+			name:'trend',
+			component:Trend
 		},
 		{
 			path:'/activityOrder',
