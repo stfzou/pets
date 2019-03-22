@@ -131,9 +131,9 @@
 								token:res.data.token
 								
 							};
-							self.$store.commit('setUserInfo',userEntity);
+							// self.$store.commit('setUserInfo',userEntity);
+							sessionStorage.setItem('user', JSON.stringify(userEntity));
 							
-							// sessionStorage.setItem('user', JSON.stringify(userEntity));
 							let toast = self.$createToast({
 								txt: '登录成功',
 								type: 'correct'
@@ -141,9 +141,19 @@
 							toast.show()
 							setTimeout(()=>{
 								if(self.$store.state.loginInfo.routerName!=''){
-									self.$router.push({
-										name:self.$store.state.loginInfo.routerName
-									})
+									if(JSON.parse(sessionStorage.getItem('id'))!=undefined){
+										self.$router.push({
+											name:self.$store.state.loginInfo.routerName,
+											query:{
+												id:JSON.parse(sessionStorage.getItem('id'))
+											}
+										})
+									}else{
+										self.$router.push({
+											name:self.$store.state.loginInfo.routerName
+										})
+									}
+									
 								}else{
 									self.$router.push({
 										name:'sellerGoods'

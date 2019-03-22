@@ -3,13 +3,39 @@
 		<div class="top_nav flex_r_s_b">
 			<div class="back" @click="back"></div>
 			<div class="nav_title">动态正文</div>
-			<div class="share flex_r_s_b">
+			<div class="share flex_r_s_b" @click="reportHide">
 				<span></span>
 				<span></span>
 				<span></span>
 			</div>
 		</div>
 		<div class="trend_cnt">
+			<div class="trend_mask" v-if="isMask" @click.stop="maskHide">
+				<div class="share_box" v-if="!isReport" @click.stop>
+					<div class="share flex_r_f_s" @click.stop="share">
+						<img src="../../assets/icon/active_share.png" alt="">
+						<span>分享</span>
+					</div>
+					<div class="report flex_r_f_s" @click.stop="reportShow">
+						<img src="../../assets/icon_jubao.png" alt="">
+						<span>举报</span>
+					</div>
+				</div>
+				<div class="trend_report" v-else @click.stop>
+					<div class="title flex_r_s_b">
+						<span class="cancel" @click.stop="maskHide">取消</span>
+						<span class="mid">举报</span>
+						<span class="confirm">确定</span>
+					</div>
+					<ul class="report_list">
+						<li v-for="(item,index) in reportData">
+							<div @click="selectReport(index)" class="flex_r_s_c" :class="{active:index == activeIndex}">{{item}}</div>
+						</li>
+					
+					</ul>
+				</div>
+			</div>
+			
 			<div class="userInfo flex_r_f_s">
 				<div class="headImg">
 					<img src="../../assets/head_icon.png" alt="">
@@ -31,7 +57,7 @@
 				<img src="../../assets/images/seller_pic.png" alt="">
 				<img src="../../assets/images/seller_pic.png" alt="">
 			</div>
-			<div class="trend_label flex_r_f_s">
+			<div class="trend_label">
 				<div class="addr flex_r_f_s"><img src="../../assets/icon/map@2x.png" alt=""><span>牛王庙</span></div>
 				<div class="footprint flex_r_f_s"><img src="../../assets/footprint.png" alt=""><span>胖太</span></div>
 				<div class="explain">#异瞳#</div>
@@ -58,7 +84,7 @@
 						<img src="../../assets/head_icon.png" alt="">
 					</div>
 					<div class="likeHeadImg active flex_r_s_c">
-						<div class="flex_r_s_b">
+						<div class="flex_r_s_b" @click="praiseLink">
 							<span></span>
 							<span></span>
 							<span></span>
@@ -128,13 +154,47 @@
 	export default{
 		data(){
 			return{
-				val:''
+				val:'',
+				isMask:false,
+				isReport:false,
+				reportData:['垃圾营销','有害信息','违法信息','诈骗信息','不实信息'],
+				activeIndex:0
 			}
 		},
 		methods:{
 			back() {
 				this.$router.go(-1); //返回上一层
 			},
+			maskHide(){
+				this.isMask = false;
+			},
+			maskShow(){
+				this.isMask = true;
+			},
+			reportShow(){
+				this.isReport = true;
+				this.isMask = true;
+			},
+			reportHide(){
+				this.isReport = false;
+				this.isMask = true;
+			},
+			selectReport(index){
+				this.activeIndex = index;
+			},
+			share(){
+				this.isMask = false
+				let toast = this.$createToast({
+					txt: '点击浏览器顶端最右边进行分享',
+					type: 'warn'
+				  })
+				toast.show()
+			},
+			praiseLink(){
+				this.$router.push({
+					name:'praise'
+				})
+			}
 		}
 	}
 </script>
@@ -142,6 +202,7 @@
 <style lang="scss">
 	.trend_warp{
 		padding-top: 88px;
+		
 		.line{
 			height: 10px;
 			background: #e8e8e8;
@@ -186,6 +247,71 @@
 		}
 		.trend_cnt{
 			padding: 0 20px 0 20px;
+			position: relative;
+			
+			.trend_mask{
+				height: 100%;
+				width: 100%;
+				left: 0;
+				top: 0;
+				position: fixed;
+				background: rgba(0,0,0,0.3);
+				z-index: 1000;
+				.share_box{
+					padding: 26px;
+					background: #fff;
+					border-radius:10px;
+					position: absolute;
+					right: 0;
+					top: 88px;
+					z-index: 10;
+					div{
+						img{
+							width:30px;
+							margin-right: 6px;
+						}
+						span{
+							font-size: 28px;
+							color: #333;
+						}
+					}
+					.share{
+						margin-bottom: 50px;
+					}
+				}
+				.trend_report{
+					position: absolute;
+					bottom: 0;
+					left: 0;
+					width: 100%;
+					background: #fff;
+					.title{
+						height: 70px;
+						font-size: 28px;
+						color: #333;
+						padding: 0 40px;
+						box-sizing: border-box;
+						border-bottom: 1px solid #ff523d;/*no*/
+					}
+					.report_list{
+						li{
+							padding: 15px 0;
+							div{
+								height: 70px;
+								box-sizing: border-box;
+								font-size: 26px;
+								color: #333;
+							}
+							.active{
+								border-top:1px solid #e8e8e8;/*no*/ 
+								border-bottom:1px solid #e8e8e8;/*no*/
+								color: #FF523D;
+							}
+						}
+					}
+				}
+			}
+			
 			.userInfo{
 				padding: 20px 0;
 				box-sizing: border-box;
@@ -245,9 +371,13 @@
 				font-size: 22px;
 				color: #666;
 				margin-top: 5px;
+				div{
+					line-height: 34px;
+				}
 				.addr{
 					width:110px;
 					margin-right: 60px;
+					
 					img{
 						width: 18px;
 						margin-right: 10px;
@@ -255,7 +385,7 @@
 				}
 				.footprint{
 					width: 100px;
-					margin-right: 60px;
+					margin: 15px 0;
 					img{
 						width: 22px;
 						margin-right: 10px;
@@ -294,8 +424,8 @@
 							width: 50px;
 							height: 10px;
 							span{
-								height: 10px;
-								width: 10px;
+								height: 6px;/*no*/
+								width: 6px;/*no*/
 								border-radius: 50px;
 								background: #999999;
 							}

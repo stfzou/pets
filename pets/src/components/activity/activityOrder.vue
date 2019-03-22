@@ -75,7 +75,7 @@
 </template>
 
 <script>
-	// import weixinPay from '../common/weixinPay.js'
+	import weixinPay from '../common/weixinPay.js'
 	export default{
 		data(){
 			return{
@@ -127,10 +127,10 @@
 				let tmp = str.split(" ");
 				let arrr = tmp[0].split("-");
 				return arrr.slice(1,3).join("/");
-			}
-// 			wxPay(){
-// 				weixinPay();
-// 			}
+			},
+ 			wxPay(){
+ 				weixinPay();
+ 			}
 		}
 	}
 </script>

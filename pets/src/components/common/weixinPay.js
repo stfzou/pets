@@ -23,10 +23,10 @@ let wexinPay = (data,cb,errorCb) => {
       paySign: paySign, // 支付签名
       success: function(res) {
         // 支付成功后的回调函数
-        cb(res);
+       alert(res)
       },
       fail:function(res){
-        errorCb(res);
+        alert(res)
       }
     });
   });
