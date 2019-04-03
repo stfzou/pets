@@ -38,52 +38,39 @@
 			
 			<div class="userInfo flex_r_f_s">
 				<div class="headImg">
-					<img src="../../assets/head_icon.png" alt="">
+					<img :src="userHeadImage" alt="">
 				</div>
 				<div class="mid">
-					<div class="userName">黛玉仙女的怪阿姨</div>
-					<div class="time">2018-08-20</div>
+					<div class="userName">{{userName}}</div>
+					<div class="time">{{time}}</div>
 				</div>
-				<div class="follow flex_r_s_c">+关注</div>
+				<div class="follow flex_r_s_c" @click="follow" v-if="isFocus == 0">+关注</div>
+				<div class="follow flex_r_s_c" @click="cancelFollow" v-else>已关注</div>
 			</div>
 			<div class="text_cnt">
-				的时间放假的说法活动结束好绝对是富几点睡附近很多事if好看的健身房的说法的说法
+				{{content}}
 			</div>
 			<div class="trend_img flex_r_s_b">
-				<img src="../../assets/images/seller_pic.png" alt="">
-				<img src="../../assets/images/seller_pic.png" alt="">
-				<img src="../../assets/images/seller_pic.png" alt="">
-				<img src="../../assets/images/seller_pic.png" alt="">
-				<img src="../../assets/images/seller_pic.png" alt="">
-				<img src="../../assets/images/seller_pic.png" alt="">
+				<img :src="item" alt="" v-for="(item,index) in images" :key="index">
+				
 			</div>
 			<div class="trend_label">
-				<div class="addr flex_r_f_s"><img src="../../assets/icon/map@2x.png" alt=""><span>牛王庙</span></div>
-				<div class="footprint flex_r_f_s"><img src="../../assets/footprint.png" alt=""><span>胖太</span></div>
-				<div class="explain">#异瞳#</div>
+				<div class="addr flex_r_f_s"><img src="../../assets/icon/map@2x.png" alt=""><span>{{geoLocation}}</span></div>
+				<!-- <div class="footprint flex_r_f_s"><img src="../../assets/footprint.png" alt=""><span>胖太</span></div>
+				<div class="explain">#异瞳#</div> -->
 			</div>
 			<div class="like_box">
 				<div class="like flex_r_f_s">
-					<i class="cubeic-like"></i>
-					<span>34人点赞</span>
+					<i class="cubeic-like" v-if="isLike == 0" @click="clikeLike"></i>
+					<i class="cubeic-like active" v-else @click="cancelLike"></i>
+					<span>{{likeCount}}人点赞</span>
 				</div>
 				<div class="like_people flex_r_s_b">
-					<div class="likeHeadImg">
-						<img src="../../assets/head_icon.png" alt="">
+					<div class="likeHeadImg" v-for="(item,index) in likeUserHeadImages">
+						<img :src="item.userHeadImage" alt="">
 					</div>
-					<div class="likeHeadImg">
-						<img src="../../assets/head_icon.png" alt="">
-					</div>
-					<div class="likeHeadImg">
-						<img src="../../assets/head_icon.png" alt="">
-					</div>
-					<div class="likeHeadImg">
-						<img src="../../assets/head_icon.png" alt="">
-					</div>
-					<div class="likeHeadImg">
-						<img src="../../assets/head_icon.png" alt="">
-					</div>
-					<div class="likeHeadImg active flex_r_s_c">
+					
+					<div class="likeHeadImg active flex_r_s_c" v-if="likeUserHeadImages.length>0">
 						<div class="flex_r_s_b" @click="praiseLink">
 							<span></span>
 							<span></span>
@@ -99,58 +86,40 @@
 		<div class="trend_comment">
 			<div class="title flex_r_s_b">
 				<div class="title_l flex_r_s_c">
-					评论105
+					评论{{commentCount}}
 				</div>
 				<div class="title_r flex_r_f_s">
 					<img src="../../assets/icon-chakan.png" alt="">
-					<span>650</span>
+					<span>{{lookCount}}</span>
 				</div>
 			</div>
 			<div class="comment_list">
-				<cube-scroll ref="scroll">
+				<cube-scroll ref="scroll" @pulling-up="onPullingUp" @pulling-down="onPullingDown" :options="options">
 					<ul>
-						<li class="flex_r_s_b">
+						<li class="flex_r_s_b" v-for="(item,index) in dynamicComments">
 							<div class="list_l">
-								<img src="../../assets/head_icon.png" alt="">
+								<img :src="item.userHeadImage" alt="">
 							</div>
 							<div class="list_mid">
-								<div class="userName">自由犬</div>
-								<div class="comment_cent">的核辐射的返回到健身房大煞风景</div>
+								<div class="userName">{{item.userName}}</div>
+								<div class="comment_cent">{{item.userContent}}</div>
 							</div>
-							<div class="list_r">12:23</div>
+							<div class="list_r">{{item.createdTime}}</div>
 						</li>
-						<li class="flex_r_s_b">
-							<div class="list_l">
-								<img src="../../assets/head_icon.png" alt="">
-							</div>
-							<div class="list_mid">
-								<div class="userName">自由犬</div>
-								<div class="comment_cent">的核辐射的返回到健身房大煞风景</div>
-							</div>
-							<div class="list_r">12:23</div>
-						</li>
-						<li class="flex_r_s_b">
-							<div class="list_l">
-								<img src="../../assets/head_icon.png" alt="">
-							</div>
-							<div class="list_mid">
-								<div class="userName">自由犬</div>
-								<div class="comment_cent">的核辐射的返回到健身房大煞风景</div>
-							</div>
-							<div class="list_r">12:23</div>
-						</li>
+						
 					</ul>
 				</cube-scroll>
 			</div>
 			<div class="send_comment flex_r_s_b">
 				<input type="text" v-model="val" placeholder="添加一条评论" />
-				<div class="send_btn">发送</div>
+				<div class="send_btn" @click="addComment">发送</div>
 			</div>
 		</div>
 	</div>
 </template>
 
 <script>
+	import Api from '../common/apj.js'
 	export default{
 		data(){
 			return{
@@ -158,8 +127,50 @@
 				isMask:false,
 				isReport:false,
 				reportData:['垃圾营销','有害信息','违法信息','诈骗信息','不实信息'],
-				activeIndex:0
+				activeIndex:0,
+				userName:'',
+				time:'',
+				images:[],
+				geoLocation:'',
+				userHeadImage:'',
+				content:'',
+				likeUserHeadImages:[],
+				likeCount:'',
+				lookCount:'',
+				commentCount:'',
+				authorId:'',
+				dynamicId:'',
+				isLike:'',
+				options:{
+					pullDownRefresh:{
+						txt:'更新成功',
+						threshold:40
+					},
+					pullUpLoad:{
+						txt:{
+							more: '加载更多', noMore: '没有更多数据了',
+						},
+						threshold:40,
+						
+					}
+				},
+				page:1,
+				dynamicComments:[],
+				likeData:[],
+				isFocus:''
 			}
+		},
+		mounted() {
+			if(JSON.parse(sessionStorage.getItem('user')) == null){
+				// this.$store.commit('setRouterName','activity');
+				this.$router.push({
+					name:'login'
+				})
+				return false;
+			}
+			this.getTrend();
+			this.getComment();
+			
 		},
 		methods:{
 			back() {
@@ -191,8 +202,256 @@
 				toast.show()
 			},
 			praiseLink(){
+				let self = this;
 				this.$router.push({
-					name:'praise'
+					name:'praise',
+					params:{
+						data:self.likeData
+					}
+				})
+			},
+			getTrend(){
+				let self = this;
+				self.axios.get(Api.trendApi+'/community/selectDynamicDetails',{
+					params:{
+						userId:JSON.parse(sessionStorage.getItem('user')).userId,
+						dynamicId:'15527119565035583'
+					}
+				}, {
+					headers: {
+						'Content-Type': 'application/x-www-form-urlencoded'
+					}
+				}).then((res)=>{
+					if(res.data.code == 1){
+						self.userName = res.data.data.userName;
+						self.geoLocation = res.data.data.geoLocation;
+						self.images = res.data.data.images.split(',');
+						self.time = res.data.data.createdTime.split(' ')[0];
+						self.userHeadImage = res.data.data.userHeadImage;
+						self.content = res.data.data.content;
+						self.likeCount = res.data.data.likeCount;
+						self.likeData = res.data.data.likeUserHeadImages;
+						self.isFocus = res.data.data.isFocus;
+						if(res.data.data.likeUserHeadImages.length>5){
+							self.likeUserHeadImages = res.data.data.likeUserHeadImages.slice(0,5);
+						}else{
+							self.likeUserHeadImages = res.data.data.likeUserHeadImages;
+						}
+						
+						self.lookCount = res.data.data.lookCount;
+						self.commentCount = res.data.data.commentCount;
+						self.authorId = res.data.data.userId;
+						self.dynamicId = res.data.data.dynamicId;
+						self.isLike = res.data.data.isLike;
+						
+					}else{
+						alert(res.data.msg)
+					}
+				})
+			},
+			getComment(){
+				let self = this;
+				self.axios.get(Api.trendApi+'/community/selectCommentByDynamicId',{
+					params:{
+						type:1,
+						contentId:'15527119565035583',
+						page:self.page,
+						rows:10
+					}
+				}, {
+					headers: {
+						'Content-Type': 'application/x-www-form-urlencoded'
+					}
+				}).then((res)=>{
+					if(res.data.code == 1){
+						
+						self.dynamicComments = res.data.data;
+						console.log(res.data.data)
+						setTimeout(()=>{
+							self.$refs.scroll.forceUpdate();
+						},800)
+						// console.log(res)
+					}else{
+						alert(res.data.msg)
+					}
+				})
+			},
+			onPullingDown() {
+			// 模拟更新数据
+				this.page = 1;
+				this.getComment();
+				setTimeout(() => {
+					this.$refs.scroll.refresh();
+				}, 1000)
+			},
+			onPullingUp() {
+			// 模拟更新数据
+				
+				let self = this;
+				this.page++;
+				self.axios.get(Api.trendApi+'/community/selectCommentByDynamicId',{
+					params:{
+						type:1,
+						contentId:'15527119565035583',
+						page:self.page,
+						rows:10
+					}
+				}, {
+					headers: {
+						'Content-Type': 'application/x-www-form-urlencoded'
+					}
+				}).then((res)=>{
+					if(res.data.code == 1){
+						
+						// self.dynamicComments = res.data.data;
+						if(res.data.data.length>0){
+							
+							setTimeout(()=>{
+								
+								res.data.data.forEach((e)=>{
+									self.dynamicComments.push(e)
+								})
+							},500)
+							setTimeout(()=>{
+								self.$refs.scroll.refresh();
+								self.$refs.scroll.forceUpdate();
+								
+							},800)
+						}else{
+							setTimeout(()=>{
+								self.$refs.scroll.forceUpdate();
+								self.$refs.scroll.refresh();
+							},500)
+							
+						}
+						
+					}else{
+						self.$refs.scroll.forceUpdate();
+						alert(res.data.msg)
+					}
+				})
+			
+			},
+			addComment(){
+				let self = this;
+				if(self.val == ''){
+					let toast = this.$createToast({
+						txt: '评论内容不能为空',
+						type: 'error'
+					  })
+					toast.show()
+					return false;
+				}else{
+					this.axios.post(Api.trendApi + '/community/addComment', {
+						authorId:self.authorId,
+						contentId:self.dynamicId,
+						userContent:self.val,
+						userId:JSON.parse(sessionStorage.getItem('user')).userId
+					}, {
+						headers: {
+							'Content-Type': 'application/json'
+						}
+					}).then((res)=>{
+						if(res.data.code == 1){
+							self.page = 1;
+							self.dynamicComments = [];
+							self.getComment();
+							self.val = '';
+							self.commentCount++;
+							let toast = self.$createToast({
+								txt: '评论成功',
+								type: 'correct'
+							  })
+							toast.show();
+							
+						}else{
+							alert(res.data.msg);
+						}
+					})
+				}
+				
+			},
+			clikeLike(){
+				let self = this;
+				
+				this.axios.post(Api.trendApi + '/community/likeDynamic', this.qs.stringify({
+					byLikeUserId:self.authorId,
+					dynamicId:self.dynamicId,
+					userId:JSON.parse(sessionStorage.getItem('user')).userId
+				}), {
+					headers: {
+						'Content-Type': 'application/x-www-form-urlencoded'
+					}
+				}).then((res)=>{
+					if(res.data.code == 1){
+						self.isLike = 1;
+						self.likeCount++;
+					}else{
+						alert(res.data.msg)
+					}
+				})
+			},
+			cancelLike(){
+				let self = this;
+				this.axios.post(Api.trendApi + '/community/disLikeDynamic', this.qs.stringify({
+					byLikeUserId:self.authorId,
+					dynamicId:self.dynamicId,
+					userId:JSON.parse(sessionStorage.getItem('user')).userId
+				}), {
+					headers: {
+						'Content-Type': 'application/x-www-form-urlencoded'
+					}
+				}).then((res)=>{
+					if(res.data.code == 1){
+						self.isLike = 0;
+						self.likeCount--;
+					}else{
+						alert(res.data.msg)
+					}
+				})
+			},
+			follow(){
+				let self = this;
+				this.axios.post(Api.trendApi + '/community/focusUser', this.qs.stringify({
+					targetUserId:self.authorId,
+					userId:JSON.parse(sessionStorage.getItem('user')).userId
+				}), {
+					headers: {
+						'Content-Type': 'application/x-www-form-urlencoded'
+					}
+				}).then((res)=>{
+					if(res.data.code == 1){
+						self.isFocus = 1;
+						let toast = self.$createToast({
+							txt: '关注成功',
+							type: 'correct'
+						  })
+						toast.show();
+					}else{
+						alert(res.data.msg)
+					}
+				})
+			},
+			cancelFollow(){
+				let self = this;
+				this.axios.post(Api.trendApi + '/community/cancelFocusUser', this.qs.stringify({
+					targetUserId:self.authorId,
+					userId:JSON.parse(sessionStorage.getItem('user')).userId
+				}), {
+					headers: {
+						'Content-Type': 'application/x-www-form-urlencoded'
+					}
+				}).then((res)=>{
+					if(res.data.code == 1){
+						self.isFocus = 0;
+						let toast = self.$createToast({
+							txt: '取消关注',
+							type: 'correct'
+						  })
+						toast.show();
+					}else{
+						alert(res.data.msg)
+					}
 				})
 			}
 		}
@@ -375,8 +634,6 @@
 					line-height: 34px;
 				}
 				.addr{
-					width:110px;
-					margin-right: 60px;
 					
 					img{
 						width: 18px;
@@ -384,7 +641,7 @@
 					}
 				}
 				.footprint{
-					width: 100px;
+					
 					margin: 15px 0;
 					img{
 						width: 22px;
@@ -398,7 +655,11 @@
 					i{
 						font-size: 28px;
 						margin-right: 10px;
-						color: #FF523D;
+						color: #999;
+						
+					}
+					.active{
+						color: #ff523d;
 					}
 					span{
 						font-size: 22px;
@@ -484,7 +745,7 @@
 							}
 						}
 						.list_mid{
-							width: 488px;
+							width: 430px;
 							.userName{
 								font-size: 28px;
 								color: #333;
@@ -499,6 +760,7 @@
 						.list_r{
 							font-size: 22px;
 							color: #999;
+							width:130px;
 						}
 					}
 					li:last-child{

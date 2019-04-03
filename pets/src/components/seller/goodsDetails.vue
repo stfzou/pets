@@ -485,11 +485,9 @@
 			},
 			addrLink(){
 				this.$router.push({
-					name:'userAddr',
-					query:{
-						name:'goodsDetails'
-					}
-				})
+					name:'userAddr'
+				});
+				self.$store.commit('setAddrName','orderAccounts');
 			},
 			addShopCar(){//加入购物车
 				let self = this;

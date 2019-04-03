@@ -216,7 +216,7 @@
 			getShopCar(){
 				let self = this;
 				self.axios.post(Api.userApi+'/car/selectShopCar',self.qs.stringify({
-					userId:31,
+					userId:JSON.parse(sessionStorage.getItem('user')).userId,
 				}), {
 					headers: {
 						'Content-Type': 'application/x-www-form-urlencoded'
@@ -454,7 +454,7 @@
 				self.axios.post(Api.userApi+'/car/updateShopSelectAll',self.qs.stringify({
 					shopId:-1,
 					select:0,
-					userId:24
+					userId:JSON.parse(sessionStorage.getItem('user')).userId
 				}), {
 					headers: {
 						'Content-Type': 'application/x-www-form-urlencoded'
@@ -478,7 +478,7 @@
 				let self = this;
 				if(this.allSelect){
 					self.axios.post(Api.userApi+'/car/deleteShopCar',self.qs.stringify({
-						userId:24
+						userId:JSON.parse(sessionStorage.getItem('user')).userId
 					}), {
 						headers: {
 							'Content-Type': 'application/x-www-form-urlencoded'
@@ -526,11 +526,10 @@
 						}
 					})
 				})
-				
 				if(isHttp){
 					self.axios.post(Api.userApi+'/order/orderSettlement',self.qs.stringify({
 					
-						userId:31
+						userId:JSON.parse(sessionStorage.getItem('user')).userId
 						
 					}), {
 						headers: {

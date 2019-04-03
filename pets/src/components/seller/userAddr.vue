@@ -93,7 +93,7 @@
 			getAddr(){
 				let self = this;
 				self.axios.post(Api.userApi+'/user/selectUserAddr',self.qs.stringify({
-					userId:29,
+					userId:JSON.parse(sessionStorage.getItem('user')).userId,
 				}), {
 					headers: {
 						'Content-Type': 'application/x-www-form-urlencoded',
@@ -123,7 +123,7 @@
 					toast.show()
 				}else{
 					self.axios.post(Api.userApi+'/user/updateAddrDefault',self.qs.stringify({
-						userId:29,
+						userId:JSON.parse(sessionStorage.getItem('user')).userId,
 						userAddrId:item.userAddrId
 					}), {
 						headers: {
@@ -134,7 +134,7 @@
 						if(res.data.code == 1){
 							self.defaultIndex = item.userAddrId;
 							self.$router.push({
-								name:self.$route.query.name
+								name:self.$store.state.addrInfo.name
 							})
 
 						}

@@ -7,11 +7,11 @@
 		<div class="praise_cnt">
 			<cube-scroll ref="scroll">
 			<ul>
-				<li v-for="item in p" class="flex_r_f_s">
+				<li v-for="item in likeData" class="flex_r_f_s">
 					<div class="headImg">
-						<img class="hPic" src="../../assets/head_icon.png" alt="">
+						<img class="hPic" :src="item.userHeadImage" alt="">
 					</div>
-					<div class="userName">自由犬神鼎飞丹砂</div>
+					<div class="userName">{{item.userName}}</div>
 				</li>
 			</ul>
 			</cube-scroll>
@@ -23,8 +23,12 @@
 	export default{
 		data(){
 			return{
-				p:[1,2,3,4,5,6,7,8,9,10,11,12]
+				likeData:[]
 			}
+		},
+		mounted() {
+			this.likeData = this.$route.params.data;
+			console.log(this.likeData)
 		},
 		methods:{
 			back() {

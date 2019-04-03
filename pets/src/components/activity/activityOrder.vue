@@ -52,20 +52,20 @@
 					<span class="payment_r">￥{{totalPrice}}</span>
 				</div>
 				<div class="payStyle flex_r_f_e">
-					<div class="flex_c_f_e">
+					<div class="flex_c_f_e" @click="aliPay">
 						<div class="payImg">
 							<img src="../../assets/zfb.png" alt="">
 							<div class="select"></div>
 						</div>
 						<p>支付宝支付</p>
 					</div>
-					<div class="flex_c_f_e">
+					<div class="flex_c_f_e" @click="wxPay">
 						<div class="payImg">
 							<img src="../../assets/weixin.png" alt="">
 							<div class="select"></div>
 						</div>
 						<p>微信支付</p>
-						
+
 					</div>
 				</div>
 				<div class="payBtn flex_r_s_c">确认支付</div>
@@ -75,27 +75,29 @@
 </template>
 
 <script>
+	import Api from '../common/apj.js'
 	import weixinPay from '../common/weixinPay.js'
-	export default{
-		data(){
-			return{
-				val:'',
-				activityImg:'',
-				addr:'',
-				endTime:'',
-				startTime:'',
-				typeName:'',
-				ticketName:'',
-				isPopup:false,
-				ticketNum:'',
-				ticketPrice:'',
-				totalPrice:'',
-				phone:'',
-				userName:''
+	export default {
+		data() {
+			return {
+				val: '',
+				activityImg: '',
+				addr: '',
+				endTime: '',
+				startTime: '',
+				typeName: '',
+				ticketName: '',
+				isPopup: false,
+				ticketNum: '',
+				ticketPrice: '',
+				totalPrice: '',
+				phone: '',
+				userName: ''
 			}
 		},
 		mounted() {
-			if(this.$route.params.data!=undefined){
+			// this.getUrlData();
+			if (this.$route.params.data != undefined) {
 				let d = this.$route.params.data;
 				this.activityImg = d.communityActivityVo.activityCover;
 				this.addr = d.communityActivityVo.activityAddr;
@@ -109,28 +111,144 @@
 				this.ticketNum = d.ticketNum;
 				this.userName = d.name;
 				this.phone = d.phone;
+				this.cAOrderId = d.cAOrderId;
 				console.log(this.$route.params.data)
 			}
-			
+			this.getCode();
 		},
-		methods:{
+		methods: {
+			getUrlData() {// 截取url中的数据
+			    
+				   let tempStr = window.location.href
+				   /**
+				   * tempArr 是一个字符串数组 格式是["key=value", "key=value", ...]
+				   */
+				   let tempArr = tempStr.split('?')[1] ? tempStr.split('?')[1].split('&') : []
+				   /**
+				   * returnArr 是要返回出去的数据对象 格式是 { key: value, key: value, ... }
+				   */
+				   let returnArr = {}
+				   tempArr.forEach(element => {
+				   returnArr[element.split('=')[0]] = element.split('=')[1]
+				   })
+				  /*输出日志*/
+				   // console.log(returnArr)
+				   alert(returnArr)
+			    
+			  
+			},
+			getUrlParam(name){
+				var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)"); //构造一个含有目标参数的正则表达式对象
+				var r = window.location.search.substr(1).match(reg);  //匹配目标参数
+				if (r != null) return unescape(r[2]); return null; //返回参数值
+			},
+			getCode () { // 非静默授权，第一次有弹框
+				this.code = this.getUrlParam('code') // 截取路径中的code，如果没有就去微信授权，如果已经获取到了就直接传code给后台获取openId
+				const local = window.location.href
+				console.log(local)
+				if (code == null || code === '') {
+					window.location.href = 'https://open.weixin.qq.com/connect/oauth2/authorize?appid=wxdf1774932d9dd96e&redirect_uri=http://app.gutouzu.com/#/activity?id=1&response_type=code&scope=SCOPE&state='+this.cAOrderId+'#wechat_redirect';
+					
+				}
+			},
+			wxPay () { // 通过code获取 openId等用户信息，/api/user/wechat/login 为后台接口
+			
+				let self = this;
+				this.axios.post(Api.userApi + '/ca/wxPay/gzhh5/prepay', this.qs.stringify({
+					cAOrderId: self.getUrlParam('state'),
+					code:self.getUrlParam('code')
+				}), {
+					headers: {
+						'Content-Type': 'application/x-www-form-urlencoded'
+					}
+				}).then((res) => {
+					if (res.data.code == 1) {
+						WeixinJSBridge.invoke('getBrandWCPayRequest', {
+							'appId': res.data.data.appid,
+							'timeStamp': res.data.data.timestamp,
+							'nonceStr': res.data.data.noncestr,
+							'package': res.data.data.package,
+							'signType': 'MD5',
+							'paySign':res.data.data.paySign
+						}, function(res) {
+							if (res.err_msg === 'get_brand_wcpay_request:ok') {
+								alert('支付成功，返回订单列表！');
+							} else if (res.err_msg === 'get_brand_wcpay_request:cancel') {
+								alert('取消支付！');
+							}else if(res.err_msg === 'get_brand_wcpay_request:fail'){
+								alert(JSON.stringify(res))
+							}
+						});	
+					} else {
+						alert(res.data.msg)
+					}
+				})
+			},
+
 			back() {
 				this.$router.go(-1); //返回上一层
 			},
-			popupShow(){
+			popupShow() {
 				this.isPopup = true;
 			},
-			popuphide(){
+			popuphide() {
 				this.isPopup = false;
 			},
-			format(str){
+			format(str) {
 				let tmp = str.split(" ");
 				let arrr = tmp[0].split("-");
-				return arrr.slice(1,3).join("/");
+				return arrr.slice(1, 3).join("/");
 			},
- 			wxPay(){
- 				weixinPay();
- 			}
+			wxH5Pay() {
+
+				let self = this;
+				this.axios.post(Api.userApi + '/ca/wxPay/h5/prepay', this.qs.stringify({
+					cAOrderId: self.cAOrderId
+				}), {
+					headers: {
+						'Content-Type': 'application/x-www-form-urlencoded'
+					}
+				}).then((res) => {
+					if (res.data.code == 1) {
+// 						
+						window.location.href=res.data.data
+						
+						console.log(res)
+
+						
+						 // weixinPay(wxData);
+
+					} else {
+						alert(res.data.msg)
+					}
+				})
+				//
+			},
+			aliPay() {
+				// alert(1);
+				let self = this;
+				this.axios.post(Api.userApi + '/ca/ali/webpay', this.qs.stringify({
+					cAOrderId: self.cAOrderId
+				}), {
+					headers: {
+						'Content-Type': 'application/x-www-form-urlencoded'
+					}
+				}).then((res) => {
+					
+						if(res.data.code == 1){
+							const div = document.createElement('div');
+							div.innerHTML = res.data.data;
+							document.body.appendChild(div);
+							document.forms.punchout_form.submit();
+							console.log(res.data)
+							self.isPopup = false;
+						}else{
+							alert(res.data.msg)
+						}
+						
+					
+				})
+			}
 		}
 	}
 </script>
@@ -138,82 +256,98 @@
 <style lang="scss">
 	@import '../../style/common.scss';
 	@import '../../style/mixin.scss';
+
 	html,
 	body {
 		height: 100%;
 		background: #f5f5f5;
 	}
-	.activityOrder{
+
+	.activityOrder {
 		padding: 88px 0 96px 0;
-		.popup{
+
+		.popup {
 			position: fixed;
 			left: 0;
 			bottom: 0;
 			z-index: 1000;
 			width: 100%;
 			height: 100%;
-			background: rgba(0,0,0,0.6);
-			.payBox{
+			background: rgba(0, 0, 0, 0.6);
+
+			.payBox {
 				position: absolute;
 				left: 0;
 				bottom: 0;
 				background: #fff;
 				width: 100%;
-				.payBtn{
+
+				.payBtn {
 					height: 96px;
 					background: #FF523D;
 					color: #fff;
 					font-size: 28px;
 				}
-				.payStyle{
+
+				.payStyle {
 					height: 286px;
-					&>div{
+
+					&>div {
 						position: relative;
-						.payImg{
+
+						.payImg {
 							position: relative;
-							img{
+
+							img {
 								width: 80px;
 							}
-							.select{
-								width: 34px;
-								height: 34px;
-								background:url('../../assets/select.png') no-repeat center 0;
+
+							.select {
+								width: 38px;
+								height: 38px;
+								background: url('../../assets/select.png') no-repeat center 0;
 								background-size: cover;
 								position: absolute;
 								right: -10px;
 								top: -10px;
 							}
 						}
-						
-						p{
+
+						p {
 							margin-top: 10px;
 							font-size: 28px;
 							color: #000;
 						}
-						
+
 					}
 				}
-				.popupTitle{
+
+				.popupTitle {
 					height: 72px;
-					border-bottom: 1px solid #FF523D;/*no*/
+					border-bottom: 1px solid #FF523D;
+					/*no*/
 					font-size: 28px;
 					color: #000;
 				}
-				.payment{
+
+				.payment {
 					height: 68px;
 					padding: 0 20px;
 					box-sizing: border-box;
-					.payment_l{
+
+					.payment_l {
 						font-size: 28px;
 						color: #000;
 					}
-					.payment_r{
+
+					.payment_r {
 						font-size: 28px;
 						color: #FF523D;
 					}
 				}
 			}
 		}
+
 		.top_nav {
 			padding: 0 20px;
 			height: 88px;
@@ -224,14 +358,14 @@
 			left: 0;
 			top: 0;
 			z-index: 100;
-		
+
 			.back {
 				width: 26px;
 				height: 42px;
 				background: url(../../assets/icon/backColory.png) no-repeat center 0;
 				background-size: cover;
 			}
-		
+
 			.nav_title {
 				font-size: 30px;
 				color: #000;
@@ -239,49 +373,50 @@
 				left: 50%;
 				top: 50%;
 				transform: translate(-50%, -50%);
-		
+
 			}
-		
+
 		}
+
 		.couponInfo {
 			background: #fff;
 			padding: 20px;
 			box-sizing: border-box;
-		
+
 			.c_l {
 				width: 270px;
 				height: 180px;
-		
+
 				img {
 					width: 100%;
 					height: 100%;
 					border-radius: 7px;
 				}
 			}
-		
+
 			.c_r {
 				width: 390px;
-		
+
 				.activiName {
 					font-size: 28px;
 					color: #000;
 					line-height: 34px;
 				}
-				
+
 				.time {
 					font-size: 22px;
 					color: #666;
 					margin-top: 50px;
 				}
-		
+
 				.address {
 					margin-top: 10px;
-		
+
 					img {
 						width: 18px;
 						margin-right: 10px;
 					}
-		
+
 					span {
 						font-size: 22px;
 						color: #666;
@@ -289,91 +424,107 @@
 				}
 			}
 		}
-		.ticket_box{
+
+		.ticket_box {
 			padding: 0 20px;
 			overflow: hidden;
-			.ticketInfo{
+
+			.ticketInfo {
 				background: #fff;
 				padding: 20px;
 				margin-top: 30px;
-				box-shadow:0px 0px 7px 0px rgba(104,104,104,0.12);
-				border-radius:10px;
-				.title{
+				box-shadow: 0px 0px 7px 0px rgba(104, 104, 104, 0.12);
+				border-radius: 10px;
+
+				.title {
 					font-size: 26px;
 					color: #666;
 					border-left: 4px solid #FF523D;
 					padding-left: 12px;
 					margin-bottom: 30px;
 				}
-				.ticket{
+
+				.ticket {
 					margin-bottom: 50px;
-					
-					.name{
+
+					.name {
 						font-size: 28px;
 						color: #000;
 						margin-bottom: 30px;
 					}
-					.price{
+
+					.price {
 						font-size: 28px;
 						color: #000;
-						.price_l{
+
+						.price_l {
 							color: #FF523D;
 						}
 					}
 				}
-				.user{
-					.userInfo{
+
+				.user {
+					.userInfo {
 						font-size: 30px;
 						color: #000;
-						.userName{
+
+						.userName {
 							margin-right: 100px;
 						}
 					}
 				}
 			}
-			.buyTx{
+
+			.buyTx {
 				margin-top: 30px;
 				padding: 20px;
 				background: #fff;
-				box-shadow:0px 0px 7px 0px rgba(104,104,104,0.12);
-				border-radius:10px;
-				.title{
+				box-shadow: 0px 0px 7px 0px rgba(104, 104, 104, 0.12);
+				border-radius: 10px;
+
+				.title {
 					font-size: 26px;
 					color: #666;
 					border-left: 4px solid #FF523D;
 					padding-left: 12px;
 					margin-bottom: 30px;
 				}
-				.cnt{
-					p{	
+
+				.cnt {
+					p {
 						font-size: 24px;
 						color: #666;
 						line-height: 48px;
-						a{
+
+						a {
 							color: #FF523D;
 						}
 					}
 				}
 			}
 		}
-		.activityOderFoot{
+
+		.activityOderFoot {
 			height: 96px;
-			border-top: 1px solid #FF523D;/*no*/
+			border-top: 1px solid #FF523D;
+			/*no*/
 			background: #fff;
 			padding: 0 20px;
 			position: fixed;
 			left: 0;
 			bottom: 0;
 			box-sizing: border-box;
-			.payMoney{
+
+			.payMoney {
 				font-size: 28px;
 				color: #000;
 			}
-			.payBtn{
-				width:182px;
-				height:70px;
-				background:#FF523D;
-				border-radius:7px;
+
+			.payBtn {
+				width: 182px;
+				height: 70px;
+				background: #FF523D;
+				border-radius: 7px;
 				color: #fff;
 				font-size: 28px;
 			}

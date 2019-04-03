@@ -142,15 +142,15 @@
 			}
 		},
 		mounted() {
+		
 			this.getUrlData();
 			if(JSON.parse(sessionStorage.getItem('user')) == null){
-				this.$store.commit('setRouterName','activity');
+				// this.$store.commit('setRouterName','activity');
 				this.$router.push({
 					name:'login'
 				})
 				return false;
 			}
-			
 			
 			// console.log(JSON.parse(sessionStorage.getItem('user')))
 			this.getActivity();
@@ -562,6 +562,7 @@
 			}
 			img{
 				width: 100%;
+				display: block;
 			}
 		}
 		.message_cnt{

@@ -85,6 +85,7 @@
 					toast.show()
 					return false;
 				}else{
+					// alert(1)
 					let self = this;
 					self.axios.post(Api.userApi+'/ca/settlementCommunityActivityOrder',self.qs.stringify({
 						cAId:JSON.parse(sessionStorage.getItem('id')),
@@ -118,6 +119,12 @@
 									}
 								})
 							},1000)
+						}else{
+							let toast = self.$createToast({
+								txt: res.data.msg,
+								type: 'error'
+							  })
+							toast.show()
 						}
 					})
 				}

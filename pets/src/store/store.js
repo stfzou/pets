@@ -7,7 +7,6 @@ export default new Vuex.Store({
   state:{
 			loginInfo:{
 				shopId:'',
-				routerName:'',
 				productId:''
 			},
 			activityInfo:{
@@ -16,6 +15,9 @@ export default new Vuex.Store({
 				ticketId:'',
 				ticketNum:'',
 				ticketType:''
+			},
+			addrInfo:{
+				name:''
 			}
 			
   },
@@ -27,15 +29,15 @@ export default new Vuex.Store({
 		setProductId(state,productId){//保存商品id
 			state.loginInfo.productId = productId;
 		},
-		setRouterName(state,name){//保存routerName
-			state.loginInfo.routerName = name;
-		},
 		setTicket(state,el){//保存活动票券信息
 			state.activityInfo.cAId = el.cAId;
 			state.activityInfo.userId = el.userId;
 			state.activityInfo.ticketId = el.ticketId;
 			state.activityInfo.ticketType = el.ticketType;
 			state.activityInfo.ticketNum = el.ticketNum;
+		},
+		setAddrName(state,name){//设置地址选择后将要跳转的页面
+			state.addrInfo.name = name;
 		}
   },
   

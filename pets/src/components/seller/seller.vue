@@ -118,7 +118,7 @@
 			getStoreInfo(){
 				let self = this;
 				self.axios.post(Api.shopApi+'/webShop/selectShopsInfoById',self.qs.stringify({
-					shopId:23,
+					shopId:JSON.parse(sessionStorage.getItem('user')).shopId,
 					lat:0,
 					lng:0
 				}), {

@@ -48,6 +48,13 @@
 			};
 		},
 		mounted() {
+			if(JSON.parse(sessionStorage.getItem('user')) == null){
+				
+				this.$router.push({
+					name:'login'
+				})
+				return false;
+			}
 			let h = document.documentElement.clientHeight - document.querySelector(".sellerGoods_warp").offsetTop;
 			document.querySelector(".sellerGoods_warp").style.height = h+'px';
 			
@@ -75,7 +82,7 @@
 				setTimeout(() => {
 					let self = this;
 					self.axios.post(Api.shopApi+'/webShop/selectProductBasicByShopId',self.qs.stringify({
-						shopId:23,
+						shopId:JSON.parse(sessionStorage.getItem('user')).shopId,
 						pageNo:self.page,
 						pageSize:8
 					}), {
@@ -108,7 +115,7 @@
 			getGoods(){
 				let self = this;
 				self.axios.post(Api.shopApi+'/webShop/selectProductBasicByShopId',self.qs.stringify({
-					shopId:23,
+					shopId:JSON.parse(sessionStorage.getItem('user')).shopId,
 					pageNo:self.page,
 					pageSize:8
 				}), {

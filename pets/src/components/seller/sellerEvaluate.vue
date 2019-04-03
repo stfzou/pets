@@ -1,6 +1,6 @@
 <template>
 	<div class="seller_eval">
-		<div class="eval_nav flex_r_s_b">
+		<div class="eval_nav flex_r_s_b" v-if="evalList.length>0">
 			<a @click="select(item,index)" 
 			:class="{'active':curunt == index}"
 			:key="index" v-for="(item,index) in evalNav">
@@ -8,8 +8,8 @@
 				<span class="span2">{{item.num}}</span>
 			</a>
 		</div>
-		<div class="line"></div>
-		<div class="eval_content">
+		<div class="line" v-if="evalList.length>0"></div>
+		<div class="eval_content" v-if="evalList.length>0">
 			<cube-scroll ref="scroll"  @pulling-up="onPullingUp" @pulling-down="onPullingDown" :options="options">
 				<!-- <transition name="fade">
 					<router-view></router-view>
@@ -43,6 +43,7 @@
 				</ul>
 			</cube-scroll>
 		</div>
+		<div class="eval_content flex_r_s_c cntTx" v-else>暂无评论</div>
 	</div>
 </template>
 
@@ -137,7 +138,7 @@
 			getEval(isImg,isPraise){
 				let self = this;
 				self.axios.post(Api.shopApi+'/webShop/selectShopAssessPage',self.qs.stringify({
-					shopId:23,
+					shopId:JSON.parse(sessionStorage.getItem('user')).shopId,
 					isImg:isImg,
 					isPraise:isPraise,
 					pageNo:0,
@@ -177,7 +178,7 @@
 				setTimeout(() => {
 					
 					self.axios.post(Api.shopApi+'/webShop/selectShopAssessPage',self.qs.stringify({
-						shopId:23,
+						shopId:JSON.parse(sessionStorage.getItem('user')).shopId,
 						isImg:self.isImgCode,
 						isPraise:self.isPraiseCode,
 						pageNo:self.page,
@@ -300,6 +301,10 @@
 					}
 				}
 			}
+		}
+		.cntTx{
+			font-size: 28px;
+			color: #000;
 		}
 	}
 </style>

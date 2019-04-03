@@ -86,15 +86,15 @@
 							'Content-Type': 'application/x-www-form-urlencoded'
 						}
 					}).then(function(res) {
-			
+						console.log(res)
 						if (res.data.code === 1) {
-							console.log(res)
+							
 							var userEntity = {
 								userName: res.data.user.userName,
 								userId: res.data.user.userId,
 								userPhone: res.data.user.phone,
-								token:res.data.token
-								
+								token:res.data.token,
+								shopId:res.data.user.userShops.shopId
 							};
 							// self.$store.commit('setUserInfo',userEntity);
 							
@@ -105,26 +105,7 @@
 							  })
 							toast.show()
 							setTimeout(()=>{
-								if(self.$store.state.loginInfo.routerName!=''){
-									if(JSON.parse(sessionStorage.getItem('id'))!=undefined){
-										self.$router.push({
-											name:self.$store.state.loginInfo.routerName,
-											query:{
-												id:JSON.parse(sessionStorage.getItem('id'))
-											}
-										})
-									}else{
-										self.$router.push({
-											name:self.$store.state.loginInfo.routerName
-										})
-									}
-									
-								}else{
-									self.$router.push({
-										name:'sellerGoods'
-									})
-								}
-									
+								self.$router.go(-1); //返回上一层	
 							},500)
 							
 			

@@ -82,10 +82,10 @@
 					<div class="detailed_l">运费</div>
 					<div class="detailed_r"><span>+</span>￥{{fare}}</div>
 				</div>
-				<div class="detailed_box flex_r_s_b">
+				<!-- <div class="detailed_box flex_r_s_b">
 					<div class="detailed_l">立减</div>
 					<div class="detailed_r"><span>-</span>￥420.00</div>
-				</div>
+				</div> -->
 			</div>
 		</div>
 		<div class="order_foot flex_r_s_b">
@@ -151,7 +151,7 @@
 			getOrder(){
 				let self = this;
 				self.axios.post(Api.userApi+'/order/orderSettlement',self.qs.stringify({
-					userId:24
+					userId:JSON.parse(sessionStorage.getItem('user')).userId
 				}), {
 					headers: {
 						'Content-Type': 'application/x-www-form-urlencoded'
@@ -162,7 +162,7 @@
 						self.payPrice = res.data.data.payPrice;
 						self.totalPrice = res.data.data.totalPrice;
 						self.fare = res.data.data.fare;
-						console.log(self.orderData)
+						console.log(res)
 					}else{
 						self.$createDialog({
 							type: 'alert',
@@ -176,20 +176,18 @@
 			addrUrl(){
 				let self = this; 
 				self.$router.push({
-					name:'userAddr',
-					query:{
-						name:'orderAccounts'
-					}
-				})
+					name:'userAddr'
+				});
+				self.$store.commit('setAddrName','orderAccounts');
 			},
 			getAddr(){
 				let self = this;
 				self.axios.post(Api.userApi+'/user/selectUserAddr',self.qs.stringify({
-					userId:29,
+					userId:JSON.parse(sessionStorage.getItem('user')).userId,
 				}), {
 					headers: {
 						'Content-Type': 'application/x-www-form-urlencoded',
-						"token":'063EC71B3F82EAB5EC46C94E2803D6E6'
+						"token":JSON.parse(sessionStorage.getItem('user')).token
 					}
 				}).then((res)=>{
 					if(res.data.code == 1){
@@ -198,7 +196,6 @@
 						res.data.data.forEach((e)=>{
 							if(e.isDefault == 1){
 								self.addr = e;
-								console.log(e)
 								return false;
 							}
 						})

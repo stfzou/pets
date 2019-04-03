@@ -62,7 +62,7 @@
 			getInfo(){
 				let self = this;
 				self.axios.post(Api.shopApi+'/webShop/getShopsWholeById',self.qs.stringify({
-					shopId:23
+					shopId:JSON.parse(sessionStorage.getItem('user')).shopId
 				}), {
 					headers: {
 						'Content-Type': 'application/x-www-form-urlencoded'

@@ -9,14 +9,15 @@
 				<a href="###">详情</a>
 			</div>
 		</div>
-		<div class="comment_nav flex_r_s_b">
+		<div class="comment_nav flex_r_s_b" v-if="evalList.length>0">
 			<span class="flex_r_s_c" :class="{'active':curunt == index}" @click="select(item,index)" :key="index" v-for="(item,index) in evalNav">
 				{{item.text}}
 			</span>
 			
 		</div>
-		<div class="line"></div>
-		<div class="comment_cnt">
+		<div class="line" v-if="evalList.length>0"></div>
+		
+		<div class="comment_cnt" v-if="evalList.length>0">
 			<cube-scroll ref="scroll" @pulling-up="onPullingUp" @pulling-down="onPullingDown" :options="options">
 				<ul class="eval_list">
 					<li class="flex_r_s_b list_item" v-for="(item,index) in evalList" :key="index">
@@ -46,6 +47,10 @@
 
 				</ul>
 			</cube-scroll>
+			
+		</div>
+		<div class="comment_cnt cntTx flex_r_s_c" v-else>
+			暂无评论
 		</div>
 		<div class="mask" v-show="isMask" @click.stop = "maskHide">
 		
@@ -681,6 +686,10 @@
 					}
 				}
 			}
+		}
+		.cntTx{
+			font-size: 28px;
+			color: #000;
 		}
 		.foot{
 			height: 98px;

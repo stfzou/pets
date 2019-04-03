@@ -28,7 +28,7 @@
 							<div class="price" v-if="item.ticketType == 1">￥{{item.ticketPrice}}</div>
 							<div class="price" v-else="">￥0</div>
 							<div class="couponNum">
-								<span class="sy">剩余{{item.ticketNum}}张</span>
+								<span class="sy">剩余{{item.ticketNum-item.sellNum}}张</span>
 								<span>每人限购{{item.limitNum}}张</span>
 							</div>
 							<div class="special_tx">
@@ -201,7 +201,8 @@
 							userId:JSON.parse(sessionStorage.getItem('user')).userId,
 							ticketId:self.ticketList[0].ticketId,
 							ticketNum:self.ticketList[0].isUse,
-							ticketType:self.ticketList[0].ticketType
+							ticketType:self.ticketList[0].ticketType,
+							syticketNum:self.ticketList[0].ticketNum-self.ticketList[0].sellNum
 						}
 						self.priceInterval = res.data.data.priceInterval;
 					}
@@ -215,18 +216,30 @@
 			selectTicket(item,index){
 				this.activeIndex = index;
 				this.ticketInfo = {
-					cAId:2,
-					userId:2,
+					cAId:JSON.parse(sessionStorage.getItem('id')),
+					userId:JSON.parse(sessionStorage.getItem('user')).userId,
 					ticketId:item.ticketId,
 					ticketNum:item.isUse,
-					ticketType:item.ticketType
+					ticketType:item.ticketType,
+					syticketNum:item.ticketNum-item.sellNum
 				}
 			},
 			commit(){
-				this.$store.commit('setTicket',this.ticketInfo);
-				this.$router.push({
-					name:'activityEnter'
-				})
+				let self = this;
+				if(this.ticketInfo.ticketNum>this.ticketInfo.syticketNum){
+					let toast = self.$createToast({
+						txt: '不能超过剩余票券数量',
+						type: 'error'
+					  })
+					toast.show();
+					return false;
+				}else{
+					this.$store.commit('setTicket',this.ticketInfo);
+					this.$router.push({
+						name:'activityEnter'
+					})
+				}
+				
 			}
 		
 		}

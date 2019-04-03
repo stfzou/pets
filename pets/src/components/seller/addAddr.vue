@@ -107,13 +107,13 @@
 					return false;
 				}else{
 					self.axios.post(Api.userApi+'/user/addUserAddr',self.qs.stringify({
-						userId:29,
+						userId:JSON.parse(sessionStorage.getItem('user')).userId,
 						addressTitle:self.addr,
 						addrProvince:self.$route.params.province,
 						addrCity:self.$route.params.city,
 						addrArea:self.$route.params.district,
 						address:self.houseNumber,
-						isDefault:1,
+						isDefault:0,
 						receivePhone:self.phone,
 						receiveName:self.userName,
 						latitude:self.$route.params.lat,
@@ -161,7 +161,7 @@
 			modify(){
 				let self = this;
 				self.axios.post(Api.userApi+'/user/updateAddr',self.qs.stringify({
-					userId:29,
+					userId:JSON.parse(sessionStorage.getItem('user')).userId,
 					addressTitle:self.addr,
 					addrProvince:self.$route.params.province,
 					addrCity:self.$route.params.city,
