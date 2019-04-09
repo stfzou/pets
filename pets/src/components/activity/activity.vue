@@ -3,7 +3,7 @@
 		<div class="top_nav flex_r_s_b" :class="{active_nav:isActiveColor}">
 			<div class="back" @click="back"></div>
 			<div class="nav_title">{{activityTitle}}</div>
-			<div class="share"></div>
+			<div class="share" @click="share"></div>
 		</div>
 		<div class="activity_filter">
 			<img :src="mainImg" alt="">
@@ -42,9 +42,10 @@
 		<div class="line"></div>
 		<div class="message_cnt">
 			<div class="title">
-				<p>留言({{commentNum}})</p>
+				<p v-if="evalList.length>0">留言({{commentNum}})</p>
+				<p v-else>留言(0)</p>
 			</div>
-			<div class="msg_box">
+			<div class="msg_box" v-if="evalList.length>0">
 				<cube-scroll ref="scroll" @pulling-up="onPullingUp" @pulling-down="onPullingDown" :options="options">
 					<ul class="eval_list">
 						<li class="flex_r_s_b list_item" v-for="(item,index) in evalList" :key="index">
@@ -71,7 +72,7 @@
 					</ul>
 				</cube-scroll>
 			</div>
-			
+			<div class="tx" v-else>暂无评论</div>
 		</div>
 		<div class="active_foot">
 			<div class="message_input flex_r_s_b">
@@ -103,6 +104,7 @@
 	import Api from '../common/apj.js'
 	export default{
 		data(){
+			let self = this;
 			return {
 				evalList:[],
 				msg:'',
@@ -119,8 +121,6 @@
 				activityPrice:'',
 				joinNum:'',
 				limitNum:'',
-				lat:'',
-				lng:'',
 				isInnerHtml:true,
 				page:0,
 				options:{
@@ -137,7 +137,8 @@
 					}
 				},
 				collectionImg:'',
-				isCollection:''
+				isCollection:'',
+				uId:'-1'
 				
 			}
 		},
@@ -146,10 +147,9 @@
 			this.getUrlData();
 			if(JSON.parse(sessionStorage.getItem('user')) == null){
 				// this.$store.commit('setRouterName','activity');
-				this.$router.push({
-					name:'login'
-				})
-				return false;
+				this.uId = '-1';
+			}else{
+				this.uId = JSON.parse(sessionStorage.getItem('user')).userId;
 			}
 			
 			// console.log(JSON.parse(sessionStorage.getItem('user')))
@@ -179,7 +179,7 @@
 				  /*输出日志*/
 				   
 				   sessionStorage.setItem('id',JSON.stringify(returnArr.id));
-			    
+					
 			  
 			  },
 	
@@ -207,11 +207,14 @@
 					}
 				}).then((res)=>{
 					if(res.data.code == 1){
-						setTimeout(() => {
-							self.$refs.scroll.forceUpdate()
-							self.evalList = res.data.data.doList;
-							self.commentNum = res.data.data.commentNum;
-						}, 500)
+						if(res.data.data.doList.length>0){
+							setTimeout(() => {
+								
+								self.evalList = res.data.data.doList;
+								self.commentNum = res.data.data.commentNum;
+							}, 500)
+						}
+						
 					}else{
 						let toast = self.$createToast({
 							txt:res.data.msg,
@@ -235,7 +238,7 @@
 				let self = this;
 				self.axios.post(Api.userApi+'/ca/selectCommunityActivityDetails',self.qs.stringify({
 					id:JSON.parse(sessionStorage.getItem('id')),
-					userId:JSON.parse(sessionStorage.getItem('user')).userId,
+					userId:self.uId,
 					latitude:0,
 					longitude:0
 				}), {
@@ -285,10 +288,12 @@
 			// 模拟更新数据
 				this.page = 0;
 				this.getEval();
-				
+				setTimeout(() => {
+					this.$refs.scroll.forceUpdate()
+				}, 600)
 				setTimeout(() => {
 					this.$refs.scroll.refresh();
-				}, 1000)
+				}, 800)
 			},
 			onPullingUp() {
 			// 模拟更新数据
@@ -306,7 +311,6 @@
 				}).then((res)=>{
 					
 					if(res.data.code == 1){
-						console.log(res)
 						
 						if(res.data.data.doList.length>0){
 							
@@ -325,7 +329,6 @@
 							
 							setTimeout(()=>{
 								self.$refs.scroll.forceUpdate();
-								
 							},500)
 						}
 						
@@ -336,35 +339,72 @@
 			
 			},
 			commitComment(){
-				let self = this;
-				self.axios.post(Api.userApi+'/ca/addCommunityActivityComment',self.qs.stringify({
-					userId:JSON.parse(sessionStorage.getItem('user')).userId,
-					communityActivityId:JSON.parse(sessionStorage.getItem('id')),
-					content:self.msg
-				}), {
-					headers: {
-						'Content-Type': 'application/x-www-form-urlencoded'
-					}
-				}).then((res)=>{
-					if(res.data.code == 1){
-						self.msg = '';
-						self.page = 0;
-						self.getEval();
-						self.$refs.scroll.scrollTo(0,0);
-						let toast = self.$createToast({
-							txt: '提交成功',
-							type: 'correct'
+				
+				if(JSON.parse(sessionStorage.getItem('user')) == null){
+					let self = this;
+					let url = window.location.href;
+					this.$store.commit('setLoginUrl',url);
+					this.$createDialog({
+						type: 'confirm',
+						icon: 'cubeic-warn',
+						title: '需要登录后才能评论',
+						confirmBtn: {
+						  text: '去登录',
+						  active: true,
+						  disabled: false,
+						  href: 'javascript:;'
+						},
+						cancelBtn: {
+						  text: '取消',
+						  active: false,
+						  disabled: false,
+						  href: 'javascript:;'
+						},
+						onConfirm: () => {
+						  self.$router.push({
+						  	name:'login'
 						  })
-						toast.show()
-					}else{
+						},
 						
-						let toast = self.$createToast({
-							txt:res.data.msg,
-							type: 'error'
-						  })
-						toast.show()
-					}
-				})
+					 }).show()
+					
+				}else{
+					let self = this;
+					self.axios.post(Api.userApi+'/ca/addCommunityActivityComment',self.qs.stringify({
+						userId:JSON.parse(sessionStorage.getItem('user')).userId,
+						communityActivityId:JSON.parse(sessionStorage.getItem('id')),
+						content:self.msg
+					}), {
+						headers: {
+							'Content-Type': 'application/x-www-form-urlencoded'
+						}
+					}).then((res)=>{
+						if(res.data.code == 1){
+							self.msg = '';
+							self.page = 0;
+							self.getEval();
+							let toast = self.$createToast({
+								txt: '提交成功',
+								type: 'correct'
+							  })
+							toast.show()
+							setTimeout(()=>{
+								
+								self.$refs.scroll.scrollTo(0,0);
+								
+							},500)
+							
+						}else{
+							
+							let toast = self.$createToast({
+								txt:res.data.msg,
+								type: 'error'
+							  })
+							toast.show()
+						}
+					})
+				}
+				
 			},
 			collection(){
 				let self = this;
@@ -421,9 +461,47 @@
 				})
 			},
 			join(){
-				this.$router.push({
-					name:'selectCoupon'
-				})
+				let self = this;
+				if(JSON.parse(sessionStorage.getItem('user')) == null){
+					let url = window.location.href;
+					this.$store.commit('setLoginUrl',url);
+					this.$createDialog({
+						type: 'confirm',
+						icon: 'cubeic-warn',
+						title: '需要登录后才能参加活动',
+						confirmBtn: {
+						  text: '去登录',
+						  active: true,
+						  disabled: false,
+						  href: 'javascript:;'
+						},
+						cancelBtn: {
+						  text: '取消',
+						  active: false,
+						  disabled: false,
+						  href: 'javascript:;'
+						},
+						onConfirm: () => {
+						  self.$router.push({
+						  	name:'login'
+						  })
+						},
+						
+					 }).show()
+					
+				}else{
+					this.$router.push({
+						name:'selectCoupon'
+					})
+				}
+				
+			},
+			share(){
+				let toast = this.$createToast({
+					txt: '点击顶部右上角进行分享',
+					type: 'warn'
+				  })
+				toast.show()
 			}
 		}
 	
@@ -432,6 +510,7 @@
 
 <style lang="scss">
 	.activity_warp{
+		
 		.line{
 			height: 10px;
 			background: #e8e8e8;
@@ -576,6 +655,12 @@
 					padding-left: 14px;
 				}
 			}
+			.tx{
+				padding: 30px 20px;
+				font-size: 28px;
+				color: #000;
+				text-align: center;
+			}
 			.msg_box{
 				height: 400px;
 			}
@@ -684,5 +769,6 @@
 				}
 			}
 		}
+		
 	}
 </style>

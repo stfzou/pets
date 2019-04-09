@@ -54,6 +54,7 @@
 		<div class="amap-page-container" v-show="false">
 			<el-amap ref="map" vid="amapDemo" :plugin="plugin" class="amap-demo">
 			</el-amap>
+		
 		</div>
 		<div class="couponBtn flex_r_s_c" @click="commit">下一步</div>
 	</div>
@@ -76,6 +77,8 @@
 				distance:'',
 				activityCover:'',
 				ticketInfo:null,
+				lng:0,
+				lat:0,
 				plugin: [
 				
 					{
@@ -98,10 +101,12 @@
 									
 									if (result && result.position) {
 										
-// 										self.lng = result.position.lng;
-// 										self.lat = result.position.lat;
+ 										self.lng = result.position.lng;
+ 										self.lat = result.position.lat;
+										self.getTicket();
 										
-										
+									}else{
+										self.getTicket();
 									}
 								});
 							}
@@ -112,7 +117,7 @@
 		},
 		mounted() {
 			// this.format("2019-03-14 11:56:00",'123')
-			this.getTicket(0,0);
+			
 			
 		},
 		methods: {
@@ -172,12 +177,12 @@
 					}
 				}
 			},
-			getTicket(lng,lat){
+			getTicket(){
 				let self = this;
 				self.axios.post(Api.userApi+'/ca/selectCommunityActivityJoinVo',self.qs.stringify({
 					id:JSON.parse(sessionStorage.getItem('id')),
-					latitude:lat,
-					longitude:lng
+					latitude:self.lat,
+					longitude:self.lng
 				}), {
 					headers: {
 						'Content-Type': 'application/x-www-form-urlencoded'
@@ -352,8 +357,8 @@
 					position: relative;
 					.select{
 						position: absolute;
-						top: -1px;
-						right: -1px;
+						top: 1px;
+						right: 1px;
 						width: 40px;
 					}
 					.couponName{

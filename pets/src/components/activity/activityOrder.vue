@@ -43,6 +43,7 @@
 		<div class="activityOderFoot flex_r_s_b">
 			<div class="payMoney">待支付:￥{{totalPrice}}</div>
 			<div class="payBtn flex_r_s_c" @click="popupShow">立即支付</div>
+			
 		</div>
 		<div class="popup" @click.stop="popuphide" v-if="isPopup">
 			<div class="payBox" @click.stop>
@@ -52,25 +53,25 @@
 					<span class="payment_r">￥{{totalPrice}}</span>
 				</div>
 				<div class="payStyle flex_r_f_e">
-					<div class="flex_c_f_e" @click="aliPay">
-						<div class="payImg">
+					<div class="flex_c_f_e">
+						<div class="payImg" @click="clickAli">
 							<img src="../../assets/zfb.png" alt="">
-							<div class="select"></div>
+							<div class="select" v-show="activeIndex == '1'"></div>
 						</div>
 						<p>支付宝支付</p>
 					</div>
-					<div class="flex_c_f_e" @click="wxPay">
-						<div class="payImg">
+					<div class="flex_c_f_e">
+						<div class="payImg" @click="clickWx">
 							<img src="../../assets/weixin.png" alt="">
-							<div class="select"></div>
+							<div class="select" v-show="activeIndex == '2'"></div>
 						</div>
 						<p>微信支付</p>
-
 					</div>
 				</div>
-				<div class="payBtn flex_r_s_c">确认支付</div>
+				<div class="payBtn flex_r_s_c" @click="commit">确认支付</div>
 			</div>
 		</div>
+		
 	</div>
 </template>
 
@@ -79,6 +80,7 @@
 	import weixinPay from '../common/weixinPay.js'
 	export default {
 		data() {
+			
 			return {
 				val: '',
 				activityImg: '',
@@ -92,31 +94,56 @@
 				ticketPrice: '',
 				totalPrice: '',
 				phone: '',
-				userName: ''
+				userName: '',
+				code:'',
+				environment:'',
+				activeIndex:'2'
 			}
 		},
 		mounted() {
-			// this.getUrlData();
-			if (this.$route.params.data != undefined) {
-				let d = this.$route.params.data;
-				this.activityImg = d.communityActivityVo.activityCover;
-				this.addr = d.communityActivityVo.activityAddr;
-				this.typeName = d.communityActivityVo.typeName;
-				this.startTime = this.format(d.communityActivityVo.startTime);
-				this.endTime = this.format(d.communityActivityVo.endTime);
-				this.ticketName = d.ticketName;
-				this.ticketNum = d.ticketNum;
-				this.ticketPrice = d.ticketPrice;
-				this.totalPrice = d.totalPrice;
-				this.ticketNum = d.ticketNum;
-				this.userName = d.name;
-				this.phone = d.phone;
-				this.cAOrderId = d.cAOrderId;
-				console.log(this.$route.params.data)
-			}
-			this.getCode();
+
+			let arr = window.location.href.split("?")[1];
+			this.cAOrderId = arr.split("=")[1];
+			// alert(this.cAOrderId);
+			this.getEnvironment();
 		},
 		methods: {
+			getEnvironment(){
+				var ua = window.navigator.userAgent.toLowerCase();
+				if (ua.match(/MicroMessenger/i) == 'micromessenger') {
+					this.environment = '0';
+					this.getCode();
+				} else {
+					let self = this;
+					this.environment = '1';
+					this.axios.post(Api.userApi + '/ca/selectSettlementCommunityActivityOrder', this.qs.stringify({
+						cAOrderId: self.cAOrderId
+					}), {
+						headers: {
+							'Content-Type': 'application/x-www-form-urlencoded'
+						}
+					}).then((res)=>{
+						if(res.data.code == 1){
+							let d = res.data.data;
+							self.activityImg = d.communityActivityVo.activityCover;
+							self.addr = d.communityActivityVo.activityAddr;
+							self.typeName = d.communityActivityVo.typeName;
+							self.startTime = self.format(d.communityActivityVo.startTime);
+							self.endTime = self.format(d.communityActivityVo.endTime);
+							self.ticketName = d.ticketName;
+							self.ticketNum = d.ticketNum;
+							self.ticketPrice = d.ticketPrice;
+							self.totalPrice = d.totalPrice;
+							self.ticketNum = d.ticketNum;
+							self.userName = d.name;
+							self.phone = d.phone;
+						}else{
+							alert(res.data.msg)
+						}
+					})
+				}
+			},
+		
 			getUrlData() {// 截取url中的数据
 			    
 				   let tempStr = window.location.href
@@ -133,30 +160,91 @@
 				   })
 				  /*输出日志*/
 				   // console.log(returnArr)
-				   alert(returnArr)
+				  
 			    
 			  
 			},
-			getUrlParam(name){
-				var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)"); //构造一个含有目标参数的正则表达式对象
-				var r = window.location.search.substr(1).match(reg);  //匹配目标参数
-				if (r != null) return unescape(r[2]); return null; //返回参数值
+			getUrlPara(name) {
+				var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)","i");
+				var r = window.location.search.substr(1).match(reg);
+				if (r!=null) return (r[2]);
+				return null;
 			},
-			getCode () { // 非静默授权，第一次有弹框
-				this.code = this.getUrlParam('code') // 截取路径中的code，如果没有就去微信授权，如果已经获取到了就直接传code给后台获取openId
-				const local = window.location.href
-				console.log(local)
-				if (code == null || code === '') {
-					window.location.href = 'https://open.weixin.qq.com/connect/oauth2/authorize?appid=wxdf1774932d9dd96e&redirect_uri=http://app.gutouzu.com/#/activity?id=1&response_type=code&scope=SCOPE&state='+this.cAOrderId+'#wechat_redirect';
+			getCode () { //静默授权
+				let self = this;
+				this.code = this.getUrlPara('code');
+				const local = window.location.href;
+				if (this.code == null || this.code === '') {
 					
+					window.location.href = 'https://open.weixin.qq.com/connect/oauth2/authorize?appid=wxdf1774932d9dd96e&redirect_uri='+encodeURIComponent(local)+'&response_type=code&scope=snsapi_base&state='+this.cAOrderId+'#wechat_redirect';
+					alert(window.location.href)
+				}else{
+					
+						this.axios.post(Api.userApi + '/ca/selectSettlementCommunityActivityOrder', this.qs.stringify({
+							cAOrderId: self.getUrlPara('state')
+						}), {
+							headers: {
+								'Content-Type': 'application/x-www-form-urlencoded'
+							}
+						}).then((res)=>{
+							if(res.data.code == 1){
+								let d = res.data.data;
+								self.activityImg = d.communityActivityVo.activityCover;
+								self.addr = d.communityActivityVo.activityAddr;
+								self.typeName = d.communityActivityVo.typeName;
+								self.startTime = self.format(d.communityActivityVo.startTime);
+								self.endTime = self.format(d.communityActivityVo.endTime);
+								self.ticketName = d.ticketName;
+								self.ticketNum = d.ticketNum;
+								self.ticketPrice = d.ticketPrice;
+								self.totalPrice = d.totalPrice;
+								self.ticketNum = d.ticketNum;
+								self.userName = d.name;
+								self.phone = d.phone;
+							}else{
+								alert(res.data.msg)
+							}
+						})
+						
+				}
+					
+				
+			},
+			clickWx(){
+				this.activeIndex = '2';
+			},
+			clickAli(){
+				this.activeIndex = '1';
+			},
+			back() {
+				this.$router.go(-1); //返回上一层
+			},
+			popupShow() {
+				this.isPopup = true;
+			},
+			popuphide() {
+				this.isPopup = false;
+			},
+			format(str) {
+				let tmp = str.split(" ");
+				let arrr = tmp[0].split("-");
+				return arrr.slice(1, 3).join("/");
+			},
+			commit(){
+				if(this.activeIndex == '2'&&this.environment == '0'){
+					this.wxPay();
+				}else if(this.activeIndex == '2'&&this.environment == '1'){
+					this.wxH5Pay();
+				}else if(this.activeIndex == '1'){
+					this.aliPay();
 				}
 			},
 			wxPay () { // 通过code获取 openId等用户信息，/api/user/wechat/login 为后台接口
-			
+				
 				let self = this;
 				this.axios.post(Api.userApi + '/ca/wxPay/gzhh5/prepay', this.qs.stringify({
-					cAOrderId: self.getUrlParam('state'),
-					code:self.getUrlParam('code')
+					cAOrderId: self.getUrlPara('state'),
+					code:self.getUrlPara('code')
 				}), {
 					headers: {
 						'Content-Type': 'application/x-www-form-urlencoded'
@@ -164,9 +252,9 @@
 				}).then((res) => {
 					if (res.data.code == 1) {
 						WeixinJSBridge.invoke('getBrandWCPayRequest', {
-							'appId': res.data.data.appid,
-							'timeStamp': res.data.data.timestamp,
-							'nonceStr': res.data.data.noncestr,
+							'appId': res.data.data.appId,
+							'timeStamp': res.data.data.timeStamp,
+							'nonceStr': res.data.data.nonceStr,
 							'package': res.data.data.package,
 							'signType': 'MD5',
 							'paySign':res.data.data.paySign
@@ -183,21 +271,6 @@
 						alert(res.data.msg)
 					}
 				})
-			},
-
-			back() {
-				this.$router.go(-1); //返回上一层
-			},
-			popupShow() {
-				this.isPopup = true;
-			},
-			popuphide() {
-				this.isPopup = false;
-			},
-			format(str) {
-				let tmp = str.split(" ");
-				let arrr = tmp[0].split("-");
-				return arrr.slice(1, 3).join("/");
 			},
 			wxH5Pay() {
 
@@ -225,29 +298,32 @@
 				//
 			},
 			aliPay() {
-				// alert(1);
-				let self = this;
-				this.axios.post(Api.userApi + '/ca/ali/webpay', this.qs.stringify({
-					cAOrderId: self.cAOrderId
-				}), {
-					headers: {
-						'Content-Type': 'application/x-www-form-urlencoded'
-					}
-				}).then((res) => {
-					
+				
+				if(this.environment == '0'){
+					alert('请点击右上角用浏览器打开进行支付')
+				}else{
+					let self = this;
+					this.axios.post(Api.userApi + '/ca/ali/webpay', this.qs.stringify({
+						cAOrderId: self.cAOrderId
+					}), {
+						headers: {
+							'Content-Type': 'application/x-www-form-urlencoded'
+						}
+					}).then((res) => {
+						
 						if(res.data.code == 1){
 							const div = document.createElement('div');
 							div.innerHTML = res.data.data;
 							document.body.appendChild(div);
 							document.forms.punchout_form.submit();
-							console.log(res.data)
 							self.isPopup = false;
 						}else{
 							alert(res.data.msg)
 						}
 						
-					
-				})
+					})
+				}
+				
 			}
 		}
 	}

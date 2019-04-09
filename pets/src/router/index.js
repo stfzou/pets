@@ -31,7 +31,7 @@ import Praise from '@/components/activity/praise'
 
 Vue.use(Router)
 export default new Router({
-	mode: 'hash',
+	mode: 'history',
     routes:[
 		{
 		  path:'',

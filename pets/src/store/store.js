@@ -16,6 +16,7 @@ export default new Vuex.Store({
 				ticketNum:'',
 				ticketType:''
 			},
+			loginUrl:'',
 			addrInfo:{
 				name:''
 			}
@@ -38,6 +39,9 @@ export default new Vuex.Store({
 		},
 		setAddrName(state,name){//设置地址选择后将要跳转的页面
 			state.addrInfo.name = name;
+		},
+		setLoginUrl(state,url){//设置登录后需要跳转的页面
+			state.loginUrl = url;
 		}
   },
   

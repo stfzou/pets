@@ -139,28 +139,16 @@
 								type: 'correct'
 							  })
 							toast.show()
-							setTimeout(()=>{
-								if(self.$store.state.loginInfo.routerName!=''){
-									if(JSON.parse(sessionStorage.getItem('id'))!=undefined){
-										self.$router.push({
-											name:self.$store.state.loginInfo.routerName,
-											query:{
-												id:JSON.parse(sessionStorage.getItem('id'))
-											}
-										})
-									}else{
-										self.$router.push({
-											name:self.$store.state.loginInfo.routerName
-										})
-									}
-									
-								}else{
-									self.$router.push({
-										name:'sellerGoods'
-									})
-								}
-									
-							},500)
+							if(self.$store.state.loginUrl!=''){
+								setTimeout(()=>{
+								    window.location.href = self.$store.state.loginUrl;
+									self.loading = false;
+								},500)
+							}else{
+								self.$router.push({
+									name:'sellerGoods'
+								})
+							}
 							
 								
 						} else {

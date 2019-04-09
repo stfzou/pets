@@ -46,6 +46,39 @@
 			back() {
 				this.$router.go(-1); //返回上一层
 			},
+			FreeJoin(cAOrderId){
+				
+				let self = this;
+				this.axios.post(Api.userApi + '/ca/freeJoinCommunityActivity', this.qs.stringify({
+					cAOrderId:cAOrderId,
+					cAId:JSON.parse(sessionStorage.getItem('id')),
+					userId:JSON.parse(sessionStorage.getItem('user')).userId
+				}), {
+					headers: {
+						'Content-Type': 'application/x-www-form-urlencoded'
+					}
+				}).then((res)=>{
+					if(res.data.code == 1){
+						let toast = this.$createToast({
+							txt: '加入活动成功',
+							type: 'cubeic-right'
+						  })
+						toast.show();
+						setTimeout(()=>{
+							self.$router.push({
+								name:'activity',
+								query:{
+									id:JSON.parse(sessionStorage.getItem('id')),
+								}
+							})
+						},500)
+						
+					}else{
+						alert(res.data.msg)
+					}
+				})
+				
+			},
 			joinActivity(){
 				let reg = /^1[3456789]\d{9}$/;
 				let regEmail = new RegExp("^[a-z0-9]+([._\\-]*[a-z0-9])*@([a-z0-9]+[-a-z0-9]*[a-z0-9]+.){1,63}[a-z0-9]+$");
@@ -86,6 +119,7 @@
 					return false;
 				}else{
 					// alert(1)
+					
 					let self = this;
 					self.axios.post(Api.userApi+'/ca/settlementCommunityActivityOrder',self.qs.stringify({
 						cAId:JSON.parse(sessionStorage.getItem('id')),
@@ -102,23 +136,25 @@
 						}
 					}).then((res)=>{
 						if(res.data.code == 1){
-							let toast = self.$createToast({
-								txt: '提交成功',
-								type: 'correct'
-							  })
-							toast.show()
-							console.log(res);
-							setTimeout(()=>{
-								self.$router.push({
-									name:'activityOrder',
-									params:{
-										data:res.data.data
-									},
-									query:{
-										userId:1
-									}
-								})
-							},1000)
+							if(self.$store.state.activityInfo.ticketType == 0){
+								self.FreeJoin(res.data.data.cAOrderId);
+							}else{
+								let toast = self.$createToast({
+									txt: '提交成功',
+									type: 'correct'
+								  })
+								toast.show()
+								setTimeout(()=>{
+									
+									self.$router.push({
+										name:'activityOrder',
+										query:{
+											cAOrderId:res.data.data.cAOrderId
+										}
+									})
+								},1000)
+							}
+							
 						}else{
 							let toast = self.$createToast({
 								txt: res.data.msg,

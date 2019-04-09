@@ -23,7 +23,7 @@
 				<router-link to="/vLogin">验证码登录</router-link>
 				<router-link to="/register">新用户注册</router-link>
 			</div>
-			<div class="login_btn flex_r_s_c" @click="login">登录</div>
+			<div class="login_btn flex_r_s_c" @click="login"><cube-loading :size="28" v-if="loading"></cube-loading><span v-else>登录</span></div>
 		</div>
 	</div>
 </template>
@@ -36,6 +36,7 @@
 				phone:'',
 				pwd:'',
 				reg: /^1[3456789]\d{9}$/,
+				loading:false
 			}
 		},
 		methods: {
@@ -45,6 +46,7 @@
 			login() {
 				//注册
 				let self = this;
+				
 				if (this.phone == '') {
 			
 					let toast = this.$createToast({
@@ -78,6 +80,7 @@
 					toast.show()
 					return false;
 				}else {
+					self.loading = true;
 					this.axios.post(Api.shopApi+'/shops_u_login', this.qs.stringify({
 						phone: this.phone,
 						password: this.pwd
@@ -96,26 +99,34 @@
 								token:res.data.token,
 								shopId:res.data.user.userShops.shopId
 							};
-							// self.$store.commit('setUserInfo',userEntity);
 							
 							sessionStorage.setItem('user', JSON.stringify(userEntity));
-							let toast = self.$createToast({
-								txt: '登录成功',
-								type: 'correct'
-							  })
-							toast.show()
-							setTimeout(()=>{
-								self.$router.go(-1); //返回上一层	
-							},500)
+							
+							if(self.$store.state.loginUrl!=''){
+								setTimeout(()=>{
+									self.loading = false;
+								    window.location.href = self.$store.state.loginUrl;
+									
+								},500)
+							}else{
+								self.$router.push({
+									name:'sellerGoods'
+								})
+							}
+							
 							
 			
 						} else {
 							console.log(res)
+							
+							setTimeout(()=>{
+								self.loading = false;
+							},500)
 							let toast = self.$createToast({
 								txt:res.data.msg,
 								type: 'error'
 							  })
-							toast.show()
+							toast.show();
 						}
 			
 					}).catch(function(err) {
@@ -124,6 +135,7 @@
 							type: 'error'
 						  })
 						toast.show()
+						self.loading = false;
 						// console.log(err)
 					})
 			
