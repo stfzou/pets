@@ -76,7 +76,7 @@
 		</div>
 		<div class="active_foot">
 			<div class="message_input flex_r_s_b">
-				<input type="text" v-model="msg" placeholder="留言">
+				<input type="text" @blur.prevent="inputLoseFocus" v-model="msg" placeholder="留言">
 				<span class="send_msg" @click="commitComment">发送</span>
 			</div>
 			<div class="bottom flex_r_f_s">
@@ -161,6 +161,12 @@
 		methods:{
 			back() {
 				this.$router.go(-1); //返回上一层
+			},
+			inputLoseFocus() {
+				setTimeout(() => {
+				  window.scrollTo(0,0);
+				},100);
+				
 			},
 			getUrlData() {// 截取url中的数据
 			    
@@ -368,6 +374,12 @@
 						
 					 }).show()
 					
+				}else if(self.msg == ''){
+					let toast = self.$createToast({
+						txt: '评论不能为空',
+						type: 'error'
+					  })
+					toast.show()
 				}else{
 					let self = this;
 					self.axios.post(Api.userApi+'/ca/addCommunityActivityComment',self.qs.stringify({

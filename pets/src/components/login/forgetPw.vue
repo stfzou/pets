@@ -11,11 +11,11 @@
 			<ul class="form_list">
 				<li class="flex_r_f_s" v-if="!isPwd">
 					<img src="../../assets/login/icon-phone.png" alt="">
-					<input type="text" v-model="phone" placeholder="请输入手机账号" />
+					<input type="text" v-model="phone" @blur.prevent="inputLoseFocus" placeholder="请输入手机账号" />
 				</li>
 				<li class="flex_r_f_s vcode_box" v-if="!isPwd">
 					<img src="../../assets/login/icon-yz.png" alt="">
-					<input type="password" v-model="vCode" placeholder="请输入验证码" />
+					<input type="password" v-model="vCode" @blur.prevent="inputLoseFocus" placeholder="请输入验证码" />
 					<div class="v_code" v-if="show">
 						<span @click="getCode">获取验证码</span>
 					</div>
@@ -26,7 +26,7 @@
 				</li>
 				<li class="flex_r_f_s" v-if="isPwd">
 					<img src="../../assets/login/icon-pwd.png" alt="">
-					<input type="password" v-model="pwd" placeholder="请输入您的密码" />
+					<input type="password" v-model="pwd" @blur.prevent="inputLoseFocus" placeholder="请输入您的密码" />
 				</li>
 			</ul>
 			
@@ -94,6 +94,12 @@
 				if(this.vCode!=''&&this.phone!=''){
 					this.isPwd = true;
 				}
+			},
+			inputLoseFocus() {
+				setTimeout(() => {
+				  window.scrollTo(0,0);
+				},100);
+				
 			},
 			changePwd(){
 				let self = this;

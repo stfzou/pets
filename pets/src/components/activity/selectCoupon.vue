@@ -41,7 +41,7 @@
 								<div class="add flex_r_s_c" style="width: 33.333%;" @click.stop="reduce(item,index)">
 									<img src="../../assets/reduce.png" alt="">
 								</div>
-								<input style="width: 33.333%;" type="text" v-model="item.isUse" @change="number(item,index)">
+								<input style="width: 33.333%;" type="text" @blur.prevent="inputLoseFocus" v-model="item.isUse" @change="number(item,index)">
 								<div style="width: 33.333%;" class="reduce flex_r_s_c" @click.stop="add(item,index)">
 									<img src="../../assets/add.png" alt="">
 								</div>
@@ -121,6 +121,12 @@
 			
 		},
 		methods: {
+			inputLoseFocus() {
+				setTimeout(() => {
+				  window.scrollTo(0,0);
+				},100);
+				
+			},
 			back() {
 				this.$router.go(-1); //返回上一层
 			},

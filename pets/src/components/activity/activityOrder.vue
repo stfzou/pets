@@ -175,9 +175,8 @@
 				this.code = this.getUrlPara('code');
 				const local = window.location.href;
 				if (this.code == null || this.code === '') {
-					
 					window.location.href = 'https://open.weixin.qq.com/connect/oauth2/authorize?appid=wxdf1774932d9dd96e&redirect_uri='+encodeURIComponent(local)+'&response_type=code&scope=snsapi_base&state='+this.cAOrderId+'#wechat_redirect';
-					alert(window.location.href)
+					
 				}else{
 					
 						this.axios.post(Api.userApi + '/ca/selectSettlementCommunityActivityOrder', this.qs.stringify({
@@ -590,6 +589,7 @@
 			left: 0;
 			bottom: 0;
 			box-sizing: border-box;
+			z-index: 100;
 
 			.payMoney {
 				font-size: 28px;

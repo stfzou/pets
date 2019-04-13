@@ -11,11 +11,11 @@
 			<ul class="form_list">
 				<li class="flex_r_f_s">
 					<img src="../../assets/login/icon-phone.png" alt="">
-					<input type="text" v-model="phone" placeholder="请输入您的手机账号" />
+					<input type="text" v-model="phone" @blur.prevent="inputLoseFocus" placeholder="请输入您的手机账号" />
 				</li>
 				<li class="flex_r_f_s">
 					<img src="../../assets/login/icon-pwd.png" alt="">
-					<input type="password" v-model="pwd" placeholder="请输入您的密码" />
+					<input type="password" v-model="pwd" @blur.prevent="inputLoseFocus" placeholder="请输入您的密码" />
 				</li>
 			</ul>
 			<div class="link flex_r_s_b">
@@ -43,6 +43,12 @@
 			back() {
 				this.$router.go(-1);//返回上一层
 			},
+			inputLoseFocus() {
+				setTimeout(() => {
+				  window.scrollTo(0,0);
+				},100);
+				
+			},  
 			login() {
 				//注册
 				let self = this;

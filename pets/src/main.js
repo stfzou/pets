@@ -12,6 +12,7 @@ import Cube from 'cube-ui'
 import store from './store/store.js'
 import AMap from 'vue-amap'
 
+
 Vue.use(Cube)
 Vue.use(AMap)
 Vue.prototype.axios = axios;
@@ -24,16 +25,22 @@ Vue.config.productionTip = false
 // http.defaults.baseURL = 'http://192.168.0.109:8082'
 
 AMap.initAMapApiLoader({
-  key: 'fe2312e4704c6f8f7787c7864ecebae6',
-  plugin: ['AMap.Icon','AMap.Geocoder','AMap.Geolocation','AMap.CitySearch','AMap.Autocomplete', 'AMap.PlaceSearch', 'AMap.Scale', 'AMap.OverView', 'AMap.ToolBar', 'AMap.MapType', 'AMap.PolyEditor', 'AMap.CircleEditor'],
-  // 默认高德 sdk 版本为 1.4.4
-  v: '1.4.4'
+	key: 'fe2312e4704c6f8f7787c7864ecebae6',
+	plugin: ['AMap.Icon', 'AMap.Geocoder', 'AMap.Geolocation', 'AMap.CitySearch', 'AMap.Autocomplete',
+		'AMap.PlaceSearch', 'AMap.Scale', 'AMap.OverView', 'AMap.ToolBar', 'AMap.MapType', 'AMap.PolyEditor',
+		'AMap.CircleEditor'
+	],
+	// 默认高德 sdk 版本为 1.4.4
+	v: '1.4.4'
 })
 /* eslint-disable no-new */
 new Vue({
-  el: '#app',
-  router,
-  store,
-  components: { App },
-  template: '<App/>'
+	el: '#app',
+	router,
+	store,
+	components: {
+		App
+	},
+	template: '<App/>'
+
 })

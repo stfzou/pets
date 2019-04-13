@@ -31,11 +31,9 @@
 						<li v-for="(item,index) in reportData">
 							<div @click="selectReport(index)" class="flex_r_s_c" :class="{active:index == activeIndex}">{{item}}</div>
 						</li>
-					
 					</ul>
 				</div>
 			</div>
-			
 			<div class="userInfo flex_r_f_s">
 				<div class="headImg">
 					<img :src="userHeadImage" alt="">
@@ -45,7 +43,7 @@
 					<div class="time">{{time}}</div>
 				</div>
 				<div class="follow flex_r_s_c" @click="follow" v-if="isFocus == 0">+关注</div>
-				<div class="follow flex_r_s_c" @click="cancelFollow" v-else>已关注</div>
+				<div class="follow flex_r_s_c" @click="cancelFollow" v-else>取消关注</div>
 			</div>
 			<div class="text_cnt">
 				{{content}}
@@ -93,7 +91,7 @@
 					<span>{{lookCount}}</span>
 				</div>
 			</div>
-			<div class="comment_list">
+			<div class="comment_list" v-if="dynamicComments.length>0">
 				<cube-scroll ref="scroll" @pulling-up="onPullingUp" @pulling-down="onPullingDown" :options="options">
 					<ul>
 						<li class="flex_r_s_b" v-for="(item,index) in dynamicComments">
@@ -110,8 +108,9 @@
 					</ul>
 				</cube-scroll>
 			</div>
+			<div class="tx" v-else>暂无评论</div>
 			<div class="send_comment flex_r_s_b">
-				<input type="text" v-model="val" placeholder="添加一条评论" />
+				<input type="text" @blur.prevent="inputLoseFocus" v-model="val" placeholder="添加一条评论" />
 				<div class="send_btn" @click="addComment">发送</div>
 			</div>
 		</div>
@@ -157,22 +156,47 @@
 				page:1,
 				dynamicComments:[],
 				likeData:[],
-				isFocus:''
+				isFocus:'',
+				userId:-1
 			}
 		},
 		mounted() {
-			if(JSON.parse(sessionStorage.getItem('user')) == null){
-				// this.$store.commit('setRouterName','activity');
-				this.$router.push({
-					name:'login'
-				})
-				return false;
+
+			if(JSON.parse(sessionStorage.getItem('user')) != null){
+				this.userId = JSON.parse(sessionStorage.getItem('user')).userId;
 			}
+			console.log(JSON.parse(sessionStorage.getItem('user'))!=null)
+			this.getUrlData();
 			this.getTrend();
 			this.getComment();
 			
 		},
 		methods:{
+			getUrlData() {// 截取url中的数据
+			    
+				   let tempStr = window.location.href
+				   /**
+				   * tempArr 是一个字符串数组 格式是["key=value", "key=value", ...]
+				   */
+				   let tempArr = tempStr.split('?')[1] ? tempStr.split('?')[1].split('&') : []
+				   /**
+				   * returnArr 是要返回出去的数据对象 格式是 { key: value, key: value, ... }
+				   */
+				   let returnArr = {}
+				   tempArr.forEach(element => {
+					returnArr[element.split('=')[0]] = element.split('=')[1]
+				   })
+				  /*输出日志*/
+				   console.log(returnArr)
+				   this.dynamicId = returnArr.dynamicId;
+			  
+			 },
+			inputLoseFocus() {
+				setTimeout(() => {
+				  window.scrollTo(0,0);
+				},100);
+				
+			},
 			back() {
 				this.$router.go(-1); //返回上一层
 			},
@@ -210,12 +234,42 @@
 					}
 				})
 			},
+			goLogin(){
+				let self = this;
+				let url = window.location.href;
+				this.$store.commit('setLoginUrl',url);
+				this.$createDialog({
+					type: 'confirm',
+					icon: 'cubeic-warn',
+					title: '需要登录后才能评论',
+					confirmBtn: {
+					  text: '去登录',
+					  active: true,
+					  disabled: false,
+					  href: 'javascript:;'
+					},
+					cancelBtn: {
+					  text: '取消',
+					  active: false,
+					  disabled: false,
+					  href: 'javascript:;'
+					},
+					onConfirm: () => {
+					  self.$router.push({
+						name:'login'
+					  })
+					 
+					},
+					
+				 }).show()
+					 
+			},
 			getTrend(){
 				let self = this;
 				self.axios.get(Api.trendApi+'/community/selectDynamicDetails',{
 					params:{
-						userId:JSON.parse(sessionStorage.getItem('user')).userId,
-						dynamicId:'15527119565035583'
+						userId:self.userId,
+						dynamicId:self.dynamicId
 					}
 				}, {
 					headers: {
@@ -250,31 +304,37 @@
 				})
 			},
 			getComment(){
-				let self = this;
-				self.axios.get(Api.trendApi+'/community/selectCommentByDynamicId',{
-					params:{
-						type:1,
-						contentId:'15527119565035583',
-						page:self.page,
-						rows:10
-					}
-				}, {
-					headers: {
-						'Content-Type': 'application/x-www-form-urlencoded'
-					}
-				}).then((res)=>{
-					if(res.data.code == 1){
-						
-						self.dynamicComments = res.data.data;
-						console.log(res.data.data)
-						setTimeout(()=>{
-							self.$refs.scroll.forceUpdate();
-						},800)
-						// console.log(res)
-					}else{
-						alert(res.data.msg)
-					}
-				})
+				
+					let self = this;
+					self.axios.get(Api.trendApi+'/community/selectCommentByDynamicId',{
+						params:{
+							type:1,
+							contentId:self.dynamicId,
+							page:self.page,
+							rows:10
+						}
+					}, {
+						headers: {
+							'Content-Type': 'application/x-www-form-urlencoded'
+						}
+					}).then((res)=>{
+						if(res.data.code == 1){
+							
+							if(res.data.data.length>0){
+								self.dynamicComments = res.data.data;
+								setTimeout(()=>{
+									self.$refs.scroll.forceUpdate();
+								},800)
+							}
+							console.log(res.data.data)
+							
+							// console.log(res)
+						}else{
+							alert(res.data.msg)
+						}
+					})
+				
+				
 			},
 			onPullingDown() {
 			// 模拟更新数据
@@ -292,7 +352,7 @@
 				self.axios.get(Api.trendApi+'/community/selectCommentByDynamicId',{
 					params:{
 						type:1,
-						contentId:'15527119565035583',
+						contentId:self.dynamicId,
 						page:self.page,
 						rows:10
 					}
@@ -333,70 +393,81 @@
 			
 			},
 			addComment(){
-				let self = this;
-				if(self.val == ''){
-					let toast = this.$createToast({
-						txt: '评论内容不能为空',
-						type: 'error'
-					  })
-					toast.show()
-					return false;
+					if(this.userId == -1){
+						this.goLogin()
+					}else{
+						let self = this;
+						if(self.val == ''){
+							let toast = this.$createToast({
+								txt: '评论内容不能为空',
+								type: 'error'
+							  })
+							toast.show()
+							return false;
+						}else{
+							this.axios.post(Api.trendApi + '/community/addComment', {
+								authorId:self.authorId,
+								contentId:self.dynamicId,
+								userContent:self.val,
+								userId:self.userId
+							}, {
+								headers: {
+									'Content-Type': 'application/json'
+								}
+							}).then((res)=>{
+								if(res.data.code == 1){
+									self.page = 1;
+									self.dynamicComments = [];
+									self.getComment();
+									self.val = '';
+									self.commentCount++;
+									let toast = self.$createToast({
+										txt: '评论成功',
+										type: 'correct'
+									  })
+									toast.show();
+									
+								}else{
+									alert(res.data.msg);
+								}
+							})
+						}
+					}
+					
+				
+					
+			},
+			clikeLike(){
+				if(this.userId == -1){
+					this.goLogin();
 				}else{
-					this.axios.post(Api.trendApi + '/community/addComment', {
-						authorId:self.authorId,
-						contentId:self.dynamicId,
-						userContent:self.val,
-						userId:JSON.parse(sessionStorage.getItem('user')).userId
-					}, {
+					let self = this;
+					this.axios.post(Api.trendApi + '/community/likeDynamic', this.qs.stringify({
+						byLikeUserId:self.authorId,
+						dynamicId:self.dynamicId,
+						userId:self.userId
+					}), {
 						headers: {
-							'Content-Type': 'application/json'
+							'Content-Type': 'application/x-www-form-urlencoded'
 						}
 					}).then((res)=>{
 						if(res.data.code == 1){
-							self.page = 1;
-							self.dynamicComments = [];
-							self.getComment();
-							self.val = '';
-							self.commentCount++;
-							let toast = self.$createToast({
-								txt: '评论成功',
-								type: 'correct'
-							  })
-							toast.show();
-							
+							self.isLike = 1;
+							self.likeCount++;
 						}else{
-							alert(res.data.msg);
+							alert(res.data.msg)
 						}
 					})
 				}
 				
 			},
-			clikeLike(){
-				let self = this;
-				
-				this.axios.post(Api.trendApi + '/community/likeDynamic', this.qs.stringify({
-					byLikeUserId:self.authorId,
-					dynamicId:self.dynamicId,
-					userId:JSON.parse(sessionStorage.getItem('user')).userId
-				}), {
-					headers: {
-						'Content-Type': 'application/x-www-form-urlencoded'
-					}
-				}).then((res)=>{
-					if(res.data.code == 1){
-						self.isLike = 1;
-						self.likeCount++;
-					}else{
-						alert(res.data.msg)
-					}
-				})
-			},
 			cancelLike(){
+				
 				let self = this;
 				this.axios.post(Api.trendApi + '/community/disLikeDynamic', this.qs.stringify({
 					byLikeUserId:self.authorId,
 					dynamicId:self.dynamicId,
-					userId:JSON.parse(sessionStorage.getItem('user')).userId
+					userId:self.userId
 				}), {
 					headers: {
 						'Content-Type': 'application/x-www-form-urlencoded'
@@ -411,32 +482,37 @@
 				})
 			},
 			follow(){
-				let self = this;
-				this.axios.post(Api.trendApi + '/community/focusUser', this.qs.stringify({
-					targetUserId:self.authorId,
-					userId:JSON.parse(sessionStorage.getItem('user')).userId
-				}), {
-					headers: {
-						'Content-Type': 'application/x-www-form-urlencoded'
-					}
-				}).then((res)=>{
-					if(res.data.code == 1){
-						self.isFocus = 1;
-						let toast = self.$createToast({
-							txt: '关注成功',
-							type: 'correct'
-						  })
-						toast.show();
-					}else{
-						alert(res.data.msg)
-					}
-				})
+				if(this.userId == -1){
+					this.goLogin();
+				}else{
+					let self = this;
+					this.axios.post(Api.trendApi + '/community/focusUser', this.qs.stringify({
+						targetUserId:self.authorId,
+						userId:self.userId
+					}), {
+						headers: {
+							'Content-Type': 'application/x-www-form-urlencoded'
+						}
+					}).then((res)=>{
+						if(res.data.code == 1){
+							self.isFocus = 1;
+							let toast = self.$createToast({
+								txt: '关注成功',
+								type: 'correct'
+							  })
+							toast.show();
+						}else{
+							alert(res.data.msg)
+						}
+					})
+				}
+				
 			},
 			cancelFollow(){
 				let self = this;
 				this.axios.post(Api.trendApi + '/community/cancelFocusUser', this.qs.stringify({
 					targetUserId:self.authorId,
-					userId:JSON.parse(sessionStorage.getItem('user')).userId
+					userId:self.userId
 				}), {
 					headers: {
 						'Content-Type': 'application/x-www-form-urlencoded'
@@ -461,7 +537,12 @@
 <style lang="scss">
 	.trend_warp{
 		padding-top: 88px;
-		
+		.tx{
+			font-size: 28px;
+			padding: 30px 20px;
+			color: #000;
+			text-align: center;
+		}
 		.line{
 			height: 10px;
 			background: #e8e8e8;
@@ -618,8 +699,8 @@
 			.trend_img{
 				flex-wrap: wrap;
 				img{
-					width: 220px;
-					height: 220px;
+					width: 216px;
+					height: 216px;
 					display: block;
 					margin-bottom: 10px;
 					border-radius: 2px;
@@ -777,7 +858,7 @@
 					border-radius: 40px;
 					border: 1px solid #e8e8e8;/*no*/
 					font-size: 26px;
-					color: #999;
+					color: #333;
 					width: 600px;
 					box-sizing: border-box;
 				}

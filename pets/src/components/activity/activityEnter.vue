@@ -8,19 +8,19 @@
 			<ul>
 				<li>
 					<div class="title">姓名<span>*</span></div>
-					<input type="text" v-model="userName" maxlength="10" placeholder="请输入您的姓名" />
+					<input type="text" @blur.prevent="inputLoseFocus" v-model="userName" maxlength="10" placeholder="请输入您的姓名" />
 				</li>
 				<li>
 					<div class="title">昵称</div>
-					<input type="text" maxlength="10" v-model="nickName" placeholder="请输入您的昵称" />
+					<input type="text" @blur.prevent="inputLoseFocus" maxlength="10" v-model="nickName" placeholder="请输入您的昵称" />
 				</li>
 				<li>
 					<div class="title">电话<span>*</span></div>
-					<input type="text" v-model="phone" placeholder="请输入您的电话" />
+					<input type="text" @blur.prevent="inputLoseFocus" v-model="phone" placeholder="请输入您的电话" />
 				</li>
 				<li>
 					<div class="title">邮箱<span>*</span></div>
-					<input type="text" v-model="eMail" placeholder="请输入您的邮箱" />
+					<input type="text" @blur.prevent="inputLoseFocus" v-model="eMail" placeholder="请输入您的邮箱" />
 				</li>
 			</ul>
 			
@@ -45,6 +45,12 @@
 		methods:{
 			back() {
 				this.$router.go(-1); //返回上一层
+			},
+			inputLoseFocus() {
+				setTimeout(() => {
+				  window.scrollTo(0,0);
+				},100);
+				
 			},
 			FreeJoin(cAOrderId){
 				
