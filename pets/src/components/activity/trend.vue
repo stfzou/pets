@@ -1,5 +1,6 @@
 <template>
 	<div class="trend_warp">
+		<DownApp v-on:closeDown="closeDown" v-show="isDown"></DownApp>
 		<div class="top_nav flex_r_s_b">
 			<div class="back" @click="back"></div>
 			<div class="nav_title">动态正文</div>
@@ -48,9 +49,11 @@
 			<div class="text_cnt">
 				{{content}}
 			</div>
-			<div class="trend_img flex_r_s_b">
-				<img :src="item" alt="" v-for="(item,index) in images" :key="index">
-				
+			<div class="trend_img">
+				<!-- <img :src="item" alt="" v-for="(item,index) in images" :key="index"> -->
+				<div class="imgs-container flex_r_s_b">
+					<img :src="img" v-for="(img, index) in images" :key="img" @click="handleImgsClick(index)">
+				</div>
 			</div>
 			<div class="trend_label">
 				<div class="addr flex_r_f_s"><img src="../../assets/icon/map@2x.png" alt=""><span>{{geoLocation}}</span></div>
@@ -67,7 +70,7 @@
 					<div class="likeHeadImg" v-for="(item,index) in likeUserHeadImages">
 						<img :src="item.userHeadImage" alt="">
 					</div>
-					
+
 					<div class="likeHeadImg active flex_r_s_c" v-if="likeUserHeadImages.length>0">
 						<div class="flex_r_s_b" @click="praiseLink">
 							<span></span>
@@ -75,10 +78,10 @@
 							<span></span>
 						</div>
 					</div>
-					
+
 				</div>
 			</div>
-			
+
 		</div>
 		<div class="line"></div>
 		<div class="trend_comment">
@@ -104,7 +107,7 @@
 							</div>
 							<div class="list_r">{{item.createdTime}}</div>
 						</li>
-						
+
 					</ul>
 				</cube-scroll>
 			</div>
@@ -114,230 +117,263 @@
 				<div class="send_btn" @click="addComment">发送</div>
 			</div>
 		</div>
+
 	</div>
 </template>
 
 <script>
+	import DownApp from '../common/downApp.vue'
 	import Api from '../common/apj.js'
-	export default{
-		data(){
-			return{
-				val:'',
-				isMask:false,
-				isReport:false,
-				reportData:['垃圾营销','有害信息','违法信息','诈骗信息','不实信息'],
-				activeIndex:0,
-				userName:'',
-				time:'',
-				images:[],
-				geoLocation:'',
-				userHeadImage:'',
-				content:'',
-				likeUserHeadImages:[],
-				likeCount:'',
-				lookCount:'',
-				commentCount:'',
-				authorId:'',
-				dynamicId:'',
-				isLike:'',
-				options:{
-					pullDownRefresh:{
-						txt:'更新成功',
-						threshold:40
+	export default {
+		data() {
+			return {
+				val: '',
+				isMask: false,
+				isReport: false,
+				reportData: ['垃圾营销', '有害信息', '违法信息', '诈骗信息', '不实信息'],
+				activeIndex: 0,
+				userName: '',
+				time: '',
+				images: [],
+				geoLocation: '',
+				userHeadImage: '',
+				content: '',
+				likeUserHeadImages: [],
+				likeCount: '',
+				lookCount: '',
+				commentCount: '',
+				authorId: '',
+				dynamicId: '',
+				isLike: '',
+				options: {
+					pullDownRefresh: {
+						txt: '更新成功',
+						threshold: 40
 					},
-					pullUpLoad:{
-						txt:{
-							more: '加载更多', noMore: '没有更多数据了',
+					pullUpLoad: {
+						txt: {
+							more: '加载更多',
+							noMore: '没有更多数据了',
 						},
-						threshold:40,
-						
+						threshold: 40,
+
 					}
 				},
-				page:1,
-				dynamicComments:[],
-				likeData:[],
-				isFocus:'',
-				userId:-1
+				page: 1,
+				dynamicComments: [],
+				likeData: [],
+				isFocus: '',
+				userId: -1,
+				isDown: true,
+				imgSlide: [],
+				initialIndex:0
+
 			}
+
 		},
 		mounted() {
 
-			if(JSON.parse(sessionStorage.getItem('user')) != null){
+			if (JSON.parse(sessionStorage.getItem('user')) != null) {
 				this.userId = JSON.parse(sessionStorage.getItem('user')).userId;
 			}
-			console.log(JSON.parse(sessionStorage.getItem('user'))!=null)
+			console.log(JSON.parse(sessionStorage.getItem('user')) != null)
 			this.getUrlData();
 			this.getTrend();
 			this.getComment();
-			
+
 		},
-		methods:{
-			getUrlData() {// 截取url中的数据
-			    
-				   let tempStr = window.location.href
-				   /**
-				   * tempArr 是一个字符串数组 格式是["key=value", "key=value", ...]
-				   */
-				   let tempArr = tempStr.split('?')[1] ? tempStr.split('?')[1].split('&') : []
-				   /**
-				   * returnArr 是要返回出去的数据对象 格式是 { key: value, key: value, ... }
-				   */
-				   let returnArr = {}
-				   tempArr.forEach(element => {
+		components: {
+			DownApp
+		},
+		methods: {
+			handleImgsClick(index) {
+				this.initialIndex = index
+				const params = {
+					$props: {
+						imgs: this.images,
+						initialIndex: 'initialIndex', // 响应式数据的key名
+						loop: false
+					},
+					$events: {
+						change: (i) => {
+							// 必须更新 initialIndex
+							this.initialIndex = i
+						}
+					}
+				}
+				this.$createImagePreview({ ...params
+				}).show()
+			},
+			closeDown() {
+				this.isDown = false;
+			},
+			getUrlData() { // 截取url中的数据
+
+				let tempStr = window.location.href
+				/**
+				 * tempArr 是一个字符串数组 格式是["key=value", "key=value", ...]
+				 */
+				let tempArr = tempStr.split('?')[1] ? tempStr.split('?')[1].split('&') : []
+				/**
+				 * returnArr 是要返回出去的数据对象 格式是 { key: value, key: value, ... }
+				 */
+				let returnArr = {}
+				tempArr.forEach(element => {
 					returnArr[element.split('=')[0]] = element.split('=')[1]
-				   })
-				  /*输出日志*/
-				   console.log(returnArr)
-				   this.dynamicId = returnArr.dynamicId;
-			  
-			 },
+				})
+				/*输出日志*/
+				console.log(returnArr)
+				this.dynamicId = returnArr.dynamicId;
+
+			},
 			inputLoseFocus() {
 				setTimeout(() => {
-				  window.scrollTo(0,0);
-				},100);
-				
+					window.scrollTo(0, 0);
+				}, 100);
+
 			},
 			back() {
 				this.$router.go(-1); //返回上一层
 			},
-			maskHide(){
+			maskHide() {
 				this.isMask = false;
 			},
-			maskShow(){
+			maskShow() {
 				this.isMask = true;
 			},
-			reportShow(){
+			reportShow() {
 				this.isReport = true;
 				this.isMask = true;
 			},
-			reportHide(){
+			reportHide() {
 				this.isReport = false;
 				this.isMask = true;
 			},
-			selectReport(index){
+			selectReport(index) {
 				this.activeIndex = index;
 			},
-			share(){
+			share() {
 				this.isMask = false
 				let toast = this.$createToast({
 					txt: '点击浏览器顶端最右边进行分享',
 					type: 'warn'
-				  })
+				})
 				toast.show()
 			},
-			praiseLink(){
+			praiseLink() {
 				let self = this;
 				this.$router.push({
-					name:'praise',
-					params:{
-						data:self.likeData
+					name: 'praise',
+					params: {
+						data: self.likeData
 					}
 				})
 			},
-			goLogin(){
+			goLogin() {
 				let self = this;
 				let url = window.location.href;
-				this.$store.commit('setLoginUrl',url);
+				this.$store.commit('setLoginUrl', url);
 				this.$createDialog({
 					type: 'confirm',
 					icon: 'cubeic-warn',
 					title: '需要登录后才能评论',
 					confirmBtn: {
-					  text: '去登录',
-					  active: true,
-					  disabled: false,
-					  href: 'javascript:;'
+						text: '去登录',
+						active: true,
+						disabled: false,
+						href: 'javascript:;'
 					},
 					cancelBtn: {
-					  text: '取消',
-					  active: false,
-					  disabled: false,
-					  href: 'javascript:;'
+						text: '取消',
+						active: false,
+						disabled: false,
+						href: 'javascript:;'
 					},
 					onConfirm: () => {
-					  self.$router.push({
-						name:'login'
-					  })
-					 
+						self.$router.push({
+							name: 'login'
+						})
+
 					},
-					
-				 }).show()
-					 
+
+				}).show()
+
 			},
-			getTrend(){
+			getTrend() {
 				let self = this;
-				self.axios.get(Api.trendApi+'/community/selectDynamicDetails',{
-					params:{
-						userId:self.userId,
-						dynamicId:self.dynamicId
+				self.axios.get(Api.trendApi + '/community/selectDynamicDetails', {
+					params: {
+						userId: self.userId,
+						dynamicId: self.dynamicId
 					}
 				}, {
 					headers: {
 						'Content-Type': 'application/x-www-form-urlencoded'
 					}
-				}).then((res)=>{
-					if(res.data.code == 1){
+				}).then((res) => {
+					if (res.data.code == 1) {
 						self.userName = res.data.data.userName;
 						self.geoLocation = res.data.data.geoLocation;
 						self.images = res.data.data.images.split(',');
+						
 						self.time = res.data.data.createdTime.split(' ')[0];
 						self.userHeadImage = res.data.data.userHeadImage;
 						self.content = res.data.data.content;
 						self.likeCount = res.data.data.likeCount;
 						self.likeData = res.data.data.likeUserHeadImages;
 						self.isFocus = res.data.data.isFocus;
-						if(res.data.data.likeUserHeadImages.length>5){
-							self.likeUserHeadImages = res.data.data.likeUserHeadImages.slice(0,5);
-						}else{
+						if (res.data.data.likeUserHeadImages.length > 5) {
+							self.likeUserHeadImages = res.data.data.likeUserHeadImages.slice(0, 5);
+						} else {
 							self.likeUserHeadImages = res.data.data.likeUserHeadImages;
 						}
-						
+
 						self.lookCount = res.data.data.lookCount;
 						self.commentCount = res.data.data.commentCount;
 						self.authorId = res.data.data.userId;
 						self.dynamicId = res.data.data.dynamicId;
 						self.isLike = res.data.data.isLike;
-						
-					}else{
+
+					} else {
 						alert(res.data.msg)
 					}
 				})
 			},
-			getComment(){
-				
-					let self = this;
-					self.axios.get(Api.trendApi+'/community/selectCommentByDynamicId',{
-						params:{
-							type:1,
-							contentId:self.dynamicId,
-							page:self.page,
-							rows:10
+			getComment() {
+
+				let self = this;
+				self.axios.get(Api.trendApi + '/community/selectCommentByDynamicId', {
+					params: {
+						type: 1,
+						contentId: self.dynamicId,
+						page: self.page,
+						rows: 10
+					}
+				}, {
+					headers: {
+						'Content-Type': 'application/x-www-form-urlencoded'
+					}
+				}).then((res) => {
+					if (res.data.code == 1) {
+
+						if (res.data.data.length > 0) {
+							self.dynamicComments = res.data.data;
+							setTimeout(() => {
+								self.$refs.scroll.forceUpdate();
+							}, 800)
 						}
-					}, {
-						headers: {
-							'Content-Type': 'application/x-www-form-urlencoded'
-						}
-					}).then((res)=>{
-						if(res.data.code == 1){
-							
-							if(res.data.data.length>0){
-								self.dynamicComments = res.data.data;
-								setTimeout(()=>{
-									self.$refs.scroll.forceUpdate();
-								},800)
-							}
-							console.log(res.data.data)
-							
-							// console.log(res)
-						}else{
-							alert(res.data.msg)
-						}
-					})
-				
-				
+						console.log(res.data.data)
+
+						// console.log(res)
+					} else {
+						alert(res.data.msg)
+					}
+				})
+
+
 			},
 			onPullingDown() {
-			// 模拟更新数据
+				// 模拟更新数据
 				this.page = 1;
 				this.getComment();
 				setTimeout(() => {
@@ -345,187 +381,187 @@
 				}, 1000)
 			},
 			onPullingUp() {
-			// 模拟更新数据
-				
+				// 模拟更新数据
+
 				let self = this;
 				this.page++;
-				self.axios.get(Api.trendApi+'/community/selectCommentByDynamicId',{
-					params:{
-						type:1,
-						contentId:self.dynamicId,
-						page:self.page,
-						rows:10
+				self.axios.get(Api.trendApi + '/community/selectCommentByDynamicId', {
+					params: {
+						type: 1,
+						contentId: self.dynamicId,
+						page: self.page,
+						rows: 10
 					}
 				}, {
 					headers: {
 						'Content-Type': 'application/x-www-form-urlencoded'
 					}
-				}).then((res)=>{
-					if(res.data.code == 1){
-						
+				}).then((res) => {
+					if (res.data.code == 1) {
+
 						// self.dynamicComments = res.data.data;
-						if(res.data.data.length>0){
-							
-							setTimeout(()=>{
-								
-								res.data.data.forEach((e)=>{
+						if (res.data.data.length > 0) {
+
+							setTimeout(() => {
+
+								res.data.data.forEach((e) => {
 									self.dynamicComments.push(e)
 								})
-							},500)
-							setTimeout(()=>{
+							}, 500)
+							setTimeout(() => {
 								self.$refs.scroll.refresh();
 								self.$refs.scroll.forceUpdate();
-								
-							},800)
-						}else{
-							setTimeout(()=>{
+
+							}, 800)
+						} else {
+							setTimeout(() => {
 								self.$refs.scroll.forceUpdate();
 								self.$refs.scroll.refresh();
-							},500)
-							
+							}, 500)
+
 						}
-						
-					}else{
+
+					} else {
 						self.$refs.scroll.forceUpdate();
 						alert(res.data.msg)
 					}
 				})
-			
+
 			},
-			addComment(){
-					if(this.userId == -1){
-						this.goLogin()
-					}else{
-						let self = this;
-						if(self.val == ''){
-							let toast = this.$createToast({
-								txt: '评论内容不能为空',
-								type: 'error'
-							  })
-							toast.show()
-							return false;
-						}else{
-							this.axios.post(Api.trendApi + '/community/addComment', {
-								authorId:self.authorId,
-								contentId:self.dynamicId,
-								userContent:self.val,
-								userId:self.userId
-							}, {
-								headers: {
-									'Content-Type': 'application/json'
-								}
-							}).then((res)=>{
-								if(res.data.code == 1){
-									self.page = 1;
-									self.dynamicComments = [];
-									self.getComment();
-									self.val = '';
-									self.commentCount++;
-									let toast = self.$createToast({
-										txt: '评论成功',
-										type: 'correct'
-									  })
-									toast.show();
-									
-								}else{
-									alert(res.data.msg);
-								}
-							})
-						}
+			addComment() {
+				if (this.userId == -1) {
+					this.goLogin()
+				} else {
+					let self = this;
+					if (self.val == '') {
+						let toast = this.$createToast({
+							txt: '评论内容不能为空',
+							type: 'error'
+						})
+						toast.show()
+						return false;
+					} else {
+						this.axios.post(Api.trendApi + '/community/addComment', {
+							authorId: self.authorId,
+							contentId: self.dynamicId,
+							userContent: self.val,
+							userId: self.userId
+						}, {
+							headers: {
+								'Content-Type': 'application/json'
+							}
+						}).then((res) => {
+							if (res.data.code == 1) {
+								self.page = 1;
+								self.dynamicComments = [];
+								self.getComment();
+								self.val = '';
+								self.commentCount++;
+								let toast = self.$createToast({
+									txt: '评论成功',
+									type: 'correct'
+								})
+								toast.show();
+
+							} else {
+								alert(res.data.msg);
+							}
+						})
 					}
-					
-				
-					
+				}
+
+
+
 			},
-			clikeLike(){
-				if(this.userId == -1){
+			clikeLike() {
+				if (this.userId == -1) {
 					this.goLogin();
-				}else{
+				} else {
 					let self = this;
 					this.axios.post(Api.trendApi + '/community/likeDynamic', this.qs.stringify({
-						byLikeUserId:self.authorId,
-						dynamicId:self.dynamicId,
-						userId:self.userId
+						byLikeUserId: self.authorId,
+						dynamicId: self.dynamicId,
+						userId: self.userId
 					}), {
 						headers: {
 							'Content-Type': 'application/x-www-form-urlencoded'
 						}
-					}).then((res)=>{
-						if(res.data.code == 1){
+					}).then((res) => {
+						if (res.data.code == 1) {
 							self.isLike = 1;
 							self.likeCount++;
-						}else{
+						} else {
 							alert(res.data.msg)
 						}
 					})
 				}
-				
+
 			},
-			cancelLike(){
-				
+			cancelLike() {
+
 				let self = this;
 				this.axios.post(Api.trendApi + '/community/disLikeDynamic', this.qs.stringify({
-					byLikeUserId:self.authorId,
-					dynamicId:self.dynamicId,
-					userId:self.userId
+					byLikeUserId: self.authorId,
+					dynamicId: self.dynamicId,
+					userId: self.userId
 				}), {
 					headers: {
 						'Content-Type': 'application/x-www-form-urlencoded'
 					}
-				}).then((res)=>{
-					if(res.data.code == 1){
+				}).then((res) => {
+					if (res.data.code == 1) {
 						self.isLike = 0;
 						self.likeCount--;
-					}else{
+					} else {
 						alert(res.data.msg)
 					}
 				})
 			},
-			follow(){
-				if(this.userId == -1){
+			follow() {
+				if (this.userId == -1) {
 					this.goLogin();
-				}else{
+				} else {
 					let self = this;
 					this.axios.post(Api.trendApi + '/community/focusUser', this.qs.stringify({
-						targetUserId:self.authorId,
-						userId:self.userId
+						targetUserId: self.authorId,
+						userId: self.userId
 					}), {
 						headers: {
 							'Content-Type': 'application/x-www-form-urlencoded'
 						}
-					}).then((res)=>{
-						if(res.data.code == 1){
+					}).then((res) => {
+						if (res.data.code == 1) {
 							self.isFocus = 1;
 							let toast = self.$createToast({
 								txt: '关注成功',
 								type: 'correct'
-							  })
+							})
 							toast.show();
-						}else{
+						} else {
 							alert(res.data.msg)
 						}
 					})
 				}
-				
+
 			},
-			cancelFollow(){
+			cancelFollow() {
 				let self = this;
 				this.axios.post(Api.trendApi + '/community/cancelFocusUser', this.qs.stringify({
-					targetUserId:self.authorId,
-					userId:self.userId
+					targetUserId: self.authorId,
+					userId: self.userId
 				}), {
 					headers: {
 						'Content-Type': 'application/x-www-form-urlencoded'
 					}
-				}).then((res)=>{
-					if(res.data.code == 1){
+				}).then((res) => {
+					if (res.data.code == 1) {
 						self.isFocus = 0;
 						let toast = self.$createToast({
 							txt: '取消关注',
 							type: 'correct'
-						  })
+						})
 						toast.show();
-					}else{
+					} else {
 						alert(res.data.msg)
 					}
 				})
@@ -535,18 +571,21 @@
 </script>
 
 <style lang="scss">
-	.trend_warp{
+	.trend_warp {
 		padding-top: 88px;
-		.tx{
+
+		.tx {
 			font-size: 28px;
 			padding: 30px 20px;
 			color: #000;
 			text-align: center;
 		}
-		.line{
+
+		.line {
 			height: 10px;
 			background: #e8e8e8;
 		}
+
 		.top_nav {
 			padding: 0 20px;
 			height: 88px;
@@ -557,14 +596,14 @@
 			left: 0;
 			top: 0;
 			z-index: 100;
-		
+
 			.back {
 				width: 26px;
 				height: 42px;
 				background: url(../../assets/icon/backColory.png) no-repeat center 0;
 				background-size: cover;
 			}
-		
+
 			.nav_title {
 				font-size: 30px;
 				color: #000;
@@ -572,297 +611,366 @@
 				left: 50%;
 				top: 50%;
 				transform: translate(-50%, -50%);
-		
+
 			}
-			.share{
+
+			.share {
 				width: 50px;
 				height: 10px;
-				span{
-					width: 6px;/*no*/
-					height: 6px;/*no*/
+
+				span {
+					width: 6px;
+					/*no*/
+					height: 6px;
+					/*no*/
 					border-radius: 50%;
 					background: #FF523D;
 				}
 			}
 		}
-		.trend_cnt{
+
+		.trend_cnt {
 			padding: 0 20px 0 20px;
 			position: relative;
-			
-			.trend_mask{
+
+			.trend_mask {
 				height: 100%;
 				width: 100%;
 				left: 0;
 				top: 0;
 				position: fixed;
-				background: rgba(0,0,0,0.3);
+				background: rgba(0, 0, 0, 0.3);
 				z-index: 1000;
-				.share_box{
+
+				.share_box {
 					padding: 26px;
 					background: #fff;
-					border-radius:10px;
+					border-radius: 10px;
 					position: absolute;
 					right: 0;
 					top: 88px;
 					z-index: 10;
-					div{
-						img{
-							width:30px;
+
+					div {
+						img {
+							width: 30px;
 							margin-right: 6px;
 						}
-						span{
+
+						span {
 							font-size: 28px;
 							color: #333;
 						}
 					}
-					.share{
+
+					.share {
 						margin-bottom: 50px;
 					}
 				}
-				.trend_report{
+
+				.trend_report {
 					position: absolute;
 					bottom: 0;
 					left: 0;
 					width: 100%;
 					background: #fff;
-					.title{
+
+					.title {
 						height: 70px;
 						font-size: 28px;
 						color: #333;
 						padding: 0 40px;
 						box-sizing: border-box;
-						border-bottom: 1px solid #ff523d;/*no*/
+						border-bottom: 1px solid #ff523d;
+						/*no*/
 					}
-					.report_list{
-						li{
+
+					.report_list {
+						li {
 							padding: 15px 0;
-							div{
+
+							div {
 								height: 70px;
 								box-sizing: border-box;
 								font-size: 26px;
 								color: #333;
 							}
-							.active{
-								border-top:1px solid #e8e8e8;/*no*/ 
-								border-bottom:1px solid #e8e8e8;/*no*/
+
+							.active {
+								border-top: 1px solid #e8e8e8;
+								/*no*/
+								border-bottom: 1px solid #e8e8e8;
+								/*no*/
 								color: #FF523D;
 							}
 						}
 					}
 				}
 			}
-			
-			.userInfo{
+
+			.userInfo {
 				padding: 20px 0;
 				box-sizing: border-box;
-				.headImg{
+
+				.headImg {
 					height: 90px;
 					width: 90px;
 					border-radius: 50%;
 					background: #ffdfdf;
 					margin-right: 20px;
-					img{
+
+					img {
 						display: block;
 						width: 100%;
 						height: 100%;
 						border-radius: 50%;
 					}
 				}
-				.mid{
+
+				.mid {
 					width: 250px;
 					margin-right: 180px;
-					.userName{
+
+					.userName {
 						font-size: 28px;
 						color: #000;
 					}
-					.time{
+
+					.time {
 						font-size: 22px;
 						color: #999;
 						margin-top: 16px;
 					}
 				}
-				.follow{
-					width:100px;
-					height:40px;
-					border:1px solid #FF523D;/*no*/
-					border-radius:6px;
+
+				.follow {
+					width: 100px;
+					height: 40px;
+					border: 1px solid #FF523D;
+					/*no*/
+					border-radius: 6px;
 					color: #FF523D;
 					font-size: 24px;
 				}
 			}
-			.text_cnt{
+
+			.text_cnt {
 				font-size: 24px;
 				color: #333;
 				line-height: 30px;
 				margin-bottom: 10px;
 			}
-			.trend_img{
-				flex-wrap: wrap;
-				img{
-					width: 216px;
-					height: 216px;
-					display: block;
-					margin-bottom: 10px;
-					border-radius: 2px;
+
+			.trend_img {
+				.imgs-container{
+					flex-wrap: wrap;
+					img {
+						width: 216px;
+						height: 216px;
+						// display: block;
+						margin-bottom: 10px;
+						border-radius: 4px;
+					}
 				}
 				
+
 			}
-			.trend_label{
+
+			.trend_label {
 				font-size: 22px;
 				color: #666;
 				margin-top: 5px;
-				div{
+
+				div {
 					line-height: 34px;
 				}
-				.addr{
-					
-					img{
+
+				.addr {
+
+					img {
 						width: 18px;
 						margin-right: 10px;
 					}
 				}
-				.footprint{
-					
+
+				.footprint {
+
 					margin: 15px 0;
-					img{
+
+					img {
 						width: 22px;
 						margin-right: 10px;
 					}
 				}
 			}
-			.like_box{
+
+			.like_box {
 				margin-top: 52px;
-				.like{
-					i{
+
+				.like {
+					i {
 						font-size: 28px;
 						margin-right: 10px;
 						color: #999;
-						
+
 					}
-					.active{
+
+					.active {
 						color: #ff523d;
 					}
-					span{
+
+					span {
 						font-size: 22px;
 						color: #666;
 					}
 				}
-				.like_people{
-					padding:20px 0 30px 0;
-					.likeHeadImg{
+
+				.like_people {
+					padding: 20px 0 30px 0;
+
+					.likeHeadImg {
 						width: 90px;
 						height: 90px;
 						border-radius: 50%;
-						background:#ffdfdf;
-						img{
+						background: #ffdfdf;
+
+						img {
 							width: 100%;
 							height: 100%;
 							border-radius: 50%;
 						}
 					}
-					.active{
+
+					.active {
 						background: #e8e8e8;
-						div{
+
+						div {
 							width: 50px;
 							height: 10px;
-							span{
-								height: 6px;/*no*/
-								width: 6px;/*no*/
+
+							span {
+								height: 6px;
+								/*no*/
+								width: 6px;
+								/*no*/
 								border-radius: 50px;
 								background: #999999;
 							}
 						}
-						
+
 					}
 				}
 			}
 		}
-		.trend_comment{
-			.title{
+
+		.trend_comment {
+			.title {
 				height: 70px;
-				border-bottom: 1px solid #e8e8e8;/*no*/
+				border-bottom: 1px solid #e8e8e8;
+				/*no*/
 				padding: 0 20px;
 				box-sizing: border-box;
-				.title_l{
+
+				.title_l {
 					height: 70px;
-					width: 106px;	
-					border-bottom: 1px solid #ff523d;/*no*/
+					width: 106px;
+					border-bottom: 1px solid #ff523d;
+					/*no*/
 					box-sizing: border-box;
 					color: #ff523d;
 					font-size: 26px;
 				}
-				.title_r{
+
+				.title_r {
 					width: 100px;
-					img{
+
+					img {
 						width: 40px;
 						margin-right: 10px;
 					}
-					span{
+
+					span {
 						font-size: 26px;
 						color: #666;
 					}
 				}
 			}
-			.comment_list{
+
+			.comment_list {
 				height: 300px;
-				ul{
+
+				ul {
 					padding: 0 20px;
-					li{
+
+					li {
 						padding: 30px 0;
 						box-sizing: border-box;
-						border-bottom: 1px solid #e8e8e8;/*no*/;
+						border-bottom: 1px solid #e8e8e8;
+						/*no*/
+						;
 						align-items: flex-start;
-						.list_l{
+
+						.list_l {
 							height: 90px;
 							width: 90px;
 							border-radius: 50%;
 							background: #ffdfdf;
 							border-radius: 50%;
-							img{
+
+							img {
 								display: block;
 								width: 100%;
 								height: 100%;
 								border-radius: 50%;
 							}
 						}
-						.list_mid{
+
+						.list_mid {
 							width: 430px;
-							.userName{
+
+							.userName {
 								font-size: 28px;
 								color: #333;
 								line-height: 54px;
 							}
-							.comment_cent{
+
+							.comment_cent {
 								font-size: #000;
 								font-size: 26px;
 								line-height: 54px;
 							}
 						}
-						.list_r{
+
+						.list_r {
 							font-size: 22px;
 							color: #999;
-							width:130px;
+							width: 130px;
 						}
 					}
-					li:last-child{
+
+					li:last-child {
 						border: none;
 					}
 				}
 			}
-			.send_comment{
+
+			.send_comment {
 				padding: 20px;
 				box-sizing: border-box;
 				border-top: 1px solid #ff523d;
-				input{
+
+				input {
 					padding: 15px;
 					border-radius: 40px;
-					border: 1px solid #e8e8e8;/*no*/
+					border: 1px solid #e8e8e8;
+					/*no*/
 					font-size: 26px;
 					color: #333;
 					width: 600px;
 					box-sizing: border-box;
 				}
-				.send_btn{
+
+				.send_btn {
 					font-size: 26px;
 					color: #999;
 				}

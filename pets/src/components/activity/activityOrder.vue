@@ -97,7 +97,8 @@
 				userName: '',
 				code:'',
 				environment:'',
-				activeIndex:'2'
+				activeIndex:'2',
+				cAId:''
 			}
 		},
 		mounted() {
@@ -125,6 +126,7 @@
 					}).then((res)=>{
 						if(res.data.code == 1){
 							let d = res.data.data;
+							self.cAId = d.cAId;
 							self.activityImg = d.communityActivityVo.activityCover;
 							self.addr = d.communityActivityVo.activityAddr;
 							self.typeName = d.communityActivityVo.typeName;
@@ -259,7 +261,10 @@
 							'paySign':res.data.data.paySign
 						}, function(res) {
 							if (res.err_msg === 'get_brand_wcpay_request:ok') {
-								alert('支付成功，返回订单列表！');
+								alert('支付成功，返回活动详情页！');
+								setTimeout(()=>{
+									window.location.href = 'http://192.168.0.119:8081/activity?id='+self.cAId;
+								},500)
 							} else if (res.err_msg === 'get_brand_wcpay_request:cancel') {
 								alert('取消支付！');
 							}else if(res.err_msg === 'get_brand_wcpay_request:fail'){

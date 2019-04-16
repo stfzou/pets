@@ -1,5 +1,6 @@
 <template>
 	<div class="activity_warp">
+		<DownApp v-on:closeDown="closeDown" v-show="isDown"></DownApp>
 		<div class="top_nav flex_r_s_b" :class="{active_nav:isActiveColor}">
 			<div class="back" @click="back"></div>
 			<div class="nav_title">{{activityTitle}}</div>
@@ -100,7 +101,7 @@
 </template>
 
 <script>
-	
+	import DownApp from '../common/downApp.vue'
 	import Api from '../common/apj.js'
 	export default{
 		data(){
@@ -138,12 +139,18 @@
 				},
 				collectionImg:'',
 				isCollection:'',
-				uId:'-1'
+				uId:'-1',
+				isDown:true
 				
 			}
 		},
+		components:{
+			DownApp
+		},
 		mounted() {
-		
+			let self = this;
+			window.addEventListener('scroll', self.handleScroll)
+			
 			this.getUrlData();
 			if(JSON.parse(sessionStorage.getItem('user')) == null){
 				// this.$store.commit('setRouterName','activity');
@@ -155,10 +162,13 @@
 			// console.log(JSON.parse(sessionStorage.getItem('user')))
 			this.getActivity();
 			this.getEval();
-			window.addEventListener('scroll', this.handleScroll)
+			
 			
 		},
 		methods:{
+			closeDown(){
+				this.isDown = false;
+			},
 			back() {
 				this.$router.go(-1); //返回上一层
 			},
@@ -190,13 +200,21 @@
 			  },
 	
 			handleScroll () {
+				
 				setTimeout(()=>{
 					var scrollTop = window.scrollY;
 					let elHeight = document.querySelector(".activity_filter").offsetHeight;
 					if(scrollTop>elHeight){
+						
 						this.isActiveColor = true;
 					}else{
 						this.isActiveColor = false;
+						
+					}
+					if(scrollTop>0){
+						this.isDown = false;
+					}else{
+						this.isDown = true;
 					}
 				},200)
 			  
