@@ -26,11 +26,11 @@
 					<div class="title flex_r_s_b">
 						<span class="cancel" @click.stop="maskHide">取消</span>
 						<span class="mid">举报</span>
-						<span class="confirm">确定</span>
+						<span class="confirm" @click="report">确定</span>
 					</div>
 					<ul class="report_list">
 						<li v-for="(item,index) in reportData">
-							<div @click="selectReport(index)" class="flex_r_s_c" :class="{active:index == activeIndex}">{{item}}</div>
+							<div @click="selectReport(item,index)" class="flex_r_s_c" :class="{active:index == activeIndex}">{{item}}</div>
 						</li>
 					</ul>
 				</div>
@@ -49,14 +49,17 @@
 			<div class="text_cnt">
 				{{content}}
 			</div>
-			<div class="trend_img">
+			<div class="trend_img" v-show="images.length>0">
 				<!-- <img :src="item" alt="" v-for="(item,index) in images" :key="index"> -->
 				<div class="imgs-container flex_r_s_b">
-					<img :src="img" v-for="(img, index) in images" :key="img" @click="handleImgsClick(index)">
+					<div class="img-box" v-for="(img,index) in images" :key="img">
+						<img :src="img" @click="handleImgsClick(index)">
+					</div>
+					
 				</div>
 			</div>
 			<div class="trend_label">
-				<div class="addr flex_r_f_s"><img src="../../assets/icon/map@2x.png" alt=""><span>{{geoLocation}}</span></div>
+				<div class="addr flex_r_f_s" v-if="geoLocation!=''"><img src="../../assets/icon/map@2x.png" alt=""><span>{{geoLocation}}</span></div>
 				<!-- <div class="footprint flex_r_f_s"><img src="../../assets/footprint.png" alt=""><span>胖太</span></div>
 				<div class="explain">#异瞳#</div> -->
 			</div>
@@ -94,7 +97,7 @@
 					<span>{{lookCount}}</span>
 				</div>
 			</div>
-			<div class="comment_list" v-if="dynamicComments.length>0">
+			<div class="comment_list">
 				<cube-scroll ref="scroll" @pulling-up="onPullingUp" @pulling-down="onPullingDown" :options="options">
 					<ul>
 						<li class="flex_r_s_b" v-for="(item,index) in dynamicComments">
@@ -111,7 +114,8 @@
 					</ul>
 				</cube-scroll>
 			</div>
-			<div class="tx" v-else>暂无评论</div>
+			<!-- <div class="tx" v-else>暂无评论</div> -->
+			<!-- v-if="dynamicComments.length>0" -->
 			<div class="send_comment flex_r_s_b">
 				<input type="text" @blur.prevent="inputLoseFocus" v-model="val" placeholder="添加一条评论" />
 				<div class="send_btn" @click="addComment">发送</div>
@@ -166,17 +170,22 @@
 				userId: -1,
 				isDown: true,
 				imgSlide: [],
-				initialIndex:0
+				initialIndex:0,
+				reportText:'垃圾营销',
+				byReportUserId:'',
+				petId:''
 
 			}
 
 		},
 		mounted() {
-
+			
+			let h = document.documentElement.clientHeight - document.querySelector(".title").offsetTop;
+			let bottomH = document.querySelector(".send_comment").offsetHeight;
+			document.querySelector(".comment_list").style.height = (h-bottomH-100)+'px';
 			if (JSON.parse(sessionStorage.getItem('user')) != null) {
 				this.userId = JSON.parse(sessionStorage.getItem('user')).userId;
 			}
-			console.log(JSON.parse(sessionStorage.getItem('user')) != null)
 			this.getUrlData();
 			this.getTrend();
 			this.getComment();
@@ -249,8 +258,9 @@
 				this.isReport = false;
 				this.isMask = true;
 			},
-			selectReport(index) {
+			selectReport(item,index) {
 				this.activeIndex = index;
+				this.reportText = item;
 			},
 			share() {
 				this.isMask = false
@@ -269,14 +279,14 @@
 					}
 				})
 			},
-			goLogin() {
+			goLogin(msg) {
 				let self = this;
 				let url = window.location.href;
 				this.$store.commit('setLoginUrl', url);
 				this.$createDialog({
 					type: 'confirm',
 					icon: 'cubeic-warn',
-					title: '需要登录后才能评论',
+					title:msg,
 					confirmBtn: {
 						text: '去登录',
 						active: true,
@@ -314,8 +324,9 @@
 					if (res.data.code == 1) {
 						self.userName = res.data.data.userName;
 						self.geoLocation = res.data.data.geoLocation;
-						self.images = res.data.data.images.split(',');
-						
+						if(res.data.data.images!=''){
+							self.images = res.data.data.images.split(',');
+						}
 						self.time = res.data.data.createdTime.split(' ')[0];
 						self.userHeadImage = res.data.data.userHeadImage;
 						self.content = res.data.data.content;
@@ -333,7 +344,8 @@
 						self.authorId = res.data.data.userId;
 						self.dynamicId = res.data.data.dynamicId;
 						self.isLike = res.data.data.isLike;
-
+						self.byReportUserId = res.data.data.userId;
+						self.petId = res.data.data.petId;
 					} else {
 						alert(res.data.msg)
 					}
@@ -362,7 +374,7 @@
 								self.$refs.scroll.forceUpdate();
 							}, 800)
 						}
-						console.log(res.data.data)
+						
 
 						// console.log(res)
 					} else {
@@ -422,7 +434,10 @@
 						}
 
 					} else {
-						self.$refs.scroll.forceUpdate();
+						setTimeout(() => {
+							self.$refs.scroll.forceUpdate();
+							
+						}, 500)
 						alert(res.data.msg)
 					}
 				})
@@ -430,7 +445,7 @@
 			},
 			addComment() {
 				if (this.userId == -1) {
-					this.goLogin()
+					this.goLogin('登录后才能评论')
 				} else {
 					let self = this;
 					if (self.val == '') {
@@ -474,14 +489,16 @@
 
 			},
 			clikeLike() {
+				
 				if (this.userId == -1) {
-					this.goLogin();
+					this.goLogin('登录后才能点赞');
 				} else {
 					let self = this;
 					this.axios.post(Api.trendApi + '/community/likeDynamic', this.qs.stringify({
-						byLikeUserId: self.authorId,
+						byLikeUserId:self.byReportUserId,
 						dynamicId: self.dynamicId,
-						userId: self.userId
+						userId: self.userId,
+						petId:self.petId
 					}), {
 						headers: {
 							'Content-Type': 'application/x-www-form-urlencoded'
@@ -519,7 +536,7 @@
 			},
 			follow() {
 				if (this.userId == -1) {
-					this.goLogin();
+					this.goLogin('登录后才能关注');
 				} else {
 					let self = this;
 					this.axios.post(Api.trendApi + '/community/focusUser', this.qs.stringify({
@@ -565,6 +582,37 @@
 						alert(res.data.msg)
 					}
 				})
+			},
+			report(){
+				if (this.userId == -1) {
+					this.isMask = false;
+					this.goLogin('登录后才举报');
+					
+				}else{
+					let self = this;
+					this.axios.post(Api.trendApi + '/community/reportDynamic', this.qs.stringify({
+						userId:self.userId,
+						dynamicId:self.dynamicId,
+						reportReason:self.reportText,
+						byReportUserId:self.byReportUserId
+					}), {
+						headers: {
+							'Content-Type': 'application/x-www-form-urlencoded'
+						}
+					}).then((res)=>{
+						if(res.data.code == 1){
+							let toast = this.$createToast({
+								txt: '举报成功',
+								type: 'correct'
+							  })
+							toast.show();
+							self.isMask = false;
+						}else{
+							alert(res.data.msg)
+						}
+					})
+				}
+				
 			}
 		}
 	}
@@ -573,7 +621,6 @@
 <style lang="scss">
 	.trend_warp {
 		padding-top: 88px;
-
 		.tx {
 			font-size: 28px;
 			padding: 30px 20px;
@@ -764,13 +811,25 @@
 			.trend_img {
 				.imgs-container{
 					flex-wrap: wrap;
-					img {
+					.img-box{
 						width: 216px;
 						height: 216px;
-						// display: block;
+						position: relative;
+						overflow: hidden;
+						
 						margin-bottom: 10px;
 						border-radius: 4px;
+						img {
+							
+							width: 100%;
+							position: absolute;
+							top: 0;
+							left: 0;
+							// display: block;
+							
+						}
 					}
+					
 				}
 				
 
@@ -955,10 +1014,15 @@
 			}
 
 			.send_comment {
-				padding: 20px;
+				padding:0 20px;
+				height: 104px;
 				box-sizing: border-box;
 				border-top: 1px solid #ff523d;
-
+				position: fixed;
+				background: #fff;
+				z-index: 100;
+				bottom: 0;
+				left: 0;
 				input {
 					padding: 15px;
 					border-radius: 40px;

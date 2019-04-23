@@ -27,7 +27,10 @@ import ActivityEnter from '@/components/activity/activityEnter'
 import ActivityOrder from '@/components/activity/activityOrder'
 import Trend from '@/components/activity/trend'
 import Praise from '@/components/activity/praise'
-
+import DynamicHome from '@/components/activity/dynamicHome'
+import Dynamic from '@/components/activity/dynamic'
+import AuthorActivity from '@/components/activity/authorActivity'
+import AuthorPets from '@/components/activity/authorPets'
 
 Vue.use(Router)
 export default new Router({
@@ -41,6 +44,28 @@ export default new Router({
 			path:'/vLogin',
 			name:'vLogin',
 			component:vLogin,
+		},
+		{
+			path:'/dynamicHome',
+			name:'dynamicHome',
+			component:DynamicHome,
+			children:[
+				{
+					path:'dynamic',
+					component:Dynamic,
+					name:'dynamic'
+				},
+				{
+					path:'authorActivity',
+					component:AuthorActivity,
+					name:'authorActivity'
+				},
+				{
+					path:'authorPets',
+					component:AuthorPets,
+					name:'authorPets'
+				}
+			]
 		},
 		{
 			path:'/activity',

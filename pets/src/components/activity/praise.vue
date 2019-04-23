@@ -2,7 +2,7 @@
 	<div class="praise_warp">
 		<div class="top_nav flex_r_s_b">
 			<div class="back" @click="back"></div>
-			<div class="nav_title">32人点赞</div>
+			<div class="nav_title"><span v-if="likeData.length">{{likeData.length}}</span><span v-else>0</span>人点赞</div>
 		</div>
 		<div class="praise_cnt">
 			<cube-scroll ref="scroll">
@@ -40,6 +40,7 @@
 </script>
 
 <style lang="scss">
+	
 	.praise_warp{
 		.line{
 			height: 10px;
