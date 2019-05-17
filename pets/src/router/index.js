@@ -31,6 +31,19 @@ import DynamicHome from '@/components/activity/dynamicHome'
 import Dynamic from '@/components/activity/dynamic'
 import AuthorActivity from '@/components/activity/authorActivity'
 import AuthorPets from '@/components/activity/authorPets'
+import Answer from '@/components/answer/answer'
+import AnswerOne from '@/components/answer/answerOne'
+import WorkOsLogin from '@/components/workOs/workOsLogin'
+import WorkOsInfoList from '@/components/workOs/workOsInfoList'
+import WorkOsCustomer from '@/components/workOs/workOsCustomer'
+import WorkOsMap from '@/components/workOs/workOsMap'
+import AddCustomer from '@/components/workOs/AddCustomer'
+import WorkOsChangePw from '@/components/workOs/workOsChangePw'
+import StaffInfo from '@/components/workOs/staffInfo'
+import AddStaff from '@/components/workOs/addStaff'
+import EditStaff from '@/components/workOs/editStaff'
+
+
 
 Vue.use(Router)
 export default new Router({
@@ -44,6 +57,67 @@ export default new Router({
 			path:'/vLogin',
 			name:'vLogin',
 			component:vLogin,
+		},
+		{
+			path:'/answer',
+			name:'answer',
+			component:Answer,
+			children:[
+				{
+					path:'answerOne',
+					component:AnswerOne,
+					name:'answerOne'
+				}
+				
+			]
+		},
+		{
+			path:'/workOsLogin',
+			name:'workOsLogin',
+			component:WorkOsLogin,
+		},
+		{
+			path:'/staffInfo',
+			name:'staffInfo',
+			component:StaffInfo,
+		},
+		{
+			path:'/addStaff',
+			name:'addStaff',
+			component:AddStaff,
+		},
+		{
+			path:'/editStaff',
+			name:'editStaff',
+			component:EditStaff
+		},
+		{
+			path:'/workOsChangePw',
+			name:'workOsChangePw',
+			component:WorkOsChangePw,
+		},
+		{
+			path:'/workOsInfoList',
+			name:'workOsInfoList',
+			component:WorkOsInfoList,
+			
+		},
+		{
+			path:'/addCustomer',
+			name:'addCustomer',
+			component:AddCustomer
+		},
+		{
+			path:'/workOsCustomer',
+			name:'workOsCustomer',
+			component:WorkOsCustomer,
+			
+		},
+		{
+			path:'/workOsMap',
+			name:'workOsMap',
+			component:WorkOsMap,
+			
 		},
 		{
 			path:'/dynamicHome',

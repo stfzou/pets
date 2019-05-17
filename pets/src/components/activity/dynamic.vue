@@ -7,8 +7,8 @@
 					<div class="item-box">
 						<div class="authorInfo flex_r_f_s">
 							<div class="author-img">
-								<img src="../../assets/head_icon.png" alt="">
-								<div class="author-vip">V</div>	
+								<img :src="item.userHeadImage" alt="">
+								<div class="author-vip flex_r_s_c">V</div>	
 							</div>
 							<div class="authorNameBox">
 								<div class="author-name">自由犬</div>
@@ -17,7 +17,7 @@
 						</div>
 						<div class="author-cnt">
 							<div class="text_cnt">
-								打客服即可的接口龙卷风的公交卡发到你了，没工夫管理费，kgflkglfkglfkglkf
+								{{item.content}}
 							</div>
 							<div class="trend_img" v-show="item.images!=''">
 								<!-- <img :src="item" alt="" v-for="(item,index) in images" :key="index"> -->
@@ -29,9 +29,9 @@
 								</div>
 							</div>
 						</div>
-						<div class="addr flex_r_f_s"><img src="../../assets/icon/map@2x.png" alt=""><span>成都市春熙路电饭锅电饭锅</span></div>
+						<div class="addr flex_r_f_s"><img src="../../assets/icon/map@2x.png" alt=""><span>{{item.geoLocation}}</span></div>
 						<div class="item-foot flex_r_f_e">
-							<div class="dynamic-pj flex_r_s_c">
+							<div class="dynamic-pj flex_r_s_c" @click="dynamicXq(item)">
 								<img src="../../assets/icon_xiaox.png" alt="">
 								<span>{{item.commentCount}}</span>
 							</div>
@@ -87,31 +87,12 @@
 				this.userId = JSON.parse(sessionStorage.getItem('user')).userId;
 			}
 			this.getHeight();
-			this.getDynamicOne();
+			setTimeout(()=>{
+				this.getDynamic();
+			},100)
+			
 		},
 		methods:{
-			getDynamicOne(){
-				let self = this;
-				self.axios.get(Api.trendApi + '/community/selectDynamicByUserId', {
-					params: {
-						beLookUserId: 24,
-						lookUserId:self.userId,
-						page:1,
-						rows:5
-					}
-				}, {
-					headers: {
-						'Content-Type': 'application/x-www-form-urlencoded'
-					}
-				}).then((res)=>{
-					if(res.data.code == 1){
-						self.dynamicList = res.data.data;
-						console.log(res.data.data)
-					}else{
-						alert(res.data.msg);
-					}
-				})
-			},
 			handleImgsClick(imges,index) {
 				this.initialIndex = index
 				const params = {
@@ -140,7 +121,7 @@
 				let self = this;
 				self.axios.get(Api.trendApi + '/community/selectDynamicByUserId', {
 					params: {
-						beLookUserId: 24,
+						beLookUserId: JSON.parse(sessionStorage.getItem('Aid')),
 						lookUserId:self.userId,
 						page:1,
 						rows:5
@@ -151,9 +132,12 @@
 					}
 				}).then((res)=>{
 					if(res.data.code == 1){
-						
+						console.log(res)
 						setTimeout(()=>{
 							self.dynamicList = res.data.data;
+							self.dynamicList.forEach((e)=>{
+								e.content = self.decodeUnicode(e.content)
+							})
 							self.$refs.scroll.forceUpdate();
 							self.$refs.scroll.refresh();
 						},500)
@@ -174,7 +158,7 @@
 				this.page++;
 				self.axios.get(Api.trendApi + '/community/selectDynamicByUserId', {
 					params: {
-						beLookUserId: 24,
+						beLookUserId: JSON.parse(sessionStorage.getItem('Aid')),
 						lookUserId:self.userId,
 						page:self.page,
 						rows:5
@@ -190,6 +174,7 @@
 							setTimeout(()=>{
 								self.$refs.scroll.forceUpdate();
 								res.data.data.forEach((e)=>{
+									e.content = self.decodeUnicode(e.content)
 									self.dynamicList.push(e)
 								});
 								setTimeout(()=>{
@@ -286,6 +271,18 @@
 					}
 				})
 			},
+			dynamicXq(item){
+				this.$router.push({
+					name:'trend',
+					query:{
+						dynamicId:item.dynamicId
+					}
+				})
+			},
+			decodeUnicode(str) {
+				str = str.replace(/\\/g, "%");
+				return unescape(str);
+			}
 			
 		}
 	}
@@ -321,6 +318,7 @@
 								position: absolute;
 								bottom: -3px;
 								right: -3px;
+								font-size: 14px;
 							}
 						}
 						.authorNameBox{

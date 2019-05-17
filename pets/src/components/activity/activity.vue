@@ -174,7 +174,8 @@
 			},
 			inputLoseFocus() {
 				setTimeout(() => {
-				  window.scrollTo(0,0);
+				  const scrollHeight = document.documentElement.scrollTop || document.body.scrollTop || 0;
+					window.scrollTo(0, Math.max(scrollHeight - 1, 0));
 				},100);
 				
 			},
@@ -235,6 +236,10 @@
 							setTimeout(() => {
 								
 								self.evalList = res.data.data.doList;
+								self.evalList.forEach((e)=>{
+									e.content = self.decodeUnicode(e.content);
+								})
+								
 								self.commentNum = res.data.data.commentNum;
 							}, 500)
 						}
@@ -252,9 +257,10 @@
 				let self = this;
 				this.$router.push({
 					name:'activityMap',
-					params:{
+					query:{
 						lat:self.lat,
-						lng:self.lng
+						lng:self.lng,
+						name:self.activityAddr
 					}
 				})
 			},
@@ -341,6 +347,7 @@
 							setTimeout(()=>{
 								self.$refs.scroll.forceUpdate();
 								res.data.data.doList.forEach((e)=>{
+									e.content = self.decodeUnicode(e.content);
 									self.evalList.push(e)
 								})
 								
@@ -532,6 +539,10 @@
 					type: 'warn'
 				  })
 				toast.show()
+			},
+			decodeUnicode(str) {
+				str = str.replace(/\\/g, "%");
+				return unescape(str);
 			}
 		}
 	
@@ -650,13 +661,13 @@
 				}
 				
 				.richeng{
-					background: url("../../assets/icon_richeng.png") no-repeat 100% center;
+					background: url("../../assets/icon/icon_she55@3x.png") no-repeat 100% center;
 					background-size: 22px;
 				}
 				.right_sjx{
 					
-					background: url("../../assets/icon/right_sjx.png") no-repeat 100% center;
-					background-size: 14px;
+					background: url("../../assets/icon/icon_she56@3x.png") no-repeat 100% center;
+					background-size: 24px;
 					margin: 35px 0;
 				}
 			}

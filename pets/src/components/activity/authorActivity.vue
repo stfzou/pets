@@ -23,7 +23,7 @@
 							<div class="price" v-if="item.minPrice == null">免费</div>
 							<div class="price" v-else>{{item.minPrice}}</div>
 							<!-- <a href="###" class="flex_r_s_c">立即报名</a> -->
-							<router-link :to="{name:'activity',query:{id:1}}"></router-link>
+							<router-link class="flex_r_s_c" :to="{name:'activity',query:{id:item.id}}">立即报名</router-link>
 						</div>
 					</div>
 				</div>
@@ -33,9 +33,8 @@
 			<cube-loading :size="30"></cube-loading>
 		</div>
 		<div class="amap-page-container" v-show="false">
-			<el-amap ref="map" vid="amapDemo" :plugin="plugin" class="amap-demo">
-			</el-amap>
-
+			<el-amap ref="map" vid="amapDemo" :plugin="plugin" class="amap-demo"></el-amap>
+			
 		</div>
 	</div>
 </template>
@@ -112,7 +111,7 @@
 			getActivityListOne() {
 				let self = this;
 				self.axios.post(Api.userApi + '/ca/selectCommunityActivityListByUserId', self.qs.stringify({
-					userId: 33,
+					userId: JSON.parse(sessionStorage.getItem('Aid')),
 					pageNo: 0,
 					pageSize: 5,
 					latitude: self.lat,
@@ -124,6 +123,7 @@
 				}).then((res) => {
 					if (res.data.code == 1) {
 						self.activityList = res.data.data;
+						console.log(self.activityList)
 						setTimeout(() => {
 							self.$refs.scroll.refresh();
 						}, 500)
@@ -136,7 +136,7 @@
 			getActivityList() {
 				let self = this;
 				self.axios.post(Api.userApi + '/ca/selectCommunityActivityListByUserId', self.qs.stringify({
-					userId: 33,
+					userId: JSON.parse(sessionStorage.getItem('Aid')),
 					pageNo: 0,
 					pageSize: 5,
 					latitude: self.lat,
@@ -166,11 +166,9 @@
 			onPullingUp() {
 			// 模拟更新数据
 				let self = this;
-				
 				this.page++;
-				console.log(this.page)
 				self.axios.post(Api.userApi + '/ca/selectCommunityActivityListByUserId', self.qs.stringify({
-					userId: 33,
+					userId: JSON.parse(sessionStorage.getItem('Aid')),
 					pageNo: self.page,
 					pageSize: 5,
 					latitude: self.lat,

@@ -21,7 +21,8 @@
 					</div>
 					<div class="fansBox flex_r_s_b">
 						<div class="fansNum flex_r_s_b">
-							<span>骨粉{{fansCount}}</span><div class="shuxian"></div><span class="followNum">关注{{focusCount}}</span>
+							<span>骨粉{{fansCount}}</span>
+							<div class="shuxian"></div><span class="followNum">关注{{focusCount}}</span>
 						</div>
 						<div class="gumiNum">骨米号:{{userNo}}</div>
 					</div>
@@ -29,7 +30,7 @@
 			</div>
 		</div>
 		<div class="dynamicNav flex_r_f_e">
-			
+
 			<router-link :to="{name:'dynamic'}" class="flex_r_s_c">
 				<span>TA的动态</span>
 				<div class="hx"></div>
@@ -51,45 +52,45 @@
 
 <script>
 	import Api from '../common/apj.js'
-	export default{
-		data(){
-			return{
-				fansCount:'',
-				focusCount:'',
-				isFocus:'',
-				isOneself:'',
-				userHeadImage:'',
-				userName:'',
-				userNo:'',
-				styleImg:'',
-				userId:-1,
-				targetUserId:''
-				
+	export default {
+		data() {
+			return {
+				fansCount: '',
+				focusCount: '',
+				isFocus: '',
+				isOneself: '',
+				userHeadImage: '',
+				userName: '',
+				userNo: '',
+				styleImg: '',
+				userId: -1,
+				aId: ''
+
 			}
 		},
 		mounted() {
-			
+
 			if (JSON.parse(sessionStorage.getItem('user')) != null) {
 				this.userId = JSON.parse(sessionStorage.getItem('user')).userId;
 			}
+			this.getUrlData();
 			this.getAuthorInfo();
 			// console.log(window.location.href)
 		},
-		methods:{
-			getAuthorInfo(){
+		methods: {
+			getAuthorInfo() {
 				let self = this;
-				
 				self.axios.get(Api.trendApi + '/userCenter/selectUserCenterByUserId', {
 					params: {
-						beLookUserId: 31,
+						beLookUserId: JSON.parse(sessionStorage.getItem('Aid')),
 						lookUserId: self.userId
 					}
 				}, {
 					headers: {
 						'Content-Type': 'application/x-www-form-urlencoded'
 					}
-				}).then((res)=>{
-					if(res.data.code == 1){
+				}).then((res) => {
+					if (res.data.code == 1) {
 						self.fansCount = res.data.data.fansCount;
 						self.focusCount = res.data.data.focusCount;
 						self.isFocus = res.data.data.isFocus;
@@ -98,27 +99,26 @@
 						self.userName = res.data.data.userName;
 						self.userNo = res.data.data.userNo;
 						self.styleImg = res.data.data.styleImg;
-						self.targetUserId = res.data.data.userId;
-						console.log(res.data.data)
+						console.log(res.data)
 					}
 				})
 			},
 			follow() {
-				
+
 				if (this.userId == -1) {
 					this.goLogin('登录后才能关注');
-				}else if(this.isOneself){
+				} else if (this.isOneself) {
 					let toast = this.$createToast({
 						txt: '不能关注自己',
 						type: 'warn'
 					})
 					toast.show();
 					return false;
-				}else {
+				} else {
 					let self = this;
-					
+
 					this.axios.post(Api.trendApi + '/community/focusUser', this.qs.stringify({
-						targetUserId: self.targetUserId,
+						targetUserId: JSON.parse(sessionStorage.getItem('Aid')),
 						userId: self.userId
 					}), {
 						headers: {
@@ -137,12 +137,12 @@
 						}
 					})
 				}
-			
+
 			},
 			cancelFollow() {
 				let self = this;
 				this.axios.post(Api.trendApi + '/community/cancelFocusUser', this.qs.stringify({
-					targetUserId: self.targetUserId,
+					targetUserId:  JSON.parse(sessionStorage.getItem('Aid')),
 					userId: self.userId
 				}), {
 					headers: {
@@ -168,7 +168,7 @@
 				this.$createDialog({
 					type: 'confirm',
 					icon: 'cubeic-warn',
-					title:msg,
+					title: msg,
 					confirmBtn: {
 						text: '去登录',
 						active: true,
@@ -185,11 +185,30 @@
 						self.$router.push({
 							name: 'login'
 						})
-			
+
 					},
-			
+
 				}).show()
-			
+
+			},
+			getUrlData() { // 截取url中的数据
+
+				let tempStr = window.location.href
+				/**
+				 * tempArr 是一个字符串数组 格式是["key=value", "key=value", ...]
+				 */
+				let tempArr = tempStr.split('?')[1] ? tempStr.split('?')[1].split('&') : []
+				/**
+				 * returnArr 是要返回出去的数据对象 格式是 { key: value, key: value, ... }
+				 */
+				let returnArr = {}
+				tempArr.forEach(element => {
+					returnArr[element.split('=')[0]] = element.split('=')[1]
+				})
+				/*输出日志*/
+				if(returnArr.aId!=undefined){
+					sessionStorage.setItem('Aid',JSON.stringify(returnArr.aId));
+				}
 			},
 		},
 	}
@@ -197,44 +216,53 @@
 
 <style lang="scss">
 	@import '../../style/common.scss';
-	.dynamicHome{
-		.top{
+
+	.dynamicHome {
+		.top {
 			padding: 0 20px 0 20px;
 			box-sizing: border-box;
 			height: 88px;
 			position: fixed;
 			top: 0;
 			left: 0;
-			.back{
+
+			.back {
 				width: 26px;
 			}
-			.share{
+
+			.share {
 				width: 50px;
 			}
 		}
-		.topBg{
-			background: rgba(0,0,0,0.3);
+
+		.topBg {
+			background: rgba(0, 0, 0, 0.3);
 		}
-		.post{
+
+		.post {
 			height: 360px;
-			background:#FFDFDF;
-			background-size:100%;
+			background: #FFDFDF;
+			background-size: 100%;
 			position: relative;
 			overflow: hidden;
-			img{
+
+			img {
 				width: 100%;
 				display: block;
 			}
 		}
-		.userInfoBox{
+
+		.userInfoBox {
 			border: 1px solid #fff;
 			padding-left: 30px;
-			.userInfo{
+
+			.userInfo {
 				padding-left: 20px;
 				height: 140px;
 				margin-top: -69px;
 				position: relative;
-				.headImg{
+
+				.headImg {
 					position: absolute;
 					left: 0;
 					top: 0;
@@ -242,12 +270,14 @@
 					width: 140px;
 					border-radius: 50%;
 					z-index: 100;
-					.hPic{
+
+					.hPic {
 						width: 100%;
 						height: 100%;
 						border-radius: 50%;
 					}
-					.rank{
+
+					.rank {
 						height: 34px;
 						width: 34px;
 						border-radius: 50%;
@@ -260,42 +290,51 @@
 						font-size: 28px;
 					}
 				}
-				.userInfo-r{
-					.userName{
+
+				.userInfo-r {
+					.userName {
 						box-sizing: border-box;
 						height: 68px;
-						background: rgba(0,0,0,0.3);
+						background: rgba(0, 0, 0, 0.3);
 						padding-left: 160px;
 						padding-right: 30px;
-						.name{
+
+						.name {
 							font-size: 30px;
 							color: #fff;
 						}
-						.follow{
+
+						.follow {
 							width: 100px;
 							height: 40px;
-							border-radius:6px;
-							border: 1px solid #fff;/*px*/
+							border-radius: 6px;
+							border: 1px solid #fff;
+							/*px*/
 							font-size: 24px;
 							color: #fff;
 						}
 					}
-					.fansBox{
+
+					.fansBox {
 						padding-left: 160px;
 						padding-right: 18px;
 						height: 72px;
 						box-sizing: border-box;
-						.fansNum{
+
+						.fansNum {
 							width: 250px;
 							font-size: 24px;
 							color: #333;
-							.shuxian{
+
+							.shuxian {
 								height: 33px;
-								width: 1px;/*no*/
+								width: 1px;
+								/*no*/
 								background: #333;
 							}
 						}
-						.gumiNum{
+
+						.gumiNum {
 							font-size: 24px;
 							color: #333;
 						}
@@ -303,15 +342,19 @@
 				}
 			}
 		}
-		.dynamicNav{
+
+		.dynamicNav {
 			margin-top: 20px;
-			border-bottom: 1px solid #e8e8e8;/*no*/
-			a{
+			border-bottom: 1px solid #e8e8e8;
+
+			/*no*/
+			a {
 				font-size: 28px;
 				color: #000;
 				height: 70px;
 				position: relative;
-				.hx{
+
+				.hx {
 					width: 84px;
 					height: 4px;
 					background: #ff523d;
@@ -322,14 +365,16 @@
 					display: none;
 				}
 			}
-			.router-link-active{
+
+			.router-link-active {
 				color: #ff523d;
-				.hx{
+
+				.hx {
 					display: block;
 				}
 			}
-			
+
 		}
-		
+
 	}
 </style>

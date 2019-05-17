@@ -48,7 +48,8 @@
 			},
 			inputLoseFocus() {
 				setTimeout(() => {
-				  window.scrollTo(0,0);
+				  const scrollHeight = document.documentElement.scrollTop || document.body.scrollTop || 0;
+					window.scrollTo(0, Math.max(scrollHeight - 1, 0));
 				},100);
 				
 			},

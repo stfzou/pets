@@ -21,32 +21,40 @@
 		<div class="couponList">
 			<ul>
 				<li :class="{active:index == activeIndex}" v-for="(item,index) in ticketList" @click="selectTicket(item,index)">
-					<img class="select" src="../../assets/icon/selectCoupon.png" alt="" v-if="index == activeIndex">
-					<div class="couponName">{{item.ticketName}}</div>
-					<div class="couponBox flex_r_s_b">
-						<div class="couponBox_l">
-							<div class="price" v-if="item.ticketType == 1">￥{{item.ticketPrice}}</div>
-							<div class="price" v-else="">￥0</div>
-							<div class="couponNum">
-								<span class="sy">剩余{{item.ticketNum-item.sellNum}}张</span>
-								<span>每人限购{{item.limitNum}}张</span>
-							</div>
-							<div class="special_tx">
-								{{item.ticketDescription}}
-							</div>
-							<div class="tx">【购买此票券需经过主办方审核】</div>
-						</div>
-						<div class="couponBox_r">
-							<div class="num_box flex_r_f_s">
-								<div class="add flex_r_s_c" style="width: 33.333%;" @click.stop="reduce(item,index)">
-									<img src="../../assets/reduce.png" alt="">
+					<div class="couponLiBox">
+						<img class="select" src="../../assets/icon/selectCoupon.png" alt="" v-if="index == activeIndex">
+						<div class="couponName">{{item.ticketName}}</div>
+						<div class="couponBox flex_r_s_b">
+							<div class="couponBox_l">
+								<div class="price" v-if="item.ticketType == 1">￥{{item.ticketPrice}}({{item.useNum|useNumFilter}})</div>
+								<div class="price" v-else="">￥0({{item.useNum|useNumFilter}})</div>
+								<div class="couponNum">
+									<span class="sy">剩余{{item.ticketNum-item.sellNum}}张</span>
+									<span>每人限购{{item.limitNum}}张</span>
 								</div>
-								<input style="width: 33.333%;" type="text" @blur.prevent="inputLoseFocus" v-model="item.isUse" @change="number(item,index)">
-								<div style="width: 33.333%;" class="reduce flex_r_s_c" @click.stop="add(item,index)">
-									<img src="../../assets/add.png" alt="">
+								<div class="special_tx flex_r_f_s" v-if="item.useNum>1">
+									每日使用次数不超过{{item.useNum}}次
+								</div>
+								<div class="tx">【购买此票券需经过主办方审核】</div>
+							</div>
+							<div class="couponBox_r">
+								<div class="num_box flex_r_f_s">
+									<div class="add flex_r_s_c" style="width: 33.333%;" @click.stop="reduce(item,index)">
+										<img src="../../assets/reduce.png" alt="">
+									</div>
+									<input style="width: 33.333%;" type="text" @blur.prevent="inputLoseFocus" v-model="item.isUse" @change="number(item,index)">
+									<div style="width: 33.333%;" class="reduce flex_r_s_c" @click.stop="add(item,index)">
+										<img src="../../assets/add.png" alt="">
+									</div>
+								</div>
+								<div class="isTuiPiao">
+									{{item.isBearRefund | isBearRefund}}
 								</div>
 							</div>
 						</div>
+					</div>
+					<div class="dotted" v-if="item.ticketDescription!=''">
+						{{item.ticketDescription}}
 					</div>
 				</li>
 			</ul>
@@ -120,10 +128,27 @@
 			
 			
 		},
+		filters:{
+			isBearRefund(val){
+				if(val==1){
+					return '支持退票'
+				}else{
+					return '不支持退票'
+				}
+			},
+			useNumFilter(val){
+				if(val == 1){
+					return '单次票'
+				}else{
+					return '连次票'
+				}
+			}
+		},
 		methods: {
 			inputLoseFocus() {
 				setTimeout(() => {
-				  window.scrollTo(0,0);
+				  const scrollHeight = document.documentElement.scrollTop || document.body.scrollTop || 0;
+					window.scrollTo(0, Math.max(scrollHeight - 1, 0));
 				},100);
 				
 			},
@@ -262,9 +287,8 @@
 	@import '../../style/mixin.scss';
 	.selectCoupon {
 		padding-top: 88px;
-		padding-bottom: 96px;
+		padding-bottom:116px;
 		background: #f5f5f5;
-		height: 100%;
 		box-sizing: border-box;
 		.top_nav {
 			padding: 0 20px;
@@ -355,16 +379,28 @@
 				padding: 0 20px;
 
 				li {
-					padding: 20px;
+					padding-bottom: 10px;
 					box-sizing: border-box;
 					background: #fff;
 					margin-top: 30px;
 					box-shadow:0px 0px 8px 0px rgba(104,104,104,0.1);
 					position: relative;
+					.dotted{
+						padding: 20px;
+						padding-bottom: 10px;
+						border-top: 1px dashed #e8e8e8;/*no*/
+						font-size: 24px;
+						color: #666;
+						word-wrap:break-word;
+						word-break:break-all;
+					}
+					.couponLiBox{
+						padding: 20px;
+					}
 					.select{
 						position: absolute;
-						top: 1px;
-						right: 1px;
+						top: 0.5px;
+						right: 0.5px;
 						width: 40px;
 					}
 					.couponName{
@@ -375,6 +411,7 @@
 					.couponBox {
 						margin-top: 20px;
 						.couponBox_l{
+							width: 500px;
 							.price{
 								font-size: 30px;
 								color: #FF523D;
@@ -424,6 +461,12 @@
 								.add {
 									height: 40px;
 								}
+							}
+							.isTuiPiao{
+								text-align: center;
+								font-size: 24px;
+								color: #666;
+								margin-top: 20px;
 							}
 						}
 					}

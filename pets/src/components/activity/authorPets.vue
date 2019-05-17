@@ -1,46 +1,44 @@
 <template>
 	<div class="authorPets">
-		<div class="authorPetsList">
-			<cube-scroll ref="scroll" :options="options">
-			<div class="authorPetsItem flex_r_s_b" v-for="item in arr">
+		<div class="authorPetsList" v-if="petList.length>0">
+			<cube-scroll ref="scroll" :options="options" @pulling-up="onPullingUp" @pulling-down="onPullingDown">
+			<div class="authorPetsItem flex_r_s_b" v-for="item in petList">
 				<div class="pet-img">
-					<img src="../../assets/head_icon.png" alt="">
+					<img :src="item.petHeadImg" alt="">
 				</div>
 				<div class="pet-info">
-					<div class="petName">胖太</div>
+					<div class="petName">{{item.petName}}</div>
 					<div class="yanzhi flex_r_f_s">
 						<img src="../../assets/footprint.png" alt="">
-						<span>颜值  45</span>
+						<span>颜值  {{item.score}}</span>
 					</div>
 					<div class="pingzhong flex_r_f_s">
 						<div class="pz flex_r_f_s">
 							<img src="../../assets/icon_pinzhong.png" alt="">
-							<span>英国短毛猫</span>
+							<span>{{item.petBreedName}}</span>
 						</div>
-						<div class="shengri flex_r_f_s">
+						<div class="shengri flex_r_f_s" v-if="item.age!=''">
 							<img src="../../assets/icon_shengri.png" alt="">
-							<span>3岁</span>
+							<span>{{item.age}}岁</span>
 						</div>
-						<div class="xingbie flex_r_f_s">
+						<div class="xingbie flex_r_f_s" v-if="item.sex!=''">
 							<img src="../../assets/icon_xingbie.png" alt="">
-							<span>DD</span>
+							<span>{{item.sex | sexFilter}}</span>
 						</div>
-						<div class="kg flex_r_f_s">
+						<div class="kg flex_r_f_s" v-if="item.weight!=''">
 							<img src="../../assets/icon_tizhong.png" alt="">
-							<span>3kg</span>
+							<span>{{item.weight}}kg</span>
 						</div>
 					</div>
 					<div class="pet-tag flex_r_f_s">
 						<img src="../../assets/icon_biaoqian.png" alt="">
-						<div class="tagList flex_r_f_s">
-							<span>吃货</span>
-							<span>小胖子</span>
-							<span>开心果</span>
+						<div class="tagList flex_r_f_s" v-show="item.petLabels.length>0">
+							<span v-for="label in item.petLabels">{{label}}</span>
 						</div>
 					</div>
-					<div class="pet-describe">
+					<div class="pet-describe" v-if="item.comment!=''">
 						<span>
-							可爱小胖子，天天欢乐多，可爱小胖子，天天欢乐多,可爱小胖子
+							{{item.comment}}
 						</span>
 						<div class="triangle-up"></div>
 					</div>
@@ -48,10 +46,14 @@
 			</div>
 			</cube-scroll>
 		</div>
+		<div class="authorPetsList flex_r_s_c" v-else>
+			<cube-loading :size="30"></cube-loading>
+		</div>
 	</div>
 </template>
 
 <script>
+	import Api from '../common/apj.js'
 	export default{
 		data(){
 			return{
@@ -70,6 +72,8 @@
 				
 					}
 				},
+				petList:[],
+				page:0
 			}
 		},
 		mounted() {
@@ -77,12 +81,95 @@
 			let elTop = document.querySelector(".dynamicNav").offsetTop;
 			let h = document.documentElement.clientHeight - elTop;
 			document.querySelector(".authorPetsList").style.height = h + 'px';
-			setTimeout(()=>{
-				 this.$refs.scroll.refresh();
-			},100)
+			
+			this.getPets();
 		},
 		methods:{
+			getPets(){
+				let self = this;
+				self.axios.get(Api.trendApi + '/userPet/selectUserPet', {
+					params: {
+						userId: JSON.parse(sessionStorage.getItem('Aid')),
+						page:1,
+						rows:5
+					}
+				}, {
+					headers: {
+						'Content-Type': 'application/x-www-form-urlencoded'
+					}
+				}).then((res)=>{
+					if(res.data.code == 1){
+						setTimeout(()=>{
+							 self.petList = res.data.data;
+							
+							 setTimeout(()=>{
+								  self.$refs.scroll.forceUpdate();
+							 	  self.$refs.scroll.refresh();
+							 },100);
+						},500);
+						console.log(res.data.data)
+					}else{
+						alert(res.data.msg);
+					}
+				})
+			},
+			onPullingDown() {
+			// 模拟更新数据
+				this.getPets();
+				
+			},
+			onPullingUp() {
+			// 模拟更新数据
+				
+				let self = this;
+				this.page++;
+				self.axios.get(Api.trendApi + '/userPet/selectUserPet', {
+					params: {
+						userId: JSON.parse(sessionStorage.getItem('Aid')),
+						page:self.page,
+						rows:5
+					}
+				}, {
+					headers: {
+						'Content-Type': 'application/x-www-form-urlencoded'
+					}
+				}).then((res)=>{
+					if(res.data.code == 1){
+					
+						if(res.data.data.length>0){
+							
+							setTimeout(()=>{
+								self.$refs.scroll.forceUpdate();
+								res.data.data.forEach((e)=>{
+									self.petList.push(e)
+								});
+								setTimeout(()=>{
+									self.$refs.scroll.refresh();
+								},100)
+							},500)
+							
+						}else{
+							setTimeout(()=>{
+								self.$refs.scroll.forceUpdate();
+							},500)
+						}
+					}else{
+						alert(res.data.msg);
+					}
+				})
+				
 			
+			},
+		},
+		
+		filters:{
+			sexFilter(val){
+				if(val == 1){
+					return 'DD'
+				}else if(val == 2){
+					return 'MM'
+				}
+			}
 		}
 	}
 </script>
@@ -103,6 +190,7 @@
 					img{
 						width: 100%;
 						height: 100%;
+						border-radius: 50%;
 					}
 				}
 				.pet-info{
@@ -170,8 +258,9 @@
 							margin-right: 10px;
 						}
 						.tagList{
+							flex-wrap: wrap;
 							span{
-								
+								margin-bottom: 10px;
 								font-size: 24px;
 								color: #333;
 								border: 1px solid #e8e8e8;
@@ -183,7 +272,7 @@
 						
 					}
 					.pet-describe{
-						margin-top: 20px;
+						margin-top: 10px;
 						padding: 10px 20px;
 						background: #ff523d;
 						color: #fff;
@@ -198,7 +287,7 @@
 							border-right:10px solid transparent;
 							border-bottom:12px solid #ff523d;
 							position: absolute;
-							top: -12px;
+							top: -8px;
 							left: 10px;
 						}
 					}

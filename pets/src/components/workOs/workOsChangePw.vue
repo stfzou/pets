@@ -1,0 +1,119 @@
+<template>
+	<div class="workOsChangePw">
+		<div class="login_nav">
+			<div class="back" @click="back"></div>
+			<div class="title">修改登录信息</div>
+		</div>
+		<div class="addCustomer_list">
+			<ul>
+				<li class="flex_r_f_s">
+					<div class="list_l"><b>*</b>手机号码:</div>
+					<div class="list_r">
+						<input type="text" value="" />
+					</div>
+				</li>
+				<li class="flex_r_f_s">
+					<div class="list_l"><b>*</b>原密码:</div>
+					<div class="list_r">
+						<input type="text" value="" />
+					</div>
+				</li>
+				<li class="flex_r_f_s">
+					<div class="list_l"><b>*</b>新密码:</div>
+					<div class="list_r">
+						<input type="text" value="" />
+					</div>
+				</li>
+				<li class="flex_r_f_s">
+					<div class="list_l"><b>*</b>重复输入:</div>
+					<div class="list_r">
+						<input type="text" value="" />
+					</div>
+				</li>
+			</ul>
+			<div class="confirmBtn flex_r_s_c">确定</div>
+		</div>
+	</div>
+</template>
+
+<script>
+	
+	export default {
+		data(){
+			return{
+				
+			}
+		},
+		mounted() {
+			
+		},
+		methods:{
+			back(){
+				
+			},
+			
+		}
+	}
+</script>
+
+<style lang="scss">
+	.workOsChangePw{
+		.login_nav{
+			height: 42px;
+			padding: 22px 0;
+			position: relative;
+			.back{
+				background: url("../../assets/icon/backColory.png") no-repeat center 0;
+				background-size: cover;
+				width: 24px;
+				height: 40px;
+				position: absolute;
+				left: 20px;
+				top: 50%;
+				margin-top: -21px;
+			}
+			.title{
+				font-size: 30px;
+				color: #333;
+				line-height: 42px;
+				text-align: center;
+			}
+		}
+		.addCustomer_list{
+			padding: 0 20px;
+			padding-bottom: 20px;
+			li{
+				padding: 20px 0;
+			}
+			.list_l{
+				font-size: 26px;
+				width: 130px;
+				color: #333;
+				b{
+					color: #ff523d;
+				}
+			}
+			.list_r{
+				margin-left: 20px;
+				&>input{
+					border: 1px solid #e8e8e8;
+					height: 50px;
+					width: 390px;
+					padding:0 10px
+				}
+				
+				
+			}
+			.confirmBtn{
+				color: #fff;
+				font-size: 30px;
+				width: 500px;
+				height: 60px;
+				background: #ff523d;
+				border-radius: 50px;
+				margin: 0 auto;
+				margin-top: 100px;
+			}
+		}
+	}
+</style>

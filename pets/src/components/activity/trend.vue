@@ -51,7 +51,7 @@
 			</div>
 			<div class="trend_img" v-show="images.length>0">
 				<!-- <img :src="item" alt="" v-for="(item,index) in images" :key="index"> -->
-				<div class="imgs-container flex_r_s_b">
+				<div class="imgs-container flex_r_f_s">
 					<div class="img-box" v-for="(img,index) in images" :key="img">
 						<img :src="img" @click="handleImgsClick(index)">
 					</div>
@@ -97,7 +97,7 @@
 					<span>{{lookCount}}</span>
 				</div>
 			</div>
-			<div class="comment_list">
+			<div class="comment_list" v-if="dynamicComments.length>0">
 				<cube-scroll ref="scroll" @pulling-up="onPullingUp" @pulling-down="onPullingDown" :options="options">
 					<ul>
 						<li class="flex_r_s_b" v-for="(item,index) in dynamicComments">
@@ -110,12 +110,14 @@
 							</div>
 							<div class="list_r">{{item.createdTime}}</div>
 						</li>
-
 					</ul>
 				</cube-scroll>
 			</div>
-			<!-- <div class="tx" v-else>暂无评论</div> -->
-			<!-- v-if="dynamicComments.length>0" -->
+			<div class="comment_list" v-else>
+				<div class="tx">暂无评论</div> 
+			</div>
+			
+			<!-- " -->
 			<div class="send_comment flex_r_s_b">
 				<input type="text" @blur.prevent="inputLoseFocus" v-model="val" placeholder="添加一条评论" />
 				<div class="send_btn" @click="addComment">发送</div>
@@ -237,9 +239,10 @@
 			},
 			inputLoseFocus() {
 				setTimeout(() => {
-					window.scrollTo(0, 0);
-				}, 100);
-
+				  const scrollHeight = document.documentElement.scrollTop || document.body.scrollTop || 0;
+					window.scrollTo(0, Math.max(scrollHeight - 1, 0));
+				},100);
+				
 			},
 			back() {
 				this.$router.go(-1); //返回上一层
@@ -329,7 +332,8 @@
 						}
 						self.time = res.data.data.createdTime.split(' ')[0];
 						self.userHeadImage = res.data.data.userHeadImage;
-						self.content = res.data.data.content;
+						// self.content = res.data.data.content;
+						self.content = self.decodeUnicode(res.data.data.content);
 						self.likeCount = res.data.data.likeCount;
 						self.likeData = res.data.data.likeUserHeadImages;
 						self.isFocus = res.data.data.isFocus;
@@ -369,9 +373,15 @@
 					if (res.data.code == 1) {
 
 						if (res.data.data.length > 0) {
-							self.dynamicComments = res.data.data;
 							setTimeout(() => {
+								self.dynamicComments = res.data.data;
+								self.dynamicComments.forEach((e)=>{
+									e.userContent = self.decodeUnicode(e.userContent);
+								})
 								self.$refs.scroll.forceUpdate();
+								setTimeout(() => {
+									self.$refs.scroll.refresh();
+								}, 200)
 							}, 800)
 						}
 						
@@ -414,21 +424,19 @@
 						// self.dynamicComments = res.data.data;
 						if (res.data.data.length > 0) {
 
+						
 							setTimeout(() => {
-
 								res.data.data.forEach((e) => {
 									self.dynamicComments.push(e)
 								})
-							}, 500)
-							setTimeout(() => {
-								self.$refs.scroll.refresh();
 								self.$refs.scroll.forceUpdate();
-
-							}, 800)
+								setTimeout(() => {
+									self.$refs.scroll.refresh();
+								}, 100)
+							}, 500)
 						} else {
 							setTimeout(() => {
 								self.$refs.scroll.forceUpdate();
-								self.$refs.scroll.refresh();
 							}, 500)
 
 						}
@@ -613,7 +621,11 @@
 					})
 				}
 				
-			}
+			},
+			decodeUnicode(str) {
+				str = str.replace(/\\/g, "%");
+				return unescape(str);
+			},
 		}
 	}
 </script>
@@ -812,19 +824,18 @@
 				.imgs-container{
 					flex-wrap: wrap;
 					.img-box{
-						width: 216px;
-						height: 216px;
+						width: 210px;
+						height: 210px;
 						position: relative;
 						overflow: hidden;
-						
 						margin-bottom: 10px;
 						border-radius: 4px;
+						margin-right: 15px;
 						img {
-							
 							width: 100%;
-							position: absolute;
-							top: 0;
-							left: 0;
+							height: 100%;
+							display: block;
+							
 							// display: block;
 							
 						}

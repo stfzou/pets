@@ -1,14 +1,14 @@
 <template>
 	<div class="activity_map">
-		
+
 		<div class="amap-page-container">
 
 			<el-amap ref="map" vid="amapDemo" :center="center" :zoom="zoom" class="amap-demo">
 
-				<el-amap-marker :icon="require('../../assets/icon/map@2x.png')" vid="component-marker" :position="center"></el-amap-marker>
-
+				<el-amap-marker :icon="require('../../assets/icon/map@2x.png')" vid="component-marker" :position="center" :events="markers.events"></el-amap-marker>
+				
 			</el-amap>
-			
+
 		</div>
 		<i class="cubeic-close close" @click="back"></i>
 	</div>
@@ -20,26 +20,53 @@
 			let self = this;
 			return {
 				center: [],
-				zoom: 14
+				zoom: 14,
+				markers:{
+					events: {
+						click: () => {
+							var ua = window.navigator.userAgent.toLowerCase();
+							if (ua.match(/MicroMessenger/i) == 'micromessenger') {
+								alert('点击右上角用浏览器打开进行导航');
+							}else{
+								window.location.href = 'https://uri.amap.com/marker?position='+self.center[0]+','+self.center[1]+'&name='+self.name;
+							}
+							
+						},
+					},
+				},
+				name:''
 			}
 		},
 		mounted() {
 			let self = this;
-			this.center = [self.$route.params.lng,self.$route.params.lat] ;
-			console.log(this.center)
-			// console.log(self.$route.params)
+			let mapInfo = this.getUrlData();
+ 			this.center = [mapInfo.lng, mapInfo.lat];
+ 			this.name = mapInfo.name;
+			console.log(mapInfo)
 		},
 		methods: {
 			back() {
-				 this.$router.go(-1); //返回上一层
-// 				this.$router.push({
-// 					name:'activity',
-// 					query:{
-// 						id:'2'
-// 					}
-// 				})
+				this.$router.go(-1); //返回上一层
 			},
-		
+			getUrlData() { // 截取url中的数据
+			
+				let tempStr = window.location.href
+				/**
+				 * tempArr 是一个字符串数组 格式是["key=value", "key=value", ...]
+				 */
+				let tempArr = tempStr.split('?')[1] ? tempStr.split('?')[1].split('&') : []
+				/**
+				 * returnArr 是要返回出去的数据对象 格式是 { key: value, key: value, ... }
+				 */
+				let returnArr = {}
+				tempArr.forEach(element => {
+					returnArr[element.split('=')[0]] = element.split('=')[1]
+				})
+				/*输出日志*/
+				return returnArr;
+				
+			
+			},
 		},
 	}
 </script>
@@ -51,13 +78,15 @@
 		width: 100%;
 		left: 0;
 		top: 0;
-		.close{
+
+		.close {
 			position: absolute;
 			left: 20px;
 			top: 20px;
 			font-size: 50px;
 			color: gray;
 		}
+
 		.amap-demo {
 			height: 100%;
 		}
@@ -65,12 +94,13 @@
 		.amap-page-container {
 			position: relative;
 			height: 100%;
+
 			input:focus {
 				outline: none;
 			}
 
 		}
 
-	
+
 	}
 </style>
