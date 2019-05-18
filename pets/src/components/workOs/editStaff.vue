@@ -75,7 +75,7 @@
 		},
 		methods:{
 			back(){
-				
+				this.$router.go(-1);
 			},
 			getEditStaff(){
 				let editStaffInfo = this.$route.query.editStaff;

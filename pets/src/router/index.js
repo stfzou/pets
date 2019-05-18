@@ -38,6 +38,7 @@ import WorkOsInfoList from '@/components/workOs/workOsInfoList'
 import WorkOsCustomer from '@/components/workOs/workOsCustomer'
 import WorkOsMap from '@/components/workOs/workOsMap'
 import AddCustomer from '@/components/workOs/AddCustomer'
+import EditCustomer from '@/components/workOs/editCustomer'
 import WorkOsChangePw from '@/components/workOs/workOsChangePw'
 import StaffInfo from '@/components/workOs/staffInfo'
 import AddStaff from '@/components/workOs/addStaff'
@@ -106,6 +107,11 @@ export default new Router({
 			path:'/addCustomer',
 			name:'addCustomer',
 			component:AddCustomer
+		},
+		{
+			path:'/editCustomer',
+			name:'editCustomer',
+			component:EditCustomer
 		},
 		{
 			path:'/workOsCustomer',

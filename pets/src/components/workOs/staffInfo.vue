@@ -63,7 +63,7 @@
 		},
 		methods: {
 			back() {
-
+				this.$router.go(-1);
 			},
 			getStaffList() {
 				let self = this;

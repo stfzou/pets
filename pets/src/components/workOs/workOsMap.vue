@@ -27,8 +27,8 @@
 
 			</div>
 			<div class="workOsCustomer_nav">
-				<a href="###">信息列表</a>
-				<a href="###" style="color:#ff523d;">地图详情</a>
+				<router-link  :to="{name:'workOsCustomer'}">信息列表</router-link>
+				<router-link class="active" :to="{name:'workOsMap'}">地图详情</router-link>
 			</div>
 			<div class="line"></div>
 		</div>
@@ -123,7 +123,7 @@
 		},
 		methods: {
 			back() {
-
+				self.$router.go(-1);
 			},
 			showAddressPicker() {
 				this.addressPicker.show()
@@ -264,6 +264,9 @@
 					font-size: 24px;
 					color: #333;
 					margin-right: 20px;
+				}
+				.active{
+					color: #ff523d;
 				}
 			}
 		}

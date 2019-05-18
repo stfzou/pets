@@ -2,7 +2,7 @@
 	<div class="workInfoList">
 		<div class="login_nav">
 			<div class="back" @click="back"></div>
-			<div class="title">欢迎你:盖伦</div>
+			<div class="title">欢迎你:{{name}}</div>
 		</div>
 		<div class="workInfoList_cnt">
 			<ul class="workInfoList_list">
@@ -52,7 +52,7 @@
 		},
 		methods:{
 			back(){
-				
+				this.$router.go(-1);
 			},
 			
 			

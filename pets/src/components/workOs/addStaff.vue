@@ -74,7 +74,7 @@
 		},
 		methods:{
 			back(){
-				
+				this.$router.go(-1);
 			},
 			showAddressPicker() {
 				this.addressPicker.show()

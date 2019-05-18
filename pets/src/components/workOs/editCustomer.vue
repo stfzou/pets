@@ -1,5 +1,5 @@
 <template>
-	<div class="addCustomer">
+	<div class="editCustomer">
 		<div class="login_nav">
 			<div class="back" @click="back"></div>
 			<div class="title">添加客户信息</div>
@@ -16,7 +16,7 @@
 					<div class="list_l"><b>*</b>所在区域:</div>
 					<div class="list_r">
 						<div class="region flex_r_f_s">
-							<div class="sheng flex_r_s_b" @click="showAddressPicker" v-for="item in cityData">
+							<div style="margin-bottom: 5px;" class="sheng flex_r_s_b" @click="showAddressPicker" v-for="item in cityData">
 								<span>{{item}}</span>
 								<i class="cube-select-icon"></i>
 							</div>
@@ -170,7 +170,7 @@
 					}
 				],
 				markers:{
-					 dragend: (e) => {
+					dragend: (e) => {
 						// var geocoder = new AMap.Geocoder();
 						let lng = e.lnglat.lng;
 						let lat = e.lnglat.lat;
@@ -181,7 +181,8 @@
 				imgOne:'',
 				imgTwo:'',
 				imgThree:'',
-				reg: /^1[3456789]\d{9}$/
+				reg: /^1[3456789]\d{9}$/,
+				clientId:''
 			}
 		},
 		mounted() {
@@ -191,14 +192,30 @@
 				onSelect: this.selectHandle,
 				onCancel: this.cancelHandle
 			});
+			this.getEditInfo();
 			this.getCondition();
 			this.getType();
 			let upLoad = document.querySelector(".uploadBox input");
 			upLoad.setAttribute("capture","camera");
+			console.log(this.$route.params)
 		},
 		methods:{
 			back(){
-				this.$router.go(-1);
+				self.$router.go(-1);
+			},
+			getEditInfo(){
+				let re = this.$route.params;
+				this.storeName = re.shopName;
+				this.cityData = re.cityData;
+				this.addr = re.addr;
+				this.phone = re.phone;
+				this.environmenVal = re.conditionId;
+				this.typeVal = re.typeId;
+				this.center = [re.longitude,re.latitude];
+				this.imgOne = re.imgOne;
+				this.imgTwo = re.imgTwo;
+				this.imgThree = re.imgThree;
+				this.clientId = re.clientId;
 			},
 			getCondition(){
 				let self = this;
@@ -315,8 +332,8 @@
 					toast.show()
 					return false;
 				}else{
-					this.axios.post(Api.staffApi + '/ca/addBClient', this.qs.stringify({
-						businessId:JSON.parse(sessionStorage.getItem('staff')).staffId,
+					this.axios.post(Api.staffApi + '/ca/editBClient', this.qs.stringify({
+						clientId:self.clientId,
 						shopName:self.storeName,
 						province:self.cityData[0],
 						city:self.cityData[1],
@@ -337,12 +354,12 @@
 					}).then((res)=>{
 						if(res.data.code == 1){
 							let toast = this.$createToast({
-								txt: '添加成功',
+								txt: '修改成功',
 								type: 'correct'
 							 })
 							toast.show();
 							setTimeout(()=>{
-								self.$router.go(0);
+								self.$router.go(-1);
 							},500)
 						}else{
 							alert(res.data.msg);
@@ -411,6 +428,7 @@
 								 })
 								toast.show();
 								self[img] = '';
+								self.addCustomer();
 							}else{
 								alert(res.data.msg);
 							}
@@ -427,7 +445,7 @@
 </script>
 
 <style lang="scss">
-	.addCustomer{
+	.editCustomer{
 		.amap-logo{
 			opacity:0;
 		}
@@ -504,8 +522,10 @@
 					}
 				}
 				.region {
+					flex-wrap: wrap;
 					div {
 						padding: 3px 20px 3px 10px;
+						// margin-bottom: 10px;
 						/*no*/
 						margin-right: 20px;
 						border: 1px solid #e8e8e8;
