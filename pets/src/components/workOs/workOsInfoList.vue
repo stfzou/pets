@@ -6,21 +6,21 @@
 		</div>
 		<div class="workInfoList_cnt">
 			<ul class="workInfoList_list">
-				<li class="flex_r_s_b">
-					<div>客户信息管理(<span>100</span>)</div>
+				<li class="flex_r_s_b" @click="khRouter">
+					<div>客户信息管理(<span>{{clientNum}}</span>)</div>
 					<img src="../../../../kugou/src/assets/images/arrow_icon.png" alt="">
 				</li>
-				<li class="flex_r_s_b" v-if="parentId==0">
+				<li class="flex_r_s_b" v-if="parentId==0" @click="staffRouter">
 					<div>员工资料管理(<span>{{staffNum}}</span>)</div>
 					<img src="../../../../kugou/src/assets/images/arrow_icon.png" alt="">
 				</li>
-				<li class="flex_r_s_b">
+				<li class="flex_r_s_b" @click="pwRouter">
 					<div>修改登录密码</div>
 					<img src="../../../../kugou/src/assets/images/arrow_icon.png" alt="">
 				</li>
 				
 			</ul>
-			<div class="quit">退出登录</div>
+			<div class="quit" @click="quit">退出登录</div>
 		</div>
 	</div>
 </template>
@@ -32,7 +32,8 @@
 				staffId:'',
 				parentId:'1',
 				name:'',
-				staffNum:''
+				staffNum:'',
+				clientNum:''
 			}
 		},
 		mounted() {
@@ -48,13 +49,34 @@
 				this.parentId = JSON.parse(sessionStorage.getItem('staff')).parentId;
 				this.name = JSON.parse(sessionStorage.getItem('staff')).name;
 				this.staffNum = JSON.parse(sessionStorage.getItem('staff')).staffNum;
+				this.clientNum = JSON.parse(sessionStorage.getItem('staff')).clientNum;
 			}
 		},
 		methods:{
 			back(){
 				this.$router.go(-1);
 			},
-			
+			khRouter(){
+				this.$router.push({
+					name:'workOsCustomer'
+				})
+			},
+			pwRouter(){
+				this.$router.push({
+					name:'workOsChangePw'
+				})
+			},
+			quit(){
+				sessionStorage.removeItem('staff');
+				this.$router.push({
+					name:'workOsLogin'
+				})
+			},
+			staffRouter(){
+				this.$router.push({
+					name:'staffInfo'
+				})
+			}
 			
 		}
 	}

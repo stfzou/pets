@@ -1,4 +1,8 @@
 export const provinceList = [
+	{
+		text:'省份',
+		value:'100000'
+	},
   {
     text: '北京市',
     value: '110000'
@@ -96,6 +100,13 @@ export const provinceList = [
 ]
 
 export const cityList = {
+	'100000':[
+		{
+			province: '城市',
+			text: '城市',
+			value: '100100'
+		}
+	],
   '110000': [
     {
       province: '北京市',
@@ -1881,6 +1892,13 @@ export const cityList = {
 }
 
 export const areaList = {
+	'100100':[
+		{
+			city: '地区',
+			text: '地区',
+			value: '100101'
+		}
+	],
   '110100': [
     {
       city: '市辖区',

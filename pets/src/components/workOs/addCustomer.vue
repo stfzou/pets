@@ -52,12 +52,27 @@
 					</div>
 				</li>
 				<li class="flex_r_f_s">
+					<div class="list_l"><b>*</b>产品类型:</div>
+					<div class="list_r">
+						<div class="projectType">
+							<el-select v-model="projectTypeVal" multiple placeholder="请选择" @change="consolog">
+								<el-option
+								  v-for="item in projectData"
+								  :key="item.value"
+								  :label="item.label"
+								  :value="item.value">
+								</el-option>
+							 </el-select>
+						</div>
+					</div>
+				</li>
+				<li class="flex_r_f_s">
 					<div class="list_l"><b>*</b>店铺照片:</div>
 					<div class="list_r">
 						<div class="flex_r_f_s">
 							<div class="uploadBox">
 								
-								<cube-upload v-if="imgOne==''" ref="upload":action="action":simultaneous-uploads="1" :process-file="processFile"
+								<cube-upload v-if="imgOne==''" ref="uploadOne":action="action":simultaneous-uploads="1" :process-file="processFile"
 								@file-submitted="fileSubmitted" @file-success="function(file){return uploadSuccess(file,'imgOne')}" />
 								<div class="img-box" v-else>
 									<img :src="imgOne" alt="">
@@ -67,7 +82,7 @@
 							</div>
 							<div class="uploadBox">
 								
-								<cube-upload v-if="imgTwo==''" ref="upload":action="action":simultaneous-uploads="1" :process-file="processFile"
+								<cube-upload v-if="imgTwo==''" ref="uploadTwo":action="action":simultaneous-uploads="1" :process-file="processFile"
 								@file-submitted="fileSubmitted" @file-success="function(file){return uploadSuccess(file,'imgTwo')}" />
 								<div class="img-box" v-else>
 									<img :src="imgTwo" alt="">
@@ -77,8 +92,8 @@
 							</div>
 							<div class="uploadBox">
 								
-								<cube-upload v-if="imgThree==''" ref="upload":action="action":simultaneous-uploads="1" :process-file="processFile"
-								@file-submitted="fileSubmitted" @file-success="function(file){return uploadSuccess(file,'imgThree')}" />
+								<cube-upload v-if="imgThree==''" ref="uploadThree":action="action":simultaneous-uploads="1" :process-file="processFile"
+								@file-submitted="fileSubmitted" @file-success="function(file){return uploadSuccess(file,'imgThree')}" @file-error="fileError" />
 								<div class="img-box" v-else>
 									<img :src="imgThree" alt="">
 									<i class="cubeic-wrong" @click="fileRemove('imgThree')"></i>
@@ -104,6 +119,8 @@
 			</ul>
 			<div class="confirmBtn flex_r_s_c" @click="addCustomer">确定</div>
 		</div>
+		
+
 	</div>
 </template>
 
@@ -122,6 +139,7 @@
 		data(){
 			let self = this;
 			return{
+				
 				cityData: ['省份', '城市', '地区'],
 				storeEnvironmen: [],
 				customerType: [],
@@ -181,24 +199,44 @@
 				imgOne:'',
 				imgTwo:'',
 				imgThree:'',
-				reg: /^1[3456789]\d{9}$/
+				reg: /^1[3456789]\d{9}$/,
+				projectData:[],
+				projectTypeVal:''
+				
 			}
 		},
 		mounted() {
-			this.addressPicker = this.$createCascadePicker({
-				title: '城市选择',
-				data: addressData,
-				onSelect: this.selectHandle,
-				onCancel: this.cancelHandle
-			});
-			this.getCondition();
-			this.getType();
-			let upLoad = document.querySelector(".uploadBox input");
-			upLoad.setAttribute("capture","camera");
+			if(JSON.parse(sessionStorage.getItem('staff'))== null){
+				
+				this.$router.push({
+					name:'workOsLogin'
+				})
+				
+			}else{
+				this.addressPicker = this.$createCascadePicker({
+					title: '城市选择',
+					data: addressData,
+					onSelect: this.selectHandle,
+					onCancel: this.cancelHandle
+				});
+				this.getCondition();
+				this.getType();
+				this.getProjectType();
+				let upLoad = document.querySelectorAll(".uploadBox input");
+				upLoad.forEach((e)=>{
+					e.setAttribute("capture","camera");
+				})
+			}
+			
+			
 		},
 		methods:{
 			back(){
 				this.$router.go(-1);
+			},
+			consolog(){
+				
+				console.log(this.projectTypeVal.join(','))
 			},
 			getCondition(){
 				let self = this;
@@ -239,6 +277,28 @@
 								value:e.typeId,
 								text:e.name,
 								icon:e.typeIcon
+							})
+						})
+					}else{
+						alert(res.data.msg);
+					}
+				})
+			},
+			getProjectType(){
+				let self = this;
+				this.axios.post(Api.staffApi + '/business/selectBClientPTypeAll', this.qs.stringify({
+					
+				}), {
+					headers: {
+						'Content-Type': 'application/x-www-form-urlencoded'
+					}
+				}).then((res)=>{
+					if(res.data.code == 1){
+						// self.customerType = res.data.data;
+						res.data.data.forEach((e)=>{
+							self.projectData.push({
+								value:e.typeId,
+								label:e.name
 							})
 						})
 					}else{
@@ -329,7 +389,8 @@
 						typeId:self.typeVal,
 						storeImg:self.imgOne,
 						displayOneImg:self.imgTwo,
-						displayTwoImg:self.imgThree
+						displayTwoImg:self.imgThree,
+						productTypeId:self.projectTypeVal.join(',')
 					}), {
 						headers: {
 							'Content-Type': 'application/x-www-form-urlencoded'
@@ -375,6 +436,9 @@
 			uploadSuccess(file,img){
 				this[img] = file.response.data;
 				console.log(this[img])
+			},
+			fileError(file){
+				console.log(file);
 			},
 			fileRemove(img){
 				let self = this;
@@ -474,6 +538,7 @@
 			}
 			.list_r{
 				margin-left: 20px;
+				flex-wrap:wrap;
 				&>input{
 					border: 1px solid #e8e8e8;
 					height: 50px;

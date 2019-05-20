@@ -52,6 +52,21 @@
 					</div>
 				</li>
 				<li class="flex_r_f_s">
+					<div class="list_l"><b>*</b>产品类型:</div>
+					<div class="list_r">
+						<div class="projectType">
+							<el-select v-model="projectTypeVal" multiple placeholder="请选择">
+								<el-option
+								  v-for="item in projectData"
+								  :key="item.value"
+								  :label="item.label"
+								  :value="item.value">
+								</el-option>
+							 </el-select>
+						</div>
+					</div>
+				</li>
+				<li class="flex_r_f_s">
 					<div class="list_l"><b>*</b>店铺照片:</div>
 					<div class="list_r">
 						<div class="flex_r_f_s">
@@ -125,6 +140,8 @@
 				cityData: ['省份', '城市', '地区'],
 				storeEnvironmen: [],
 				customerType: [],
+				projectData:[],
+				projectTypeVal:[],
 				storeName:'',
 				addr:'',
 				phone:'',
@@ -182,7 +199,8 @@
 				imgTwo:'',
 				imgThree:'',
 				reg: /^1[3456789]\d{9}$/,
-				clientId:''
+				clientId:'',
+				
 			}
 		},
 		mounted() {
@@ -192,16 +210,42 @@
 				onSelect: this.selectHandle,
 				onCancel: this.cancelHandle
 			});
-			this.getEditInfo();
+			
 			this.getCondition();
 			this.getType();
+			this.getProjectType();
+			this.getEditInfo();
 			let upLoad = document.querySelector(".uploadBox input");
 			upLoad.setAttribute("capture","camera");
-			console.log(this.$route.params)
+			
 		},
 		methods:{
 			back(){
 				self.$router.go(-1);
+			},
+			getProjectType(){
+				let self = this;
+				this.axios.post(Api.staffApi + '/business/selectBClientPTypeAll', this.qs.stringify({
+					
+				}), {
+					headers: {
+						'Content-Type': 'application/x-www-form-urlencoded'
+					}
+				}).then((res)=>{
+					if(res.data.code == 1){
+						// self.customerType = res.data.data;
+						
+						res.data.data.forEach((e)=>{
+							self.projectData.push({
+								value:e.typeId,
+								label:e.name
+							})
+						})
+						
+					}else{
+						alert(res.data.msg);
+					}
+				})
 			},
 			getEditInfo(){
 				let re = this.$route.params;
@@ -216,6 +260,9 @@
 				this.imgTwo = re.imgTwo;
 				this.imgThree = re.imgThree;
 				this.clientId = re.clientId;
+				re.productTypeId.split(',').forEach((e)=>{
+					this.projectTypeVal.push(parseInt(e))
+				})
 			},
 			getCondition(){
 				let self = this;
@@ -346,7 +393,8 @@
 						typeId:self.typeVal,
 						storeImg:self.imgOne,
 						displayOneImg:self.imgTwo,
-						displayTwoImg:self.imgThree
+						displayTwoImg:self.imgThree,
+						productTypeId:self.projectTypeVal.join(',')
 					}), {
 						headers: {
 							'Content-Type': 'application/x-www-form-urlencoded'

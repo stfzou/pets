@@ -91,8 +91,8 @@
 								staffId:res.data.data.id,
 								parentId:res.data.data.parentId,
 								phone:res.data.data.phone,
-								staffNum:res.data.data.staffNum
-								
+								staffNum:res.data.data.staffNum,
+								clientNum:res.data.data.clientNum
 							}
 							sessionStorage.setItem('staff', JSON.stringify(staffInfo));
 							setTimeout(()=>{

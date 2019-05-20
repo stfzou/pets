@@ -14,6 +14,7 @@
   },
   "dependencies": {
     "cube-ui": "^1.12.6",
+    "element-ui": "^2.8.2",
     "img-vuer": "^0.17.2",
     "lib-flexible": "^0.3.2",
     "vue": "^2.5.2",

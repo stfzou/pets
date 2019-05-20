@@ -4,6 +4,9 @@
 			<div class="login_nav">
 				<div class="back" @click="back"></div>
 				<div class="title">客户信息列表</div>
+				<router-link class="addStaffData" :to="{name:'addCustomer'}" v-if="parentId!=0">
+					<img src="../../assets/ali-add.png" alt="">
+				</router-link>
 			</div>
 			<div class="searchCriteria">
 				<div class="region flex_r_f_s">
@@ -13,14 +16,15 @@
 					</div>
 				</div>
 				<div class="customerType flex_r_f_s">
-					<cube-select v-model="environmenVal" :options="storeEnvironmen" placeholder="店铺环境"></cube-select>
-					<cube-select v-model="typeVal" :options="customerType" placeholder="客户类型"></cube-select>
-					<cube-select v-model="staffVal" :options="staffData" placeholder="员工"></cube-select>
+					<cube-select v-model="environmenVal" :options="storeEnvironmen" placeholder="店铺环境" @change="getCustomer"></cube-select>
+					<cube-select v-model="typeVal" :options="customerType" placeholder="客户类型" @change="getCustomer"></cube-select>
+					<cube-select v-model="projectTypeVal" :options="projectData" placeholder="产品类型" @change="getCustomer"></cube-select>
+					<cube-select v-model="staffVal" :options="staffData" placeholder="员工" v-if="parentId==0" @change="getCustomer"></cube-select>
 				</div>
 				<div class="search_box">
 					<div class="search flex_r_s_b">
-						<input type="text" placeholder="输入你要搜索的内容">
-						<div class="sIcon flex_r_s_c">
+						<input type="text" placeholder="输入你要查询的店铺名字" v-model="shopName">
+						<div class="sIcon flex_r_s_c" @click="getCustomer">
 							<img src="../../assets/ali-sousuo.png" alt="">
 						</div>
 					</div>
@@ -33,13 +37,13 @@
 			</div>
 			<div class="line"></div>
 		</div>
-		<div class="workOsCustomer_cnt">
+		<div class="workOsCustomer_cnt" v-if="customerList.length>0">
 			<cube-scroll ref="scroll" :options="options"  @pulling-up="onPullingUp" @pulling-down="onPullingDown">
 			<ul class="listInfo">
 				<li v-for="item in customerList">
 					<div class="storeName flex_r_f_s"><span>{{item.shopName}}</span>
 						<!-- <a href="###"><img src="../../assets/ali-edit.png" alt=""></a> -->
-						<router-link :to="{name:'editCustomer',params:{
+						<router-link v-if="parentId!=0" :to="{name:'editCustomer',params:{
 							cityData:[item.province,item.city,item.area],
 							addr:item.address,
 							shopName:item.shopName,
@@ -51,7 +55,8 @@
 							phone:item.phone,
 							typeId:item.typeId,
 							conditionId:item.conditionId,
-							clientId:item.clientId
+							clientId:item.clientId,
+							productTypeId:item.productTypeId
 						}}">
 							<img src="../../assets/ali-edit.png" alt="">
 						</router-link>
@@ -62,7 +67,7 @@
 					</div>
 					<div class="addTime flex_r_s_b">
 						<span class="span">添加日期:{{item.createTime}}</span>
-						<cube-rate v-model="starVal" :disabled="true" :max="5"></cube-rate>
+						<cube-rate v-model="item.conditionId" :disabled="true" :max="5"></cube-rate>
 					</div>
 					<div class="customerType">
 						<div class="colorType flex_r_s_b">
@@ -74,11 +79,15 @@
 						</div>
 						
 					</div>
+					<div class="pdtext">产品类型:<span v-for="pItem in item.clientPTypeNames">{{pItem}}</span></div>
 					<div class="personCharge">负责人:{{name}}</div>
 				</li>
 					
 			</ul>
 			</cube-scroll>
+		</div>
+		<div class="div1" v-show="customerList.length==0">
+			<div class="tx">暂无数据</div>
 		</div>
 	</div>
 </template>
@@ -96,11 +105,13 @@
 	export default {
 		data() {
 			return {
-				storeEnvironmen: ['一星级', '二星级', '三星级', '四星级', '五星级'],
-				customerType: ['重点客户', '优质客户', '一般客户', '潜在客户', '无效客户'],
-				staffData:['张三','李四','王麻子'],
+				storeEnvironmen: [{value:'',text:'全部店铺'}],
+				customerType: [{value:'',text:'全部客户'}],
+				staffData:[{value:'-1',text:'全部员工'}],
+				projectData:[{value:'',text:'全部类型'}],
 				environmenVal: '',
 				typeVal: '',
+				projectTypeVal:'',
 				staffVal:'',
 				addressPicker: '',
 				cityData: ['省份', '城市', '地区'],
@@ -110,6 +121,7 @@
 				qu:'',
 				page:0,
 				starVal:5,
+				shopName:'',
 				name:'',
 				options:{
 					pullDownRefresh:{
@@ -124,22 +136,137 @@
 						
 					}
 				},
+				parentId:'1',
+				
 			}
 		},
 		mounted() {
-			this.addressPicker = this.$createCascadePicker({
-				title: '城市选择',
-				data: addressData,
-				onSelect: this.selectHandle,
-				onCancel: this.cancelHandle
-			});
-			this.getCustomer();
-			this.name = JSON.parse(sessionStorage.getItem('staff')).name;
+			if(JSON.parse(sessionStorage.getItem('staff'))== null){
+				
+				this.$router.push({
+					name:'workOsLogin'
+				})
+				
+			}else{
+				console.log(JSON.parse(sessionStorage.getItem('staff')))
+				this.addressPicker = this.$createCascadePicker({
+					title: '城市选择',
+					data: addressData,
+					onSelect: this.selectHandle,
+					onCancel: this.cancelHandle
+				});
+				this.name = JSON.parse(sessionStorage.getItem('staff')).name;
+				this.parentId = JSON.parse(sessionStorage.getItem('staff')).parentId;
+				if(this.parentId == 0){
+					this.staffVal = '-1';
+				}else{
+					this.staffVal = JSON.parse(sessionStorage.getItem('staff')).staffId;
+				}
+				this.getCustomer();
+				this.getCondition();
+				this.getProjectType();
+				this.getType();
+				this.getStaff();
+			}
+			
 			// console.log(JSON.parse(sessionStorage.getItem('staff')))
 		},
 		methods: {
 			back() {
 				this.$router.go(-1);
+			},
+			getStaff(){
+				let self = this;
+				this.axios.post(Api.staffApi + '/business/selectBusinessStaffAll', this.qs.stringify({
+					pageNo:0,
+					pageSize:100
+				}), {
+					headers: {
+						'Content-Type': 'application/x-www-form-urlencoded'
+					}
+				}).then((res)=>{
+					if(res.data.code == 1){
+						// self.storeEnvironmen = res.data.data;
+						
+						res.data.data.forEach((e)=>{
+							self.staffData.push({
+								value:e.id,
+								text:e.name
+							})
+						})
+						
+					}else{
+						alert(res.data.msg);
+					}
+				})
+			},
+			getCondition(){
+				let self = this;
+				this.axios.post(Api.staffApi + '/business/selectBShopsConditionAll', this.qs.stringify({
+					
+				}), {
+					headers: {
+						'Content-Type': 'application/x-www-form-urlencoded'
+					}
+				}).then((res)=>{
+					if(res.data.code == 1){
+						// self.storeEnvironmen = res.data.data;
+						
+						res.data.data.forEach((e)=>{
+							self.storeEnvironmen.push({
+								value:e.conditionId,
+								text:e.name
+							})
+						})
+					}else{
+						alert(res.data.msg);
+					}
+				})
+			},
+			getType(){
+				let self = this;
+				this.axios.post(Api.staffApi + '/business/selectBShopsTypeAll', this.qs.stringify({
+					
+				}), {
+					headers: {
+						'Content-Type': 'application/x-www-form-urlencoded'
+					}
+				}).then((res)=>{
+					if(res.data.code == 1){
+						// self.customerType = res.data.data;
+						res.data.data.forEach((e)=>{
+							self.customerType.push({
+								value:e.typeId,
+								text:e.name,
+								icon:e.typeIcon
+							})
+						})
+					}else{
+						alert(res.data.msg);
+					}
+				})
+			},
+			getProjectType(){
+				let self = this;
+				this.axios.post(Api.staffApi + '/business/selectBClientPTypeAll', this.qs.stringify({
+					
+				}), {
+					headers: {
+						'Content-Type': 'application/x-www-form-urlencoded'
+					}
+				}).then((res)=>{
+					if(res.data.code == 1){
+						// self.customerType = res.data.data;
+						res.data.data.forEach((e)=>{
+							self.projectData.push({
+								value:e.typeId,
+								text:e.name
+							})
+						})
+					}else{
+						alert(res.data.msg);
+					}
+				})
 			},
 			getCustomer(){
 				let self = this;
@@ -153,14 +280,16 @@
 					this.qu = this.cityData[2]
 				}
 				this.axios.post(Api.staffApi + '/business/selectBClientInfo', this.qs.stringify({
-					businessId:JSON.parse(sessionStorage.getItem('staff')).staffId,
+					businessId:self.staffVal,
 					province:self.sheng,
 					city:self.shi,
 					area:self.qu,
 					conditionId:self.environmenVal,
 					typeId:self.typeVal,
 					pageNo:0,
-					pageSize:3
+					pageSize:3,
+					shopName:self.shopName,
+					productTypeId:self.projectTypeVal
 				}), {
 					headers: {
 						'Content-Type': 'application/x-www-form-urlencoded'
@@ -182,7 +311,8 @@
 				this.addressPicker.show()
 			},
 			selectHandle(selectedVal, selectedIndex, selectedText) {
-				this.cityData = selectedText
+				this.cityData = selectedText;
+				this.getCustomer();
 			},
 			cancelHandle() {
 				this.$createToast({
@@ -211,13 +341,14 @@
 				}
 				this.page++;
 				this.axios.post(Api.staffApi + '/business/selectBClientInfo', this.qs.stringify({
-					businessId:JSON.parse(sessionStorage.getItem('staff')).staffId,
+					businessId:self.staffVal,
 					province:self.sheng,
 					city:self.shi,
 					area:self.qu,
 					conditionId:self.environmenVal,
 					typeId:self.typeVal,
 					pageNo:self.page,
+					productTypeId:self.projectTypeVal,
 					pageSize:3
 				}), {
 					headers: {
@@ -272,7 +403,19 @@
 				height: 42px;
 				padding: 22px 0;
 				position: relative;
-
+				.addStaffData {
+					width: 40px;
+					height: 40px;
+					position: absolute;
+					right: 20px;
+					top: 50%;
+					margin-top: -21px;
+				
+					img {
+						width: 40px;
+						height: 40px;
+					}
+				}
 				.back {
 					background: url("../../assets/icon/backColory.png") no-repeat center 0;
 					background-size: cover;
@@ -375,7 +518,14 @@
 				}
 			}
 		}
-
+		.div1{
+			.tx{
+				font-size: 30px;
+				color: #000;
+				text-align: center;
+				padding-top: 50px;
+			}
+		}
 		.workOsCustomer_cnt {
 			position: absolute;
 			top: 330px;
@@ -383,6 +533,7 @@
 			left: 0;
 			right: 0;
 			padding: 0 20px;
+			
 			.listInfo{
 				&>li{
 					padding-top: 10px;
@@ -430,6 +581,14 @@
 								padding: 5px 0;
 								border-radius: 20px;
 							}
+						}
+					}
+					.pdtext{
+						padding-top: 20px;
+						color: #999;
+						font-size: 24px;
+						span{
+							margin-right: 10px;
 						}
 					}
 					.personCharge{

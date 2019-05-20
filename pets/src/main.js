@@ -3,8 +3,11 @@
 import Vue from 'vue'
 import App from './App'
 import router from './router'
+import 'element-ui/lib/theme-chalk/index.css';
 import 'lib-flexible/flexible.js'
 import '@/style/style.scss'
+import ElementUI from 'element-ui';
+
 import axios from "axios"
 import http from "axios"
 import Qs from 'qs'
@@ -13,8 +16,9 @@ import store from './store/store.js'
 import VueAMap from 'vue-amap'
 
 
-Vue.use(Cube)
-Vue.use(VueAMap)
+Vue.use(Cube);
+Vue.use(VueAMap);
+Vue.use(ElementUI);
 Vue.prototype.axios = axios;
 Vue.prototype.http = http;
 Vue.prototype.qs = Qs;
