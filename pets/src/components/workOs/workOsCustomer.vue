@@ -3,7 +3,7 @@
 		<div class="workOsCustomer_top">
 			<div class="login_nav">
 				<div class="back" @click="back"></div>
-				<div class="title">客户信息列表</div>
+				<div class="title">客户信息列表(<span>{{bcNum}}</span>)</div>
 				<router-link class="addStaffData" :to="{name:'addCustomer'}" v-if="parentId!=0">
 					<img src="../../assets/ali-add.png" alt="">
 				</router-link>
@@ -12,6 +12,7 @@
 				<div class="region flex_r_f_s">
 					<div class="sheng flex_r_s_b" @click="showAddressPicker" v-for="item in cityData">
 						<span>{{item}}</span>
+						
 						<i class="cube-select-icon"></i>
 					</div>
 				</div>
@@ -19,6 +20,9 @@
 					<cube-select v-model="environmenVal" :options="storeEnvironmen" placeholder="店铺环境" @change="getCustomer"></cube-select>
 					<cube-select v-model="typeVal" :options="customerType" placeholder="客户类型" @change="getCustomer"></cube-select>
 					<cube-select v-model="projectTypeVal" :options="projectData" placeholder="产品类型" @change="getCustomer"></cube-select>
+					
+				</div>
+				<div class="customerTypeBox">
 					<cube-select v-model="staffVal" :options="staffData" placeholder="员工" v-if="parentId==0" @change="getCustomer"></cube-select>
 				</div>
 				<div class="search_box">
@@ -35,13 +39,13 @@
 				<router-link class="active" :to="{name:'workOsCustomer'}">信息列表</router-link>
 				<router-link :to="{name:'workOsMap'}">地图详情</router-link>
 			</div>
-			<div class="line"></div>
+			
 		</div>
 		<div class="workOsCustomer_cnt" v-if="customerList.length>0">
 			<cube-scroll ref="scroll" :options="options"  @pulling-up="onPullingUp" @pulling-down="onPullingDown">
 			<ul class="listInfo">
 				<li v-for="item in customerList">
-					<div class="storeName flex_r_f_s"><span>{{item.shopName}}</span>
+					<div class="storeName flex_r_f_s"><span><b>{{item.shopName}}</b></span>
 						<!-- <a href="###"><img src="../../assets/ali-edit.png" alt=""></a> -->
 						<router-link v-if="parentId!=0" :to="{name:'editCustomer',params:{
 							cityData:[item.province,item.city,item.area],
@@ -61,9 +65,11 @@
 							<img src="../../assets/ali-edit.png" alt="">
 						</router-link>
 					</div>
+					<div class="addr">
+						{{item.province}}-{{item.city}}-{{item.area}}
+					</div>
 					<div class="addr flex_r_f_s">
-						<span>{{item.address}}<img src="../../assets/icon/map@2x.png" alt=""></span>
-						
+						<a :href="'https://uri.amap.com/marker?position='+item.longitude+','+item.latitude+'&name='+item.address">{{item.address}}<img src="../../assets/icon/map@2x.png" alt=""></a>
 					</div>
 					<div class="addTime flex_r_s_b">
 						<span class="span">添加日期:{{item.createTime}}</span>
@@ -71,13 +77,12 @@
 					</div>
 					<div class="customerType">
 						<div class="colorType flex_r_s_b">
-							<span style="background: #0093dd;">重点客户</span>
-							<span style="background: #85c324;">优质客户</span>
-							<span style="background: #ef9b48;">一般客户</span>
-							<span style="background: #bb8fbb;">潜在客户</span>
-							<span style="background: #aba9a9;">无效客户</span>
+							<span style="background: #0093dd;" v-if="item.clientTypeName=='重点客户'">重点客户</span>
+							<span style="background: #85c324;" v-if="item.clientTypeName=='优质客户'">优质客户</span>
+							<span style="background: #ef9b48;" v-if="item.clientTypeName=='一般客户'">一般客户</span>
+							<span style="background: #bb8fbb;" v-if="item.clientTypeName=='潜在客户'">潜在客户</span>
+							<span style="background: #aba9a9;" v-if="item.clientTypeName=='无效客户'">无效客户</span>
 						</div>
-						
 					</div>
 					<div class="pdtext">产品类型:<span v-for="pItem in item.clientPTypeNames">{{pItem}}</span></div>
 					<div class="personCharge">负责人:{{name}}</div>
@@ -105,10 +110,10 @@
 	export default {
 		data() {
 			return {
-				storeEnvironmen: [{value:'',text:'全部店铺'}],
-				customerType: [{value:'',text:'全部客户'}],
-				staffData:[{value:'-1',text:'全部员工'}],
-				projectData:[{value:'',text:'全部类型'}],
+				storeEnvironmen: [{value:'',text:'店铺星级'}],
+				customerType: [{value:'',text:'客户类型'}],
+				staffData:[{value:'-1',text:'选择员工'}],
+				projectData:[{value:'',text:'产品类型'}],
 				environmenVal: '',
 				typeVal: '',
 				projectTypeVal:'',
@@ -119,6 +124,7 @@
 				sheng:'',
 				shi:'',
 				qu:'',
+				bcNum:'',
 				page:0,
 				starVal:5,
 				shopName:'',
@@ -173,7 +179,9 @@
 		},
 		methods: {
 			back() {
-				this.$router.go(-1);
+				this.$router.push({
+					name:'workOsInfoList'
+				});
 			},
 			getStaff(){
 				let self = this;
@@ -269,6 +277,7 @@
 				})
 			},
 			getCustomer(){
+				this.page = 0;
 				let self = this;
 				if(this.cityData[0]=='省份'){
 					this.sheng = '';
@@ -297,7 +306,8 @@
 				}).then((res) => {
 					if (res.data.code == 1) {
 						console.log(res)
-						self.customerList = res.data.data;
+						self.customerList = res.data.data.bClientVos;
+						self.bcNum = res.data.data.bcNum;
 						setTimeout(() => {
 							this.$refs.scroll.refresh();
 							this.$refs.scroll.forceUpdate();
@@ -315,11 +325,7 @@
 				this.getCustomer();
 			},
 			cancelHandle() {
-				this.$createToast({
-					type: 'correct',
-					txt: 'Picker canceled',
-					time: 1000
-				}).show()
+				
 			},
 			onPullingDown() {
 				// 模拟更新数据
@@ -357,12 +363,13 @@
 				}).then((res) => {
 					if (res.data.code == 1) {
 			
-						if (res.data.data.length > 0) {
+						if (res.data.data.bClientVos.length > 0) {
 			
 							setTimeout(() => {
-								res.data.data.forEach((e) => {
+								res.data.data.bClientVos.forEach((e) => {
 									self.customerList.push(e)
-								})
+								});
+								self.bcNum = res.data.data.bcNum;
 								self.$refs.scroll.forceUpdate();
 								setTimeout(() => {
 									self.$refs.scroll.refresh();
@@ -393,7 +400,8 @@
 		position: relative;
 
 		.workOsCustomer_top {
-			height: 330px;
+			height: 380px;
+			border-bottom: 4px solid #e8e8e8;
 			.line{
 				height: 4px;
 				background: #e8e8e8;
@@ -403,6 +411,7 @@
 				height: 42px;
 				padding: 22px 0;
 				position: relative;
+				border-bottom: 1px solid #e8e8e8;
 				.addStaffData {
 					width: 40px;
 					height: 40px;
@@ -432,12 +441,15 @@
 					color: #333;
 					line-height: 42px;
 					text-align: center;
+					span{
+						color: #ff523d;
+					}
 				}
 			}
 
 			.searchCriteria {
 				padding: 0 20px;
-
+				padding-top: 20px;
 				.region {
 					div {
 						padding: 5px 20px 5px 10px;
@@ -464,17 +476,26 @@
 
 				.customerType {
 					padding-top: 20px;
-
+					
 					.cube-select {
 						padding-top: 3px;
 						padding-bottom: 3px;
 						font-size: 26px;
-						margin-right: 20px;
+						margin-right: 10px;
+						width: 200px;
 					}
 				}
-
+				.customerTypeBox{
+					padding-top: 10px;
+					.cube-select {
+						padding-top: 3px;
+						padding-bottom: 3px;
+						font-size: 26px;
+						width: 200px;
+					}
+				}
 				.search_box {
-					padding-top: 20px;
+					padding-top: 10px;
 
 					.search {
 						height: 48px;
@@ -528,7 +549,7 @@
 		}
 		.workOsCustomer_cnt {
 			position: absolute;
-			top: 330px;
+			top: 380px;
 			bottom: 0;
 			left: 0;
 			right: 0;
@@ -536,9 +557,10 @@
 			
 			.listInfo{
 				&>li{
-					padding-top: 10px;
+					padding-top: 30px;
 					.storeName{
-						font-size: 28px;
+						font-size: 34px;
+						font-weight: bold;
 						color: #333;
 						a{
 							img{

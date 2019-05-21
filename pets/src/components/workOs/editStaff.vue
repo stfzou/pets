@@ -75,14 +75,16 @@
 		},
 		methods:{
 			back(){
-				this.$router.go(-1);
+				this.$router.push({
+					name:'workOsInfoList'
+				});
 			},
 			getEditStaff(){
 				let editStaffInfo = this.$route.query.editStaff;
 				this.staffName = editStaffInfo.name;
 				this.pwd = editStaffInfo.password;
 				this.phone = editStaffInfo.phone;
-				this.cityData = [editStaffInfo.area,editStaffInfo.city,editStaffInfo.province];
+				this.cityData = [editStaffInfo.province,editStaffInfo.city,editStaffInfo.area];
 				this.staffId = editStaffInfo.id	
 			},
 			showAddressPicker() {
@@ -140,9 +142,9 @@
 						phone: this.phone,
 						password: this.pwd,
 						name:this.staffName,
-						area:this.cityData[0],
+						area:this.cityData[2],
 						city:this.cityData[1],
-						province:this.cityData[2],
+						province:this.cityData[0],
 						id:this.staffId
 					}), {
 						headers: {
@@ -181,6 +183,7 @@
 			height: 42px;
 			padding: 22px 0;
 			position: relative;
+			border-bottom: 1px solid #e8e8e8;
 			.back{
 				background: url("../../assets/icon/backColory.png") no-repeat center 0;
 				background-size: cover;

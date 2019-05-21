@@ -48,13 +48,16 @@
 				this.staffId = JSON.parse(sessionStorage.getItem('staff')).staffId;
 				this.parentId = JSON.parse(sessionStorage.getItem('staff')).parentId;
 				this.name = JSON.parse(sessionStorage.getItem('staff')).name;
-				this.staffNum = JSON.parse(sessionStorage.getItem('staff')).staffNum;
-				this.clientNum = JSON.parse(sessionStorage.getItem('staff')).clientNum;
+				// this.staffNum = JSON.parse(sessionStorage.getItem('staff')).staffNum;
+				this.staffNum = this.$store.state.staffNum;
+				this.clientNum = this.$store.state.customerNum;
 			}
 		},
 		methods:{
 			back(){
-				this.$router.go(-1);
+				this.$router.push({
+					name:'workOsInfoList'
+				});
 			},
 			khRouter(){
 				this.$router.push({
@@ -90,6 +93,7 @@
 			height: 42px;
 			padding: 22px 0;
 			position: relative;
+			border-bottom: 1px solid #e8e8e8;
 			.back{
 				background: url("../../assets/icon/backColory.png") no-repeat center 0;
 				background-size: cover;

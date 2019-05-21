@@ -74,7 +74,9 @@
 		},
 		methods:{
 			back(){
-				this.$router.go(-1);
+				this.$router.push({
+					name:'workOsInfoList'
+				});
 			},
 			showAddressPicker() {
 				this.addressPicker.show()
@@ -131,9 +133,9 @@
 						phone: this.phone,
 						password: this.pwd,
 						name:this.staffName,
-						area:this.cityData[0],
+						province:this.cityData[0],
 						city:this.cityData[1],
-						province:this.cityData[2],
+						area:this.cityData[2],
 						parentId:JSON.parse(sessionStorage.getItem('staff')).staffId
 					}), {
 						headers: {
@@ -172,6 +174,7 @@
 			height: 42px;
 			padding: 22px 0;
 			position: relative;
+			border-bottom: 1px solid #e8e8e8;
 			.back{
 				background: url("../../assets/icon/backColory.png") no-repeat center 0;
 				background-size: cover;
@@ -192,6 +195,7 @@
 		.addCustomer_list{
 			padding: 0 20px;
 			padding-bottom: 20px;
+			
 			li{
 				padding: 20px 0;
 			}

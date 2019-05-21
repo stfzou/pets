@@ -20,7 +20,10 @@ export default new Vuex.Store({
 			loginUrl:'',
 			addrInfo:{
 				name:''
-			}
+			},
+			//员工管理系统
+			staffNum:'',
+			customerNum:''
 			
   },
   mutations:{
@@ -43,6 +46,13 @@ export default new Vuex.Store({
 		},
 		setLoginUrl(state,url){//设置登录后需要跳转的页面
 			state.loginUrl = url;
+		},
+		//员工管理系统
+		setCustomerNum(state,num){
+			state.customerNum = num
+		},
+		setStaffNum(state,num){
+			state.staffNum = num;
 		}
 		
   },

@@ -37,7 +37,9 @@
 		},
 		methods: {
 			back() {
-				this.$router.go(-1);//返回上一层
+				this.$router.push({
+					name:'workOsInfoList'
+				});//返回上一层
 			},
 			inputLoseFocus() {
 				setTimeout(() => {
@@ -90,10 +92,10 @@
 								name:res.data.data.name,
 								staffId:res.data.data.id,
 								parentId:res.data.data.parentId,
-								phone:res.data.data.phone,
-								staffNum:res.data.data.staffNum,
-								clientNum:res.data.data.clientNum
+								phone:res.data.data.phone
 							}
+							self.$store.commit('setStaffNum',res.data.data.staffNum);
+							self.$store.commit('setCustomerNum',res.data.data.clientNum);
 							sessionStorage.setItem('staff', JSON.stringify(staffInfo));
 							setTimeout(()=>{
 								self.loading = false;

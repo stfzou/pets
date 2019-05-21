@@ -9,7 +9,7 @@
 				<li class="flex_r_f_s">
 					<div class="list_l"><b>*</b>手机号码:</div>
 					<div class="list_r">
-						<input type="text" v-model="phone" />
+						<input type="text" readonly="readonly" v-model="phone" />
 					</div>
 				</li>
 				<li class="flex_r_f_s">
@@ -50,10 +50,13 @@
 		},
 		mounted() {
 			console.log(JSON.parse(sessionStorage.getItem('staff')))
+			this.phone = JSON.parse(sessionStorage.getItem('staff')).phone;
 		},
 		methods:{
 			back(){
-				this.$router.go(-1);
+				this.$router.push({
+					name:'workOsInfoList'
+				});
 			},
 			commit(){
 				let self = this;
@@ -146,6 +149,7 @@
 			height: 42px;
 			padding: 22px 0;
 			position: relative;
+			border-bottom: 1px solid #e8e8e8;
 			.back{
 				background: url("../../assets/icon/backColory.png") no-repeat center 0;
 				background-size: cover;

@@ -3,14 +3,6 @@ export const provinceList = [
 		text:'省份',
 		value:'100000'
 	},
-	{
-	  text: '四川省',
-	  value: '510000'
-	},
-	{
-	  text: '重庆市',
-	  value: '500000'
-	},
   {
     text: '北京市',
     value: '110000'
@@ -74,6 +66,12 @@ export const provinceList = [
   }, {
     text: '海南省',
     value: '460000'
+  }, {
+    text: '重庆市',
+    value: '500000'
+  }, {
+    text: '四川省',
+    value: '510000'
   }, {
     text: '贵州省',
     value: '520000'

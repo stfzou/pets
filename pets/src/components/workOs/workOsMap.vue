@@ -3,7 +3,7 @@
 		<div class="workOsCustomer_top">
 			<div class="login_nav">
 				<div class="back" @click="back"></div>
-				<div class="title">客户信息列表</div>
+				<div class="title">客户信息列表(<span>{{bcNum}}</span>)</div>
 			</div>
 			<div class="searchCriteria">
 				<div class="region flex_r_f_s">
@@ -16,6 +16,9 @@
 					<cube-select v-model="environmenVal" :options="storeEnvironmen" placeholder="店铺环境" @change="getCustomer"></cube-select>
 					<cube-select v-model="typeVal" :options="customerType" placeholder="客户类型" @change="getCustomer"></cube-select>
 					<cube-select v-model="projectTypeVal" :options="projectData" placeholder="产品类型" @change="getCustomer"></cube-select>
+					<!-- <cube-select v-model="staffVal" :options="staffData" placeholder="员工" v-if="parentId==0" @change="getCustomer"></cube-select> -->
+				</div>
+				<div class="customerTypeBox">
 					<cube-select v-model="staffVal" :options="staffData" placeholder="员工" v-if="parentId==0" @change="getCustomer"></cube-select>
 				</div>
 				<div class="search_box">
@@ -63,10 +66,10 @@
 			let self = this;
 			return {
 				center:[116.397428, 39.90923],
-				storeEnvironmen: [{value:'',text:'全部店铺'}],
-				customerType: [{value:'',text:'全部客户'}],
-				staffData:[{value:'-1',text:'全部员工'}],
-				projectData:[{value:'',text:'全部类型'}],
+				storeEnvironmen: [{value:'',text:'店铺星级'}],
+				customerType: [{value:'',text:'客户类型'}],
+				staffData:[{value:'-1',text:'选择员工'}],
+				projectData:[{value:'',text:'产品类型'}],
 				environmenVal: '',
 				projectTypeVal:'',
 				shopName:'',
@@ -82,6 +85,7 @@
 				page:0,
 				name:'',
 				parentId:'2',
+				bcNum:'',
 				options:{
 					pullDownRefresh:{
 						txt:'更新成功',
@@ -165,7 +169,9 @@
 		},
 		methods: {
 			back() {
-				this.$router.go(-1);
+				this.$router.push({
+					name:'workOsInfoList'
+				});
 			},
 			getProjectType(){
 				let self = this;
@@ -285,7 +291,7 @@
 				})
 			},
 			getCustomer(){
-				console.log(this.starVal)
+				this.page = 0;
 				let self = this;
 				if(this.cityData[0]=='省份'){
 					this.sheng = '';
@@ -314,8 +320,8 @@
 				}).then((res) => {
 					if (res.data.code == 1) {
 						console.log(res)
-						self.customerList = res.data.data;
-						
+						self.customerList = res.data.data.bClientVos;
+						self.bcNum = res.data.data.bcNum;
 					} else {
 						alert(res.data.msg)
 					}
@@ -334,7 +340,7 @@
 		position: relative;
 
 		.workOsCustomer_top {
-			height: 350px;
+			height: 380px;
 			.line{
 				height: 4px;
 				background: #e8e8e8;
@@ -344,7 +350,7 @@
 				height: 42px;
 				padding: 22px 0;
 				position: relative;
-
+				border-bottom: 1px solid #e8e8e8;
 				.back {
 					background: url("../../assets/icon/backColory.png") no-repeat center 0;
 					background-size: cover;
@@ -361,12 +367,15 @@
 					color: #333;
 					line-height: 42px;
 					text-align: center;
+					span{
+						color: #ff523d;
+					}
 				}
 			}
 
 			.searchCriteria {
 				padding: 0 20px;
-
+				padding-top: 20px;
 				.region {
 					div {
 						padding: 5px 20px 5px 10px;
@@ -398,11 +407,19 @@
 						padding-top: 3px;
 						padding-bottom: 3px;
 						font-size: 26px;
-						margin-right: 20px;
-						margin-bottom: 10px;
+						margin-right: 10px;
+						width: 200px;
 					}
 				}
-
+				.customerTypeBox{
+					padding-top: 10px;
+					.cube-select {
+						padding-top: 3px;
+						padding-bottom: 3px;
+						font-size: 26px;
+						width: 200px;
+					}
+				}
 				.search_box {
 					padding-top: 10px;
 
@@ -451,7 +468,7 @@
 
 		.workOsCustomer_cnt {
 			position: absolute;
-			top: 350px;
+			top: 380px;
 			bottom: 0;
 			left: 0;
 			right: 0;

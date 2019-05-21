@@ -71,34 +71,50 @@
 					<div class="list_r">
 						<div class="flex_r_f_s">
 							<div class="uploadBox">
-								
-								<cube-upload v-if="imgOne==''" ref="uploadOne":action="action":simultaneous-uploads="1" :process-file="processFile"
-								@file-submitted="fileSubmitted" @file-success="function(file){return uploadSuccess(file,'imgOne')}" />
-								<div class="img-box" v-else>
+							
+								<cube-upload v-if="imgOne==''" ref="uploadOne":action="action":simultaneous-uploads="1" :max="1"
+									:process-file="processFile"@file-submitted="fileSubmitted" @file-success="function(file){return uploadSuccess(file,'imgOne','loadOne')}" 
+									@files-added="function(file){return filesAdded('loadOne')}" />
+							
+								<div class="img-box" v-if="imgOne!=''">
 									<img :src="imgOne" alt="">
 									<i class="cubeic-wrong" @click="fileRemove('imgOne')"></i>
 								</div>
-								<p>店内照片</p>
+								<p>
+									<cube-loading v-show="loadOne" class="flex_r_s_c" :size="28"></cube-loading>
+									<span>门头照片</span>
+
+								</p>
 							</div>
 							<div class="uploadBox">
 								
-								<cube-upload v-if="imgTwo==''" ref="uploadTwo":action="action":simultaneous-uploads="1" :process-file="processFile"
-								@file-submitted="fileSubmitted" @file-success="function(file){return uploadSuccess(file,'imgTwo')}" />
-								<div class="img-box" v-else>
+								<cube-upload v-if="imgTwo==''" :max="1" ref="uploadTwo":action="action":simultaneous-uploads="1" :process-file="processFile"
+								@file-submitted="fileSubmitted" @file-success="function(file){return uploadSuccess(file,'imgTwo','loadTwo')}"
+								@files-added="function(file){return filesAdded('loadTwo')}"/>
+								
+								<div class="img-box" v-if="imgTwo!=''">
 									<img :src="imgTwo" alt="">
 									<i class="cubeic-wrong" @click="fileRemove('imgTwo')"></i>
 								</div>
-								<p>店外照片</p>
+								<p>
+									<cube-loading v-show="loadTwo" class="flex_r_s_c" :size="28"></cube-loading>
+									<span>陈列照片</span>
+								</p>
 							</div>
 							<div class="uploadBox">
 								
-								<cube-upload v-if="imgThree==''" ref="uploadThree":action="action":simultaneous-uploads="1" :process-file="processFile"
-								@file-submitted="fileSubmitted" @file-success="function(file){return uploadSuccess(file,'imgThree')}" @file-error="fileError" />
-								<div class="img-box" v-else>
+								<cube-upload v-if="imgThree==''" :max="1" ref="uploadThree":action="action":simultaneous-uploads="1" :process-file="processFile"
+								@file-submitted="fileSubmitted" @file-success="function(file){return uploadSuccess(file,'imgThree','loadThree')}" @file-error="fileError"
+								 @files-added="function(file){return filesAdded('loadThree')}"/>
+								
+								<div class="img-box" v-if="imgThree!=''">
 									<img :src="imgThree" alt="">
 									<i class="cubeic-wrong" @click="fileRemove('imgThree')"></i>
 								</div>
-								<p>店外照片</p>
+								<p>
+									<cube-loading v-show="loadThree" class="flex_r_s_c" :size="28"></cube-loading>
+									<span>陈列照片</span>
+								</p>
 							</div>
 						</div>
 						
@@ -110,7 +126,7 @@
 						<div class="customer_map">
 							<el-amap ref="map" vid="amapDemo" :center="center" :zoom="15" class="amap-demo" :plugin="plugin">
 							
-								<el-amap-marker draggable="true" :events="markers" :icon="require('../../assets/icon/map@2x.png')" vid="component-marker" :position="center"></el-amap-marker>
+								<el-amap-marker :draggable="true" :events="markers" :icon="require('../../assets/icon/map@2x.png')" vid="component-marker" :position="center"></el-amap-marker>
 								
 							</el-amap>
 						</div>
@@ -199,6 +215,10 @@
 				imgOne:'',
 				imgTwo:'',
 				imgThree:'',
+				loadOne:false,
+				loadTwo:false,
+				loadThree:false,
+				
 				reg: /^1[3456789]\d{9}$/,
 				projectData:[],
 				projectTypeVal:''
@@ -232,7 +252,9 @@
 		},
 		methods:{
 			back(){
-				this.$router.go(-1);
+				this.$router.push({
+					name:'workOsInfoList'
+				});
 			},
 			consolog(){
 				
@@ -403,7 +425,9 @@
 							 })
 							toast.show();
 							setTimeout(()=>{
-								self.$router.go(0);
+								self.$router.push({
+									name:'workOsCustomer'
+								})
 							},500)
 						}else{
 							alert(res.data.msg);
@@ -433,12 +457,17 @@
 			fileSubmitted(file) {
 			  file.base64Value = file.file.base64
 			},
-			uploadSuccess(file,img){
+			uploadSuccess(file,img,load){
 				this[img] = file.response.data;
-				console.log(this[img])
+				this[load] = false;
 			},
 			fileError(file){
 				console.log(file);
+			},
+			filesAdded(load){
+				console.log(this[load])
+				this[load] = true;
+				
 			},
 			fileRemove(img){
 				let self = this;
@@ -460,7 +489,7 @@
 						href: 'javascript:;'
 					},
 					onConfirm: () => {
-						let self = this;
+						// let self = this;
 						this.axios.post(Api.staffApi + '/business/deleteImg', this.qs.stringify({
 							imgAddr:self[img]
 						}), {
@@ -475,6 +504,13 @@
 								 })
 								toast.show();
 								self[img] = '';
+								setTimeout(()=>{
+									let upLoad = document.querySelectorAll(".uploadBox input");
+									upLoad.forEach((e)=>{
+										e.setAttribute("capture","camera");
+									});
+								},200)
+								
 							}else{
 								alert(res.data.msg);
 							}
@@ -505,6 +541,7 @@
 			height: 42px;
 			padding: 22px 0;
 			position: relative;
+			border-bottom: 1px solid #e8e8e8;
 			.back{
 				background: url("../../assets/icon/backColory.png") no-repeat center 0;
 				background-size: cover;
@@ -523,8 +560,7 @@
 			}
 		}
 		.addCustomer_list{
-			padding: 0 20px;
-			padding-bottom: 20px;
+			padding: 20px;
 			li{
 				padding: 20px 0;
 			}
@@ -547,9 +583,9 @@
 					font-size: 26px;
 				}
 				.img-box{
-					width: 80px;/*no*/
-					height: 80px;/*no*/
-					margin: 0 10px 10px 0;/*no*/
+					width: 120px;
+					height: 120px;
+					// margin: 0 10px 10px 0;
 					box-sizing: border-box;
 					background-color: #fff;
 					box-shadow: 0 0 6px 2px rgba(0,0,0,.08);
@@ -602,10 +638,26 @@
 				}
 				.uploadBox{
 					margin-right: 15px;
+					.cube-upload-btn-def{
+						width: 120px;
+						height: 120px;
+					}
+					.cube-upload-def .cube-upload-btn, .cube-upload-def .cube-upload-file{
+						margin:0 ;
+					}
+					.cube-upload{
+						width: 120px;
+						height: 120px;
+					}
 					p{
 						text-align: center;
-						font-size: 24px;
-						color: #999;
+						padding-top: 10px;
+						div{
+							text-align: center;
+							font-size: 28px;
+							color: 999;
+							
+						}
 					}
 				}
 				.customer_map{

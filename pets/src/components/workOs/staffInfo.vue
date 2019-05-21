@@ -23,10 +23,10 @@
 							</div>
 						</div>
 						<div class="phone">{{item.phone}}</div>
-						<div class="addr">区域:{{item.area}}-{{item.city}}-{{item.province}}</div>
+						<div class="addr">区域:{{item.province}}-{{item.city}}-{{item.area}}</div>
 						<div class="addTime flex_r_s_b">
 							<span>添加日期:{{item.createTime}}</span>
-							<img @click="showBtn(item)" src="../../assets/ali-delete.png" alt="">
+							<!-- <img @click="showBtn(item)" src="../../assets/ali-delete.png" alt=""> -->
 						</div>
 					</li>
 				</ul>
@@ -63,7 +63,9 @@
 		},
 		methods: {
 			back() {
-				this.$router.go(-1);
+				this.$router.push({
+					name:'workOsInfoList'
+				});
 			},
 			getStaffList() {
 				let self = this;
@@ -134,55 +136,7 @@
 					}
 				})
 			},
-			showBtn(item) {
-				this.$createDialog({
-					type: 'confirm',
-					icon: 'cubeic-alert',
-					title: '删除',
-					content: '是否确定删除该员工信息？',
-					confirmBtn: {
-						text: '确定',
-						active: true,
-						disabled: false,
-						href: 'javascript:;'
-					},
-					cancelBtn: {
-						text: '取消',
-						active: false,
-						disabled: false,
-						href: 'javascript:;'
-					},
-					onConfirm: () => {
-						let self = this;
-						this.axios.post(Api.staffApi + '/business/deleteBusinessStaff', this.qs.stringify({
-							id:item.id
-						}), {
-							headers: {
-								'Content-Type': 'application/x-www-form-urlencoded'
-							}
-						}).then((res)=>{
-							if(res.data.code == 1){
-								let toast = this.$createToast({
-									txt: '删除成功',
-									type: 'correct'
-								 })
-								toast.show();
-								self.staffInfo.forEach((e,index)=>{
-									if(item.id == e.id){
-										self.staffInfo.splice(index,1);
-										return false;
-									}
-								})
-							}else{
-								alert(res.data.msg);
-							}
-						})
-					},
-					onCancel: () => {
-						
-					}
-				}).show()
-			}
+			
 		}
 	}
 </script>
@@ -197,7 +151,7 @@
 			height: 42px;
 			padding: 22px 0;
 			position: relative;
-
+			border-bottom: 1px solid #e8e8e8;
 			.back {
 				background: url("../../assets/icon/backColory.png") no-repeat center 0;
 				background-size: cover;
@@ -237,7 +191,7 @@
 			left: 0;
 			right: 0;
 			bottom: 0;
-
+			padding-top: 20px;
 			ul {
 				padding: 0 20px;
 			}
