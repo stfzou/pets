@@ -70,7 +70,7 @@
 				onSelect: this.selectHandle,
 				onCancel: this.cancelHandle
 			});
-			console.log(JSON.parse(sessionStorage.getItem('staff')))
+			
 		},
 		methods:{
 			back(){
@@ -136,7 +136,7 @@
 						province:this.cityData[0],
 						city:this.cityData[1],
 						area:this.cityData[2],
-						parentId:JSON.parse(sessionStorage.getItem('staff')).staffId
+						parentId:JSON.parse(localStorage.getItem('staff')).staffId
 					}), {
 						headers: {
 							'Content-Type': 'application/x-www-form-urlencoded'

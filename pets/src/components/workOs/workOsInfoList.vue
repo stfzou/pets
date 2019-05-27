@@ -26,6 +26,7 @@
 </template>
 
 <script>
+	import Api from '../common/apj.js'
 	export default{
 		data(){
 			return{
@@ -38,19 +39,23 @@
 		},
 		mounted() {
 			
-			if(JSON.parse(sessionStorage.getItem('staff'))== null){
+			if(JSON.parse(localStorage.getItem('staff'))== null){
 				
 				this.$router.push({
 					name:'workOsLogin'
 				})
 				
 			}else{
-				this.staffId = JSON.parse(sessionStorage.getItem('staff')).staffId;
-				this.parentId = JSON.parse(sessionStorage.getItem('staff')).parentId;
-				this.name = JSON.parse(sessionStorage.getItem('staff')).name;
-				// this.staffNum = JSON.parse(sessionStorage.getItem('staff')).staffNum;
-				this.staffNum = this.$store.state.staffNum;
-				this.clientNum = this.$store.state.customerNum;
+				this.staffId = JSON.parse(localStorage.getItem('staff')).staffId;
+				this.parentId = JSON.parse(localStorage.getItem('staff')).parentId;
+				this.name = JSON.parse(localStorage.getItem('staff')).name;
+				this.staffNum = JSON.parse(localStorage.getItem('staff')).staffNum;
+				// this.staffNum = this.$store.state.staffNum;
+				this.clientNum = JSON.parse(localStorage.getItem('staff')).clientNum;
+				if(this.parentId == 0){
+					this.staffId = '-1';
+				}
+				this.getCustomer();
 			}
 		},
 		methods:{
@@ -70,7 +75,7 @@
 				})
 			},
 			quit(){
-				sessionStorage.removeItem('staff');
+				localStorage.removeItem('staff');
 				this.$router.push({
 					name:'workOsLogin'
 				})
@@ -79,7 +84,35 @@
 				this.$router.push({
 					name:'staffInfo'
 				})
-			}
+			},
+			getCustomer(){
+				let self = this;
+				this.axios.post(Api.staffApi + '/business/selectBClientInfo', this.qs.stringify({
+					businessId:self.staffId,
+					province:'',
+					city:'',
+					area:'',
+					conditionId:'',
+					typeId:'',
+					pageNo:0,
+					pageSize:1,
+					shopName:'',
+					productTypeId:''
+				}), {
+					headers: {
+						'Content-Type': 'application/x-www-form-urlencoded'
+					}
+				}).then((res) => {
+					if (res.data.code == 1) {
+						
+						
+						self.clientNum = res.data.data.bcNum;
+						
+					} else {
+						alert(res.data.msg)
+					}
+				})
+			},
 			
 		}
 	}

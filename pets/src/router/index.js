@@ -37,6 +37,7 @@ import WorkOsLogin from '@/components/workOs/workOsLogin'
 import WorkOsInfoList from '@/components/workOs/workOsInfoList'
 import WorkOsCustomer from '@/components/workOs/workOsCustomer'
 import WorkOsMap from '@/components/workOs/workOsMap'
+import WorkOsPcMap from '@/components/workOs/workOsPcMap'
 import AddCustomer from '@/components/workOs/AddCustomer'
 import EditCustomer from '@/components/workOs/editCustomer'
 import WorkOsChangePw from '@/components/workOs/workOsChangePw'
@@ -48,11 +49,11 @@ import EditStaff from '@/components/workOs/editStaff'
 
 Vue.use(Router)
 export default new Router({
-	mode: 'history',
+	mode: 'hash',
     routes:[
 		{
 		  path:'',
-		  redirect:'seller/sellerGoods'
+		  redirect:'/workOsInfoList'
 		},
 		{
 			path:'/vLogin',
@@ -124,6 +125,11 @@ export default new Router({
 			name:'workOsMap',
 			component:WorkOsMap,
 			
+		},
+		{
+			path:'/workOsPcMap',
+			name:'workOsPcMap',
+			component:WorkOsPcMap,
 		},
 		{
 			path:'/dynamicHome',

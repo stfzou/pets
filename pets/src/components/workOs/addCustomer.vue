@@ -29,6 +29,7 @@
 						<input type="text" v-model="addr" />
 					</div>
 				</li>
+				
 				<li class="flex_r_f_s">
 					<div class="list_l"><b>*</b>联系电话:</div>
 					<div class="list_r">
@@ -55,7 +56,7 @@
 					<div class="list_l"><b>*</b>产品类型:</div>
 					<div class="list_r">
 						<div class="projectType">
-							<el-select v-model="projectTypeVal" multiple placeholder="请选择" @change="consolog">
+							<el-select v-model="projectTypeVal" multiple placeholder="请选择">
 								<el-option
 								  v-for="item in projectData"
 								  :key="item.value"
@@ -77,7 +78,7 @@
 									@files-added="function(file){return filesAdded('loadOne')}" />
 							
 								<div class="img-box" v-if="imgOne!=''">
-									<img :src="imgOne" alt="">
+									<img :src="imgOne" alt="" @click="showImagePreview('imgOne')">
 									<i class="cubeic-wrong" @click="fileRemove('imgOne')"></i>
 								</div>
 								<p>
@@ -93,7 +94,7 @@
 								@files-added="function(file){return filesAdded('loadTwo')}"/>
 								
 								<div class="img-box" v-if="imgTwo!=''">
-									<img :src="imgTwo" alt="">
+									<img :src="imgTwo" alt="" @click="showImagePreview('imgTwo')">
 									<i class="cubeic-wrong" @click="fileRemove('imgTwo')"></i>
 								</div>
 								<p>
@@ -108,7 +109,7 @@
 								 @files-added="function(file){return filesAdded('loadThree')}"/>
 								
 								<div class="img-box" v-if="imgThree!=''">
-									<img :src="imgThree" alt="">
+									<img :src="imgThree" alt=""  @click="showImagePreview('imgThree')">
 									<i class="cubeic-wrong" @click="fileRemove('imgThree')"></i>
 								</div>
 								<p>
@@ -120,13 +121,21 @@
 						
 					</div>
 				</li>
+				<li class="flex_r_f_s">
+					<div class="list_l"><b>*</b>客户备注:</div>
+					<div class="list_r">
+						<div class="remark">
+							<cube-textarea v-model="remark" :maxlength="200" placeholder="请输入客户备注信息"></cube-textarea>
+						</div>
+					</div>
+				</li>
 				<li>
 					<div class="list_l"><b>*</b>地理位置:</div>
 					<div class="list_r">
 						<div class="customer_map">
 							<el-amap ref="map" vid="amapDemo" :center="center" :zoom="15" class="amap-demo" :plugin="plugin">
 							
-								<el-amap-marker :draggable="true" :events="markers" :icon="require('../../assets/icon/map@2x.png')" vid="component-marker" :position="center"></el-amap-marker>
+								<el-amap-marker v-if="isMark" :draggable="true" :events="markers" :icon="require('../../assets/icon/map@2x.png')" vid="component-marker"></el-amap-marker>
 								
 							</el-amap>
 						</div>
@@ -155,7 +164,11 @@
 		data(){
 			let self = this;
 			return{
-				
+				isCommit:false,
+				remark:'',
+				isMark:true,
+				lng:'',
+				lat:'',
 				cityData: ['省份', '城市', '地区'],
 				storeEnvironmen: [],
 				customerType: [],
@@ -166,45 +179,50 @@
 				typeVal: '',
 				//图片上传
 				action: {
-					target:'http://192.168.0.109:8083/business/updateImg',
-					prop: 'file',
+					target:Api.staffApi+'/business/updateImg',
+					prop: 'base64Value',
 					max:1
 					
 				},
 				center:[0,0],
-				plugin: [
-				
-					{
-						pName: 'Geolocation',
-						enableHighAccuracy: true,//是否使用高精度定位，默认:true
-						timeout: 100,          //超过10秒后停止定位，默认：无穷大
-						maximumAge: 0,           //定位结果缓存0毫秒，默认：0
-						convert: true,           //自动偏移坐标，偏移后的坐标为高德坐标，默认：true
-						showButton: true,        //显示定位按钮，默认：true
-						buttonPosition: 'RB',    //定位按钮停靠位置，默认：'LB'，左下角
-						showMarker: false,        //定位成功后在定位到的位置显示点标记，默认：true
-						showCircle: true,        //定位成功后用圆圈表示定位精度范围，默认：true
-						panToLocation: true,     //定位成功后将定位到的位置作为地图中心点，默认：true
-						zoomToAccuracy:true,//定位成功后调整地图视野范围使定位位置及精度范围视野内可见，默认：f
-						extensions:'all',
-						events: {
-							init(o) {
-								// o 是高德地图定位插件实例
-								o.getCurrentPosition((status, result) => {
-									
-									if (result && result.position) {
-										setTimeout(()=>{
-											self.center = [result.position.lng,result.position.lat]
-										},200)
-										
-									}
-								});
-							}
-						}
+				plugin: [{
+					pName: 'Geolocation',
+					enableHighAccuracy: true,//是否使用高精度定位，默认:true
+					timeout: 10000,          //超过10秒后停止定位，默认：无穷大
+					showMarker: false,        //定位成功后在定位到的位置显示点标记，默认：true
+					showCircle: false,        //定位成功后用圆圈表示定位精度范围，默认：true
+					panToLocation: true,     //定位成功后将定位到的位置作为地图中心点，默认：true
+					zoomToAccuracy:false,//定位成功后调整地图视野范围使定位位置及精度范围视野内可见，默认：f
+					useNative:true,
+					events: {
+					  init(o) {
+						// o 是高德地图定位插件实例
+						o.getCurrentPosition((status, result) => {
+						  if (result && result.position) {
+							self.lng = result.position.lng;
+							self.lat = result.position.lat;
+							self.center = [self.lng, self.lat];
+							
+							// self.$nextTick();
+						  }
+						});
+					  },
+					  complete(res){
+						
+						 self.isMark = false;
+						
+						 setTimeout(()=>{
+							  self.isMark = true;
+							  self.lng = res.position.lng;
+							  self.lat = res.position.lat;
+							  self.center = [self.lng, self.lat];
+						 },200)
+					  }
 					}
-				],
+				 }],
 				markers:{
-					 dragend: (e) => {
+					position:self.center,
+					dragend: (e) => {
 						// var geocoder = new AMap.Geocoder();
 						let lng = e.lnglat.lng;
 						let lat = e.lnglat.lat;
@@ -226,7 +244,7 @@
 			}
 		},
 		mounted() {
-			if(JSON.parse(sessionStorage.getItem('staff'))== null){
+			if(JSON.parse(localStorage.getItem('staff'))== null){
 				
 				this.$router.push({
 					name:'workOsLogin'
@@ -256,9 +274,10 @@
 					name:'workOsInfoList'
 				});
 			},
-			consolog(){
-				
-				console.log(this.projectTypeVal.join(','))
+			showImagePreview(img) {
+			  this.$createImagePreview({
+				imgs: [this[img]]
+			  }).show()
 			},
 			getCondition(){
 				let self = this;
@@ -332,7 +351,7 @@
 				let self = this;
 				if(this.center[0] == 0){
 					let toast = this.$createToast({
-						txt: '定位失败，请刷新页面尝试重新定位',
+						txt: '定位失败，请点击地图定位按钮重新定位',
 						type: 'error'
 					  })
 					toast.show()
@@ -398,7 +417,7 @@
 					return false;
 				}else{
 					this.axios.post(Api.staffApi + '/ca/addBClient', this.qs.stringify({
-						businessId:JSON.parse(sessionStorage.getItem('staff')).staffId,
+						businessId:JSON.parse(localStorage.getItem('staff')).staffId,
 						shopName:self.storeName,
 						province:self.cityData[0],
 						city:self.cityData[1],
@@ -412,6 +431,7 @@
 						storeImg:self.imgOne,
 						displayOneImg:self.imgTwo,
 						displayTwoImg:self.imgThree,
+						remark:self.remark,
 						productTypeId:self.projectTypeVal.join(',')
 					}), {
 						headers: {
@@ -566,7 +586,7 @@
 			}
 			.list_l{
 				font-size: 26px;
-				width: 180px;
+				width: 150px;
 				color: #333;
 				b{
 					color: #ff523d;
@@ -581,6 +601,12 @@
 					width: 390px;
 					padding:0 10px;
 					font-size: 26px;
+				}
+				.remark{
+					width: 430px;
+					.cube-textarea-wrapper{
+						font-size: 24px;
+					}
 				}
 				.img-box{
 					width: 120px;

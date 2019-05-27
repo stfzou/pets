@@ -92,11 +92,12 @@
 								name:res.data.data.name,
 								staffId:res.data.data.id,
 								parentId:res.data.data.parentId,
-								phone:res.data.data.phone
+								phone:res.data.data.phone,
+								staffNum:res.data.data.staffNum
 							}
-							self.$store.commit('setStaffNum',res.data.data.staffNum);
-							self.$store.commit('setCustomerNum',res.data.data.clientNum);
-							sessionStorage.setItem('staff', JSON.stringify(staffInfo));
+// 							self.$store.commit('setStaffNum',res.data.data.staffNum);
+// 							self.$store.commit('setCustomerNum',res.data.data.clientNum);
+							localStorage.setItem('staff', JSON.stringify(staffInfo));
 							setTimeout(()=>{
 								self.loading = false;
 								self.$router.push({

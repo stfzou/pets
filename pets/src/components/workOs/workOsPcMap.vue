@@ -1,5 +1,5 @@
 <template>
-	<div class="workOsMap">
+	<div class="workOsPcMap">
 		<div class="workOsCustomer_top">
 			<div class="login_nav">
 				<div class="back" @click="back"></div>
@@ -11,30 +11,26 @@
 						<span>{{item}}</span>
 						<i class="cube-select-icon"></i>
 					</div>
-				</div>
-				<div class="customerType flex_r_f_s">
-					<cube-select v-model="environmenVal" :options="storeEnvironmen" placeholder="店铺环境" @change="getCustomer"></cube-select>
-					<cube-select v-model="typeVal" :options="customerType" placeholder="客户类型" @change="getCustomer"></cube-select>
-					<cube-select v-model="projectTypeVal" :options="projectData" placeholder="产品类型" @change="getCustomer"></cube-select>
-					<!-- <cube-select v-model="staffVal" :options="staffData" placeholder="员工" v-if="parentId==0" @change="getCustomer"></cube-select> -->
-				</div>
-				<div class="customerTypeBox">
-					<cube-select v-model="staffVal" :options="staffData" placeholder="员工" v-if="parentId==0" @change="getCustomer"></cube-select>
-				</div>
-				<div class="search_box">
-					<div class="search flex_r_s_b">
-						<input type="text" placeholder="输入你要查询的店铺名字" v-model="shopName">
-						<div class="sIcon flex_r_s_c" @click="getCustomer">
-							<img src="../../assets/ali-sousuo.png" alt="">
+					<div class="customerType flex_r_f_s">
+						<cube-select v-model="environmenVal" :options="storeEnvironmen" placeholder="店铺环境" @change="getCustomer"></cube-select>
+						<cube-select v-model="typeVal" :options="customerType" placeholder="客户类型" @change="getCustomer"></cube-select>
+						<cube-select v-model="projectTypeVal" :options="projectData" placeholder="产品类型" @change="getCustomer"></cube-select>
+						<cube-select v-model="staffVal" :options="staffData" placeholder="员工" v-if="parentId==0" @change="getCustomer"></cube-select>
+						<div class="search_box">
+							<div class="search flex_r_s_b">
+								<input type="text" placeholder="输入你要查询的店铺名字" v-model="shopName">
+								<div class="sIcon flex_r_s_c" @click="getCustomer">
+									<img src="../../assets/ali-sousuo.png" alt="">
+								</div>
+							</div>
 						</div>
 					</div>
 				</div>
+				
+				
 
 			</div>
-			<div class="workOsCustomer_nav">
-				<router-link  :to="{name:'workOsCustomer'}">信息列表</router-link>
-				<router-link class="active" :to="{name:'workOsMap'}">地图详情</router-link>
-			</div>
+			
 			
 		</div>
 		<div class="workOsCustomer_cnt">
@@ -139,10 +135,10 @@
 						convert: true,           //自动偏移坐标，偏移后的坐标为高德坐标，默认：true
 						showButton: true,        //显示定位按钮，默认：true
 						buttonPosition: 'RB',    //定位按钮停靠位置，默认：'LB'，左下角
-						showMarker: false,        //定位成功后在定位到的位置显示点标记，默认：true
-						showCircle: false,        //定位成功后用圆圈表示定位精度范围，默认：true
+						showMarker:false,        //定位成功后在定位到的位置显示点标记，默认：true
+						showCircle:false,        //定位成功后用圆圈表示定位精度范围，默认：true
 						panToLocation: true,     //定位成功后将定位到的位置作为地图中心点，默认：true
-						zoomToAccuracy:false,//定位成功后调整地图视野范围使定位位置及精度范围视野内可见，默认：f
+						zoomToAccuracy:true,//定位成功后调整地图视野范围使定位位置及精度范围视野内可见，默认：f
 						extensions:'all',
 						useNative:true,
 						events: {
@@ -151,7 +147,8 @@
 								o.getCurrentPosition((status, result) => {
 									
 									if (result && result.position) {
-										self.center = [result.position.lng,result.position.lat];
+										self.center = [result.position.lng,result.position.lat]
+										
 									}
 								});
 							}
@@ -385,12 +382,12 @@
 </script>
 
 <style lang="scss">
-	.workOsMap {
+	.workOsPcMap {
 		height: 100%;
 		position: relative;
 
 		.workOsCustomer_top {
-			height: 380px;
+			height: 180px;
 			.line{
 				height: 4px;
 				background: #e8e8e8;
@@ -427,16 +424,14 @@
 				padding: 0 20px;
 				padding-top: 20px;
 				.region {
-					div {
-						padding: 5px 20px 5px 10px;
-						/*no*/
+					.sheng  {
+						padding: 8px 20px 8px 10px;
+						width: 150px;
 						margin-right: 20px;
 						border: 1px solid #e8e8e8;
-						/*no*/
 						text-align: center;
 						border-radius: 2px;
-						/*no*/
-						width: initial;
+						// width: initial;
 
 						span {
 							font-size: 26px;
@@ -451,31 +446,23 @@
 				}
 
 				.customerType {
-					padding-top: 20px;
-					
 					.cube-select {
 						padding-top: 3px;
 						padding-bottom: 3px;
 						font-size: 26px;
 						margin-right: 10px;
-						width: 200px;
+						width: 150px;
+						
 					}
 				}
-				.customerTypeBox{
-					padding-top: 10px;
-					.cube-select {
-						padding-top: 3px;
-						padding-bottom: 3px;
-						font-size: 26px;
-						width: 200px;
-					}
-				}
+			
 				.search_box {
-					padding-top: 10px;
-
+					margin-left: 30px;
+					width: 260px;
 					.search {
 						height: 48px;
 						border: 1px solid #ff523d;
+						width: 300px;
 						/*no*/
 						border-radius: 22px;
 						padding-left: 10px;
@@ -502,24 +489,11 @@
 				}
 			}
 
-			.workOsCustomer_nav {
-				padding: 0 20px;
-				padding-top: 20px;
-
-				a {
-					font-size: 24px;
-					color: #333;
-					margin-right: 20px;
-				}
-				.active{
-					color: #ff523d;
-				}
-			}
 		}
 
 		.workOsCustomer_cnt {
 			position: absolute;
-			top: 380px;
+			top: 180px;
 			bottom: 0;
 			left: 0;
 			right: 0;

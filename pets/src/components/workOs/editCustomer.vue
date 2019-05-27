@@ -29,6 +29,7 @@
 						<input type="text" v-model="addr" />
 					</div>
 				</li>
+				
 				<li class="flex_r_f_s">
 					<div class="list_l"><b>*</b>联系电话:</div>
 					<div class="list_r">
@@ -78,7 +79,7 @@
 									@files-added="function(file){return filesAdded('loadOne')}" />
 									
 									<div class="img-box" v-if="imgOne!=''">
-										<img :src="imgOne" alt="">
+										<img :src="imgOne" alt="" @click="showImagePreview('imgOne')">
 										<i class="cubeic-wrong" @click="fileRemove('imgOne')"></i>
 									</div>
 									<p>
@@ -94,7 +95,7 @@
 									@files-added="function(file){return filesAdded('loadTwo')}"/>
 									
 									<div class="img-box" v-if="imgTwo!=''">
-										<img :src="imgTwo" alt="">
+										<img :src="imgTwo" alt="" @click="showImagePreview('imgTwo')">
 										<i class="cubeic-wrong" @click="fileRemove('imgTwo')"></i>
 									</div>
 									<p>
@@ -109,7 +110,7 @@
 									 @files-added="function(file){return filesAdded('loadThree')}"/>
 									
 									<div class="img-box" v-if="imgThree!=''">
-										<img :src="imgThree" alt="">
+										<img :src="imgThree" alt="" @click="showImagePreview('imgThree')">
 										<i class="cubeic-wrong" @click="fileRemove('imgThree')"></i>
 									</div>
 									<p>
@@ -123,13 +124,22 @@
 						
 					</div>
 				</li>
+				<li class="flex_r_f_s">
+					<div class="list_l"><b>*</b>客户备注:</div>
+					<div class="list_r">
+						<div class="remark">
+							<cube-textarea v-model="remark" :maxlength="200" placeholder="请输入客户备注信息" ></cube-textarea>
+						</div>
+					</div>
+				</li>
+				
 				<li>
 					<div class="list_l"><b>*</b>地理位置:</div>
 					<div class="list_r">
 						<div class="customer_map">
-							<el-amap ref="map" vid="amapDemo" :center="center" :zoom="15" class="amap-demo" :plugin="plugin">
+							<el-amap ref="map" vid="amapDemo" :center="center" :zoom="15" class="amap-demo">
 							
-								<el-amap-marker :events="markers" :icon="require('../../assets/icon/map@2x.png')" vid="component-marker" :position="center"></el-amap-marker>
+								<el-amap-marker :draggable="true" :events="markers" :icon="require('../../assets/icon/map@2x.png')" vid="component-marker" :position="center"></el-amap-marker>
 								
 							</el-amap>
 						</div>
@@ -157,6 +167,7 @@
 			let self = this;
 			return{
 				cityData: ['省份', '城市', '地区'],
+				remark:'',
 				storeEnvironmen: [],
 				customerType: [],
 				projectData:[],
@@ -168,43 +179,12 @@
 				typeVal: '',
 				//图片上传
 				action: {
-					target:'http://192.168.0.109:8083/business/updateImg',
-					prop: 'file',
+					target:Api.staffApi+'/business/updateImg',
+					prop: 'base64Value',
 					max:1
 					
 				},
 				center:[0,0],
-				plugin: [
-				
-					{
-						pName: 'Geolocation',
-						enableHighAccuracy: true,//是否使用高精度定位，默认:true
-						timeout: 100,          //超过10秒后停止定位，默认：无穷大
-						maximumAge: 0,           //定位结果缓存0毫秒，默认：0
-						convert: true,           //自动偏移坐标，偏移后的坐标为高德坐标，默认：true
-						showButton: true,        //显示定位按钮，默认：true
-						buttonPosition: 'RB',    //定位按钮停靠位置，默认：'LB'，左下角
-						showMarker: false,        //定位成功后在定位到的位置显示点标记，默认：true
-						showCircle: true,        //定位成功后用圆圈表示定位精度范围，默认：true
-						panToLocation: true,     //定位成功后将定位到的位置作为地图中心点，默认：true
-						zoomToAccuracy:true,//定位成功后调整地图视野范围使定位位置及精度范围视野内可见，默认：f
-						extensions:'all',
-						events: {
-							init(o) {
-								// o 是高德地图定位插件实例
-								o.getCurrentPosition((status, result) => {
-									
-									if (result && result.position) {
-										setTimeout(()=>{
-											self.center = [result.position.lng,result.position.lat]
-										},200)
-										
-									}
-								});
-							}
-						}
-					}
-				],
 				markers:{
 					dragend: (e) => {
 						// var geocoder = new AMap.Geocoder();
@@ -245,6 +225,11 @@
 					name:'workOsInfoList'
 				});
 			},
+			showImagePreview(img) {
+			  this.$createImagePreview({
+				imgs: [this[img]]
+			  }).show()
+			},
 			getProjectType(){
 				let self = this;
 				this.axios.post(Api.staffApi + '/business/selectBClientPTypeAll', this.qs.stringify({
@@ -282,6 +267,7 @@
 				this.imgTwo = re.imgTwo;
 				this.imgThree = re.imgThree;
 				this.clientId = re.clientId;
+				this.remark = re.remark;
 				re.productTypeId.split(',').forEach((e)=>{
 					this.projectTypeVal.push(parseInt(e))
 				})
@@ -416,6 +402,7 @@
 						storeImg:self.imgOne,
 						displayOneImg:self.imgTwo,
 						displayTwoImg:self.imgThree,
+						remark:self.remark,
 						productTypeId:self.projectTypeVal.join(',')
 					}), {
 						headers: {
@@ -566,7 +553,7 @@
 			}
 			.list_l{
 				font-size: 26px;
-				width: 180px;
+				width: 150px;
 				color: #333;
 				b{
 					color: #ff523d;
@@ -580,6 +567,12 @@
 					width: 390px;
 					padding:0 10px;
 					font-size: 26px;
+				}
+				.remark{
+					width: 430px;
+					.cube-textarea-wrapper{
+						font-size: 24px;
+					}
 				}
 				.img-box{
 					width: 120px;

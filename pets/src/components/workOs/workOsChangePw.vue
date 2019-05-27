@@ -49,8 +49,17 @@
 			}
 		},
 		mounted() {
-			console.log(JSON.parse(sessionStorage.getItem('staff')))
-			this.phone = JSON.parse(sessionStorage.getItem('staff')).phone;
+			// console.log(JSON.parse(localStorage.getItem('staff')).phone)
+			if(JSON.parse(localStorage.getItem('staff'))== null){
+				
+				this.$router.push({
+					name:'workOsLogin'
+				})
+				
+			}else{
+				this.phone = JSON.parse(localStorage.getItem('staff')).phone;
+			}
+			
 		},
 		methods:{
 			back(){
@@ -107,7 +116,7 @@
 					return false;
 				}else{
 					this.axios.post(Api.staffApi+'/business/updateBusinessStaffPwd', this.qs.stringify({
-						id:JSON.parse(sessionStorage.getItem('staff')).staffId,	
+						id:JSON.parse(localStorage.getItem('staff')).staffId,	
 						phone: this.phone,
 						oldPwd: this.oldPw,
 						newPwd:this.qrPw
@@ -119,7 +128,7 @@
 						console.log(res)
 						
 						if (res.data.code === 1) {
-							sessionStorage.removeItem('staff');
+							localStorage.removeItem('staff');
 							let toast = self.$createToast({
 								txt: '修改成功',
 								type: 'correct'

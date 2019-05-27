@@ -22,8 +22,9 @@
 					<cube-select v-model="projectTypeVal" :options="projectData" placeholder="产品类型" @change="getCustomer"></cube-select>
 					
 				</div>
-				<div class="customerTypeBox">
-					<cube-select v-model="staffVal" :options="staffData" placeholder="员工" v-if="parentId==0" @change="getCustomer"></cube-select>
+				<div class="customerTypeBox flex_r_f_s" v-if="parentId==0">
+					<cube-select v-model="staffVal" :options="staffData" placeholder="员工" @change="getCustomer"></cube-select>
+					<router-link :to="{name:'workOsPcMap'}">PC端链接</router-link>
 				</div>
 				<div class="search_box">
 					<div class="search flex_r_s_b">
@@ -45,9 +46,9 @@
 			<cube-scroll ref="scroll" :options="options"  @pulling-up="onPullingUp" @pulling-down="onPullingDown">
 			<ul class="listInfo">
 				<li v-for="item in customerList">
-					<div class="storeName flex_r_f_s"><span><b>{{item.shopName}}</b></span>
+					<div class="storeName">
 						<!-- <a href="###"><img src="../../assets/ali-edit.png" alt=""></a> -->
-						<router-link v-if="parentId!=0" :to="{name:'editCustomer',params:{
+						<router-link class="flex_r_f_s" v-if="parentId!=0" :to="{name:'editCustomer',params:{
 							cityData:[item.province,item.city,item.area],
 							addr:item.address,
 							shopName:item.shopName,
@@ -60,8 +61,10 @@
 							typeId:item.typeId,
 							conditionId:item.conditionId,
 							clientId:item.clientId,
-							productTypeId:item.productTypeId
+							productTypeId:item.productTypeId,
+							remark:item.remark
 						}}">
+							<span><b>{{item.shopName}}</b></span>
 							<img src="../../assets/ali-edit.png" alt="">
 						</router-link>
 					</div>
@@ -77,14 +80,26 @@
 					</div>
 					<div class="customerType">
 						<div class="colorType flex_r_s_b">
-							<span style="background: #0093dd;" v-if="item.clientTypeName=='重点客户'">重点客户</span>
-							<span style="background: #85c324;" v-if="item.clientTypeName=='优质客户'">优质客户</span>
-							<span style="background: #ef9b48;" v-if="item.clientTypeName=='一般客户'">一般客户</span>
-							<span style="background: #bb8fbb;" v-if="item.clientTypeName=='潜在客户'">潜在客户</span>
-							<span style="background: #aba9a9;" v-if="item.clientTypeName=='无效客户'">无效客户</span>
+							<a style="background: #0093dd;"  v-if="item.clientTypeName=='重点客户'" :href="'https://uri.amap.com/marker?position='+item.longitude+','+item.latitude+'&name='+item.address">
+								重点客户
+							</a>
+							<a style="background: #85c324;" v-if="item.clientTypeName=='优质客户'" :href="'https://uri.amap.com/marker?position='+item.longitude+','+item.latitude+'&name='+item.address"> 
+								优质客户
+							</a>
+							<a style="background: #ef9b48;" v-if="item.clientTypeName=='一般客户'" :href="'https://uri.amap.com/marker?position='+item.longitude+','+item.latitude+'&name='+item.address">
+								一般客户
+							</a>
+							<a style="background: #bb8fbb;" v-if="item.clientTypeName=='潜在客户'" :href="'https://uri.amap.com/marker?position='+item.longitude+','+item.latitude+'&name='+item.address">
+								潜在客户
+							</a>
+							<a style="background: #aba9a9;" v-if="item.clientTypeName=='无效客户'" :href="'https://uri.amap.com/marker?position='+item.longitude+','+item.latitude+'&name='+item.address">
+								无效客户
+							</a>
+							
 						</div>
 					</div>
 					<div class="pdtext">产品类型:<span v-for="pItem in item.clientPTypeNames">{{pItem}}</span></div>
+					<div class="remark" v-if="item.remark!=''">客户备注:{{item.remark}}</div>
 					<div class="personCharge">负责人:{{name}}</div>
 				</li>
 					
@@ -147,26 +162,27 @@
 			}
 		},
 		mounted() {
-			if(JSON.parse(sessionStorage.getItem('staff'))== null){
+			// console.log(JSON.parse(localStorage.getItem('staff'))==null)
+			if(JSON.parse(localStorage.getItem('staff'))== null){
 				
 				this.$router.push({
 					name:'workOsLogin'
 				})
 				
 			}else{
-				console.log(JSON.parse(sessionStorage.getItem('staff')))
+				console.log(JSON.parse(localStorage.getItem('staff')))
 				this.addressPicker = this.$createCascadePicker({
 					title: '城市选择',
 					data: addressData,
 					onSelect: this.selectHandle,
 					onCancel: this.cancelHandle
 				});
-				this.name = JSON.parse(sessionStorage.getItem('staff')).name;
-				this.parentId = JSON.parse(sessionStorage.getItem('staff')).parentId;
+				this.name = JSON.parse(localStorage.getItem('staff')).name;
+				this.parentId = JSON.parse(localStorage.getItem('staff')).parentId;
 				if(this.parentId == 0){
 					this.staffVal = '-1';
 				}else{
-					this.staffVal = JSON.parse(sessionStorage.getItem('staff')).staffId;
+					this.staffVal = JSON.parse(localStorage.getItem('staff')).staffId;
 				}
 				this.getCustomer();
 				this.getCondition();
@@ -288,6 +304,13 @@
 					this.shi = this.cityData[1]
 					this.qu = this.cityData[2]
 				}
+				if(this.cityData[1] == '城市'){
+					this.shi = '';
+				}
+				if(this.cityData[2] == '市辖区'){
+					this.qu = '';
+				}
+			
 				this.axios.post(Api.staffApi + '/business/selectBClientInfo', this.qs.stringify({
 					businessId:self.staffVal,
 					province:self.sheng,
@@ -296,7 +319,7 @@
 					conditionId:self.environmenVal,
 					typeId:self.typeVal,
 					pageNo:0,
-					pageSize:3,
+					pageSize:10,
 					shopName:self.shopName,
 					productTypeId:self.projectTypeVal
 				}), {
@@ -345,6 +368,12 @@
 					this.shi = this.cityData[1]
 					this.qu = this.cityData[2]
 				}
+				if(this.cityData[1] == '城市'){
+					this.shi = '';
+				}
+				if(this.cityData[2] == '市辖区'){
+					this.qu = '';
+				}
 				this.page++;
 				this.axios.post(Api.staffApi + '/business/selectBClientInfo', this.qs.stringify({
 					businessId:self.staffVal,
@@ -355,7 +384,7 @@
 					typeId:self.typeVal,
 					pageNo:self.page,
 					productTypeId:self.projectTypeVal,
-					pageSize:3
+					pageSize:10
 				}), {
 					headers: {
 						'Content-Type': 'application/x-www-form-urlencoded'
@@ -493,6 +522,11 @@
 						font-size: 26px;
 						width: 200px;
 					}
+					a{
+						font-size: 26px;
+						// color: #ff523d;
+						margin-left: 20px;
+					}
 				}
 				.search_box {
 					padding-top: 10px;
@@ -519,6 +553,7 @@
 
 						input {
 							width: 85%;
+							font-size: 26px;
 						}
 					}
 
@@ -562,7 +597,8 @@
 						font-size: 34px;
 						font-weight: bold;
 						color: #333;
-						a{
+						a{	
+							color: #333;
 							img{
 								width: 40px;
 								margin-left: 10px;
@@ -594,9 +630,8 @@
 					.customerType{
 						padding-top: 20px;
 						.colorType{
-							span{
+							a{
 								width: 120px;
-								background: red;
 								font-size: 22px;
 								color: #fff;
 								text-align: center;
@@ -605,6 +640,7 @@
 							}
 						}
 					}
+				
 					.pdtext{
 						padding-top: 20px;
 						color: #999;
@@ -612,6 +648,12 @@
 						span{
 							margin-right: 10px;
 						}
+					}
+					.remark{
+						padding-top: 20px;
+						color: #999;
+						font-size: 24px;
+						line-height: 32px;
 					}
 					.personCharge{
 						color: #999;
