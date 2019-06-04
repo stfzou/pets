@@ -12,6 +12,8 @@ import AddGoods from '@/components/addGoods'
 import Sell from '@/components/selling'
 import GoodsEdit from '@/components/goodsEdit'
 import Upload from '@/components/upload'
+import PublishActivity from '@/components/activity/publishActivity'
+import Ticket from '@/components/activity/ticket'
 
 Vue.use(Router)
 
@@ -51,6 +53,17 @@ export default new Router({
 				path:'goodsEdit',
 				name:'goodsEdit',
 				component:GoodsEdit
+			},{
+				path:'publishActivity',
+				name:'publishActivity',
+				component:PublishActivity,
+				meta:{
+					keepAlive:true // 需要要缓存
+				}
+			},{
+				path:'ticket',
+				name:'ticket',
+				component:Ticket
 			}]
 		},
 		{

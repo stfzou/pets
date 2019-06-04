@@ -87,7 +87,7 @@
 						},{
 						subNavName:'未上架的商品',
 						subIcon:require('../assets/home/icon_home1.png'),
-						link:''
+						link:'publishActivity'
 						},{
 						subNavName:'草稿箱',
 						subIcon:require('../assets/home/icon_home2.png'),

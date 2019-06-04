@@ -97,7 +97,6 @@
 			
 								  </el-amap>
 								
-								 
 								</div>
 							</div>
 						</li>
@@ -239,7 +238,7 @@
 						console.log(self.mapCenter)
 					}
 				},
-				 searchOption: {
+				searchOption: {
 					city:'',
 					citylimit: true
 				},
@@ -271,7 +270,7 @@
 				zoom:14,
 				plugin: [{
 				  enableHighAccuracy: true,//是否使用高精度定位，默认:true
-				  timeout: 100,          //超过10秒后停止定位，默认：无穷大
+				  timeout: 10000,          //超过10秒后停止定位，默认：无穷大
 				  maximumAge: 0,           //定位结果缓存0毫秒，默认：0
 				  convert: false,           //自动偏移坐标，偏移后的坐标为高德坐标，默认：true
 				  showButton: false,        //显示定位按钮，默认：true

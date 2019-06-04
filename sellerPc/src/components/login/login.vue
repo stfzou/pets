@@ -42,6 +42,7 @@
 </template>
 
 <script>
+	import Api from '../common/apj.js'
 	export default {
 		data() {
 			return {
@@ -80,7 +81,7 @@
 						this.count = TIME_COUNT;
 						this.show = false;
 						if(!this.forgetState){
-							this.axios.get('/shops_sms_register?phone=' + this.phone, {
+							this.axios.get(Api.shopApi+'/shops_sms_register?phone=' + this.phone, {
 									headers: {
 										'Content-Type': 'application/x-www-form-urlencoded'
 									}
@@ -92,7 +93,7 @@
 									console.log(error);
 								});
 						}else{
-							this.axios.get('/sms_getpwd?phone=' + this.phone, {
+							this.axios.get(Api.shopApi+'/sms_getpwd?phone=' + this.phone, {
 									headers: {
 										'Content-Type': 'application/x-www-form-urlencoded'
 									}
@@ -162,7 +163,7 @@
 					});
 					return false;
 				} else {
-					this.axios.post('/shops_u_register', this.qs.stringify({
+					this.axios.post(Api.shopApi+'/shops_u_register', this.qs.stringify({
 						phone: this.phone,
 						password: this.pwd,
 						v_code: this.yz
@@ -282,7 +283,7 @@
 					return false;
 				} else {
 					let self = this;
-					this.axios.post('/chekegetPwd', this.qs.stringify({
+					this.axios.post(Api.shopApi+'/chekegetPwd', this.qs.stringify({
 						phone: this.phone,
 						v_code: this.yz
 					}), {
@@ -354,7 +355,7 @@
 					return false;
 				} else {
 					let self = this;
-					this.axios.post('/updateGetPwd', this.qs.stringify({
+					this.axios.post(Api.shopApi+'/updateGetPwd', this.qs.stringify({
 						phone: this.phone,
 						password: this.pwd
 					}), {
@@ -429,7 +430,7 @@
 						background: 'rgba(0, 0, 0, 0.7)'
 					});
 
-					this.axios.post('/shops_u_login', this.qs.stringify({
+					this.axios.post(Api.shopApi+'/shops_u_login', this.qs.stringify({
 						phone: this.phone,
 						password: this.pwd,
 					}), {

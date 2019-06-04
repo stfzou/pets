@@ -7,7 +7,7 @@ import ElementUI from 'element-ui'
 import '@/style/style.css'
 import 'element-ui/lib/theme-chalk/index.css'
 import GeminiScrollbar from 'vue-gemini-scrollbar'
-import AMap from 'vue-amap'
+import AMap from "vue-amap";
 import VDistpicker from 'v-distpicker'
 import store from './store/store'
 import axios from 'axios'
@@ -21,7 +21,7 @@ Vue.use(AMap)
 Vue.use(GeminiScrollbar)//引用自定义滚动条组件
 //Vue.use(QRCode)
 
-axios.defaults.baseURL = 'http://192.168.0.109:8084'
+// axios.defaults.baseURL = 'http://192.168.0.109:8084'
 Vue.prototype.axios = axios;
 Vue.prototype.qs = Qs;
 
