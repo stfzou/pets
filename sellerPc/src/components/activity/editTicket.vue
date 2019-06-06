@@ -1,5 +1,5 @@
 <template>
-	<div class="ticketWarp">
+	<div class="editTicketWarp">
 		<ul class="ticketList">
 			<li>
 				<div class="add_goods_title">票券基本信息</div>
@@ -199,45 +199,51 @@
 			}
 		},
 		mounted(){
+			console.log(this.$route.params.ticketInfo)
 			
-			// this.activeData = this.$route.params.activeData
-			console.log(this.$route.params.activeData)
-			// console.log(this.capitalize(this.activeData[0]))
-			this.getActiveData();
+			this.getTicketInfo();
+			// console.log(JSON.parse(sessionStorage.getItem('user')).userId)
 		},
 		methods: {
-			getActiveData(){
-				let self= this;
-				this.axios.get(Api.userApi+'/ca/selectActivityTimeAndTicketNum?userId='+ JSON.parse(sessionStorage.getItem('user')).userId, {
-					headers: {
-						'Content-Type': 'application/x-www-form-urlencoded'
-					}
-				}).then(function(res) {
-					if(res.data.code == 1){
-						
-						if(res.data.data.ticketNum>0){
-							
-							self.activityData = [self.capiDate(res.data.data.startTime),self.capiDate(res.data.data.endTime)];
-							
-						}else{
-							if(self.$route.params.activeData == undefined){
-								self.$router.push({
-									name:'publishActivity'
-								})
-							}else{
-								self.activeData = self.$route.params.activeData;
-								
-							}
-							
-						}
-						self.reserveData = self.$route.params.activeData;
-						self.effectiveData = self.$route.params.activeData;
-						
-					}else{
-						alert(res.data.msg)
-					}	
-				})
-					
+			getTicketInfo(){
+				let self = this;
+				let re = this.$route.params.ticketInfo;
+				this.charge = re.ticketType+'';
+				console.log(this.$route.params)
+				this.ticketTitle = re.ticketName;
+				this.ticketNum = re.ticketNum;
+				this.ticketPrice = re.ticketPrice;
+				this.limitNum = re.limitNum;
+				if(re.isCheck == '1'){
+					this.isExamine = true;
+				}else{
+					this.isExamine = false;
+				}
+				this.ticketExplain = re.ticketDescription;
+				if(re.isBuyTime =='1'){
+					this.isActiveEnd = true;
+				}else{
+					this.isActiveEnd = false;
+				}
+				this.reserveData = [self.capiDate(re.buyStartTime),self.capiDate(re.buyEndTime)];
+				if(re.isValidTime == '1'){
+					this.isActiveIng = true;
+				}else{
+					this.isActiveEnd = false;
+				}
+				this.effectiveData = [self.capiDate(re.validStartTime),self.capiDate(re.validEndTime)];
+				this.ticketStyleVal = re.useType+'';
+				this.returnVal = re.isBearRefund+'';
+				this.useNum = re.useNum;
+				this.activeData = this.$route.params.activeData;
+			},
+			capitalize (value) {//将时间戳转化为日期
+			  var date = new Date(parseInt(value));
+			  var tt = [date.getFullYear(), ((date.getMonth()+1)<10?'0'+(date.getMonth()+1):date.getMonth()+1), (date.getDate()<10?'0'+date.getDate():date.getDate())].join('-') + ' ' +[(date.getHours()<10?'0'+date.getHours():date.getHours()), (date.getMinutes()<10?'0'+date.getMinutes():date.getMinutes())].join(':');
+			  return tt;
+			},
+			capiDate(value){//将日期转化为时间戳
+				return new Date(value).getTime();
 			},
 			reserveDataChange(val){//限制订购时间
 				if(val[1]>this.activeData[1]){
@@ -259,20 +265,13 @@
 					this.effectiveData = [];
 				}
 			},
-			capitalize (value) {//对时间日期进行过滤
-			  var date = new Date(parseInt(value));
-			  var tt = [date.getFullYear(), ((date.getMonth()+1)<10?'0'+(date.getMonth()+1):date.getMonth()+1), (date.getDate()<10?'0'+date.getDate():date.getDate())].join('-') + ' ' +[(date.getHours()<10?'0'+date.getHours():date.getHours()), (date.getMinutes()<10?'0'+date.getMinutes():date.getMinutes())].join(':');
-              return tt;
-			},
-			capiDate(value){//将日期转化为时间戳
-				return new Date(value).getTime();
-			},
 			addTicket() {
 				
 				let self = this;
 				let examineVal = ''
 				let activeEndVal = ''
 				let activeIng = ''
+				console.log(self.ticketStyleVal)
 				if(self.isExamine){
 					examineVal = '1'
 					
@@ -294,7 +293,6 @@
 				if(self.charge!='1'){
 					self.ticketPrice = ''
 				}
-				
 				if(self.ticketTitle == ''){
 					self.$message({
 						showClose: true,
@@ -331,12 +329,6 @@
 						message:'请填写有效日期',
 						type: 'error',
 					});
-				}else if(self.activeData.length<1){
-					self.$message({
-						showClose: true,
-						message:'请填在添加活动页填写写活动开始日期',
-						type: 'error',
-					});
 				}else if(self.ticketStyleVal == '2'&&self.useNum==''){
 					self.$message({
 						showClose: true,
@@ -355,16 +347,16 @@
 						isCheck:examineVal,
 						ticketDescription:self.ticketExplain,
 						isBuyTime:activeEndVal,
-						buyStartTime:self.capitalize(self.reserveData[0]),
-						buyEndTime:self.capitalize(self.reserveData[1]),
+						buyStartTime:self.reserveData[0],
+						buyEndTime:self.reserveData[1],
 						isValidTime:activeIng,
-						validStartTime:self.capitalize(self.effectiveData[0]),
-						validEndTime:self.capitalize(self.effectiveData[1]),
+						validStartTime:self.effectiveData[0],
+						validEndTime:self.effectiveData[1],
 						useType:self.ticketStyleVal,
 						useNum:self.useNum,
 						isBearRefund:self.returnVal,
-						startTime:self.capitalize(self.activeData[0]),
-						endTime:self.capitalize(self.activeData[1])
+						startTime:self.activeData[0],
+						endTime:self.activeData[1]
 						
 					}), {
 						headers: {
@@ -389,14 +381,13 @@
 				}
 				
 			}
-			
 		}
 		
 	}
 </script>
 
 <style lang="scss">
-	.ticketWarp {
+	.editTicketWarp {
 		padding: 40px;
 		padding-right: 10px;
 		.el-date-editor .el-range__close-icon{

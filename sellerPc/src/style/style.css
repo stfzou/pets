@@ -123,7 +123,7 @@ body {
   justify-content: space-around;
 }
 .flex_c_f_s{
-  align-items:flex-start;
+  align-items:center;
 }
 .flex_c_f_e{
   justify-content: flex-end;

@@ -14,6 +14,7 @@ import GoodsEdit from '@/components/goodsEdit'
 import Upload from '@/components/upload'
 import PublishActivity from '@/components/activity/publishActivity'
 import Ticket from '@/components/activity/ticket'
+import EditTicket from '@/components/activity/editTicket'
 
 Vue.use(Router)
 
@@ -45,7 +46,8 @@ export default new Router({
 				path:'addGoods',
 				name:'addGoods',
 				component:AddGoods
-			},{
+			},
+			{
 				path:'sell',
 				name:'sell',
 				component:Sell
@@ -64,6 +66,10 @@ export default new Router({
 				path:'ticket',
 				name:'ticket',
 				component:Ticket
+			},{
+				path:'editTicket',
+				name:'editTicket',
+				component:EditTicket
 			}]
 		},
 		{
