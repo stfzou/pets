@@ -270,7 +270,7 @@
 			};
 		},
 		activated() {
-
+			this.getTicket();
 		},
 		filters: {
 			chargeFilter(val){//是否免费过滤
@@ -339,7 +339,8 @@
 						
 						if(res.data.data.ticketNum>0){
 							self.ticketNum = res.data.data.ticketNum;
-							self.activityData = [self.capiDate(res.data.data.startTime),self.capiDate(res.data.data.endTime)]
+							self.activityData = [self.capiDate(res.data.data.startTime),self.capiDate(res.data.data.endTime)];
+							// console.log()
 						}
 						
 					}	
@@ -562,6 +563,7 @@
 							self.formData = new FormData();
 							self.formData.append("Img",blob,file.name);
 							console.log("********将blob对象转成formData对象********");
+							// console.log(self.formData)
 							
 						};
 					};

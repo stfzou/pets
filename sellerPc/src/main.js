@@ -26,19 +26,19 @@ Vue.prototype.axios = axios;
 Vue.prototype.qs = Qs;
 
 /** 验证用户是否登录 **/
-router.beforeEach((to,from,next) => {
-   
-	if(to.name == 'login'){
-		next();
-	}else if(sessionStorage.getItem('user')){
-		
-		next();
-		
-	}else{
-		next('/login');
-	}
-	
-})
+// router.beforeEach((to,from,next) => {
+//    
+// 	if(to.name == 'login'){
+// 		next();
+// 	}else if(sessionStorage.getItem('user')){
+// 		
+// 		next();
+// 		
+// 	}else{
+// 		next('/login');
+// 	}
+// 	
+// })
 
 AMap.initAMapApiLoader({
   key: 'fe2312e4704c6f8f7787c7864ecebae6',

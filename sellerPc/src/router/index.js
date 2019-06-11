@@ -15,6 +15,10 @@ import Upload from '@/components/upload'
 import PublishActivity from '@/components/activity/publishActivity'
 import Ticket from '@/components/activity/ticket'
 import EditTicket from '@/components/activity/editTicket'
+import SponsorManage from '@/components/activity/sponsorManage'
+import AddSponsor from '@/components/activity/addSponsor'
+import RealName from '@/components/activity/realName'
+import RealUser from '@/components/activity/realUser'
 
 Vue.use(Router)
 
@@ -70,6 +74,22 @@ export default new Router({
 				path:'editTicket',
 				name:'editTicket',
 				component:EditTicket
+			},{
+				path:'sponsorManage',
+				name:'sponsorManage',
+				component:SponsorManage
+			},{
+				path:'addSponsor',
+				name:'addSponsor',
+				component:AddSponsor
+			},{
+				path:'realName',
+				name:'realName',
+				component:RealName
+			},{
+				path:'realUser',
+				name:'realUser',
+				component:RealUser
 			}]
 		},
 		{

@@ -196,6 +196,7 @@
 				returnVal:'1',//是否支持退票
 				useNum:'1',//每日使用最多次数
 				activeData:[],//活动开始日期
+				ticketId:''//活动卷ID
 			}
 		},
 		mounted(){
@@ -208,8 +209,9 @@
 			getTicketInfo(){
 				let self = this;
 				let re = this.$route.params.ticketInfo;
+				this.activeData = this.$route.params.activeData;
 				this.charge = re.ticketType+'';
-				console.log(this.$route.params)
+				this.ticketId = re.ticketId;
 				this.ticketTitle = re.ticketName;
 				this.ticketNum = re.ticketNum;
 				this.ticketPrice = re.ticketPrice;
@@ -222,20 +224,28 @@
 				this.ticketExplain = re.ticketDescription;
 				if(re.isBuyTime =='1'){
 					this.isActiveEnd = true;
+					this.reserveData = this.activeData;
+					
 				}else{
 					this.isActiveEnd = false;
+					this.reserveData = [self.capiDate(re.buyStartTime),self.capiDate(re.buyEndTime)];
 				}
-				this.reserveData = [self.capiDate(re.buyStartTime),self.capiDate(re.buyEndTime)];
+				
 				if(re.isValidTime == '1'){
 					this.isActiveIng = true;
+					this.effectiveData = this.activeData;
+					
 				}else{
 					this.isActiveEnd = false;
+					this.effectiveData = [self.capiDate(re.validStartTime),self.capiDate(re.validEndTime)];
+					alert(2)
 				}
-				this.effectiveData = [self.capiDate(re.validStartTime),self.capiDate(re.validEndTime)];
+				
 				this.ticketStyleVal = re.useType+'';
 				this.returnVal = re.isBearRefund+'';
 				this.useNum = re.useNum;
-				this.activeData = this.$route.params.activeData;
+				
+				console.log(this.activeData)
 			},
 			capitalize (value) {//将时间戳转化为日期
 			  var date = new Date(parseInt(value));
@@ -337,7 +347,8 @@
 					});
 				}else{
 					
-					self.axios.post(Api.userApi+'/ca/addCommunityActivityTicket', self.qs.stringify({
+					self.axios.post(Api.userApi+'/ca/editCommunityActivityTicket', self.qs.stringify({
+						ticketId:self.ticketId,
 						userId:JSON.parse(sessionStorage.getItem('user')).userId,
 						ticketType:self.charge,
 						ticketName:self.ticketTitle,
@@ -347,16 +358,16 @@
 						isCheck:examineVal,
 						ticketDescription:self.ticketExplain,
 						isBuyTime:activeEndVal,
-						buyStartTime:self.reserveData[0],
-						buyEndTime:self.reserveData[1],
+						buyStartTime:self.capitalize(self.reserveData[0]),
+						buyEndTime:self.capitalize(self.reserveData[1]),
 						isValidTime:activeIng,
-						validStartTime:self.effectiveData[0],
-						validEndTime:self.effectiveData[1],
+						validStartTime:self.capitalize(self.effectiveData[0]),
+						validEndTime:self.capitalize(self.effectiveData[1]),
 						useType:self.ticketStyleVal,
 						useNum:self.useNum,
 						isBearRefund:self.returnVal,
-						startTime:self.activeData[0],
-						endTime:self.activeData[1]
+						startTime:self.capitalize(self.activeData[0]),
+						endTime:self.capitalize(self.activeData[1])
 						
 					}), {
 						headers: {
@@ -366,9 +377,12 @@
 						if(res.data.code == 1){
 							self.$message({
 								showClose: true,
-								message:'添加成功',
+								message:'编辑成功',
 								type: 'success'
 							});
+							self.$router.push({
+								name:'publishActivity'
+							})
 						}else{
 							self.$message({
 								showClose: true,

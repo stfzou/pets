@@ -91,11 +91,11 @@
 						},{
 						subNavName:'草稿箱',
 						subIcon:require('../assets/home/icon_home2.png'),
-						link:''
+						link:'sponsorManage'
 						},{
 						subNavName:'商品展示分类',
 						subIcon:require('../assets/home/icon_home5.png'),
-						link:''
+						link:'realName'
 						},{
 						subNavName:'评价管理',
 						subIcon:require('../assets/home/icon_home4.png'),

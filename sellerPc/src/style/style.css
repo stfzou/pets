@@ -132,7 +132,13 @@ body {
   justify-content: space-between;
   align-items:flex-start;
 }
-
+.flex_r_s_c{
+	/* flex-direction: row;
+	align-items:center;
+	justify-content:center; */
+	flex-direction: row;
+	flex-start:center;
+}
 .container{
 	width:100%;
 	margin: 0 auto;

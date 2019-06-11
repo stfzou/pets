@@ -377,6 +377,9 @@
 								message:'添加成功',
 								type: 'success'
 							});
+							self.$router.push({
+								name:'publishActivity'
+							});
 						}else{
 							self.$message({
 								showClose: true,

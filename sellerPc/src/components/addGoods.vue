@@ -1479,6 +1479,7 @@
 				width: 300px;
 				color: #fff;
 				font-size: 16px;
+				
 			}
 			.save_btn{
 				background:#434343;
