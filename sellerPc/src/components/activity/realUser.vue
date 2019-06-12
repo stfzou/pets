@@ -10,7 +10,7 @@
 				</div>
 				<div class="realNameList_r">
 					<div class="sponsorName">
-						<el-input class="goodsNameInput" v-model="val" maxlength="60" placeholder="企业/组织全称"></el-input>
+						<el-input class="goodsNameInput" v-model="val" maxlength="60" placeholder="请输入姓名"></el-input>
 					</div>
 				</div>
 			</li>
@@ -20,7 +20,7 @@
 				</div>
 				<div class="realNameList_r">
 					<div class="sponsorName">
-						<el-input class="goodsNameInput" v-model="val" maxlength="60" placeholder="企业/组织注册号"></el-input>
+						<el-input class="goodsNameInput" v-model="val" maxlength="60" placeholder="请输入身份证号"></el-input>
 					</div>
 				</div>
 			</li>
@@ -37,11 +37,11 @@
 							</div>
 							<div v-show="!imgData.sfzz">
 								<el-upload ref="uploadSfzz" class="avatar-uploader" action="http://192.168.0.109:8084/updateImg"
-								 :show-file-list="false" list-type="picture-card" name="Img" :limit="1" :on-progress="handleSfzzPreview"
+								 :show-file-list="false" list-type="picture-card" name="Img" :limit="1" 
 								 :on-success="handleSfzzSuccess" :before-upload="beforeAvatarUpload">
 									<i class="el-icon-plus avatar-uploader-icon"></i>
 								</el-upload>
-								<el-progress v-if="imgData.sfzzP>0" :percentage="imgData.sfzzP"></el-progress>
+								
 							</div>
 							<div class="mid">
 								<h3>法人身份证正面照片</h3>
@@ -58,11 +58,11 @@
 							</div>
 							<div v-show="!imgData.sfzf">
 								<el-upload ref="uploadSfzf" class="avatar-uploader" action="http://192.168.0.109:8084/updateImg"
-								 :show-file-list="false" list-type="picture-card" :limit="1" name='Img' :on-progress="handleSfzfPreview"
+								 :show-file-list="false" list-type="picture-card" :limit="1" name='Img'
 								 :on-success="handleSfzfSuccess" :before-upload="beforeAvatarUpload">
 									<i class="el-icon-plus avatar-uploader-icon"></i>
 								</el-upload>
-								<el-progress v-if="imgData.sfzfP>0" :percentage="imgData.sfzfP"></el-progress>
+								<!-- <el-progress v-if="imgData.sfzfP>0" :percentage="imgData.sfzfP"></el-progress> -->
 							</div>
 							<div class="mid">
 								<h3>法人身份证反面照片</h3>
@@ -78,7 +78,7 @@
 			
 		</ul>
 		<div class="save_box">
-			<el-button round class="fabu_btn" @click="dilogShow">保存</el-button>
+			<el-button round class="fabu_btn">保存</el-button>
 		</div>
 	</div>
 </template>
@@ -101,12 +101,12 @@
 		methods:{
 			beforeAvatarUpload(file) {
 				
-				const isLt2M = file.size / 1024 / 1024 < 2;
-			
-				if (!isLt2M) {
-				  this.$message.error('上传图片大小不能超过 2MB!');
-				}
-				return isLt2M;
+			// 	const isLt2M = file.size / 1024 / 1024 < 2;
+			// 
+			// 	if (!isLt2M) {
+			// 	  this.$message.error('上传图片大小不能超过 2MB!');
+			// 	}
+			// 	return isLt2M;
 			},
 			handleSfzzSuccess(res, file, fileList) { //身份证正面上传
 			
@@ -118,15 +118,6 @@
 				this.imgData.sfzf = file.response.data.imgAddr;
 				this.imgData.sfzfId = file.response.data.imgId;
 				this.imgData.sfzfP = 0;
-			},
-			handleSfzzPreview(file) { //上传时百分比钩子
-			
-				this.imgData.sfzzP = file.percent;
-				console.log(this.imgData.sfzzP)
-			},
-			handleSfzfPreview(file) { //上传时百分比钩子
-			
-				this.imgData.sfzfP = file.percent;
 			},
 			
 			deleteImg(arr, img) { //照片删除

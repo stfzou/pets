@@ -1,44 +1,48 @@
 <template>
 	<div class="sponsorManage">
-		<div class="sponsorManageDialog flex_r_f_e">
-			<div class="dialogCnt flex_r_f_e">
+		<div class="sponsorManageDialog flex_r_f_e" v-if="isDilog" @click.stop="dialogHide">
+			<div class="dialogCnt flex_r_f_e" @click.stop>
 				<div>
 					<div class="dialog-title">主办方认证</div>
 					<p>1、认证后的主办方享受专属V标识。</p>
 					<p>2、企业身份认证适合于企业（含个人）、组织、单位申请，个人身份认证仅供个人申请。</p>
 					<p>3、同一账户只能选择一个身份进行认证。</p>
 					<p>4、通过第三方资质审核机构对您所提交的资料进行审核，审核服务费为300元/年（此审核服务费用无法退回）。</p>
-					<div class="dialogBtn pointer">立即认证</div>
+					<div class="dialogBtn pointer" @click="realLink">立即认证</div>
 				</div>
 			</div>
 		</div>
 		<div class="addBtn pointer">+添加主办方</div>
 		<div class="sponsorList">
-			<div class="sponsorBox" v-for="item in arr">
+			<div class="sponsorBox" v-for="item in sponsorList">
 				<div class="sponsorTop flex_r_s_b">
 					<div class="sponsorHeadImg">
-						<img src="../../assets/home/head_icon.png" alt="">
+						<img :src="item.organizerHead" alt="">
 					</div>
 					<div class="sponsorMid">
 						<div class="sponsorName flex_r_f_s">
-							<span>自由犬宠物用品有限公司</span>
+							<span v-if="item.type == '1'">{{item.name}}</span>
+							<span v-else>{{item.companyName}}</span>
 							<!-- <img src="../../assets/icon_renzheng.PNG" alt=""> -->
-							<img src="../../assets/icon_renzheng.png" alt="">
+							<img v-if="item.type == '2'" src="../../assets/icon_renzheng.png" alt="">
+							<img v-else src="../../assets/icon_renzheng2.png" alt="">
 						</div>
-						<div class="rzType">企业主办方</div>
+						<div class="rzType" v-if="item.type == '1'">个人主办方</div>
+						<div class="rzType" v-else>企业主办方</div>
 						<div class="rzSign">
-							<div class="rzSuccess">已认证<span>有效期至2019年6月10日</span></div>
-							<!-- <div class="rzExceed">认证失效<span>有效期至2019年6月10日</span></div>
-							<div class="rzError">认证错误</div>
+							<div class="rzSuccess" v-if="item.isApprove=='2'">已认证<span>有效期至2019年6月10日</span></div>
+							<div class="rzExceed" v-if="item.isExpired=='1'">认证失效<span>有效期至2019年6月10日</span></div>
+							<!-- <div class="rzError">认证错误</div>
 							<div class="rzIng">认证中</div> -->
 						</div>
 					</div>
 					<div class="sponsorRight flex_r_s_b">
-						<div class="rzBtn pointer">重新认证</div>
+						<div class="rzBtn pointer" v-if="isExpired =='1'" @click="dialogShow(item)">重新认证</div>
+						<div class="rzBtn pointer" v-else @click="dialogShow(item)">立即认证</div>
 						<div class="editBtn pointer">编辑</div>
 					</div>
 				</div>
-				<div class="rzTip"><i class="el-icon-warning"></i>身份证即将到期,请重新认证</div>
+				<div class="rzTip" v-if="item.statusDescription!=''"><i class="el-icon-warning"></i>{{item.statusDescription}}</div>
 			</div>
 		</div>
 		<div class="wxtx">
@@ -55,7 +59,50 @@
 	export default {
 		data(){
 			return {
-				arr:[1,2,3,4,5,6]
+				arr:[1,2,3,4,5,6],
+				isDilog:false,
+				sponsorList:[],
+				type:''
+			}
+		},
+		mounted() {
+			this.getSponsor();
+		},
+		methods:{
+			dialogShow(item){
+				this.isDilog = true;
+				this.type = item.type;
+			},
+			dialogHide(){
+				this.isDilog = false;
+			},
+			realLink(){
+				if(this.type=='1'){
+					this.$router.push({
+						name:'realUser'
+					})
+				}else if(this.type=='2'){
+					this.$router.push({
+						name:'realName'
+					})
+				}
+				
+			},
+			getSponsor(){
+				let self = this;
+				self.axios.post(Api.userApi+'/ca/selectCommunityActivityOrganizerByUserId', self.qs.stringify({
+					userId:JSON.parse(sessionStorage.getItem('user')).userId
+				}), {
+					headers: {
+						'Content-Type': 'application/x-www-form-urlencoded'
+					}
+				}).then((res)=>{
+					if(res.data.code == 1){
+						self.sponsorList = res.data.data
+					}else{
+						alert(res.data.msg)
+					}
+				})
 			}
 		}
 	}

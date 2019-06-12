@@ -11,11 +11,11 @@
 					</div>
 					<div class="yzCode flex_r_s_b">
 						<img src="../../assets/icon_yanzheng@2x.png" alt="">
-						<input type="text" v-model="val" placeholder="请输入验证码">
+						<input type="text" v-model="code" placeholder="请输入验证码">
 						<span class="getcode pointer" v-show="show" @click="getCode">获取验证码</span>
 						<span v-show="!show" class="count getcode pointer">{{count}} 秒</span>
 					</div>
-					<div class="codeBtn pointer">验证</div>
+					<div class="codeBtn pointer" @click="addSponsor">验证</div>
 				</div>
 				
 			</div>
@@ -23,7 +23,7 @@
 		<ul class="addSponsorList">
 			<li>
 				
-				<div class="add_goods_title">票券基本信息</div>
+				<div class="add_goods_title">主办方添加</div>
 				
 			</li>
 			<li class="flex_r_f_s sponsorImgLi">
@@ -65,7 +65,7 @@
 				</div>
 				<div class="addSponsorList_r">
 					<div class="sponsorName">
-						<el-input class="goodsNameInput" v-model="input" maxlength="60" placeholder="请输入主办方简称"></el-input>
+						<el-input class="goodsNameInput" v-model="sponsorAppellation" maxlength="60" placeholder="请输入主办方简称"></el-input>
 						<div class="tx">（主办方简称可以是企业简称、社团组织名称等词汇，请勿使用非法如果名称中含有商标名称，可能您需要上传商标注册证书和商标授权书等文件。）</div>
 					</div>
 				</div>
@@ -76,7 +76,7 @@
 				</div>
 				<div class="addSponsorList_r">
 					<div class="sponsorName">
-						<el-input class="goodsNameInput" v-model="input" maxlength="60" placeholder="请输入企业名称"></el-input>
+						<el-input class="goodsNameInput" v-model="enterpriseName" maxlength="60" placeholder="请输入企业名称"></el-input>
 					</div>
 				</div>
 			</li>
@@ -86,7 +86,7 @@
 				</div>
 				<div class="addSponsorList_r">
 					<div class="sponsorName">
-						<el-input class="goodsNameInput" v-model="input" maxlength="60" placeholder="请输入真实姓名"></el-input>
+						<el-input class="goodsNameInput" v-model="realName" maxlength="60" placeholder="请输入真实姓名"></el-input>
 					</div>
 				</div>
 			</li>
@@ -96,7 +96,7 @@
 				</div>
 				<div class="addSponsorList_r">
 					<div class="sponsorName">
-						<el-input class="goodsNameInput" v-model="input" maxlength="60" placeholder="请输入手机号码"></el-input>
+						<el-input class="goodsNameInput" v-model="phone" maxlength="60" placeholder="请输入手机号码"></el-input>
 					</div>
 				</div>
 			</li>
@@ -126,69 +126,146 @@
 				sponsorImg:'',//主办方头像
 				formData:'',//头像数据
 				isEnterprise:'1',//是否是企业
-				val:'',
-				input:'',
+				sponsorAppellation:'',//主办方简称
+				enterpriseName:'',//企业名称
+				realName:'',//真实姓名
 				sponsorIntroduction:'',//主办方简介
 				timer: null,//验证码定时器
-				phone: '17380534931',//手机号码
+				phone:'',//手机号码
+				codePhone:JSON.parse(sessionStorage.getItem('user')).userPhone,
 				code:'',//验证码
 				count:'',//计算
 				show:true,
-				isDilog:false
+				isDilog:false,
+				reg: /^1[3456789]\d{9}$/    //手机号码正则
 			}
+		},
+		mounted() {
+			// console.log(JSON.parse(sessionStorage.getItem('user')))
 		},
 		methods:{
 			dilogShow(){
-				this.isDilog = true;
+				let self = this;
+				if(self.sponsorImg==''){
+					self.$message({
+						showClose: true,
+						message: '请上传主办方头像',
+						type: 'error',
+					});
+					return false;
+				}else if(self.sponsorAppellation==''){
+					self.$message({
+						showClose: true,
+						message: '请填写主办方简称',
+						type: 'error',
+					});
+					return false;
+				}else if(self.isEnterprise=='1'&&self.realName==''){
+					self.$message({
+						showClose: true,
+						message: '请填写真实姓名',
+						type: 'error',
+					});
+					return false;
+				}else if(self.isEnterprise=='2'&&self.enterpriseName==''){
+					self.$message({
+						showClose: true,
+						message: '请填企业名称',
+						type: 'error',
+					});
+					return false;
+				}else if (!self.reg.test(self.phone)) {
+				
+					self.$message({
+						showClose: true,
+						message: '手机号码输入错误',
+						type: 'error',
+					});
+					return false;
+				}else if(self.sponsorIntroduction==''){
+					self.$message({
+						showClose: true,
+						message: '请填写主办方简介',
+						type: 'error',
+					});
+					return false;
+				}
+				this.axios.get(Api.userApi+'/ca/selectCommunityActivityOrganizerCountByUserId?userId=' + JSON.parse(sessionStorage.getItem('user')).userId, {
+						headers: {
+							'Content-Type': 'application/x-www-form-urlencoded'
+						}
+					}).then(function(res) {
+						console.log(res)
+						if(res.data.data=='1'&&self.isEnterprise=='1'){
+							self.$message({
+								showClose: true,
+								message: '已添加个人',
+								type: 'error',
+							});
+							
+							return false;
+						}else if(res.data.data=='2'&&self.isEnterprise=='2'){
+							self.$message({
+								showClose: true,
+								message: '已添加企业',
+								type: 'error',
+							});
+							
+							return false;
+						}else if(res.data.data == '3'){
+							self.$message({
+								showClose: true,
+								message: '个人和企业都已添加',
+								type: 'error',
+							});
+							
+							return false;
+						}else{
+							self.isDilog = true;
+						}
+					}).catch(function(error) {
+						console.log(error);
+				});
+				
 			},
 			dilogHide(){
+				
 				this.isDilog = false;
 			},
 			getCode() {
 				//获取验证码
-				if (this.phone) {
-					let _this = this;
-					const TIME_COUNT = 60;
-					if (!this.timer) {
-						this.count = TIME_COUNT;
-						this.show = false;
-						if(!this.forgetState){
-							this.axios.get(Api.shopApi+'/shops_sms_register?phone=' + this.phone, {
-									headers: {
-										'Content-Type': 'application/x-www-form-urlencoded'
-									}
-								})
-								.then(function(response) {
-									console.log(response);
-								})
-								.catch(function(error) {
-									console.log(error);
-								});
-						}else{
-							this.axios.get(Api.shopApi+'/sms_getpwd?phone=' + this.phone, {
-									headers: {
-										'Content-Type': 'application/x-www-form-urlencoded'
-									}
-								})
-								.then(function(response) {
-									console.log(response);
-								})
-								.catch(function(error) {
-									console.log(error);
-								});
-						}
-						
-						this.timer = setInterval(() => {
-							if (this.count > 0 && this.count <= TIME_COUNT) {
-								this.count--;
-							} else {
-								this.show = true;
-								clearInterval(this.timer);
-								this.timer = null;
-							}
-						}, 1000)
+				let uId = JSON.parse(sessionStorage.getItem('user')).userId;
+				let _this = this;
+				const TIME_COUNT = 60;
+				if (!this.timer) {
+					this.count = TIME_COUNT;
+					this.show = false;
+					if(!this.forgetState){
+						this.axios.get(Api.userApi+'/ca/sms_organizer?userId='+uId+'&phone='+_this.phone, {
+								headers: {
+									'Content-Type': 'application/x-www-form-urlencoded'
+								}
+							}).then(function(res) {
+								if(res.data.code == '0'){
+									this.show = true;
+									clearInterval(this.timer);
+									this.timer = null;
+								}
+							}).catch(function(error) {
+								console.log(error);
+							});
 					}
+					this.timer = setInterval(() => {
+						if (this.count > 0 && this.count <= TIME_COUNT) {
+							this.count--;
+						} else {
+							this.show = true;
+							clearInterval(this.timer);
+							this.timer = null;
+						}
+					}, 1000)
 				}
+			
 			
 			},
 			uploadIMG(e) {
@@ -322,24 +399,61 @@
 			},
 			addSponsor(){
 				let self= this;
-				self.formData.append("userId",'31');
-				self.formData.append("type",'2');
-				self.formData.append("code",'188683');
-				self.formData.append("organizerSynopsis",'111111');
-				self.formData.append("name",'测试主办方');
-				self.formData.append("phone",'1738053491')
-				self.axios.post(Api.userApi + '/ca/addCommunityActivityOrganizer',self.formData,{
-					headers: {
-						'Content-Type': 'multipart/form-data'
-					}
-				}).then((res) => {
-					if (res.data.code == 1) {
-						// self.activeType = res.data.data;
-						console.log(res)
-					} else {
-						alert(res.data.msg)
-					}
-				})
+				this.axios.get(Api.userApi+'/ca/selectOrganizerInfoIsRepeat',{params:{
+					userId:JSON.parse(sessionStorage.getItem('user')).userId,
+					type:self.isEnterprise,
+					organizerName:self.sponsorAppellation,
+					phone:self.phone,
+					companyName:self.enterpriseName
+				}}, {
+						headers: {
+							'Content-Type': 'application/x-www-form-urlencoded'
+						}
+					}).then((res)=>{
+						if(res.data.code=='1'){
+							if(this.code == ''){
+								self.$message({
+									showClose: true,
+									message: '验证码不能为空',
+									type: 'error',
+								});
+								return false;
+							}else{
+								if(self.isEnterprise=='1'){
+									self.enterpriseName = '';
+								}else{
+									self.realName = '';
+								}
+								self.formData.append("userId",JSON.parse(sessionStorage.getItem('user')).userId);
+								self.formData.append("type",self.isEnterprise);
+								self.formData.append("code",self.code);
+								self.formData.append("organizerSynopsis",self.sponsorIntroduction);
+								self.formData.append("name",self.realName);
+								self.formData.append("phone",self.phone)
+								self.formData.append("companyName",self.enterpriseName)
+								self.axios.post(Api.userApi + '/ca/addCommunityActivityOrganizer',self.formData,{
+									headers: {
+										'Content-Type': 'multipart/form-data'
+									}
+								}).then((res) => {
+									if (res.data.code == 1) {
+										// self.activeType = res.data.data;
+										self.$message({
+											showClose: true,
+											message: '添加成功',
+											type: 'success',
+										})
+									} else {
+										alert(res.data.msg)
+									}
+								})
+							}
+							
+						}else{
+							alert(res.data.msg)
+						}
+					})
+				
 			}
 		}
 	}
@@ -355,7 +469,7 @@
 			height: 100%;
 			left: 0;
 			top: 0;
-			z-index:10000;
+			z-index:1500;
 			background: rgba(0,0,0,0.6);
 			.dilogList{
 				width: 400px;
