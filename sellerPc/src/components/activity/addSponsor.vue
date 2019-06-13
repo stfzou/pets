@@ -391,7 +391,7 @@
 			
 						if (action == 'confirm') {
 							self.$refs.uploadGoodsMain.uploadFiles.splice(0, 1);
-							self.postFormData = '';
+							self.formData = '';
 							self.sponsorImg = '';
 						}
 					}
@@ -424,6 +424,7 @@
 								}else{
 									self.realName = '';
 								}
+								// alert(111)
 								self.formData.append("userId",JSON.parse(sessionStorage.getItem('user')).userId);
 								self.formData.append("type",self.isEnterprise);
 								self.formData.append("code",self.code);
@@ -431,6 +432,8 @@
 								self.formData.append("name",self.realName);
 								self.formData.append("phone",self.phone)
 								self.formData.append("companyName",self.enterpriseName)
+								self.formData.append("organizerName",self.sponsorAppellation)
+								
 								self.axios.post(Api.userApi + '/ca/addCommunityActivityOrganizer',self.formData,{
 									headers: {
 										'Content-Type': 'multipart/form-data'
@@ -442,7 +445,12 @@
 											showClose: true,
 											message: '添加成功',
 											type: 'success',
-										})
+										});
+										setTimeout(function(){
+											self.$router.push({
+												name:'addSponsor'
+											})
+										},200)
 									} else {
 										alert(res.data.msg)
 									}

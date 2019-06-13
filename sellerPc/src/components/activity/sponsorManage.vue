@@ -13,7 +13,7 @@
 			</div>
 		</div>
 		<div class="addBtn pointer">+添加主办方</div>
-		<div class="sponsorList">
+		<div class="sponsorList" v-if="sponsorList.length>0">
 			<div class="sponsorBox" v-for="item in sponsorList">
 				<div class="sponsorTop flex_r_s_b">
 					<div class="sponsorHeadImg">
@@ -31,14 +31,14 @@
 						<div class="rzType" v-else>企业主办方</div>
 						<div class="rzSign">
 							<div class="rzSuccess" v-if="item.isApprove=='2'">已认证<span>有效期至2019年6月10日</span></div>
-							<div class="rzExceed" v-if="item.isExpired=='1'">认证失效<span>有效期至2019年6月10日</span></div>
-							<!-- <div class="rzError">认证错误</div>
-							<div class="rzIng">认证中</div> -->
+						 	<div class="rzExceed" v-if="item.isExpired=='1'">认证失效<span>有效期至2019年6月10日</span></div>
+							<!-- <div class="rzError">认证错误</div> -->
+							<div class="rzIng" v-if="item.status=='1'">认证中</div>
 						</div>
 					</div>
 					<div class="sponsorRight flex_r_s_b">
-						<div class="rzBtn pointer" v-if="isExpired =='1'" @click="dialogShow(item)">重新认证</div>
-						<div class="rzBtn pointer" v-else @click="dialogShow(item)">立即认证</div>
+						<!-- <div class="rzBtn pointer" v-if="isExpired =='1'" @click="dialogShow(item)">重新认证</div> -->
+						<div class="rzBtn pointer" @click="dialogShow(item)">立即认证</div>
 						<div class="editBtn pointer">编辑</div>
 					</div>
 				</div>
@@ -59,10 +59,10 @@
 	export default {
 		data(){
 			return {
-				arr:[1,2,3,4,5,6],
 				isDilog:false,
 				sponsorList:[],
-				type:''
+				type:'',
+				organizerId:''
 			}
 		},
 		mounted() {
@@ -72,18 +72,26 @@
 			dialogShow(item){
 				this.isDilog = true;
 				this.type = item.type;
+				this.organizerId = item.organizerId;
 			},
 			dialogHide(){
 				this.isDilog = false;
 			},
-			realLink(){
+			realLink(item){
+				let self = this;
 				if(this.type=='1'){
 					this.$router.push({
-						name:'realUser'
+						name:'realUser',
+						query:{
+							organizerId:self.organizerId
+						}
 					})
 				}else if(this.type=='2'){
 					this.$router.push({
-						name:'realName'
+						name:'realName',
+						query:{
+							organizerId:self.organizerId
+						}
 					})
 				}
 				
@@ -99,6 +107,7 @@
 				}).then((res)=>{
 					if(res.data.code == 1){
 						self.sponsorList = res.data.data
+						console.log(self.sponsorList)
 					}else{
 						alert(res.data.msg)
 					}
