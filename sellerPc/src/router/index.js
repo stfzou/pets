@@ -17,6 +17,7 @@ import Ticket from '@/components/activity/ticket'
 import EditTicket from '@/components/activity/editTicket'
 import SponsorManage from '@/components/activity/sponsorManage'
 import AddSponsor from '@/components/activity/addSponsor'
+import EditSponsor from '@/components/activity/editSponsor'
 import RealName from '@/components/activity/realName'
 import RealUser from '@/components/activity/realUser'
 
@@ -82,6 +83,10 @@ export default new Router({
 				path:'addSponsor',
 				name:'addSponsor',
 				component:AddSponsor
+			},{
+				path:'editSponsor',
+				name:'editSponsor',
+				component:EditSponsor
 			},{
 				path:'realName',
 				name:'realName',

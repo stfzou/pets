@@ -53,7 +53,7 @@
 						<div class="outside flex_r_s_b">
 							<div class="outside_img" v-if="imgData.sfzz">
 								<img :src="imgData.sfzz">
-								<i @click="deleteImg($refs.uploadSfzz.uploadFiles,'sfzz')" class="el-icon-circle-close"></i>
+								<i @click="deleteImg($refs.uploadSfzz.uploadFiles,'sfzz','IDCardFrontImg')" class="el-icon-circle-close"></i>
 							</div>
 							<div v-show="!imgData.sfzz">
 								<el-upload ref="uploadSfzz"  :http-request="function(file){return uploadIMG(file,'sfzz','IDCardFrontImg')}" class="avatar-uploader" 
@@ -73,7 +73,7 @@
 						<div class="outside inside flex_r_s_b">
 							<div class="outside_img" v-if="imgData.sfzf">
 								<img :src="imgData.sfzf">
-								<i @click="deleteImg($refs.uploadSfzf.uploadFiles,'sfzf')" class="el-icon-circle-close"></i>
+								<i @click="deleteImg($refs.uploadSfzf.uploadFiles,'sfzf','IDCardBackImg')" class="el-icon-circle-close"></i>
 							</div>
 							<div v-show="!imgData.sfzf">
 								<el-upload ref="uploadSfzf" :http-request="function(file){return uploadIMG(file,'sfzf','IDCardBackImg')}"  class="avatar-uploader" action="http://192.168.0.109:8084/updateImg"
@@ -113,7 +113,7 @@
 					sfzf: '',//身份证反面
 				},
 				organizerId:'',
-				formData:'',
+				formData:new FormData(),
 				code:'',//验证码
 				count:'',//计算
 				show:true,
@@ -188,7 +188,7 @@
 				this.imgPreview(e.file,imgUrl,fData);
 			  }
 			},
-			deleteImg(arr,img) { //照片删除
+			deleteImg(arr,img,imgName) { //照片删除
 				let self = this;
 				this.$confirm('此操作将永久删除该文件, 是否继续?', '提示', {
 					confirmButtonText: '确定',
@@ -198,6 +198,7 @@
 						if (action == 'confirm') {
 								
 							arr.splice(0,1);
+							self.formData.delete(imgName);
 							self.imgData[img] = '';
 						}
 					}
@@ -269,8 +270,6 @@
 			
 							console.log("*******base64转blob对象******");
 							console.log(blob);
-			
-							self.formData = new FormData();
 							self.formData.append(fData,blob,file.name);
 							console.log("********将blob对象转成formData对象********");
 							// console.log(self.formData)
@@ -279,6 +278,7 @@
 					};
 				}
 			},
+			
 			dilogHide(){
 				
 				this.isDilog = false;
@@ -355,8 +355,8 @@
 					self.formData.append('userId',JSON.parse(sessionStorage.getItem('user')).userId)
 					self.formData.append('type','1')
 					self.formData.append('IDCardNumber',self.idCard)
-					self.formData.append('IDCardFrontImg',self.imgData.sfzz)
-					self.formData.append('IDCardBackImg',self.imgData.sfzf)
+					// self.formData.append('IDCardFrontImg',self.imgData.sfzz)
+					// self.formData.append('IDCardBackImg',self.imgData.sfzf)
 					self.formData.append('name',self.userName)
 					self.formData.append('phone',self.phone)
 					
@@ -370,6 +370,9 @@
 								showClose: true,
 								message: '认证审核中',
 								type: 'success',
+							});
+							self.$router.push({
+								name:'sponsorManage'
 							})
 						}else{
 							alert(res.data.msg)

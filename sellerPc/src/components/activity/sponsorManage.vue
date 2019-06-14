@@ -39,7 +39,7 @@
 					<div class="sponsorRight flex_r_s_b">
 						<!-- <div class="rzBtn pointer" v-if="isExpired =='1'" @click="dialogShow(item)">重新认证</div> -->
 						<div class="rzBtn pointer" @click="dialogShow(item)">立即认证</div>
-						<div class="editBtn pointer">编辑</div>
+						<div class="editBtn pointer" @click="editLink(item)">编辑</div>
 					</div>
 				</div>
 				<div class="rzTip" v-if="item.statusDescription!=''"><i class="el-icon-warning"></i>{{item.statusDescription}}</div>
@@ -110,6 +110,14 @@
 						console.log(self.sponsorList)
 					}else{
 						alert(res.data.msg)
+					}
+				})
+			},
+			editLink(item){
+				this.$router.push({
+					name:'editSponsor',
+					params:{
+						sponsorInfo:item
 					}
 				})
 			}

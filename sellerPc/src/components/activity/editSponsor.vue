@@ -124,7 +124,7 @@
 		data(){
 			return{
 				sponsorImg:'',//主办方头像
-				formData:'',//头像数据
+				formData:new FormData(),//头像数据
 				isEnterprise:'1',//是否是企业
 				sponsorAppellation:'',//主办方简称
 				enterpriseName:'',//企业名称
@@ -137,13 +137,29 @@
 				count:'',//计算
 				show:true,
 				isDilog:false,
+				organizerId:'',
+				organizerHead:'',
 				reg: /^1[3456789]\d{9}$/    //手机号码正则
 			}
 		},
 		mounted() {
 			// console.log(JSON.parse(sessionStorage.getItem('user')))
+			console.log(this.$route.params.sponsorInfo);
+			this.getSponsorInfo();
 		},
 		methods:{
+			getSponsorInfo(){
+				let re = this.$route.params.sponsorInfo;
+				this.sponsorImg = re.organizerHead;
+				this.organizerHead = re.organizerHead;
+				this.isEnterprise = re.type+'';
+				this.sponsorAppellation = re.organizerName;
+				this.enterpriseName = re.companyName;
+				this.phone = re.phone;
+				this.sponsorIntroduction = re.organizerSynopsis;
+				this.realName = re.name;
+				this.organizerId = re.organizerId;
+			},
 			dilogShow(){
 				let self = this;
 				if(self.sponsorImg==''){
@@ -189,43 +205,9 @@
 						type: 'error',
 					});
 					return false;
+				}else{
+					self.isDilog = true;
 				}
-				this.axios.get(Api.userApi+'/ca/selectCommunityActivityOrganizerCountByUserId?userId=' + JSON.parse(sessionStorage.getItem('user')).userId, {
-						headers: {
-							'Content-Type': 'application/x-www-form-urlencoded'
-						}
-					}).then(function(res) {
-						console.log(res)
-						if(res.data.data=='1'&&self.isEnterprise=='1'){
-							self.$message({
-								showClose: true,
-								message: '已添加个人',
-								type: 'error',
-							});
-							
-							return false;
-						}else if(res.data.data=='2'&&self.isEnterprise=='2'){
-							self.$message({
-								showClose: true,
-								message: '已添加企业',
-								type: 'error',
-							});
-							
-							return false;
-						}else if(res.data.data == '3'){
-							self.$message({
-								showClose: true,
-								message: '个人和企业都已添加',
-								type: 'error',
-							});
-							
-							return false;
-						}else{
-							self.isDilog = true;
-						}
-					}).catch(function(error) {
-						console.log(error);
-				});
 				
 			},
 			dilogHide(){
@@ -241,7 +223,7 @@
 					this.count = TIME_COUNT;
 					this.show = false;
 					if(!this.forgetState){
-						this.axios.get(Api.userApi+'/ca/sms_organizer?userId='+uId+'&phone='+_this.phone, {
+						this.axios.get(Api.userApi+'/ca/sms_update_organizer?userId='+uId+'&phone='+_this.phone+'&type='+_this.isEnterprise, {
 								headers: {
 									'Content-Type': 'application/x-www-form-urlencoded'
 								}
@@ -370,8 +352,6 @@
 			
 							console.log("*******base64转blob对象******");
 							console.log(blob);
-							
-							self.formData = new FormData();
 							self.formData.append("organizerHeadImg",blob,file.name);
 							console.log("********将blob对象转成formData对象********");
 							
@@ -427,14 +407,16 @@
 								// alert(111)
 								self.formData.append("userId",JSON.parse(sessionStorage.getItem('user')).userId);
 								self.formData.append("type",self.isEnterprise);
+								self.formData.append("type",self.isEnterprise);
 								self.formData.append("code",self.code);
 								self.formData.append("organizerSynopsis",self.sponsorIntroduction);
 								self.formData.append("name",self.realName);
 								self.formData.append("phone",self.phone)
 								self.formData.append("companyName",self.enterpriseName)
 								self.formData.append("organizerName",self.sponsorAppellation)
+								self.formData.append("organizerId",self.organizerId)
 								
-								self.axios.post(Api.userApi + '/ca/addCommunityActivityOrganizer',self.formData,{
+								self.axios.post(Api.userApi + '/ca/updateCommunityActivityOrganizerInfo',self.formData,{
 									headers: {
 										'Content-Type': 'multipart/form-data'
 									}
@@ -443,12 +425,12 @@
 										// self.activeType = res.data.data;
 										self.$message({
 											showClose: true,
-											message: '添加成功',
+											message: '编辑成功',
 											type: 'success',
 										});
 										setTimeout(function(){
 											self.$router.push({
-												name:'addSponsor'
+												name:'sponsorManage'
 											})
 										},200)
 									} else {
