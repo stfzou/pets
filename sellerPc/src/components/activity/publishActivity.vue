@@ -8,16 +8,16 @@
 				<p class="list_l">活动封面<span>*</span></p>
 				<div class="list_r">
 					<div class="goods_main_pic">
-						<div class="postImg" v-show="postUrl!=''">
-							<div class="img-box">
-								<img width="100%" :src="postUrl" alt="">
-								<i class="el-icon-close pointer" @click="deleteGoodsMain(0)"></i>
+						<div class="postImg" v-show="postUrlList.length>0">
+							<div class="img-box" v-for="(item,index) in postUrlList">
+								<img width="100%" :src="item.url" alt="">
+								<i class="el-icon-close pointer" @click="deleteGoodsMain(postUrlList,index)"></i>
 							</div>
 
 						</div>
-						<div class="postImg" v-show="postUrl==''">
-							<el-upload class="avatar-uploader" :before-upload="function(file){return sizeReg(file,800,533)}"  :http-request="uploadIMG" ref="uploadGoodsMain" 
-							action="http://192.168.0.109:8084/updateImg" multiple :on-exceed="handleExceed" 
+						<div class="postImg" v-show="postUrlList.length==0">
+							<el-upload class="avatar-uploader" :before-upload="function(file){return sizeReg(file,800,533)}" :file-list="postUrlList" 
+							:http-request="function(file){return uploadIMG(file,postUrlList)}"ref="uploadGoodsMain" action="http://192.168.0.109:8084/updateImg" multiple 
 							:limit="1" list-type="picture" name="Img">
 								<div class="upload-text flex_c_f_s">
 									<i class="el-icon-plus"></i>
@@ -37,8 +37,8 @@
 			<li class="clearfloat">
 				<p class="list_l">选择主办方<span>*</span></p>
 				<div class="list_r">
-					<el-select v-model="undertakerVal" placeholder="请选择活动分类">
-						<el-option v-for="item in undertakerData" :key="item.typeId" :label="item.typeName" :value="item.typeId">
+					<el-select v-model="undertakerVal" placeholder="请选择主办方">
+						<el-option v-for="item in undertakerData" :key="item.organizerId" :label="item.organizerName" :value="item.organizerId">
 						</el-option>
 					</el-select>
 				</div>
@@ -49,7 +49,7 @@
 				<div class="list_r">
 					<el-date-picker v-if="ticketNum>0" readonly v-model="activityData" type="datetimerange" range-separator="至" start-placeholder="开始日期" end-placeholder="结束日期" value-format="timestamp">
 					</el-date-picker>
-					<el-date-picker v-else v-model="activityData" type="datetimerange" range-separator="至" start-placeholder="开始日期" end-placeholder="结束日期" value-format="timestamp">
+					<el-date-picker v-else  type="datetimerange" v-model="activityData" range-separator="至" start-placeholder="开始日期" end-placeholder="结束日期" value-format="timestamp">
 					</el-date-picker>
 				</div>
 			</li>
@@ -65,7 +65,7 @@
 				<p class="list_l">详细地址<span>*</span></p>
 				<div class="list_r detailedAddr">
 					<div class="street">
-						<input id="input_id" v-model="street" class="active_input" type="text" placeholder="请输入详细街道名称和门牌号，请与执照地址一致">
+						<input id="input_id" v-model="street" class="active_input" type="text" placeholder="请输入详细街道名称和门牌号">
 						<span class="map_button pointer">去定位</span>
 					</div>
 					<div class="amap-page-container">
@@ -91,7 +91,7 @@
 				</div>
 			</li>
 			<li class="clearfloat">
-				<p class="list_l">活动详情<span>*</span></p>
+				<p class="list_l">活动详情</p>
 				<div class="list_r editer">
 					<el-input class="textarea" type="textarea" resize="none" placeholder="请输入内容" v-model="activeText">
 					</el-input>
@@ -99,17 +99,17 @@
 						<draggable v-model="activeImg" :options="{animation:500}">
 							<transition-group>
 
-								<div class="describe_img_box" v-for="(item,index) in activeImg" :key="item.imgUrl">
+								<div class="describe_img_box" v-for="(item,index) in activeImg" :key="item.url">
 									<!-- <img :src="element.imgUrl" :height="element.height" :width="element.width" alt=""> -->
-									<img :src="item.imgUrl" :height="item.height" :width="item.width" alt="">
-									<i class="el-icon-close" @click="describeImgRemove(index)"></i>
+									<img :src="item.url" :height="item.height" :width="item.width" alt="">
+									<i class="el-icon-close" @click="deleteGoodsMain(activeImg,index)"></i>
 								</div>
 
 							</transition-group>
 						</draggable>
 						<div class="upload-describe">
-							<el-upload class="describe-uploader" :before-upload="function(file){return sizeReg(file,10,10)}" ref="uploadDescribe"  action="http://192.168.0.109:8084/updateImg" multiple
-							 :http-request="handleDescribe" :limit="20" list-type="picture" :on-exceed="handleDescribeExceed" name="Img">
+							<el-upload class="describe-uploader" :before-upload="function(file){return sizeReg(file,10,10)}"  :on-exceed="handleExceed" :file-list="activeImg" ref="uploadDescribe"  
+							action="http://192.168.0.109:8084/updateImg" multiple :http-request="function(file){return handleDescribe(file,activeImg)}" :limit="2" list-type="picture"  name="Img">
 								<i class="el-icon-plus"></i>
 							</el-upload>
 						</div>
@@ -157,7 +157,7 @@
 			<li class="clearfloat">
 				<p class="list_l">人数限制<span>*</span></p>
 				<div class="list_r">
-					<el-input class="goodsNameInput h32" v-model="limitPeople" maxlength="60" placeholder="请输入可参加活动人数"></el-input>
+					<el-input class="goodsNameInput h32" @change="inputChange('limitPeople')" v-model="limitPeople" maxlength="60" placeholder="请输入可参加活动人数"></el-input>
 
 				</div>
 			</li>
@@ -174,7 +174,18 @@
 
 				</div>
 			</li>
-
+			<li class="clearfloat">
+				<p class="list_l">报名时间</p>
+				<div class="list_r delivery_mode">
+					<div class="delivery_mode_box">
+						<el-checkbox disabled v-model="isEndJoin">活动结束前均可报名</el-checkbox>
+					</div>
+					<!-- <div v-if="!isEndJoin">
+						<el-date-picker v-model="joinDate" @change="effectiveDataChange" type="datetimerange" range-separator="至" start-placeholder="开始日期" 
+						end-placeholder="结束日期" value-format="timestamp"> </el-date-picker>
+					</div> -->
+				</div>
+			</li>
 		</ul>
 		<div class="save_box">
 
@@ -198,8 +209,8 @@
 			return {
 				ticketNum:0,//票劵数量
 				picavalue:'',//file对象
-				postFormData:'',//封面formData
-				postUrl:'',//封面路径
+				formData:new FormData(),//封面formData
+				postUrlList:[],
 				isMark: false,
 				activityData:[], //活动时间
 				lng: '',
@@ -266,7 +277,9 @@
 				releaseStyle: true, //发布方式
 				undertakerData: [], //承办方数据
 				undertakerVal: '', //承办方值
-				ticketList:[]//票劵列表
+				ticketList:[],//票劵列表
+				isEndJoin:true,//是否报名时间都可以参加
+				joinDate:[]
 			};
 		},
 		activated() {
@@ -306,6 +319,8 @@
 			this.getActiveType();
 			this.getActiveData();
 			this.getTicket();
+			this.getSponsor();
+			
 			this.$store.commit('initialNav', {
 				navNum: 1,
 				subNum: 0
@@ -315,6 +330,179 @@
 			}, 200)
 		},
 		methods: {
+			commit(){
+				if(this.postUrlList.length<1){
+					this.$message({
+						showClose: true,
+						message: '请上传封面图片',
+						type: 'error',
+					});
+					return false;
+				}else if(this.activeTitle==''){
+					this.$message({
+						showClose: true,
+						message: '请填写活动标题',
+						type: 'error',
+					});
+					return false;
+				}else if(this.undertakerVal==''){
+					this.$message({
+						showClose: true,
+						message: '选择主办方',
+						type: 'error',
+					});
+					return false;
+				}else if(this.activityData.length<1){
+					this.$message({
+						showClose: true,
+						message: '请选择活动举办时间',
+						type: 'error',
+					});
+					return false;
+				}else if(this.province==''||this.city==''||this.dist==''){
+					this.$message({
+						showClose: true,
+						message: '请选择省市区',
+						type: 'error',
+					});
+					return false;
+				}else if(this.street==''){
+					this.$message({
+						showClose: true,
+						message: '请填写详细地址',
+						type: 'error',
+					});
+					return false;
+				}else if(this.activeTypeVal==''){
+					this.$message({
+						showClose: true,
+						message: '请选择活动分类',
+						type: 'error',
+					});
+					return false;
+				}else if(this.ticketList.length==0){
+					this.$message({
+						showClose: true,
+						message: '添加活动票劵',
+						type: 'error',
+					});
+					return false;
+				}else if(this.limitPeople==''){
+					this.$message({
+						showClose: true,
+						message: '请输入限制人数',
+						type: 'error',
+					});
+					return false;
+				}else if(!this.isEndJoin&&this.joinDate.length<1){
+					this.$message({
+						showClose: true,
+						message: '请填写报名时间',
+						type: 'error',
+					});
+					return false;
+				}else{
+					
+					let self = this;
+					let isPublic = null;
+					let isEnd = null;
+					if(self.releaseStyle){
+						isPublic = '1'
+					}else{
+						isPublic = '0'
+					}
+					// if(self.isEndJoin){
+					// 	isEnd = '1'
+					// 	self.formData.append('isEndJoin',isEnd);
+					// }else{
+					// 	isEnd = '0';
+					// 	self.formData.append('joinEndTime',self.capitalize(self.joinDate[1]))
+					// }
+					if(self.activeImg.length>0){
+						self.activeImg.forEach((e)=>{
+							self.formData.append('imgs',e.blob,e.name);
+						})
+					}
+					self.formData.append('userId',JSON.parse(sessionStorage.getItem('user')).userId)
+					self.formData.append('activityTitel',self.activeTitle)
+					self.formData.append('organizerId',self.undertakerVal)
+					self.formData.append('startTime',self.capitalize(self.activityData[0]))
+					self.formData.append('endTime',self.capitalize(self.activityData[1]))
+					self.formData.append('activityAddr',self.province+''+self.city+''+self.dist)
+					self.formData.append('address',self.street)
+					self.formData.append('latitude',self.mapCenter[1])
+					self.formData.append('longitude',self.mapCenter[0])
+					self.formData.append('typeId',self.activeTypeVal)
+					self.formData.append('limitNum',self.limitPeople)
+					self.formData.append('description',self.activeText)
+					self.formData.append('isPublic',isPublic)
+					self.formData.append('isEndJoin',1);
+					self.formData.append('cover',self.postUrlList[0].blob,self.postUrlList[0].name)
+					// if(self.activeImg.length>0){
+					// 	
+					// }
+					
+					self.axios.post(Api.userApi+'/ca/addCommunityActivity',self.formData, {
+						headers: {
+							'Content-Type': 'multipart/form-data'
+						}
+					}).then((res)=>{
+						if(res.data.code == 1){
+							self.$message({
+								showClose: true,
+								message:'活动发布成功',
+								type: 'success',
+							});
+						}else{
+							alert(res.data.msg)
+						}
+					})
+				}
+			},
+			inputChange(value){//input数字限制
+				// console.log(this.tableDataCs)
+				let reg = /^\d+\.?\d{0,2}$/
+				if(!reg.test(this[value])){
+					this[value] = ''
+				}
+				
+			},
+			effectiveDataChange(val){//报名日期限制时间
+				if(this.activityData.length<1){
+					this.$message({
+						showClose: true,
+						message: '请先选择活动时间',
+						type: 'error',
+					});
+					return false;
+				}else if(val[0]>this.activityData[1]||val[1]>this.activityData[1]){
+					this.$message({
+						showClose: true,
+						message:'报名时间只能在活动结束之前',
+						type: 'error',
+					});
+					this.joinDate = [];
+				}
+				
+			},
+			
+			getSponsor(){//查询主办方
+				let self = this;
+				self.axios.post(Api.userApi+'/ca/selectCommunityActivityOrganizerByUserId', self.qs.stringify({
+					userId:JSON.parse(sessionStorage.getItem('user')).userId
+				}), {
+					headers: {
+						'Content-Type': 'application/x-www-form-urlencoded'
+					}
+				}).then((res)=>{
+					if(res.data.code == 1){
+						self.undertakerData = res.data.data
+						console.log(self.sponsorList)
+					}else{
+						alert(res.data.msg)
+					}
+				})
+			},
 			onSelected(data) { //省市区选择回调
 				this.province = data.province.value
 				this.city = data.city.value
@@ -346,6 +534,11 @@
 					}	
 				})
 					
+			},
+			capitalize (value) {//将时间戳转化为日期
+			  var date = new Date(parseInt(value));
+			  var tt = [date.getFullYear(), ((date.getMonth()+1)<10?'0'+(date.getMonth()+1):date.getMonth()+1), (date.getDate()<10?'0'+date.getDate():date.getDate())].join('-') + ' ' +[(date.getHours()<10?'0'+date.getHours():date.getHours()), (date.getMinutes()<10?'0'+date.getMinutes():date.getMinutes())].join(':');
+			  return tt;
 			},
 			capiDate(value){//将日期转化为时间戳
 				return new Date(value).getTime();
@@ -480,8 +673,8 @@
 					reader.readAsDataURL(file);
 				});
 			},
-		
-			uploadIMG(e) {
+			
+			uploadIMG(e,imgList) {
 			  this.picavalue = e.file;
 			  console.log(this.picavalue.size / 1024);
 			  if (this.picavalue.size / 1024 > 10000) {
@@ -490,7 +683,7 @@
 				  type: "warning"
 				});
 			  } else {
-				this.imgPreview(e.file);
+				this.imgPreview(e.file,imgList);
 			  }
 			},
 			// 压缩图片
@@ -533,7 +726,7 @@
 				});
 			},
 			//获取图片
-			imgPreview(file) {
+			imgPreview(file,imgList) {
 				let self = this;
 				//判断支不支持FileReader
 				if (!file || !window.FileReader) return;
@@ -556,12 +749,15 @@
 							self.postUrl = result;
 
 							let blob = self.dataURItoBlob(data);
-
+							imgList.push({
+								url:result,
+								blob:blob,
+								name:file.name
+							})
 							console.log("*******base64转blob对象******");
 							console.log(blob);
-
-							self.formData = new FormData();
-							self.formData.append("Img",blob,file.name);
+							// self.formData = new FormData();
+							// self.formData.append("Img",blob,file.name);
 							console.log("********将blob对象转成formData对象********");
 							// console.log(self.formData)
 							
@@ -570,11 +766,12 @@
 				}
 			},
 			
-			inputChange(value, inputVal) { //表格input
+			inputChange(value) { //表格input
 				// console.log(this.tableDataCs)
+				let self = this;
 				let reg = /^\d+\.?\d{0,2}$/
-				if (!reg.test(value[inputVal])) {
-					value[inputVal] = ''
+				if (!reg.test(self[inputVal])) {
+					self[inputVal] = ''
 				}
 
 			},
@@ -582,9 +779,9 @@
 				// console.log(val)
 			},
 			handleExceed(files, fileList) {
-				this.$message.warning(`只能上传一张图片`);
+				this.$message.warning(`只能上传20张图片`);
 			},
-			deleteGoodsMain() { //活动封面图删除
+			deleteGoodsMain(imgList,index) { //活动封面图删除
 
 				let self = this;
 				this.$confirm('此操作将永久删除该文件, 是否继续?', '提示', {
@@ -594,9 +791,9 @@
 					callback: function(action, instance) {
 
 						if (action == 'confirm') {
-							self.$refs.uploadGoodsMain.uploadFiles.splice(0, 1);
-							self.postFormData = '';
-							self.postUrl = '';
+							imgList.splice(index, 1);
+							// self.postFormData = '';
+							// self.postUrl = '';
 						}
 					}
 				})
@@ -632,14 +829,14 @@
 							// console.log("*******base64转blob对象******");
 							// console.log(blob);
 				
-							let formData = new FormData();
-							formData.append("Img",blob,file.name);
+							// formData.append("Img",blob,file.name);
 							self.activeImg.push({
-								formData:formData,
-								imgUrl:result,
+								blob:blob,
+								url:result,
 								height: '',
 								width: '',
-								name:file.name
+								name:file.name,
+								
 							});
 							self.imgSize.forEach((e) => {
 								self.activeImg.forEach((j) => {
@@ -659,46 +856,7 @@
 			handleDescribeExceed(files, fileList) {
 				this.$message.warning(`当前限制选择 20 个文件`);
 			},
-			describeImgRemove(index) { //活动详情图片删除
-				let self = this;
-				this.$confirm('此操作将永久删除该文件, 是否继续?', '提示', {
-					confirmButtonText: '确定',
-					cancelButtonText: '取消',
-					type: 'warning',
-					callback: function(action, instance) {
-
-						if (action == 'confirm') {
-
-							self.axios.post(Api.shopApi + '/deleteImg', self.qs.stringify({
-								imgAddr: self.activeImg[index].imgUrl
-							}), {
-								headers: {
-									'Content-Type': 'application/x-www-form-urlencoded'
-								}
-							}).then(function(res) {
-								if (res.data.code == 1) {
-									self.activeImg[index].imgUrl = '';
-									self.activeImg[index].imgId = '';
-									self.activeImg.splice(index, 1);
-									self.$refs.uploadDescribe.uploadFiles.splice(index, 1);
-
-								} else {
-									self.$message({
-										showClose: true,
-										message: res.data.msg,
-										type: 'error',
-									});
-								}
-
-							})
-
-						}
-					}
-				})
-			},
-			commit(num) { //提交
-			
-			},
+		
 		}
 	}
 </script>
