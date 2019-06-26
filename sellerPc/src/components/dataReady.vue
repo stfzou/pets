@@ -69,6 +69,7 @@
 </template>
 
 <script>
+	import Api from './common/apj.js'
 	export default {
 		data() {
 			return {

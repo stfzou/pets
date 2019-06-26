@@ -202,6 +202,7 @@
 </template>
 
 <script>
+	import Api from './common/apj.js'
 	export default {
 		data() {
 			return {
@@ -239,7 +240,7 @@
 		mounted: function() {
 			let self = this;
 			
-			this.axios.post('/selectShopUserInfo', this.qs.stringify({
+			this.axios.post(Api.shopApi+'/selectShopUserInfo', this.qs.stringify({
 				userId:JSON.parse(sessionStorage.getItem('user')).userId
 				
 			}), {
@@ -272,7 +273,7 @@
 				}
 			})
 			
-			this.axios.post('/webShop/selectShopsType ', this.qs.stringify({
+			this.axios.post(Api.shopApi+'/webShop/selectShopsType ', this.qs.stringify({
 				shopId: JSON.parse(sessionStorage.getItem('user')).shopId
 			}), {
 				headers: {
@@ -355,7 +356,7 @@
 					type: 'warning',
 					callback: function(action, instance) {
 						if (action == 'confirm') {
-							self.axios.post('/deleteImg', self.qs.stringify({
+							self.axios.post(Api.shopApi+'/deleteImg', self.qs.stringify({
 								imgAddr: self.imgData[img],
 							}), {
 								headers: {
@@ -466,7 +467,7 @@
 							isLong: self.checkedNum
 
 						}
-						this.axios.post('/webShop/editShopsQualification', this.qs.stringify(shopInfoData), {
+						this.axios.post(Api.shopApi+'/webShop/editShopsQualification', this.qs.stringify(shopInfoData), {
 							headers: {
 								'Content-Type': 'application/x-www-form-urlencoded'
 							}
@@ -534,7 +535,7 @@
 							isQualification: 0,
 							
 						}
-						this.axios.post('/webShop/editShopsQualification', this.qs.stringify(shopInfoData), {
+						this.axios.post(Api.shopApi+'/webShop/editShopsQualification', this.qs.stringify(shopInfoData), {
 							headers: {
 								'Content-Type': 'application/x-www-form-urlencoded'
 							}

@@ -124,7 +124,8 @@
 		data(){
 			return{
 				sponsorImg:'',//主办方头像
-				formData:new FormData(),//头像数据
+				sponsorImgData:'',
+				formData:null,//头像数据
 				isEnterprise:'1',//是否是企业
 				sponsorAppellation:'',//主办方简称
 				enterpriseName:'',//企业名称
@@ -349,10 +350,10 @@
 							self.sponsorImg = result;
 			
 							let blob = self.dataURItoBlob(data);
-			
+							self.sponsorImgData = blob;
 							console.log("*******base64转blob对象******");
 							console.log(blob);
-							self.formData.append("organizerHeadImg",blob,file.name);
+							
 							console.log("********将blob对象转成formData对象********");
 							
 							
@@ -371,8 +372,8 @@
 			
 						if (action == 'confirm') {
 							self.$refs.uploadGoodsMain.uploadFiles.splice(0, 1);
-							self.formData.delete('organizerHeadImg');
 							self.sponsorImg = '';
+							self.sponsorImgData = '';
 						}
 					}
 				})
@@ -405,18 +406,19 @@
 									self.realName = '';
 								}
 								// alert(111)
-								self.formData.append("userId",JSON.parse(sessionStorage.getItem('user')).userId);
-								self.formData.append("type",self.isEnterprise);
-								self.formData.append("type",self.isEnterprise);
-								self.formData.append("code",self.code);
-								self.formData.append("organizerSynopsis",self.sponsorIntroduction);
-								self.formData.append("name",self.realName);
-								self.formData.append("phone",self.phone)
-								self.formData.append("companyName",self.enterpriseName)
-								self.formData.append("organizerName",self.sponsorAppellation)
-								self.formData.append("organizerId",self.organizerId)
+								let formData = new FormData();
+								formData.append("organizerHeadImg",self.sponsorImgData);
+								formData.append("userId",JSON.parse(sessionStorage.getItem('user')).userId);
+								formData.append("type",self.isEnterprise);
+								formData.append("code",self.code);
+								formData.append("organizerSynopsis",self.sponsorIntroduction);
+								formData.append("name",self.realName);
+								formData.append("phone",self.phone)
+								formData.append("companyName",self.enterpriseName)
+								formData.append("organizerName",self.sponsorAppellation)
+								formData.append("organizerId",self.organizerId)
 								
-								self.axios.post(Api.userApi + '/ca/updateCommunityActivityOrganizerInfo',self.formData,{
+								self.axios.post(Api.userApi + '/ca/updateCommunityActivityOrganizerInfo',formData,{
 									headers: {
 										'Content-Type': 'multipart/form-data'
 									}

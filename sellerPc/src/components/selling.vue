@@ -133,6 +133,7 @@
 
 <script>
 	import QRCode from 'qrcodejs2'
+	import Api from './common/apj.js'
 	export default {
 		data() {
 			return {
@@ -221,7 +222,7 @@
 							type: 'warning',
 							callback: function(action, instance) {
 								if (action == 'confirm') {
-									self.axios.post('/shop/deleteProduct', self.qs.stringify({
+									self.axios.post(Api.shopApi+'/shop/deleteProduct', self.qs.stringify({
 										shopId: JSON.parse(sessionStorage.getItem('user')).shopId,
 										productIds:arr.join(',')
 									}), {
@@ -260,7 +261,7 @@
 					type: 'warning',
 					callback: function(action, instance) {
 						if (action == 'confirm') {
-							self.axios.post('/shop/deleteProduct', self.qs.stringify({
+							self.axios.post(Api.shopApi+'/shop/deleteProduct', self.qs.stringify({
 								shopId: JSON.parse(sessionStorage.getItem('user')).shopId,
 								productIds:scope.productId
 							}), {
@@ -322,7 +323,7 @@
 				let self = this;
 				let tump = e;
 				console.log(tump)
-				self.axios.post('/webShop/updateProductToppingTime', self.qs.stringify({
+				self.axios.post(Api.shopApi+'/webShop/updateProductToppingTime', self.qs.stringify({
 					productId:e.productId
 				}), {
 					headers: { //经营品类
@@ -357,7 +358,7 @@
 						callback: function(action, instance) {
 							if (action == 'confirm') {
 					
-								self.axios.post('/shop/productCancel', self.qs.stringify({
+								self.axios.post(Api.shopApi+'/shop/productCancel', self.qs.stringify({
 									shopId: JSON.parse(sessionStorage.getItem('user')).shopId,
 									productIds:scope.productId
 								}), {
@@ -395,7 +396,7 @@
 						callback: function(action, instance) {
 							if (action == 'confirm') {
 					
-								self.axios.post('/shop/productCancel', self.qs.stringify({
+								self.axios.post(Api.shopApi+'/shop/productCancel', self.qs.stringify({
 									shopId: JSON.parse(sessionStorage.getItem('user')).shopId,
 									productIds:arr.join(',')
 								}), {
@@ -443,7 +444,7 @@
 			getGoodsClass() { //初始化商品分类
 
 				let self = this;
-				this.axios.post('/selectGroupAll', {
+				this.axios.post(Api.shopApi+'/selectGroupAll', {
 					headers: { //经营品类
 						'Content-Type': 'application/x-www-form-urlencoded',
 					}
@@ -457,7 +458,7 @@
 							};
 							obj.label = e.name;
 							obj.value = e.id;
-							self.axios.post('/selectGSortOne', self.qs.stringify({
+							self.axios.post(Api.shopApi+'/selectGSortOne', self.qs.stringify({
 								gIds: obj.value
 							}), {
 								headers: { //经营品类
@@ -477,7 +478,7 @@
 										};
 										childrenObj.label = s.sortName;
 										childrenObj.value = s.sortId;
-										self.axios.post('/selectSortTwo', self.qs.stringify({
+										self.axios.post(Api.shopApi+'/selectSortTwo', self.qs.stringify({
 											sortIds: childrenObj.value
 										}), {
 											headers: { //经营品类
@@ -533,7 +534,7 @@
 			getAllGoods(state,val) { //根据状态查询商品
 			
 				let self = this;
-				this.axios.post('/webShop/selectShopsProduct', this.qs.stringify({
+				this.axios.post(Api.shopApi+'/webShop/selectShopsProduct', this.qs.stringify({
 					shopId: JSON.parse(sessionStorage.getItem('user')).shopId,
 					status: state,
 					pageNo: val,
@@ -552,6 +553,7 @@
 				}).then(function(res) {
 					if (res.data.code == 1) {
 						self.tableData = res.data.data.list;
+						// console.log(self.tableData)
 						self.total = res.data.data.total;
 						setTimeout(() => {
 							self.loading = false;

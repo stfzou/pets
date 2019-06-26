@@ -26,7 +26,7 @@
 							<GeminiScrollbar class="my-scroll-bar">
 								<div class="nav_left">
 									<ul>
-										<li :class="{active:navIndex == index}" v-for="(item,index) in navData" @click="selectNav(item,index)">
+										<li :class="{active:$store.state.nav.navNum == index}" v-for="(item,index) in navData" @click="selectNav(item,index)">
 											<div class="flex_c_f_e pointer">
 												
 												<img :src="item.url" alt="">
@@ -41,10 +41,10 @@
 							</GeminiScrollbar>
 							<div class="nav_right">
 								<ul>
-									<li v-for="(item,index) in subNavData" class="flex_r_f_s" @click="subSelect(index)">
-										<img v-if="subNavIndex==index" src="../assets/condition/icon_02.png" alt="">
+									<li  v-for="(item,index) in $store.state.nav.subData" class="flex_r_f_s" @click="subSelect(index)">
+										<img v-if="$store.state.nav.subNum==index" src="../assets/condition/icon_02.png" alt="">
 										<img v-else :src="item.subIcon" alt="">
-										<router-link :to="{name:item.link}" active-class="active">
+										<router-link :to="{name:item.link}" :class="{active:$store.state.nav.subNum==index}">
 											{{item.subNavName}}
 										</router-link>
 									</li>
@@ -54,7 +54,7 @@
 						
 					</el-aside>
 					<el-main class="cnt">
-							<router-view></router-view>
+							<router-view :key="10111111"></router-view>
 							<footer class="footer" style="text-align: center;">自由犬  @2018  v20.41</footer>
 
 					</el-main>
@@ -87,15 +87,15 @@
 						},{
 						subNavName:'未上架的商品',
 						subIcon:require('../assets/home/icon_home1.png'),
-						link:'publishActivity'
+						link:''
 						},{
 						subNavName:'草稿箱',
 						subIcon:require('../assets/home/icon_home2.png'),
-						link:'sponsorManage'
+						link:''
 						},{
 						subNavName:'商品展示分类',
 						subIcon:require('../assets/home/icon_home5.png'),
-						link:'realName'
+						link:''
 						},{
 						subNavName:'评价管理',
 						subIcon:require('../assets/home/icon_home4.png'),
@@ -110,25 +110,46 @@
 					},{
 						navName:'报表中心',url:require('../assets/home/icon_baobiao@2x.png'),subData:[{subNavName:'',subIcon:'',}]
 					},{
-						navName:'财务管理',url:require('../assets/home/icon_caiwu@2x.png'),subData:[{subNavName:'',subIcon:'',}]
+						navName:'活动管理',url:require('../assets/home/icon_caiwu@2x.png'),
+						subData:[{
+						subNavName:'发布活动',
+						subIcon:require('../assets/home/icon_home1.png'),
+						link:'publishActivity'
+						},{
+						subNavName:'主办方管理',
+						subIcon:require('../assets/home/icon_home2.png'),
+						link:'sponsorManage'
+						},{
+						subNavName:'认证',
+						subIcon:require('../assets/home/icon_home5.png'),
+						link:'realName'
+						}]
 					},{
 						navName:'消息管理',url:require('../assets/home/icon_xiaoxi@2x.png'),subData:[{subNavName:'',subIcon:'',}]
 					},{
 						navName:'设置',url:require('../assets/home/icon_shezhi@2x.png'),subData:[{subNavName:'',subIcon:'',}]
 					}],
 				subNavData:[],
-				navIndex:null,
-				subNavIndex:null
+				navIndex:1,
+				subNavIndex:0
 			};
 		},
+		
 		methods: {
 			selectNav(item,index) {
 				this.navIndex = index;
 				this.subNavData = item.subData;
+				this.$store.commit('changeIndexNav',index)
+				this.$store.commit('setChangeSubData',item.subData)
+				// this.$router.push({
+				// 	name:item.subData[0].link
+				// })
 			},
 			subSelect(index){
 				this.subNavIndex = index;
+				this.$store.commit('changeSubIndex',index)
 			},
+			
 			quit(){
 				
 				let self = this;
@@ -145,14 +166,7 @@
 				})
 			}	
 		},
-		mounted(){
-			this.navIndex = this.$store.state.nav.navNum;
-			this.subNavIndex = this.$store.state.nav.subNum;
-			this.subNavData = this.navData[this.navIndex].subData;
-			
-			
-		}
-			
+		
 		
 		
 	}

@@ -124,6 +124,8 @@
 		data(){
 			return{
 				sponsorImg:'',//主办方头像
+				sponsorImgData:'',
+				sponsorImgName:'',
 				formData:'',//头像数据
 				isEnterprise:'1',//是否是企业
 				sponsorAppellation:'',//主办方简称
@@ -367,12 +369,10 @@
 							self.sponsorImg = result;
 			
 							let blob = self.dataURItoBlob(data);
-			
+							self.sponsorImgData = blob;
+							self.sponsorImgName = file.name;
 							console.log("*******base64转blob对象******");
-							console.log(blob);
-							
-							self.formData = new FormData();
-							self.formData.append("organizerHeadImg",blob,file.name);
+						
 							console.log("********将blob对象转成formData对象********");
 							
 							
@@ -391,8 +391,9 @@
 			
 						if (action == 'confirm') {
 							self.$refs.uploadGoodsMain.uploadFiles.splice(0, 1);
-							self.formData.delete('organizerHeadImg');
+							// self.formData.delete('organizerHeadImg');
 							self.sponsorImg = '';
+							self.sponsorImgData = '';
 						}
 					}
 				})
@@ -425,16 +426,18 @@
 									self.realName = '';
 								}
 								// alert(111)
-								self.formData.append("userId",JSON.parse(sessionStorage.getItem('user')).userId);
-								self.formData.append("type",self.isEnterprise);
-								self.formData.append("code",self.code);
-								self.formData.append("organizerSynopsis",self.sponsorIntroduction);
-								self.formData.append("name",self.realName);
-								self.formData.append("phone",self.phone)
-								self.formData.append("companyName",self.enterpriseName)
-								self.formData.append("organizerName",self.sponsorAppellation)
+								let formData = new FormData();
+								formData.append("organizerHeadImg",self.sponsorImgData,self.sponsorImgName);
+								formData.append("userId",JSON.parse(sessionStorage.getItem('user')).userId);
+								formData.append("type",self.isEnterprise);
+								formData.append("code",self.code);
+								formData.append("organizerSynopsis",self.sponsorIntroduction);
+								formData.append("name",self.realName);
+								formData.append("phone",self.phone)
+								formData.append("companyName",self.enterpriseName)
+								formData.append("organizerName",self.sponsorAppellation)
 								
-								self.axios.post(Api.userApi + '/ca/addCommunityActivityOrganizer',self.formData,{
+								self.axios.post(Api.userApi + '/ca/addCommunityActivityOrganizer',formData,{
 									headers: {
 										'Content-Type': 'multipart/form-data'
 									}
@@ -448,7 +451,7 @@
 										});
 										setTimeout(function(){
 											self.$router.push({
-												name:'addSponsor'
+												name:'sponsorManage'
 											})
 										},200)
 									} else {

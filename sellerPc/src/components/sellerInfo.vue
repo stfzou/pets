@@ -219,7 +219,7 @@
 </template>
 
 <script>
-
+	import Api from './common/apj.js'
 	import VDistpicker from 'v-distpicker'
 	export default {
 		components: { VDistpicker },
@@ -316,7 +316,7 @@
 		},
 		mounted:function(){
 			let self = this;
-			this.axios.post('/selectShopUserInfo', this.qs.stringify({
+			this.axios.post(Api.shopApi+'/selectShopUserInfo', this.qs.stringify({
 				userId:JSON.parse(sessionStorage.getItem('user')).userId
 				
 			}), {
@@ -354,12 +354,12 @@
 			
 			
 			this.axios.all([
-				this.axios.post('/getOperateAll',{
+				this.axios.post(Api.shopApi+'/getOperateAll',{
 					headers: { //经营品类
 						'Content-Type': 'application/x-www-form-urlencoded',
 					}
 				}),
-				this.axios.post('/getShopTypeAll',{
+				this.axios.post(Api.shopApi+'/getShopTypeAll',{
 					headers: { //商店类型
 						'Content-Type': 'application/x-www-form-urlencoded',
 					}
@@ -412,7 +412,7 @@
 							type: 'warning',
 							callback:function(action, instance){
 								if(action == 'confirm'){
-									self.axios.post('/deleteImg', self.qs.stringify({
+									self.axios.post(Api.shopApi+'/deleteImg', self.qs.stringify({
 										imgAddr: self.sellerInfo[img],
 									}), {
 										headers: {
@@ -516,7 +516,7 @@
 							spinner: 'el-icon-loading',
 							background: 'rgba(0, 0, 0, 0.7)'
 						});
-						this.axios.post('/webShop/editShopsInfo', this.qs.stringify({
+						this.axios.post(Api.shopApi+'/webShop/editShopsInfo', this.qs.stringify({
 							
 							shopId:JSON.parse(sessionStorage.getItem('user')).shopId,
 							shopName:self.storeNameInput,

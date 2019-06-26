@@ -73,10 +73,10 @@
 						<div class="outside flex_r_s_b">
 							<div class="outside_img" v-if="imgData.yyzz">
 								<img :src="imgData.yyzz">
-								<i @click="deleteImg($refs.uploadYyzz.uploadFiles,'yyzz','licenseImg')" class="el-icon-circle-close"></i>
+								<i @click="deleteImg($refs.uploadYyzz.uploadFiles,'yyzz')" class="el-icon-circle-close"></i>
 							</div>
 							<div v-show="!imgData.yyzz">
-								<el-upload ref="uploadYyzz" :http-request="function(file){return uploadIMG(file,'yyzz','licenseImg')}" class="avatar-uploader" action="http://192.168.0.109:8084/updateImg"
+								<el-upload ref="uploadYyzz" :http-request="function(file){return uploadIMG(file,'yyzz','yyzzObj')}" class="avatar-uploader" action="http://192.168.0.109:8084/updateImg"
 								 :show-file-list="false" list-type="picture-card" name="Img" :limit="1" :before-upload="beforeAvatarUpload">
 									<i class="el-icon-plus avatar-uploader-icon"></i>
 								</el-upload>
@@ -103,10 +103,10 @@
 						<div class="outside flex_r_s_b">
 							<div class="outside_img" v-if="imgData.sfzz">
 								<img :src="imgData.sfzz">
-								<i @click="deleteImg($refs.uploadSfzz.uploadFiles,'sfzz','IDCardFrontImg')" class="el-icon-circle-close"></i>
+								<i @click="deleteImg($refs.uploadSfzz.uploadFiles,'sfzz')" class="el-icon-circle-close"></i>
 							</div>
 							<div v-show="!imgData.sfzz">
-								<el-upload ref="uploadSfzz" :http-request="function(file){return uploadIMG(file,'sfzz','IDCardFrontImg')}" class="avatar-uploader" action="http://192.168.0.109:8084/updateImg"
+								<el-upload ref="uploadSfzz" :http-request="function(file){return uploadIMG(file,'sfzz','sfzzObj')}" class="avatar-uploader" action="http://192.168.0.109:8084/updateImg"
 								 :show-file-list="false" list-type="picture-card" name="Img" :limit="1" :before-upload="beforeAvatarUpload">
 									<i class="el-icon-plus avatar-uploader-icon"></i>
 								</el-upload>
@@ -123,10 +123,10 @@
 						<div class="outside inside flex_r_s_b">
 							<div class="outside_img" v-if="imgData.sfzf">
 								<img :src="imgData.sfzf">
-								<i @click="deleteImg($refs.uploadSfzf.uploadFiles,'sfzf','IDCardBackImg')" class="el-icon-circle-close"></i>
+								<i @click="deleteImg($refs.uploadSfzf.uploadFiles,'sfzf')" class="el-icon-circle-close"></i>
 							</div>
 							<div v-show="!imgData.sfzf">
-								<el-upload ref="uploadSfzf" :http-request="function(file){return uploadIMG(file,'sfzf','IDCardBackImg')}" class="avatar-uploader" action="http://192.168.0.109:8084/updateImg"
+								<el-upload ref="uploadSfzf" :http-request="function(file){return uploadIMG(file,'sfzf','sfzfObj')}" class="avatar-uploader" action="http://192.168.0.109:8084/updateImg"
 								 :show-file-list="false" list-type="picture-card" :limit="1" name='Img' :before-upload="beforeAvatarUpload">
 									<i class="el-icon-plus avatar-uploader-icon"></i>
 								</el-upload>
@@ -152,10 +152,10 @@
 						<div class="outside flex_r_s_b">
 							<div class="outside_img" v-if="imgData.rzgh">
 								<img :src="imgData.rzgh">
-								<i @click="deleteImg($refs.uploadRzgh.uploadFiles,'rzgh','approveImg')" class="el-icon-circle-close"></i>
+								<i @click="deleteImg($refs.uploadRzgh.uploadFiles,'rzgh')" class="el-icon-circle-close"></i>
 							</div>
 							<div v-show="!imgData.rzgh">
-								<el-upload ref="uploadRzgh" :http-request="function(file){return uploadIMG(file,'rzgh','approveImg')}" class="avatar-uploader" action="http://192.168.0.109:8084/updateImg"
+								<el-upload ref="uploadRzgh" :http-request="function(file){return uploadIMG(file,'rzgh','rzghObj')}" class="avatar-uploader" action="http://192.168.0.109:8084/updateImg"
 								 :show-file-list="false" list-type="picture-card" name="Img" :limit="1" :before-upload="beforeAvatarUpload">
 									<i class="el-icon-plus avatar-uploader-icon"></i>
 								</el-upload>
@@ -194,8 +194,24 @@
 					yyzz: '',
 					rzgh: '',
 				},
+				sfzzObj:{
+					picData:'',
+					picName:''
+				},
+				sfzfObj:{
+					picData:'',
+					picName:''
+				},
+				yyzzObj:{
+					picData:'',
+					picName:''
+				},
+				rzghObj:{
+					picData:'',
+					picName:''
+				},
 				organizerId:'',//认证主键
-				formData:new FormData(),
+				formData:null,
 				code:'',//验证码
 				count:'',//计算
 				show:true,
@@ -208,7 +224,25 @@
 		},
 		mounted() {
 			this.organizerId = this.$route.query.organizerId;
-			// alert(this.organizerId)
+			this.$store.commit('initialNav', {
+				navNum: 6,
+				subNum: 2,
+				subData: [{
+					subNavName: '发布活动',
+					subIcon: require('../../assets/home/icon_home1.png'),
+					link: 'publishActivity'
+				}, {
+					subNavName: '主办方管理',
+					subIcon: require('../../assets/home/icon_home2.png'),
+					link: 'sponsorManage'
+				}, {
+					subNavName: '认证',
+					subIcon: require('../../assets/home/icon_home5.png'),
+					link: 'realName'
+				}]
+			});
+		
+			
 		},
 		methods:{
 			inputChange(value){//表格input
@@ -303,10 +337,11 @@
 							// self.postUrl = result;
 							self.imgData[imgUrl] = result;
 							let blob = self.dataURItoBlob(data);
-			
+							self[fData].picData = blob;
+							self[fData].picName = file.name;
 							console.log("*******base64转blob对象******");
-							console.log(blob);
-							self.formData.append(fData,blob,file.name);
+							
+							// self.formData.append(fData,blob,file.name);
 							console.log("********将blob对象转成formData对象********");
 							
 							
@@ -367,7 +402,7 @@
 					callback: function(action, instance) {
 						if (action == 'confirm') {
 							arr.splice(0,1);
-							self.formData.delete(imgName);
+							// self.formData.delete(imgName);
 							self.imgData[img] = '';
 						}
 					}
@@ -475,16 +510,21 @@
 					});
 					return false;
 				}else{
-					self.formData.append('organizerId',self.organizerId)
-					self.formData.append('code',self.code)
-					self.formData.append('userId',JSON.parse(sessionStorage.getItem('user')).userId)
-					self.formData.append('type','2')
-					self.formData.append('IDCardNumber',self.idCard)
-					self.formData.append('name',self.userName)
-					self.formData.append('phone',self.phone)
-					self.formData.append('businessLicenseNum',self.businessLicenseNum)
-					self.formData.append('companyName',self.companyName)
-					self.axios.post(Api.userApi+'/ca/updateCommunityActivityOrganizer',self.formData, {
+					let formData = new FormData();
+					formData.append('licenseImg',self.yyzzObj.picData,self.yyzzObj.picName)
+					formData.append('IDCardFrontImg',self.sfzzObj.picData,self.sfzzObj.picName)
+					formData.append('IDCardBackImg',self.sfzfObj.picData,self.sfzfObj.picName)
+					formData.append('approveImg',self.rzghObj.picData,self.rzghObj.picName)
+					formData.append('organizerId',self.organizerId)
+					formData.append('code',self.code)
+					formData.append('userId',JSON.parse(sessionStorage.getItem('user')).userId)
+					formData.append('type','2')
+					formData.append('IDCardNumber',self.idCard)
+					formData.append('name',self.userName)
+					formData.append('phone',self.phone)
+					formData.append('businessLicenseNum',self.businessLicenseNum)
+					formData.append('companyName',self.companyName)
+					self.axios.post(Api.userApi+'/ca/updateCommunityActivityOrganizer',formData, {
 						headers: {
 							'Content-Type': 'multipart/form-data'
 						}

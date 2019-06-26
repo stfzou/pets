@@ -490,6 +490,7 @@
 
 <script>
 	import draggable from 'vuedraggable'
+	import Api from './common/apj.js'
 	export default {
 		components: {
 			draggable
@@ -609,7 +610,7 @@
 				let isPush = true;
 				let pId = this.productId;
 				
-				this.axios.post('/selectShopsProductTips',self.qs.stringify({productId:pId}),{
+				this.axios.post(Api.shopApi+'/selectShopsProductTips',self.qs.stringify({productId:pId}),{
 					headers: { //经营品类
 						'Content-Type': 'application/x-www-form-urlencoded',
 					}
@@ -651,7 +652,7 @@
 								clearAll:0,
 							}
 							
-							self.axios.post('/webShop/selectANV', self.qs.stringify({
+							self.axios.post(Api.shopApi+'/webShop/selectANV', self.qs.stringify({
 								attrNameId:id
 							}), {
 								headers: {
@@ -728,7 +729,7 @@
 						
 						//获取商品品牌
 						if(re.sort){
-							self.axios.post('/webShop/selectSortBrandAll',self.qs.stringify({//初始化商品品牌数据
+							self.axios.post(Api.shopApi+'/webShop/selectSortBrandAll',self.qs.stringify({//初始化商品品牌数据
 								sortId:re.sort.parentId,
 							}), {
 								headers: {
@@ -756,7 +757,7 @@
 						//获取商品属性
 						if(re.sort){
 							
-							self.axios.post('/selectSortAttrNameValues',self.qs.stringify({//初始化商品属性
+							self.axios.post(Api.shopApi+'/selectSortAttrNameValues',self.qs.stringify({//初始化商品属性
 								sortId:re.sort.sortId,
 							}), {
 								headers: {
@@ -1051,7 +1052,7 @@
 					describePic.push(e.imgId)
 				})
 				
-				this.axios.post('/webShop/editProduct', this.qs.stringify({
+				this.axios.post(Api.shopApi+'/webShop/editProduct', this.qs.stringify({
 					productId:self.productId,
 					shopId: JSON.parse(sessionStorage.getItem('user')).shopId,
 					sortIds: self.selectedGoodsClass[2],
@@ -1128,7 +1129,7 @@
 					}
 				})
 				if(isHttp){
-					this.axios.post('/webShop/deleteAttrValue', this.qs.stringify({
+					this.axios.post(Api.shopApi+'/webShop/deleteAttrValue', this.qs.stringify({
 							attrNameId:e.value,
 							avIds:j
 					}), {
@@ -1166,7 +1167,7 @@
 			},
 			getGoodsSpecName(){ //获取规格名字
 				let self = this;
-				this.axios.post('/webShop/selectAttrNameAll',{
+				this.axios.post(Api.shopApi+'/webShop/selectAttrNameAll',{
 				 	headers: { //经营品类
 				 		'Content-Type': 'application/x-www-form-urlencoded',
 				 	}
@@ -1185,7 +1186,7 @@
 			getGoodsClass(){//初始化商品分类
 				
 				let self = this;
-				this.axios.post('/selectGroupAll',{
+				this.axios.post(Api.shopApi+'/selectGroupAll',{
 					headers: { //经营品类
 						'Content-Type': 'application/x-www-form-urlencoded',
 					}
@@ -1195,7 +1196,7 @@
 							let obj = {label:'',value:'',children:[]};
 							obj.label = e.name;
 							obj.value = e.id;
-							self.axios.post('/selectGSortOne',self.qs.stringify({gIds:obj.value}),{
+							self.axios.post(Api.shopApi+'/selectGSortOne',self.qs.stringify({gIds:obj.value}),{
 								headers: { //经营品类
 									'Content-Type': 'application/x-www-form-urlencoded',
 								}
@@ -1209,7 +1210,7 @@
 										let childrenObj = {lable:'',value:'',children:[]};
 										childrenObj.label = s.sortName;
 										childrenObj.value = s.sortId;
-										self.axios.post('/selectSortTwo',self.qs.stringify({sortIds:childrenObj.value}),{
+										self.axios.post(Api.shopApi+'/selectSortTwo',self.qs.stringify({sortIds:childrenObj.value}),{
 											headers: { //经营品类
 												'Content-Type': 'application/x-www-form-urlencoded',
 											}
@@ -1244,7 +1245,7 @@
 			handleChange(value) { //商品分类回调并
 				let self = this;
 				
-				self.axios.post('/webShop/selectSortBrandAll',self.qs.stringify({//初始化商品品牌数据
+				self.axios.post(Api.shopApi+'/webShop/selectSortBrandAll',self.qs.stringify({//初始化商品品牌数据
 					sortId:value[1],
 				}), {
 					headers: {
@@ -1263,7 +1264,7 @@
 					}
 				});
 				
-				self.axios.post('/selectSortAttrNameValues',self.qs.stringify({//初始化商品属性
+				self.axios.post(Api.shopApi+'/selectSortAttrNameValues',self.qs.stringify({//初始化商品属性
 					sortId:value[2],
 				}), {
 					headers: {
@@ -1309,7 +1310,7 @@
 						callback:function(action, instance){
 							
 							if(action == 'confirm'){
-								self.axios.post('/deleteImg', self.qs.stringify({
+								self.axios.post(Api.shopApi+'/deleteImg', self.qs.stringify({
 									imgAddr: self.goodsMainList[index].imgUrl,
 								}), {
 									headers: {
@@ -1371,7 +1372,7 @@
 								
 								if(action == 'confirm'){
 									
-									self.axios.post('/deleteImg', self.qs.stringify({
+									self.axios.post(Api.shopApi+'/deleteImg', self.qs.stringify({
 										imgAddr: scope.yulan
 									}), {
 										headers: {
@@ -1407,7 +1408,7 @@
 							
 							if(action == 'confirm'){
 								
-								self.axios.post('/deleteImg', self.qs.stringify({
+								self.axios.post(Api.shopApi+'/deleteImg', self.qs.stringify({
 									imgAddr: self.describeImg[index].imgUrl
 								}), {
 									headers: {
@@ -1489,7 +1490,7 @@
 						}
 					})
 					if(isHttp){
-						this.axios.post('/webShop/addAttrValue', this.qs.stringify({
+						this.axios.post(Api.shopApi+'/webShop/addAttrValue', this.qs.stringify({
 								anId:e.value,
 								avName:e.inputVal,
 								status:0
@@ -1543,7 +1544,7 @@
 								arr.push(j.value)
 							}
 						})
-						this.axios.post('/webShop/selectANV', this.qs.stringify({
+						this.axios.post(Api.shopApi+'/webShop/selectANV', this.qs.stringify({
 							attrNameId:e.n,
 							avIds:arr
 						}), {
@@ -1560,7 +1561,7 @@
 						})
 					}		
 					e.clearAll = n;		
-					this.axios.post('/webShop/selectANV', this.qs.stringify({
+					this.axios.post(Api.shopApi+'/webShop/selectANV', this.qs.stringify({
 						attrNameId:n
 					}), {
 						headers: {

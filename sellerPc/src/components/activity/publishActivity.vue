@@ -16,9 +16,9 @@
 
 						</div>
 						<div class="postImg" v-show="postUrlList.length==0">
-							<el-upload class="avatar-uploader" :before-upload="function(file){return sizeReg(file,800,533)}" :file-list="postUrlList" 
-							:http-request="function(file){return uploadIMG(file,postUrlList)}"ref="uploadGoodsMain" action="http://192.168.0.109:8084/updateImg" multiple 
-							:limit="1" list-type="picture" name="Img">
+							<el-upload class="avatar-uploader" :before-upload="function(file){return sizeReg(file,800,533)}" :file-list="postUrlList"
+							 :http-request="function(file){return uploadIMG(file,postUrlList)}" ref="uploadGoodsMain" action="http://192.168.0.109:8084/updateImg"
+							 multiple :limit="1" list-type="picture" name="Img">
 								<div class="upload-text flex_c_f_s">
 									<i class="el-icon-plus"></i>
 									<div><span>+</span>点击上传活动封面 (850*533)</div>
@@ -47,9 +47,11 @@
 			<li class="clearfloat">
 				<p class="list_l">活动时间<span>*</span></p>
 				<div class="list_r">
-					<el-date-picker v-if="ticketNum>0" readonly v-model="activityData" type="datetimerange" range-separator="至" start-placeholder="开始日期" end-placeholder="结束日期" value-format="timestamp">
+					<el-date-picker v-if="ticketNum>0" readonly v-model="activityData" type="datetimerange" range-separator="至"
+					 start-placeholder="开始日期" end-placeholder="结束日期" value-format="timestamp">
 					</el-date-picker>
-					<el-date-picker v-else  type="datetimerange" v-model="activityData" range-separator="至" start-placeholder="开始日期" end-placeholder="结束日期" value-format="timestamp">
+					<el-date-picker v-else type="datetimerange" v-model="activityData" range-separator="至" start-placeholder="开始日期"
+					 end-placeholder="结束日期" value-format="timestamp">
 					</el-date-picker>
 				</div>
 			</li>
@@ -108,8 +110,9 @@
 							</transition-group>
 						</draggable>
 						<div class="upload-describe">
-							<el-upload class="describe-uploader" :before-upload="function(file){return sizeReg(file,10,10)}"  :on-exceed="handleExceed" :file-list="activeImg" ref="uploadDescribe"  
-							action="http://192.168.0.109:8084/updateImg" multiple :http-request="function(file){return handleDescribe(file,activeImg)}" :limit="2" list-type="picture"  name="Img">
+							<el-upload class="describe-uploader" :before-upload="function(file){return sizeReg(file,10,10)}" :on-exceed="handleExceed"
+							 :file-list="activeImg" ref="uploadDescribe" action="http://192.168.0.109:8084/updateImg" multiple :http-request="function(file){return handleDescribe(file,activeImg)}"
+							 :limit="2" list-type="picture" name="Img">
 								<i class="el-icon-plus"></i>
 							</el-upload>
 						</div>
@@ -157,7 +160,8 @@
 			<li class="clearfloat">
 				<p class="list_l">人数限制<span>*</span></p>
 				<div class="list_r">
-					<el-input class="goodsNameInput h32" @change="inputChange('limitPeople')" v-model="limitPeople" maxlength="60" placeholder="请输入可参加活动人数"></el-input>
+					<el-input class="goodsNameInput h32" @change="inputChange('limitPeople')" v-model="limitPeople" maxlength="60"
+					 placeholder="请输入可参加活动人数"></el-input>
 
 				</div>
 			</li>
@@ -189,7 +193,7 @@
 		</ul>
 		<div class="save_box">
 
-			<el-button round class="fabu_btn" @click="commit">下一步</el-button>
+			<el-button round class="fabu_btn" @click="commit">发布</el-button>
 		</div>
 	</div>
 
@@ -207,15 +211,15 @@
 		data() {
 			let self = this;
 			return {
-				ticketNum:0,//票劵数量
-				picavalue:'',//file对象
-				formData:new FormData(),//封面formData
-				postUrlList:[],
+				ticketNum: 0, //票劵数量
+				picavalue: '', //file对象
+				formData: new FormData(), //封面formData
+				postUrlList: [],
 				isMark: false,
-				activityData:[], //活动时间
+				activityData: [], //活动时间
 				lng: '',
 				lat: '',
-				imgSize:[],
+				imgSize: [],
 				mapCenter: [121.59996, 31.197646],
 				province: '',
 				city: '',
@@ -277,228 +281,248 @@
 				releaseStyle: true, //发布方式
 				undertakerData: [], //承办方数据
 				undertakerVal: '', //承办方值
-				ticketList:[],//票劵列表
-				isEndJoin:true,//是否报名时间都可以参加
-				joinDate:[]
+				ticketList: [], //票劵列表
+				isEndJoin: true, //是否报名时间都可以参加
+				joinDate: []
 			};
 		},
 		activated() {
 			this.getTicket();
 		},
 		filters: {
-			chargeFilter(val){//是否免费过滤
-				if(val == '1'){
+			chargeFilter(val) { //是否免费过滤
+				if (val == '1') {
 					return '收费'
-				}else{
+				} else {
 					return '免费'
 				}
 			},
-			isCheckFilter(val){//是否审核过滤
-				if(val == '1'){
+			isCheckFilter(val) { //是否审核过滤
+				if (val == '1') {
 					return '报名需要审核'
-				}else{
+				} else {
 					return '报名无需审核'
 				}
 			},
-			isOneTicket(val){
-				if(val == '2'){
+			isOneTicket(val) {
+				if (val == '2') {
 					return '连次票'
-				}else{
+				} else {
 					return '单次票'
 				}
 			},
-			isReturn(val){
-				if(val == '1'){
+			isReturn(val) {
+				if (val == '1') {
 					return '支持退票'
-				}else{
+				} else {
 					return '不支持退票'
 				}
 			}
 		},
-		mounted () {
+		mounted() {
 			this.getActiveType();
 			this.getActiveData();
 			this.getTicket();
 			this.getSponsor();
-			
+
+
 			this.$store.commit('initialNav', {
-				navNum: 1,
-				subNum: 0
+				navNum: 6,
+				subNum: 0,
+				subData: [{
+					subNavName: '发布活动',
+					subIcon: require('../../assets/home/icon_home1.png'),
+					link: 'publishActivity'
+				}, {
+					subNavName: '主办方管理',
+					subIcon: require('../../assets/home/icon_home2.png'),
+					link: 'sponsorManage'
+				}, {
+					subNavName: '认证',
+					subIcon: require('../../assets/home/icon_home5.png'),
+					link: 'realName'
+				}]
 			});
+
 			setTimeout(() => {
 				document.querySelector('.cnt').scrollTop = 0;
 			}, 200)
 		},
 		methods: {
-			commit(){
-				if(this.postUrlList.length<1){
+			commit() {
+				// alert(1);
+				if (this.postUrlList.length < 1) {
 					this.$message({
 						showClose: true,
 						message: '请上传封面图片',
 						type: 'error',
 					});
 					return false;
-				}else if(this.activeTitle==''){
+				} else if (this.activeTitle == '') {
 					this.$message({
 						showClose: true,
 						message: '请填写活动标题',
 						type: 'error',
 					});
 					return false;
-				}else if(this.undertakerVal==''){
+				} else if (this.activeTitle.length<5) {
+					this.$message({
+						showClose: true,
+						message: '活动标题不少于5个字',
+						type: 'error',
+					});
+					return false;
+				} else if (this.undertakerVal == '') {
 					this.$message({
 						showClose: true,
 						message: '选择主办方',
 						type: 'error',
 					});
 					return false;
-				}else if(this.activityData.length<1){
+				} else if (this.activityData.length < 1) {
 					this.$message({
 						showClose: true,
 						message: '请选择活动举办时间',
 						type: 'error',
 					});
 					return false;
-				}else if(this.province==''||this.city==''||this.dist==''){
+				} else if (this.province == '' || this.city == '' || this.dist == '') {
 					this.$message({
 						showClose: true,
 						message: '请选择省市区',
 						type: 'error',
 					});
 					return false;
-				}else if(this.street==''){
+				} else if (this.street == '') {
 					this.$message({
 						showClose: true,
 						message: '请填写详细地址',
 						type: 'error',
 					});
 					return false;
-				}else if(this.activeTypeVal==''){
+				} else if (this.activeTypeVal == '') {
 					this.$message({
 						showClose: true,
 						message: '请选择活动分类',
 						type: 'error',
 					});
 					return false;
-				}else if(this.ticketList.length==0){
+				} else if (this.ticketList.length == 0) {
 					this.$message({
 						showClose: true,
 						message: '添加活动票劵',
 						type: 'error',
 					});
 					return false;
-				}else if(this.limitPeople==''){
+				} else if (this.limitPeople == '') {
 					this.$message({
 						showClose: true,
 						message: '请输入限制人数',
 						type: 'error',
 					});
 					return false;
-				}else if(!this.isEndJoin&&this.joinDate.length<1){
+				} else if (!this.isEndJoin && this.joinDate.length < 1) {
 					this.$message({
 						showClose: true,
 						message: '请填写报名时间',
 						type: 'error',
 					});
 					return false;
-				}else{
-					
+				} else {
+
 					let self = this;
 					let isPublic = null;
 					let isEnd = null;
-					if(self.releaseStyle){
+					if (self.releaseStyle) {
 						isPublic = '1'
-					}else{
+					} else {
 						isPublic = '0'
 					}
-					// if(self.isEndJoin){
-					// 	isEnd = '1'
-					// 	self.formData.append('isEndJoin',isEnd);
-					// }else{
-					// 	isEnd = '0';
-					// 	self.formData.append('joinEndTime',self.capitalize(self.joinDate[1]))
-					// }
-					if(self.activeImg.length>0){
-						self.activeImg.forEach((e)=>{
-							self.formData.append('imgs',e.blob,e.name);
+					if (self.activeImg.length > 0) {
+						self.activeImg.forEach((e) => {
+							self.formData.append('imgs', e.blob, e.name);
 						})
 					}
-					self.formData.append('userId',JSON.parse(sessionStorage.getItem('user')).userId)
-					self.formData.append('activityTitel',self.activeTitle)
-					self.formData.append('organizerId',self.undertakerVal)
-					self.formData.append('startTime',self.capitalize(self.activityData[0]))
-					self.formData.append('endTime',self.capitalize(self.activityData[1]))
-					self.formData.append('activityAddr',self.province+''+self.city+''+self.dist)
-					self.formData.append('address',self.street)
-					self.formData.append('latitude',self.mapCenter[1])
-					self.formData.append('longitude',self.mapCenter[0])
-					self.formData.append('typeId',self.activeTypeVal)
-					self.formData.append('limitNum',self.limitPeople)
-					self.formData.append('description',self.activeText)
-					self.formData.append('isPublic',isPublic)
-					self.formData.append('isEndJoin',1);
-					self.formData.append('cover',self.postUrlList[0].blob,self.postUrlList[0].name)
-					// if(self.activeImg.length>0){
-					// 	
-					// }
+					let formData = new FormData();
+					formData.append('userId', JSON.parse(sessionStorage.getItem('user')).userId)
+					formData.append('activityTitel', self.activeTitle)
+					formData.append('organizerId', self.undertakerVal)
+					formData.append('startTime', self.capitalize(self.activityData[0]))
+					formData.append('endTime', self.capitalize(self.activityData[1]))
+					formData.append('activityAddr', self.province + '' + self.city + '' + self.dist)
+					formData.append('address', self.street)
+					formData.append('latitude', self.mapCenter[1])
+					formData.append('longitude', self.mapCenter[0])
+					formData.append('typeId', self.activeTypeVal)
+					formData.append('limitNum', self.limitPeople)
+					formData.append('description', self.activeText)
+					formData.append('isPublic', isPublic)
+					formData.append('isEndJoin', 1);
+					formData.append('cover', self.postUrlList[0].blob, self.postUrlList[0].name)
+					if(self.activeImg.length>0){
+						
+						self.activeImg.forEach((e)=>{
+							formData.append('imgs',e.blob,e.name)
+						})
+					}
 					
-					self.axios.post(Api.userApi+'/ca/addCommunityActivity',self.formData, {
+					self.axios.post(Api.userApi + '/ca/addCommunityActivity',formData, {
 						headers: {
 							'Content-Type': 'multipart/form-data'
 						}
-					}).then((res)=>{
-						if(res.data.code == 1){
+					}).then((res) => {
+						if (res.data.code == 1) {
 							self.$message({
 								showClose: true,
-								message:'活动发布成功',
+								message: '活动发布成功',
 								type: 'success',
 							});
-						}else{
+						} else {
 							alert(res.data.msg)
 						}
 					})
 				}
 			},
-			inputChange(value){//input数字限制
+			inputChange(value) { //input数字限制
 				// console.log(this.tableDataCs)
 				let reg = /^\d+\.?\d{0,2}$/
-				if(!reg.test(this[value])){
+				if (!reg.test(this[value])) {
 					this[value] = ''
 				}
-				
+
 			},
-			effectiveDataChange(val){//报名日期限制时间
-				if(this.activityData.length<1){
+			effectiveDataChange(val) { //报名日期限制时间
+				if (this.activityData.length < 1) {
 					this.$message({
 						showClose: true,
 						message: '请先选择活动时间',
 						type: 'error',
 					});
 					return false;
-				}else if(val[0]>this.activityData[1]||val[1]>this.activityData[1]){
+				} else if (val[0] > this.activityData[1] || val[1] > this.activityData[1]) {
 					this.$message({
 						showClose: true,
-						message:'报名时间只能在活动结束之前',
+						message: '报名时间只能在活动结束之前',
 						type: 'error',
 					});
 					this.joinDate = [];
 				}
-				
+
 			},
-			
-			getSponsor(){//查询主办方
+
+			getSponsor() { //查询主办方
 				let self = this;
-				self.axios.post(Api.userApi+'/ca/selectCommunityActivityOrganizerByUserId', self.qs.stringify({
-					userId:JSON.parse(sessionStorage.getItem('user')).userId
+				self.axios.post(Api.userApi + '/ca/selectCommunityActivityOrganizerByUserId', self.qs.stringify({
+					userId: JSON.parse(sessionStorage.getItem('user')).userId
 				}), {
 					headers: {
 						'Content-Type': 'application/x-www-form-urlencoded'
 					}
-				}).then((res)=>{
-					if(res.data.code == 1){
+				}).then((res) => {
+					if (res.data.code == 1) {
 						self.undertakerData = res.data.data
 						console.log(self.sponsorList)
-					}else{
+					} else {
 						alert(res.data.msg)
 					}
 				})
@@ -516,62 +540,66 @@
 
 				}
 			},
-			getActiveData(){
-				let self= this;
-				this.axios.get(Api.userApi+'/ca/selectActivityTimeAndTicketNum?userId='+ JSON.parse(sessionStorage.getItem('user')).userId, {
+			getActiveData() {
+				let self = this;
+				this.axios.get(Api.userApi + '/ca/selectActivityTimeAndTicketNum?userId=' + JSON.parse(sessionStorage.getItem(
+					'user')).userId, {
 					headers: {
 						'Content-Type': 'application/x-www-form-urlencoded'
 					}
 				}).then(function(res) {
-					if(res.data.code == 1){
-						
-						if(res.data.data.ticketNum>0){
+					if (res.data.code == 1) {
+
+						if (res.data.data.ticketNum > 0) {
 							self.ticketNum = res.data.data.ticketNum;
-							self.activityData = [self.capiDate(res.data.data.startTime),self.capiDate(res.data.data.endTime)];
+							self.activityData = [self.capiDate(res.data.data.startTime), self.capiDate(res.data.data.endTime)];
 							// console.log()
 						}
-						
-					}	
+
+					}
 				})
-					
+
 			},
-			capitalize (value) {//将时间戳转化为日期
-			  var date = new Date(parseInt(value));
-			  var tt = [date.getFullYear(), ((date.getMonth()+1)<10?'0'+(date.getMonth()+1):date.getMonth()+1), (date.getDate()<10?'0'+date.getDate():date.getDate())].join('-') + ' ' +[(date.getHours()<10?'0'+date.getHours():date.getHours()), (date.getMinutes()<10?'0'+date.getMinutes():date.getMinutes())].join(':');
-			  return tt;
+			capitalize(value) { //将时间戳转化为日期
+				var date = new Date(parseInt(value));
+				var tt = [date.getFullYear(), ((date.getMonth() + 1) < 10 ? '0' + (date.getMonth() + 1) : date.getMonth() + 1), (
+					date.getDate() < 10 ? '0' + date.getDate() : date.getDate())].join('-') + ' ' + [(date.getHours() < 10 ? '0' +
+					date.getHours() : date.getHours()), (date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes())].join(
+					':');
+				return tt;
 			},
-			capiDate(value){//将日期转化为时间戳
+			capiDate(value) { //将日期转化为时间戳
 				return new Date(value).getTime();
 			},
-			editTicket(item){//编辑活动票劵页面
+			editTicket(item) { //编辑活动票劵页面
 				let self = this;
-				if(this.activityData.length<1){
+				if (this.activityData.length < 1) {
 					this.$message({
-					  message: "请先添加活动时间",
-					  type: "warning"
+						message: "请先添加活动时间",
+						type: "warning"
 					});
-				}else{
+				} else {
 					this.$router.push({
-						name:'editTicket',
-						params:{
-							ticketInfo:item,
-							activeData:self.activityData
+						name: 'editTicket',
+						params: {
+							ticketInfo: item,
+							activeData: self.activityData
 						}
 					})
 				}
 			},
-			addTicket(){//添加活动票劵页面
+			addTicket() { //添加活动票劵页面
 				let self = this;
-				if(this.activityData.length<1){
+				if (this.activityData.length < 1) {
 					this.$message({
-					  message: "请先添加活动时间",
-					  type: "warning"
+						message: "请先添加活动时间",
+						type: "warning"
 					});
-				}else{
+				} else {
 					this.$router.push({
-						name:'ticket',
-						params:{
-							activeData:self.activityData
+						name: 'ticket',
+						params: {
+							activeData: self.activityData
 						}
 					})
 				}
@@ -590,62 +618,62 @@
 					}
 				})
 			},
-			deleteTicket(item,index){//删除票劵
+			deleteTicket(item, index) { //删除票劵
 				let self = this;
 				this.$confirm('是否确定删除此票劵, 是否继续?', '提示', {
 					confirmButtonText: '确定',
 					cancelButtonText: '取消',
 					type: 'warning',
 					callback: function(action, instance) {
-				
+
 						if (action == 'confirm') {
-				
-							self.axios.post(Api.userApi+'/ca/deleteCommunityActivityTicket', self.qs.stringify({
-								ticketId:item.ticketId
+
+							self.axios.post(Api.userApi + '/ca/deleteCommunityActivityTicket', self.qs.stringify({
+								ticketId: item.ticketId
 							}), {
 								headers: {
 									'Content-Type': 'application/x-www-form-urlencoded'
 								}
-							}).then((res)=>{
-								if(res.data.code == 1){
+							}).then((res) => {
+								if (res.data.code == 1) {
 									self.$message({
 										showClose: true,
-										message:'删除票劵成功',
+										message: '删除票劵成功',
 										type: 'success'
 									});
-									self.ticketList.splice(index,1);
+									self.ticketList.splice(index, 1);
 									self.ticketNum = self.ticketList.le
-								}else{
+								} else {
 									alert(res.data.msg)
 								}
 							})
-				
+
 						}
 					}
 				})
-				
+
 			},
 			releaseStyleHandle() {
 
 			},
-			getTicket(){
+			getTicket() {
 				let self = this;
-				self.axios.post(Api.userApi+'/ca/selectNoUseTicket', self.qs.stringify({
-					userId:JSON.parse(sessionStorage.getItem('user')).userId
+				self.axios.post(Api.userApi + '/ca/selectNoUseTicket', self.qs.stringify({
+					userId: JSON.parse(sessionStorage.getItem('user')).userId
 				}), {
 					headers: {
 						'Content-Type': 'application/x-www-form-urlencoded'
 					}
-				}).then((res)=>{
-					if(res.data.code == 1){
+				}).then((res) => {
+					if (res.data.code == 1) {
 						self.ticketList = res.data.data;
 						console.log(res.data.data)
-					}else{
+					} else {
 						alert(res.data.msg)
 					}
 				})
 			},
-			sizeReg(file,w,h) { //检测上传l图片宽高
+			sizeReg(file, w, h) { //检测上传l图片宽高
 				let _this = this;
 
 				return new Promise(function(resolve, reject) {
@@ -655,16 +683,24 @@
 						image.onload = function() {
 							var width = this.width;
 							var height = this.height;
-							if (width < w || height<h) {
+							if (width < w || height < h) {
 								_this.$alert('图片宽度必须大于800并且高度大于533', '提示', {
 									confirmButtonText: '确定'
 								});
 								reject();
 							}
-							if(width<=height){
-								_this.imgSize.push({name:file.name,imgH:130,imgW:''});
-							}else{
-								_this.imgSize.push({name:file.name,imgW:130,imgH:''});
+							if (width <= height) {
+								_this.imgSize.push({
+									name: file.name,
+									imgH: 130,
+									imgW: ''
+								});
+							} else {
+								_this.imgSize.push({
+									name: file.name,
+									imgW: 130,
+									imgH: ''
+								});
 							}
 							resolve();
 						};
@@ -673,21 +709,21 @@
 					reader.readAsDataURL(file);
 				});
 			},
-			
-			uploadIMG(e,imgList) {
-			  this.picavalue = e.file;
-			  console.log(this.picavalue.size / 1024);
-			  if (this.picavalue.size / 1024 > 10000) {
-				this.$message({
-				  message: "图片大小不能超过10M",
-				  type: "warning"
-				});
-			  } else {
-				this.imgPreview(e.file,imgList);
-			  }
+
+			uploadIMG(e, imgList) {
+				this.picavalue = e.file;
+				console.log(this.picavalue.size / 1024);
+				if (this.picavalue.size / 1024 > 10000) {
+					this.$message({
+						message: "图片大小不能超过10M",
+						type: "warning"
+					});
+				} else {
+					this.imgPreview(e.file, imgList);
+				}
 			},
 			// 压缩图片
-			compress(file,img) {
+			compress(file, img) {
 				let canvas = document.createElement("canvas");
 				let ctx = canvas.getContext("2d");
 				let initSize = img.src.length;
@@ -701,7 +737,7 @@
 				ctx.drawImage(img, 0, 0, width, height);
 
 				//进行最小压缩
-				let ndata = canvas.toDataURL('image/jpeg',0.7);
+				let ndata = canvas.toDataURL('image/jpeg', 0.7);
 				// console.log("*******压缩后的图片大小*******");
 				// console.log(ndata)
 				// console.log(ndata.length);
@@ -726,14 +762,14 @@
 				});
 			},
 			//获取图片
-			imgPreview(file,imgList) {
+			imgPreview(file, imgList) {
 				let self = this;
 				//判断支不支持FileReader
 				if (!file || !window.FileReader) return;
 				if (/^image/.test(file.type)) {
 					//创建一个reader
 					let reader = new FileReader();
-					
+
 					//将图片转成base64格式
 					reader.readAsDataURL(file);
 					//读取成功后的回调
@@ -743,16 +779,16 @@
 						img.src = result;
 						console.log("********未压缩前的图片大小********");
 						console.log(result.length);
-						
+
 						img.onload = function() {
-							let data = self.compress(file,img);
+							let data = self.compress(file, img);
 							self.postUrl = result;
 
 							let blob = self.dataURItoBlob(data);
 							imgList.push({
-								url:result,
-								blob:blob,
-								name:file.name
+								url: result,
+								blob: blob,
+								name: file.name
 							})
 							console.log("*******base64转blob对象******");
 							console.log(blob);
@@ -760,12 +796,12 @@
 							// self.formData.append("Img",blob,file.name);
 							console.log("********将blob对象转成formData对象********");
 							// console.log(self.formData)
-							
+
 						};
 					};
 				}
 			},
-			
+
 			inputChange(value) { //表格input
 				// console.log(this.tableDataCs)
 				let self = this;
@@ -781,7 +817,7 @@
 			handleExceed(files, fileList) {
 				this.$message.warning(`只能上传20张图片`);
 			},
-			deleteGoodsMain(imgList,index) { //活动封面图删除
+			deleteGoodsMain(imgList, index) { //活动封面图删除
 
 				let self = this;
 				this.$confirm('此操作将永久删除该文件, 是否继续?', '提示', {
@@ -798,18 +834,18 @@
 					}
 				})
 			},
-			handleDescribe(e,fileList) { //活动详情图片上传
+			handleDescribe(e, fileList) { //活动详情图片上传
 				let self = this;
 				//判断支不支持FileReader
 				let file = e.file;
 				console.log(fileList)
 				if (!file || !window.FileReader) return;
-					console.log(file.type)
+				console.log(file.type)
 				if (/^image/.test(file.type)) {
 					//创建一个reader
-					
+
 					let reader = new FileReader();
-					
+
 					//将图片转成base64格式
 					reader.readAsDataURL(file);
 					//读取成功后的回调
@@ -819,24 +855,24 @@
 						img.src = result;
 						// console.log("********未压缩前的图片大小********");
 						// console.log(result.length);
-						
+
 						img.onload = function() {
-							let data = self.compress(file,img);
+							let data = self.compress(file, img);
 							// self.postUrl = result;
-				
+
 							let blob = self.dataURItoBlob(data);
-				
+
 							// console.log("*******base64转blob对象******");
 							// console.log(blob);
-				
+
 							// formData.append("Img",blob,file.name);
 							self.activeImg.push({
-								blob:blob,
-								url:result,
+								blob: blob,
+								url: result,
 								height: '',
 								width: '',
-								name:file.name,
-								
+								name: file.name,
+
 							});
 							self.imgSize.forEach((e) => {
 								self.activeImg.forEach((j) => {
@@ -847,7 +883,7 @@
 								})
 							})
 							// console.log("********将blob对象转成formData对象********");
-							
+
 						};
 					};
 				}
@@ -856,7 +892,7 @@
 			handleDescribeExceed(files, fileList) {
 				this.$message.warning(`当前限制选择 20 个文件`);
 			},
-		
+
 		}
 	}
 </script>
@@ -990,15 +1026,18 @@
 						.el-upload--picture-card {
 							border: none;
 						}
-						.postImg{
+
+						.postImg {
 							width: 400px;
 							height: 200px;
 							border: 1px solid #ddd;
 							border-radius: 4px;
+
 							.img-box {
 								position: relative;
 								width: 400px;
 								height: 200px;
+
 								i {
 									position: absolute;
 									top: -5px;
@@ -1008,16 +1047,18 @@
 									border-radius: 50%;
 									z-index: 100;
 								}
+
 								img {
 									height: 100%;
 									width: 100%;
 									display: block;
-									
+
 								}
 							}
+
 							.avatar-uploader {
 								.upload-text {
-									align-items:center;
+									align-items: center;
 									justify-content: center;
 									height: 200px;
 									box-sizing: border-box;
@@ -1027,18 +1068,20 @@
 									text-align: left;
 									font-size: 14px;
 									color: #999;
-									i{
+
+									i {
 										font-size: 60px;
 									}
+
 									span {
 										color: #FF523D;
 										margin-right: 5px;
-							
+
 									}
 								}
 							}
 						}
-						
+
 					}
 				}
 
@@ -1195,7 +1238,7 @@
 								background: #ff523d;
 								color: #fff;
 								margin-right: 100px;
-								
+
 							}
 
 							.delete {

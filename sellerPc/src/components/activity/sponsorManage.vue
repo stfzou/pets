@@ -12,7 +12,7 @@
 				</div>
 			</div>
 		</div>
-		<div class="addBtn pointer">+添加主办方</div>
+		<div class="addBtn pointer"><router-link :to="{name:'addSponsor'}">+添加主办方</router-link></div>
 		<div class="sponsorList" v-if="sponsorList.length>0">
 			<div class="sponsorBox" v-for="item in sponsorList">
 				<div class="sponsorTop flex_r_s_b">
@@ -23,6 +23,8 @@
 						<div class="sponsorName flex_r_f_s">
 							<span v-if="item.type == '1'">{{item.name}}</span>
 							<span v-else>{{item.companyName}}</span>
+							
+							
 							<!-- <img src="../../assets/icon_renzheng.PNG" alt=""> -->
 							<img v-if="item.type == '2'" src="../../assets/icon_renzheng.png" alt="">
 							<img v-else src="../../assets/icon_renzheng2.png" alt="">
@@ -30,9 +32,9 @@
 						<div class="rzType" v-if="item.type == '1'">个人主办方</div>
 						<div class="rzType" v-else>企业主办方</div>
 						<div class="rzSign">
-							<div class="rzSuccess" v-if="item.isApprove=='2'">已认证<span>有效期至2019年6月10日</span></div>
+							<div class="rzSuccess" v-if="item.status=='2'">已认证<span>有效期至2019年6月10日</span></div>
 						 	<div class="rzExceed" v-if="item.isExpired=='1'">认证失效<span>有效期至2019年6月10日</span></div>
-							<!-- <div class="rzError">认证错误</div> -->
+							<div class="rzError" v-if="item.status=='3'">认证错误</div>
 							<div class="rzIng" v-if="item.status=='1'">认证中</div>
 						</div>
 					</div>
@@ -67,6 +69,26 @@
 		},
 		mounted() {
 			this.getSponsor();
+			
+		
+			this.$store.commit('initialNav', {
+				navNum: 6,
+				subNum: 1,
+				subData: [{
+					subNavName: '发布活动',
+					subIcon: require('../../assets/home/icon_home1.png'),
+					link: 'publishActivity'
+				}, {
+					subNavName: '主办方管理',
+					subIcon: require('../../assets/home/icon_home2.png'),
+					link: 'sponsorManage'
+				}, {
+					subNavName: '认证',
+					subIcon: require('../../assets/home/icon_home5.png'),
+					link: 'realName'
+				}]
+			});
+		
 		},
 		methods:{
 			dialogShow(item){
@@ -176,7 +198,9 @@
 			border-radius: 20px;
 			text-align: center;
 			line-height: 30px;
-			
+			a{
+				color:#fff;
+			}
 		}
 		.wxtx{
 			padding: 10px;
