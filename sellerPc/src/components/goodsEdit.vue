@@ -555,7 +555,7 @@
 					this.specifications[0].guigeName.forEach((e)=>{
 						navOneArr.push({value:e.subId,name:e.name})
 					})
-					
+					// console.log(this.specifications)
 					return navOneArr
 				}else{
 					return navOneArr
@@ -659,49 +659,60 @@
 									'Content-Type': 'application/x-www-form-urlencoded'
 								}
 							}).then(function(res){
-								if(res.data.code == 1){
+								if(res.data.code == 1&&res.data.data.length>0){
 									
 									res.data.data.forEach((j)=>{
 										obj.sOption.push({value:j.attrValueId,label:j.attrValueName,status:j.status})
 									})
+									
+									
 								}
 							})
 							self.specifications.push(obj)
 							
+							// self.tbData()
 						});
-						
-						if(self.specifications.length>0){
-							re.skus.forEach((e)=>{
-								e.anvs.forEach((j)=>{
-									self.specifications.forEach((s)=>{
-										// s.value = j.anId
-										if(j.anId == s.value&&s.input.indexOf(j.avId)<0){
-											s.input.push(j.avId);
-											if(j.avStatus == 0){
-												s.sOption.push({value:j.avId,label:j.avName,status:j.avStatus})
+						console.log(self.specifications)
+						setTimeout(()=>{
+							if(self.specifications.length>0){
+								
+								let arr = [];
+								
+								re.skus.forEach((e)=>{
+									e.anvs.forEach((j)=>{
+										self.specifications.forEach((s)=>{
+											// s.value = j.anId
+											if(j.anId == s.value&&s.input.indexOf(j.avId)<0){
+												s.input.push(j.avId);
+												if(j.avStatus == 0){
+													s.sOption.push({value:j.avId,label:j.avName,status:j.avStatus})
+												}
 											}
-										}
+											
+										})
 										
 									})
 									
+									if(self.specifications.length==2){
+										// let arr1 = [];
+										
+										arr.push({
+											idS1:e.anvs[0].anId,idS2:e.anvs[1].anId,idOne:e.anvs[0].avId,idTwo:e.anvs[1].avId,
+											specOne:e.anvs[0].avName,specTwo:e.anvs[1].avName,kucun:e.skuPNum,sellPrice:e.original,
+											cost:e.costPrice,kg:e.productWeight,sku:e.skuCode,yulan:e.skuImgAddr,yulanId:e.skuImgId,flieList:[]
+										})
+										
+										
+									}else if(self.specifications.length==1){
+										self.guigeList.push({
+											idS1:e.anvs[0].anId,idOne:e.anvs[0].avId,
+											specOne:e.anvs[0].avName,kucun:e.skuPNum,sellPrice:e.original,
+											cost:e.costPrice,kg:e.productWeight,sku:e.skuCode,yulan:e.skuImgAddr,yulanId:e.skuImgId,flieList:[]
+										})
+									}
+										
 								})
 								
-								if(self.specifications.length==2){
-									self.guigeList.push({
-										idS1:e.anvs[0].anId,idS2:e.anvs[1].anId,idOne:e.anvs[0].avId,idTwo:e.anvs[1].avId,
-										specOne:e.anvs[0].avName,specTwo:e.anvs[1].avName,kucun:e.skuPNum,sellPrice:e.original,
-										cost:e.costPrice,kg:e.productWeight,sku:e.skuCode,yulan:e.skuImgAddr,yulanId:e.skuImgId,flieList:[]
-									})
-								}else if(self.specifications.length==1){
-									self.guigeList.push({
-										idS1:e.anvs[0].anId,idOne:e.anvs[0].avId,
-										specOne:e.anvs[0].avName,kucun:e.skuPNum,sellPrice:e.original,
-										cost:e.costPrice,kg:e.productWeight,sku:e.skuCode,yulan:e.skuImgAddr,yulanId:e.skuImgId,flieList:[]
-									})
-								}
-									
-							})
-							setTimeout(()=>{
 								self.specifications.forEach((e)=>{
 								//{subId:res.data.data.attrValueId,name:res.data.data.attrValueName,parentId:e.value}
 									e.input.forEach((i)=>{
@@ -717,14 +728,33 @@
 									
 								})
 								
-							},100)
-						}else{
-							self.noSpecifications = [];
-							self.noSpecifications.push({
-								kucun:re.skus[0].skuPNum,sellPrice:re.skus[0].original,cost:re.skus[0].costPrice,kg:re.skus[0].productWeight,
-								sku:re.skus[0].skuCode,yulan:re.skus[0].skuImgAddr,yulanId:re.skus[0].skuImgId,flieList:[]
-							})
-						}
+								if(self.specifications.length==2){
+									
+									
+									arr.forEach((j)=>{
+										
+										self.specifications[0].input.forEach((e)=>{
+											
+											if(j.idOne == e){
+												self.guigeList.push(j)
+											}
+											
+										})
+										
+										
+									})
+									
+									
+								}
+							}else{
+								self.noSpecifications = [];
+								self.noSpecifications.push({
+									kucun:re.skus[0].skuPNum,sellPrice:re.skus[0].original,cost:re.skus[0].costPrice,kg:re.skus[0].productWeight,
+									sku:re.skus[0].skuCode,yulan:re.skus[0].skuImgAddr,yulanId:re.skus[0].skuImgId,flieList:[]
+								})
+							}
+						},500)
+						
 						
 						
 						//获取商品品牌
@@ -850,7 +880,7 @@
 						if(re.productTips.shipTime!=''){
 							self.sendTime = re.productTips.shipTime+''
 						}
-						
+						// self.objectSpanMethod();
 					}else{
 						self.$message.error(res.data.msg)
 					}
@@ -860,7 +890,7 @@
 			},
 			
 			sizeReg(file){//检测上传l图片宽高
-				
+				console.log(this.guigeList)
 				let _this = this; 
 				return new Promise(function(resolve, reject) { 
 					var reader = new FileReader(); 
@@ -1107,6 +1137,7 @@
 				
 			},
 			searchChange(j,e){
+				
 				e.guigeName=[];
 				j.forEach((s)=>{
 					e.sOption.forEach((i)=>{
@@ -1530,6 +1561,8 @@
 			},
 			specSelect(n,e){
 				let self = this;
+				e.input = [];
+				e.guigeName = [];
 				self.specOption.forEach((m)=>{
 					if(m.value == n){
 						e.tableName = m.label;
@@ -1553,8 +1586,7 @@
 							}
 						}).then(function(res){
 							if(res.data.code==1){
-									e.input = [];
-									e.guigeName = [];
+									self.tbData();
 							}else{
 								self.$message.error(res.data.msg);
 							}

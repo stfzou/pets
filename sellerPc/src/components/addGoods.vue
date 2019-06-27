@@ -1272,6 +1272,8 @@
 			},
 			specSelect(n,e){
 				let self = this;
+				e.input = [];
+				e.guigeName = [];
 				
 				self.specOption.forEach((m)=>{
 					if(m.value == n){
@@ -1293,12 +1295,10 @@
 								'Content-Type': 'application/x-www-form-urlencoded'
 							}
 						}).then(function(res){
-							if(res.data.code==1){
-									e.input = [];
-									e.guigeName = [];
-									self.tbData();
-							}else{
+							if(res.data.code!=1){
 								self.$message.error(res.data.msg);
+							}else{
+								self.tbData();
 							}
 						})
 					}		
@@ -1316,6 +1316,8 @@
 								e.sOption.push({value:j.attrValueId,label:j.attrValueName,status:j.status})
 							})
 							
+						}else{
+							self.$message.error(res.data.msg);
 						}
 					})
 			
