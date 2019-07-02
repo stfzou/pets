@@ -28,7 +28,7 @@ Vue.config.productionTip = false
 
 // http.defaults.baseURL = 'http://192.168.0.109:8082'
 
-VueAMap.initAMapApiLoader({
+VueAMap.initAMapApiLoader({ 
 	key: 'fe2312e4704c6f8f7787c7864ecebae6',
 	plugin: ['AMap.Icon', 'AMap.Geocoder', 'AMap.Geolocation', 'AMap.CitySearch', 'AMap.Autocomplete',
 		'AMap.PlaceSearch', 'AMap.Scale', 'AMap.OverView', 'AMap.ToolBar', 'AMap.MapType', 'AMap.PolyEditor',

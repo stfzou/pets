@@ -69,7 +69,7 @@
 				</li>
 				<li class="flex_r_f_s">
 					<div class="list_l"><b>*</b>店铺照片:</div>
-					<div class="list_r">
+					<div class="list_r uploadDiv">
 						<div class="flex_r_f_s">
 							<div class="uploadBox">
 							
@@ -122,7 +122,7 @@
 					</div>
 				</li>
 				<li class="flex_r_f_s">
-					<div class="list_l"><b>*</b>客户备注:</div>
+					<div class="list_l">客户备注:</div>
 					<div class="list_r">
 						<div class="remark">
 							<cube-textarea v-model="remark" :maxlength="200" placeholder="请输入客户备注信息"></cube-textarea>
@@ -408,7 +408,15 @@
 					  })
 					toast.show()
 					return false;
-				}else if(this.imgOne == ''||this.imgTwo==''||this.imgThree==''){
+				}else if(self.projectTypeVal.length<1){
+					let toast = this.$createToast({
+						txt: '请选择产品类型',
+						type: 'error'
+					  })
+					toast.show()
+					return false;
+				}
+				else if(this.imgOne == ''||this.imgTwo==''||this.imgThree==''){
 					let toast = this.$createToast({
 						txt: '请上传店铺照片',
 						type: 'error'
@@ -592,6 +600,9 @@
 					color: #ff523d;
 				}
 			}
+			.uploadDiv{
+				width: 80%;
+			}
 			.list_r{
 				margin-left: 20px;
 				flex-wrap:wrap;
@@ -609,8 +620,8 @@
 					}
 				}
 				.img-box{
-					width: 120px;
-					height: 120px;
+					width: 140px;
+					height: 140px;
 					// margin: 0 10px 10px 0;
 					box-sizing: border-box;
 					background-color: #fff;
@@ -664,16 +675,22 @@
 				}
 				.uploadBox{
 					margin-right: 15px;
+					.cube-upload-input{
+						width: 100%;
+						height: 100%
+					}
 					.cube-upload-btn-def{
-						width: 120px;
-						height: 120px;
+						width: 140px;
+						height: 140px;
+						
 					}
 					.cube-upload-def .cube-upload-btn, .cube-upload-def .cube-upload-file{
 						margin:0 ;
 					}
 					.cube-upload{
-						width: 120px;
-						height: 120px;
+						width: 140px;
+						height: 140px;
+						// overflow: auto;
 					}
 					p{
 						text-align: center;

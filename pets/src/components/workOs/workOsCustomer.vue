@@ -47,8 +47,10 @@
 			<ul class="listInfo">
 				<li v-for="item in customerList">
 					<div class="storeName">
-						<!-- <a href="###"><img src="../../assets/ali-edit.png" alt=""></a> -->
-						<router-link class="flex_r_f_s" v-if="parentId!=0" :to="{name:'editCustomer',params:{
+						<!-- <a href="###"><img src="../../assets/ali-ed
+						
+						it.png" alt=""></a> -->
+						<router-link class="flex_r_f_s" :to="{name:'editCustomer',params:{
 							cityData:[item.province,item.city,item.area],
 							addr:item.address,
 							shopName:item.shopName,
@@ -100,7 +102,7 @@
 					</div>
 					<div class="pdtext">产品类型:<span v-for="pItem in item.clientPTypeNames">{{pItem}}</span></div>
 					<div class="remark" v-if="item.remark!=''">客户备注:{{item.remark}}</div>
-					<div class="personCharge">负责人:{{name}}</div>
+					<div class="personCharge">负责人:{{item.businessName}}</div>
 				</li>
 					
 			</ul>

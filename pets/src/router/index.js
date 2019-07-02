@@ -33,6 +33,10 @@ import AuthorActivity from '@/components/activity/authorActivity'
 import AuthorPets from '@/components/activity/authorPets'
 import Answer from '@/components/answer/answer'
 import AnswerOne from '@/components/answer/answerOne'
+import CouponList from '@/components/shareCoupon/couponList'
+import ShopCoupon from '@/components/shareCoupon/shopCoupon'
+import CouponXq from '@/components/shareCoupon/couponXq'
+
 import WorkOsLogin from '@/components/workOs/workOsLogin'
 import WorkOsInfoList from '@/components/workOs/workOsInfoList'
 import WorkOsCustomer from '@/components/workOs/workOsCustomer'
@@ -49,7 +53,7 @@ import EditStaff from '@/components/workOs/editStaff'
 
 Vue.use(Router)
 export default new Router({
-	mode: 'hash',
+	mode: 'history',
     routes:[
 		{
 		  path:'',
@@ -72,6 +76,21 @@ export default new Router({
 				}
 				
 			]
+		},
+		{
+			path:'/couponList',
+			name:'couponList',
+			component:CouponList,
+		},
+		{
+			path:'/shopCoupon',
+			name:'shopCoupon',
+			component:ShopCoupon,
+		},
+		{
+			path:'/couponXq',
+			name:'couponXq',
+			component:CouponXq,
 		},
 		{
 			path:'/workOsLogin',
