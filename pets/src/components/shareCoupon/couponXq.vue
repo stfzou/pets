@@ -7,16 +7,18 @@
 		</div>
 		<div class="couponInfoBox flex_r_s_c">
 			<div class="couponInfo">
+				<img class="sign" v-show="isReceive===1"  src="../../assets/received.png" alt="">
+				<img class="sign" v-show="isReceive===0"  src="../../assets/receiveEnd.png" alt="">
 				<div class="couponTop">
-					<img class="couponImg" src="../../assets/images/seller_pic.png" alt="">
-					<div class="couponName">强生宠儿全系列狗粮线下店铺优惠券</div>
-					<p>强生宠儿全系列狗粮产品购买订单购满100元均可使用</p>
-					<div class="sale">￥5</div>
-					<div class="condition">满100元可用</div>
+					<img class="couponImg" :src="couponIcan" alt="">
+					<div class="couponName">{{couponName}}</div>
+					<p>{{couponDesc}}</p>
+					<div class="sale">￥{{couponPrice}}</div>
+					<div class="condition">满{{conditionPrice}}元可用</div>
 					<div class="receiveBtnBox">
-						<div class="receiveBtn flex_r_s_c">立即领取</div>
-						<div v-show="false" class="receiveBtn receivedBtn flex_r_s_c">以领取</div>
-						<div v-show="false" class="receiveBtn receivedBtn flex_r_s_c">立即领取</div>
+						<div v-show="isReceive===2||isReceive===1" @click="receiveBtn" class="receiveBtn flex_r_s_c">立即领取</div>
+						<!-- <div v-show="isReceive===1" class="receiveBtn receivedBtn flex_r_s_c">已领取</div> -->
+						<div v-show="isReceive===0" class="receiveBtn receivedBtn flex_r_s_c">已领完</div>
 					</div>
 				</div>
 				<div class="couponBottom">
@@ -28,7 +30,7 @@
 								商户
 							</div>
 							<div class="listRight">
-								成华双庆宠物生活馆
+								{{shopName}}
 							</div>
 						</li>
 						<li class="flex_r_f_s">
@@ -36,7 +38,7 @@
 								地址
 							</div>
 							<div class="listRight flex_r_s_b">
-								<span>成都市锦江区东恒国际二栋二单元11111111111111</span>
+								<span>{{shopAddress}}</span>
 								<img class="addrImg" src="../../assets/couponAddr.png" alt="">
 							</div>
 						</li>
@@ -45,7 +47,7 @@
 								距离
 							</div>
 							<div class="listRight">
-								0.4km
+								{{distance}}
 							</div>
 						</li>
 						<li class="flex_r_f_s">
@@ -53,7 +55,7 @@
 								有效期
 							</div>
 							<div class="listRight">
-								2019/04/23前有效
+								{{couponEndTime}}前有效
 							</div>
 						</li>
 					</ul>
@@ -66,36 +68,46 @@
 		<div class="couponListBox">
 			
 			<ul>
-				<li class="flex_r_s_b" v-for="item in arr">
+				<li class="flex_r_s_b" v-for="item in couponList">
 					<div class="list_l">
 						<div class="listLeftTop flex_r_s_b">
-							<img src="../../assets/images/seller_pic.png" alt="">
+							<img @click="couponXqLink(item)" :src="item.couponIcan" alt="">
 							<div class="couponNameBox">
-								<div class="couponName">强生宠儿全系列狗粮线下店铺优惠券</div>
+								<div class="couponName">{{item.couponName}}</div>
+								<div class="distance">{{item.distance}}</div>
 								<div class="progressBox flex_r_s_b">
 									<div class="progress">
-										<div></div>
+										<div :style="item.styleObj"></div>
 									</div>
-									<span>剩余60%</span>
+									<span>剩余{{item.sx}}</span>
 								</div>
 							</div>
 						</div>
 					</div>
 					<div class="list_r">
-						<div class="sale">￥5</div>
-						<div class="condition">满100元可用</div>
-						<div class="makeTime">2019/04/23前有效</div>
+						<div class="sale" :class="{activeColor:item.receiveNum==item.circulation}">￥{{item.couponPrice}}</div>
+						<div class="condition">
+							<span :class="{activeColor:item.receiveNum==item.circulation}" v-if="item.conditionPrice!=0">满{{item.conditionPrice}}元可用</span>
+							<span :class="{activeColor:item.receiveNum==item.circulation}" v-else>无门槛</span>
+						</div>
+						<div class="makeTime">{{item.couponEndTime}}前有效</div>
 						<div class="receiveBtnBox">
-							<div class="receiveBtn flex_r_s_c">立即领取</div>
-							<div v-show="false" class="receiveBtn receivedBtn flex_r_s_c">以领取</div>
-							<div v-show="false" class="receiveBtn receivedBtn flex_r_s_c">立即领取</div>
+							<div v-if="item.isReceive==0||item.receiveNum==item.circulation" class="receiveBtn receivedBtn flex_r_s_c">立即领取</div>
+							<div @click="receive(item)" v-else class="receiveBtn flex_r_s_c">立即领取</div>
+							<!-- <div v-show="item.receiveNum==item.circulation" class="receiveBtn receivedBtn flex_r_s_c">已领完</div> -->
+							<!-- <div v-show="item.isReceive==0" class="receiveBtn receivedBtn flex_r_s_c">立即领取</div> -->
+							
 						</div>
 						
 					</div>
-					<!-- <img class="imprint" src="../../assets/received.png" alt="">
-					<img class="imprint" src="../../assets/receiveEnd.png" alt=""> -->
+					<img v-show="item.isReceive==1" class="imprint" src="../../assets/received.png" alt="">
+					<img v-show="item.isReceive==0" class="imprint" src="../../assets/receiveEnd.png" alt="">
 				</li>
 			</ul>
+			
+		</div>
+		<div class="amap-page-container" v-show="false">
+			<el-amap ref="map" vid="amapDemo" :plugin="plugin" class="amap-demo"></el-amap>
 			
 		</div>
 	</div>
@@ -105,8 +117,26 @@
 	import Api from '../common/apj.js'
 	export default{
 		data(){
+			let self = this;
 			return{
 				arr:[1,2,3,4,5,6,7],
+				lng:0,
+				lat:0,
+				uId:'31',
+				couponId:'',
+				couponList:[],
+				couponName:'',
+				couponIcan:'',
+				shopAddress:'',
+				couponDesc:'',
+				couponPrice:'',
+				conditionPrice:'',
+				receiveNum:'',
+				shopName:'',
+				shopAddress:'',
+				distance:'',
+				couponEndTime:'',
+				isReceive:'',
 				options:{
 					pullDownRefresh:{
 						txt:'更新成功',
@@ -120,7 +150,55 @@
 						
 					}
 				},
+				plugin: [
+				
+					{
+						pName: 'Geolocation',
+						enableHighAccuracy: true, //是否使用高精度定位，默认:true
+						timeout: 10000, //超过10秒后停止定位，默认：无穷大
+						maximumAge: 0, //定位结果缓存0毫秒，默认：0
+						convert: true, //自动偏移坐标，偏移后的坐标为高德坐标，默认：true
+						showButton: true, //显示定位按钮，默认：true
+						buttonPosition: 'RB', //定位按钮停靠位置，默认：'LB'，左下角
+						showMarker: true, //定位成功后在定位到的位置显示点标记，默认：true
+						showCircle: true, //定位成功后用圆圈表示定位精度范围，默认：true
+						panToLocation: true, //定位成功后将定位到的位置作为地图中心点，默认：true
+						zoomToAccuracy: true, //定位成功后调整地图视野范围使定位位置及精度范围视野内可见，默认：f
+						extensions: 'all',
+						events: {
+							init(o) {
+								// o 是高德地图定位插件实例
+								o.getCurrentPosition((status, result) => {
+				
+									if (result && result.position) {
+				
+										self.lng = result.position.lng;
+										self.lat = result.position.lat;
+										
+									} else {
+										// self.getActivityListOne();
+										let toast = self.$createToast({
+											txt: '定位失败，请刷新页面重新定位',
+											type: 'warn'
+										  })
+										toast.show()
+									}
+								});
+							}
+						}
+					}
+				]
 			}
+		},
+		mounted() {
+			if(JSON.parse(sessionStorage.getItem('user')) == null){
+				// this.$store.commit('setRouterName','activity');
+				this.uId = '';
+			}else{
+				this.uId = JSON.parse(sessionStorage.getItem('user')).userId;
+			}
+			this.couponId = this.$route.query.couponId;
+			this.getShopCouponList();
 		},
 		methods:{
 			back() {
@@ -138,6 +216,167 @@
 			},
 			onPullingUp(){
 				//加载
+			},
+			couponXqLink(item){
+				this.$router.push({
+					name:'couponXq',
+					query:{
+						couponId:item.couponId
+					}
+				});
+				this.couponId = this.$route.query.couponId;
+				this.getShopCouponList();
+			},
+			receiveBtn(){
+				let self = this;
+				if(JSON.parse(sessionStorage.getItem('user')) == null){
+					
+					let url = window.location.href;
+					this.$store.commit('setLoginUrl',url);
+					this.$createDialog({
+						type: 'confirm',
+						icon: 'cubeic-warn',
+						title: '需要登录后才能评论',
+						confirmBtn: {
+						  text: '去登录',
+						  active: true,
+						  disabled: false,
+						  href: 'javascript:;'
+						},
+						cancelBtn: {
+						  text: '取消',
+						  active: false,
+						  disabled: false,
+						  href: 'javascript:;'
+						},
+						onConfirm: () => {
+						  self.$router.push({
+						  	name:'login'
+						  })
+						},
+						
+					 }).show()
+					
+				}else{
+					
+					self.axios.post(Api.userApi + '/coupon/addUserCoupon', self.qs.stringify({
+						userId: self.uId,
+						couponId:self.couponId,
+						
+					}), {
+						headers: {
+							'Content-Type': 'application/x-www-form-urlencoded'
+						}
+					}).then((res)=>{
+						if(res.data.code == 1){
+							let toast = self.$createToast({
+								txt: '领取成功',
+								type: 'correct'
+							  })
+							toast.show();
+							setTimeout(()=>{
+								self.getShopCouponList();
+							},500)
+						}else{
+							alert(res.data.msg)
+						}
+					})
+				}
+			},
+			getShopCouponList(){
+				let self = this;
+				self.axios.post(Api.userApi + '/coupon/selectCouponDetailsAndShopsInfo', self.qs.stringify({
+					userId: self.uId,
+					couponId: self.couponId,
+					latitude: self.lat,
+					longitude: self.lng
+				}), {
+					headers: {
+						'Content-Type': 'application/x-www-form-urlencoded'
+					}
+				}).then((res)=>{
+					if(res.data.code == 1){
+						self.couponName = res.data.data.couponName;
+						self.couponIcan = res.data.data.couponIcan;
+						self.shopAddress = res.data.data.shopAddress;
+						self.couponDesc = res.data.data.couponDesc;
+						self.couponList = res.data.data.shopCoupons;
+						self.couponPrice = res.data.data.couponPrice;
+						self.conditionPrice = res.data.data.conditionPrice;
+						self.receiveNum = res.data.data.receiveNum;
+						self.shopName = res.data.data.shopName;
+						self.shopAddress = res.data.data.shopAddress;
+						self.distance = res.data.data.distance;
+						self.couponEndTime = res.data.data.couponEndTime;
+						self.isReceive = res.data.data.isReceive;
+						self.couponList.forEach((e)=>{
+							e.styleObj = {
+								width:Math.round((e.receiveNum/e.circulation * 10000)/100).toFixed(4) + '%'
+							}
+							e.sx = (100-Math.round((e.receiveNum/e.circulation * 10000)/100).toFixed(4))+'%'
+						})
+						console.log(self.couponList)
+					}else{
+						alert(res.data.msg)
+					}
+					
+				})
+			},
+			receive(item){
+				let self = this;
+				if(JSON.parse(sessionStorage.getItem('user')) == null){
+					
+					let url = window.location.href;
+					this.$store.commit('setLoginUrl',url);
+					this.$createDialog({
+						type: 'confirm',
+						icon: 'cubeic-warn',
+						title: '需要登录后才能评论',
+						confirmBtn: {
+						  text: '去登录',
+						  active: true,
+						  disabled: false,
+						  href: 'javascript:;'
+						},
+						cancelBtn: {
+						  text: '取消',
+						  active: false,
+						  disabled: false,
+						  href: 'javascript:;'
+						},
+						onConfirm: () => {
+						  self.$router.push({
+						  	name:'login'
+						  })
+						},
+						
+					 }).show()
+					
+				}else{
+					
+					self.axios.post(Api.userApi + '/coupon/addUserCoupon', self.qs.stringify({
+						userId: self.uId,
+						couponId:item.couponId,
+						
+					}), {
+						headers: {
+							'Content-Type': 'application/x-www-form-urlencoded'
+						}
+					}).then((res)=>{
+						if(res.data.code == 1){
+							let toast = self.$createToast({
+								txt: '领取成功',
+								type: 'correct'
+							  })
+							toast.show();
+							setTimeout(()=>{
+								self.getShopCouponList();
+							},500)
+						}else{
+							alert(res.data.msg)
+						}
+					})
+				}
 			}
 		}
 	}
@@ -183,6 +422,14 @@
 				background: #fff;
 				border-radius: 10px;
 				overflow: hidden;
+				position: relative;
+				.sign{
+					position: absolute;
+					width: 130px;
+					height: 130px;
+					top: -34px;
+					right: -28px;
+				}
 				.couponTop{
 					padding: 40px 20px 50px 20px;
 					img{
@@ -190,6 +437,7 @@
 						height: 178px;
 						display: block;
 						margin: 0 auto;
+						border-radius: 10px;
 					}
 					.couponName{
 						text-align: center;
