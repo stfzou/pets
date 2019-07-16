@@ -19,6 +19,7 @@ import AddSponsor from '@/components/activity/addSponsor'
 import EditSponsor from '@/components/activity/editSponsor'
 import RealName from '@/components/activity/realName'
 import RealUser from '@/components/activity/realUser'
+import DeliveryStyle from '@/components/deliveryStyle'
 
 Vue.use(Router)
 
@@ -61,7 +62,13 @@ export default new Router({
 				meta:{
 					keepAlive:true // 需要要缓存
 				}
-			},{
+			},
+			{
+				path:'deliveryStyle',
+				name:'deliveryStyle',
+				component:DeliveryStyle
+			},
+			{
 				path:'ticket',
 				name:'ticket',
 				component:Ticket

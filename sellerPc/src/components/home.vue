@@ -100,6 +100,10 @@
 						subNavName:'评价管理',
 						subIcon:require('../assets/home/icon_home4.png'),
 						link:''
+						},{
+							subNavName:'配送方式',
+							subIcon:require('../assets/home/icon_home4.png'),
+							link:'deliveryStyle'
 						}]	
 					},{
 						navName:'订单管理',url:require('../assets/home/icon_dingdan@2x.png'),subData:[{subNavName:'',subIcon:'',}]
