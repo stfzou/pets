@@ -48,7 +48,8 @@ import WorkOsChangePw from '@/components/workOs/workOsChangePw'
 import StaffInfo from '@/components/workOs/staffInfo'
 import AddStaff from '@/components/workOs/addStaff'
 import EditStaff from '@/components/workOs/editStaff'
-
+import VisitRecords from '@/components/workOs/visitRecords'
+import AddVisitInfo from '@/components/workOs/addVisitInfo'
 
 
 Vue.use(Router)
@@ -74,7 +75,7 @@ export default new Router({
 					component:AnswerOne,
 					name:'answerOne'
 				}
-				
+
 			]
 		},
 		{
@@ -117,11 +118,21 @@ export default new Router({
 			name:'workOsChangePw',
 			component:WorkOsChangePw,
 		},
+    {
+      path:'/visitRecords',
+      name:'visitRecords',
+      component:VisitRecords,
+    },
+    {
+      path:'/addVisitInfo',
+      name:'addVisitInfo',
+      component:AddVisitInfo,
+    },
 		{
 			path:'/workOsInfoList',
 			name:'workOsInfoList',
 			component:WorkOsInfoList,
-			
+
 		},
 		{
 			path:'/addCustomer',
@@ -137,13 +148,13 @@ export default new Router({
 			path:'/workOsCustomer',
 			name:'workOsCustomer',
 			component:WorkOsCustomer,
-			
+
 		},
 		{
 			path:'/workOsMap',
 			name:'workOsMap',
 			component:WorkOsMap,
-			
+
 		},
 		{
 			path:'/workOsPcMap',
@@ -294,7 +305,7 @@ export default new Router({
 					redirect:'sellerEval/evalContent',
 					component:SellerEval,
 					children:[
-						{	
+						{
 							name:'evalConten',
 							path:'evalContent',
 							component:EvalContent

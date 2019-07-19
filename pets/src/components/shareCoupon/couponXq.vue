@@ -119,10 +119,9 @@
 		data(){
 			let self = this;
 			return{
-				arr:[1,2,3,4,5,6,7],
 				lng:0,
 				lat:0,
-				uId:'31',
+				uId:'',
 				couponId:'',
 				couponList:[],
 				couponName:'',
@@ -213,6 +212,7 @@
 			},
 			onPullingDown(){
 				//刷新
+			
 			},
 			onPullingUp(){
 				//加载

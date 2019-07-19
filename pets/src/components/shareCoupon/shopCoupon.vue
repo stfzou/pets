@@ -14,7 +14,7 @@
 			</a>
 		</div>
 		<div class="couponListBox">
-			<cube-scroll ref="scroll" @pulling-up="onPullingUp" @pulling-down="onPullingDown" :options="options">
+			<cube-scroll ref="scroll">
 			<ul>
 				<li class="flex_r_s_b" v-for="item in couponList">
 					<div class="list_l">
@@ -46,7 +46,7 @@
 						
 					</div>
 					<img v-show="item.isReceive==1" class="imprint" src="../../assets/received.png" alt="">
-					<img v-show="item.receiveNum==item.circulation" class="imprint" src="../../assets/receiveEnd.png" alt="">
+					<img v-show="item.isReceive==0" class="imprint" src="../../assets/receiveEnd.png" alt="">
 				</li>
 			</ul>
 			</cube-scroll>
@@ -132,8 +132,9 @@
 			}else{
 				this.uId = JSON.parse(sessionStorage.getItem('user')).userId;
 			}
-			this.shopId = '30';
+			this.shopId = this.getUrlData().shopId;
 			this.getShopCouponList();
+			
 		},
 		methods:{
 			back() {
@@ -153,6 +154,24 @@
 						couponId:item.couponId
 					}
 				})
+			},
+			getUrlData() {// 截取url中的数据
+			    
+				   let tempStr = window.location.href
+				   /**
+				   * tempArr 是一个字符串数组 格式是["key=value", "key=value", ...]
+				   */
+				   let tempArr = tempStr.split('?')[1] ? tempStr.split('?')[1].split('&') : []
+				   /**
+				   * returnArr 是要返回出去的数据对象 格式是 { key: value, key: value, ... }
+				   */
+				   let returnArr = {}
+				   tempArr.forEach(element => {
+				   returnArr[element.split('=')[0]] = element.split('=')[1]
+				   })
+				  /*输出日志*/
+				   return returnArr;
+			  
 			},
 			getShopCouponList(){
 				let self = this;

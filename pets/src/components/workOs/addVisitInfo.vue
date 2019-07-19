@@ -1,74 +1,28 @@
 <template>
-	<div class="addCustomer">
+	<div class="addVisitInfo">
 		<div class="login_nav">
 			<div class="back" @click="back"></div>
-			<div class="title">添加客户信息</div>
+			<div class="title">添加拜访信息</div>
 		</div>
 		<div class="addCustomer_list">
 			<ul>
 				<li class="flex_r_f_s">
-					<div class="list_l"><b>*</b>店铺名称:</div>
+					<div class="list_l"><b>*</b>拜访对象:</div>
 					<div class="list_r">
-						<input type="text" v-model="storeName" />
-					</div>
-				</li>
-				<li class="flex_r_f_s">
-					<div class="list_l"><b>*</b>所在区域:</div>
-					<div class="list_r">
-						<div class="region flex_r_f_s">
-							<div class="sheng flex_r_s_b" @click="showAddressPicker" v-for="item in cityData">
-								<span>{{item}}</span>
-								<i class="cube-select-icon"></i>
-							</div>
-						</div>
-					</div>
-				</li>
-				<li class="flex_r_f_s">
-					<div class="list_l"><b>*</b>经营地址:</div>
-					<div class="list_r">
-						<input type="text" v-model="addr" />
+             <cube-select v-model="staffName" title="选择员工" :options="nameOpt" @change="nameChange"> </cube-select>
 					</div>
 				</li>
 
 				<li class="flex_r_f_s">
-					<div class="list_l"><b>*</b>联系电话:</div>
+					<div class="list_l"><b>*</b>签到地点:</div>
 					<div class="list_r">
-						<input type="text" v-model="phone" />
+						<div class="addr">大数据时代加粉的时间放假第三方接口都是富家女的司法鉴定所</div>
 					</div>
 				</li>
+
+
 				<li class="flex_r_f_s">
-					<div class="list_l"><b>*</b>店铺环境:</div>
-					<div class="list_r">
-						<div class="customerType">
-							<cube-select v-model="environmenVal" :options="storeEnvironmen" placeholder="店铺环境"></cube-select>
-						</div>
-					</div>
-				</li>
-				<li class="flex_r_f_s">
-					<div class="list_l"><b>*</b>客户类型:</div>
-					<div class="list_r">
-						<div class="customerType">
-							<cube-select v-model="typeVal" :options="customerType" placeholder="客户类型"></cube-select>
-						</div>
-					</div>
-				</li>
-				<li class="flex_r_f_s">
-					<div class="list_l"><b>*</b>产品类型:</div>
-					<div class="list_r">
-						<div class="projectType">
-							<el-select v-model="projectTypeVal" multiple placeholder="请选择">
-								<el-option
-								  v-for="item in projectData"
-								  :key="item.value"
-								  :label="item.label"
-								  :value="item.value">
-								</el-option>
-							 </el-select>
-						</div>
-					</div>
-				</li>
-				<li class="flex_r_f_s">
-					<div class="list_l"><b>*</b>店铺照片:</div>
+					<div class="list_l"><b>*</b>现场照片:</div>
 					<div class="list_r uploadDiv">
 						<div class="flex_r_f_s">
 							<div class="uploadBox">
@@ -122,7 +76,7 @@
 					</div>
 				</li>
 				<li class="flex_r_f_s">
-					<div class="list_l">客户备注:</div>
+					<div class="list_l"><b>*</b>拜访备注:</div>
 					<div class="list_r">
 						<div class="remark">
 							<cube-textarea v-model="remark" :maxlength="200" placeholder="请输入客户备注信息"></cube-textarea>
@@ -142,7 +96,7 @@
 					</div>
 				</li>
 			</ul>
-			<div class="confirmBtn flex_r_s_c" @click="addCustomer">确定</div>
+			<div class="confirmBtn flex_r_s_c" @click="addCustomer">提交</div>
 		</div>
 
 
@@ -153,30 +107,19 @@
 	import Api from '../common/apj.js'
 	import {provinceList,cityList,areaList} from '../../data/area'
 	import compress from '../../data/image'
-	const addressData = provinceList
-	addressData.forEach(province => {
-		province.children = cityList[province.value]
-		province.children.forEach(city => {
-			city.children = areaList[city.value]
-		})
-	})
+
 	export default {
 		data(){
 			let self = this;
 			return{
 				isCommit:false,
+        nameOpt: [1, 2, 3, 4, 5, 6],
 				remark:'',
 				isMark:true,
 				lng:'',
 				lat:'',
-				cityData: ['省份', '城市', '地区'],
-				storeEnvironmen: [],
-				customerType: [],
-				storeName:'',
+				staffName:'',//员工名字
 				addr:'',
-				phone:'',
-				environmenVal: '',
-				typeVal: '',
 				//图片上传
 				action: {
 					target:Api.staffApi+'/business/updateImg',
@@ -236,35 +179,22 @@
 				loadOne:false,
 				loadTwo:false,
 				loadThree:false,
-
-				reg: /^1[3456789]\d{9}$/,
-				projectData:[],
-				projectTypeVal:''
-
 			}
 		},
 		mounted() {
-			if(JSON.parse(localStorage.getItem('staff'))== null){
-
-				this.$router.push({
-					name:'workOsLogin'
-				})
-
-			}else{
-				this.addressPicker = this.$createCascadePicker({
-					title: '城市选择',
-					data: addressData,
-					onSelect: this.selectHandle,
-					onCancel: this.cancelHandle
-				});
-				this.getCondition();
-				this.getType();
-				this.getProjectType();
-				let upLoad = document.querySelectorAll(".uploadBox input");
-				upLoad.forEach((e)=>{
-					e.setAttribute("capture","camera");
-				})
-			}
+// 			if(JSON.parse(localStorage.getItem('staff'))== null){
+//
+// 				this.$router.push({
+// 					name:'workOsLogin'
+// 				})
+//
+// 			}else{
+//
+// 				let upLoad = document.querySelectorAll(".uploadBox input");
+// 				upLoad.forEach((e)=>{
+// 					e.setAttribute("capture","camera");
+// 				})
+// 			}
 
 
 		},
@@ -279,190 +209,9 @@
 				imgs: [this[img]]
 			  }).show()
 			},
-			getCondition(){
-				let self = this;
-				this.axios.post(Api.staffApi + '/business/selectBShopsConditionAll', this.qs.stringify({
 
-				}), {
-					headers: {
-						'Content-Type': 'application/x-www-form-urlencoded'
-					}
-				}).then((res)=>{
-					if(res.data.code == 1){
-						// self.storeEnvironmen = res.data.data;
-
-						res.data.data.forEach((e)=>{
-							self.storeEnvironmen.push({
-								value:e.conditionId,
-								text:e.name
-							})
-						})
-					}else{
-						alert(res.data.msg);
-					}
-				})
-			},
-			getType(){
-				let self = this;
-				this.axios.post(Api.staffApi + '/business/selectBShopsTypeAll', this.qs.stringify({
-
-				}), {
-					headers: {
-						'Content-Type': 'application/x-www-form-urlencoded'
-					}
-				}).then((res)=>{
-					if(res.data.code == 1){
-						// self.customerType = res.data.data;
-						res.data.data.forEach((e)=>{
-							self.customerType.push({
-								value:e.typeId,
-								text:e.name,
-								icon:e.typeIcon
-							})
-						})
-					}else{
-						alert(res.data.msg);
-					}
-				})
-			},
-			getProjectType(){
-				let self = this;
-				this.axios.post(Api.staffApi + '/business/selectBClientPTypeAll', this.qs.stringify({
-
-				}), {
-					headers: {
-						'Content-Type': 'application/x-www-form-urlencoded'
-					}
-				}).then((res)=>{
-					if(res.data.code == 1){
-						// self.customerType = res.data.data;
-						res.data.data.forEach((e)=>{
-							self.projectData.push({
-								value:e.typeId,
-								label:e.name
-							})
-						})
-					}else{
-						alert(res.data.msg);
-					}
-				})
-			},
 			addCustomer(){
 				let self = this;
-				if(this.center[0] == 0){
-					let toast = this.$createToast({
-						txt: '定位失败，请点击地图定位按钮重新定位',
-						type: 'error'
-					  })
-					toast.show()
-					return false;
-				}else if(this.storeName == ''){
-					let toast = this.$createToast({
-						txt: '店铺名称不能为空',
-						type: 'error'
-					  })
-					toast.show()
-					return false;
-				}else if(this.cityData[0] == '省份'){
-					let toast = this.$createToast({
-						txt: '请填写省市区',
-						type: 'error'
-					  })
-					toast.show()
-					return false;
-				}else if(this.addr == ''){
-					let toast = this.$createToast({
-						txt: '经营地址不能为空',
-						type: 'error'
-					  })
-					toast.show()
-					return false;
-				}else if (this.phone == '') {
-
-					let toast = this.$createToast({
-						txt: '手机号不能为空',
-						type: 'error'
-					  })
-					toast.show()
-					return false;
-				}else if (!this.reg.test(this.phone)) {
-
-					let toast = this.$createToast({
-						txt: '手机号格式错误',
-						type: 'error'
-					  })
-					toast.show()
-					return false;
-				}else if (this.environmenVal == '') {
-
-					let toast = this.$createToast({
-						txt: '请选择店铺环境',
-						type: 'error'
-					  })
-					toast.show()
-					return false;
-				}else if(this.typeVal == ''){
-					let toast = this.$createToast({
-						txt: '请填选择客户类型',
-						type: 'error'
-					  })
-					toast.show()
-					return false;
-				}else if(self.projectTypeVal.length<1){
-					let toast = this.$createToast({
-						txt: '请选择产品类型',
-						type: 'error'
-					  })
-					toast.show()
-					return false;
-				}
-				else if(this.imgOne == ''||this.imgTwo==''||this.imgThree==''){
-					let toast = this.$createToast({
-						txt: '请上传店铺照片',
-						type: 'error'
-					  })
-					toast.show()
-					return false;
-				}else{
-					this.axios.post(Api.staffApi + '/ca/addBClient', this.qs.stringify({
-						businessId:JSON.parse(localStorage.getItem('staff')).staffId,
-						shopName:self.storeName,
-						province:self.cityData[0],
-						city:self.cityData[1],
-						area:self.cityData[2],
-						address:self.addr,
-						latitude:self.center[1],
-						longitude:self.center[0],
-						phone:self.phone,
-						conditionId:self.environmenVal,
-						typeId:self.typeVal,
-						storeImg:self.imgOne,
-						displayOneImg:self.imgTwo,
-						displayTwoImg:self.imgThree,
-						remark:self.remark,
-						productTypeId:self.projectTypeVal.join(',')
-					}), {
-						headers: {
-							'Content-Type': 'application/x-www-form-urlencoded'
-						}
-					}).then((res)=>{
-						if(res.data.code == 1){
-							let toast = this.$createToast({
-								txt: '添加成功',
-								type: 'correct'
-							 })
-							toast.show();
-							setTimeout(()=>{
-								self.$router.push({
-									name:'workOsCustomer'
-								})
-							},500)
-						}else{
-							alert(res.data.msg);
-						}
-					})
-				}
-
 			},
 			showAddressPicker() {
 				this.addressPicker.show()
@@ -473,6 +222,9 @@
 			cancelHandle() {
 
 			},
+      nameChange() {
+
+      },
 			processFile(file, next) {
 			  compress(file, {
 				compress: {
@@ -555,7 +307,7 @@
 </script>
 
 <style lang="scss">
-	.addCustomer{
+	.addVisitInfo{
 		.amap-logo{
 			opacity:0;
 		}
@@ -594,7 +346,7 @@
 			}
 			.list_l{
 				font-size: 26px;
-				width: 150px;
+				width: 160px;
 				color: #333;
 				b{
 					color: #ff523d;
@@ -613,6 +365,16 @@
 					padding:0 10px;
 					font-size: 26px;
 				}
+        .addr{
+          padding-left: 20px;
+          line-height: 30px;
+          color: #999;
+        }
+        .cube-select{
+          width: 200px;
+          height: 65px;
+          padding: 15px 10px 5px 20px;
+         }
 				.remark{
 					width: 430px;
 					.cube-textarea-wrapper{
@@ -717,6 +479,7 @@
 				background: #ff523d;
 				border-radius: 50px;
 				margin: 0 auto;
+        margin-top: 30px;
 			}
 		}
 	}

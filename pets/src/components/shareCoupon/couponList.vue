@@ -68,7 +68,7 @@
 						<div class="saleNum">商家共{{item.shopTotalNum}}种优惠券</div>
 					</div>
 					<img v-show="item.isReceive==1" class="imprint" src="../../assets/received.png" alt="">
-					<img v-show="item.receiveNum==item.circulation" class="imprint" src="../../assets/receiveEnd.png" alt="">
+					<img v-show="item.isReceive==0" class="imprint" src="../../assets/receiveEnd.png" alt="">
 				</li>
 			</ul>
 			</cube-scroll>
@@ -111,6 +111,7 @@
 				condition:'',
 				distance:'',
 				uId:'',
+				page:0,
 				lng:'104.1608900000',
 				lat:'30.7214200000',
 				options:{
@@ -185,7 +186,7 @@
 					couponPrice:self.couponPrice,
 					condition:self.condition,
 					distance:self.distance,
-					pageSize: 10,
+					pageSize: 2,
 					latitude: self.lat,
 					longitude: self.lng,
 					couponPTypeId:self.couponPTypeId
@@ -203,8 +204,15 @@
 							e.sx = (100-Math.round((e.receiveNum/e.circulation * 10000)/100).toFixed(4))+'%'
 						})
 						console.log(self.couponList)
+						setTimeout(()=>{
+							self.$refs.scroll.forceUpdate();
+							self.$refs.scroll.refresh();
+						},500)
 					}else{
 						alert(res.data.msg)
+						setTimeout(()=>{
+							self.$refs.scroll.forceUpdate();
+						},500)
 					}
 					
 				})
@@ -229,9 +237,61 @@
 			},
 			onPullingDown(){
 				//刷新
+				this.page = 0;
+				this.getCouponList();
 			},
 			onPullingUp(){
 				//加载
+				let self = this;
+				self.page++
+				self.axios.post(Api.userApi + '/coupon/selectCouponList', self.qs.stringify({
+					userId: self.uId,
+					pageNo: self.page,
+					city:self.city,
+					couponPrice:self.couponPrice,
+					condition:self.condition,
+					distance:self.distance,
+					pageSize: 2,
+					latitude: self.lat,
+					longitude: self.lng,
+					couponPTypeId:self.couponPTypeId
+				}), {
+					headers: {
+						'Content-Type': 'application/x-www-form-urlencoded'
+					}
+				}).then((res)=>{
+					if(res.data.code == 1){
+						if(res.data.data.length>0){
+							
+							setTimeout(()=>{
+								self.$refs.scroll.forceUpdate();
+								res.data.data.forEach((e)=>{
+									e.styleObj = {
+										width:Math.round((e.receiveNum/e.circulation * 10000)/100).toFixed(4) + '%'
+									}
+									e.sx = (100-Math.round((e.receiveNum/e.circulation * 10000)/100).toFixed(4))+'%'
+									self.couponList.push(e)
+								});
+								
+								setTimeout(()=>{
+									self.$refs.scroll.refresh();
+								},200)
+								
+							},500)
+						}else{
+							
+							setTimeout(()=>{
+								self.$refs.scroll.forceUpdate();
+							},500)
+						}
+					}else{
+						alert(res.data.msg)
+						setTimeout(()=>{
+							self.$refs.scroll.forceUpdate();
+						},500)
+					}
+					
+				})
 			},
 			navClick(index){ //条件筛选显示
 				if(this.navIndex === index){
@@ -239,7 +299,6 @@
 					
 				}else{
 					this.navIndex = index;
-					
 				}
 				
 			},
@@ -247,18 +306,21 @@
 				this.subNavIndex = index;
 				this.distance = item.val;
 				this.navIndex = '';
+				this.page = 0;
 				this.getCouponList()
 			},
 			subNavClickTwo(item,index){//条件筛选
 				this.subNavIndex2 = index;
 				this.condition = item.val;
 				this.navIndex = '';
+				this.page = 0;
 				this.getCouponList()
 			},
 			subNavClickThree(item,index){
 				this.subNavIndex3 = index;
 				this.couponPrice = item.val;
 				this.navIndex = '';
+				this.page = 0;
 				this.getCouponList()
 			},
 			receive(item){
@@ -270,7 +332,7 @@
 					this.$createDialog({
 						type: 'confirm',
 						icon: 'cubeic-warn',
-						title: '需要登录后才能评论',
+						title: '需要登录后才参加活动',
 						confirmBtn: {
 						  text: '去登录',
 						  active: true,
@@ -309,7 +371,8 @@
 							  })
 							toast.show();
 							setTimeout(()=>{
-								self.$router.go(0)
+								self.page = 0;
+								self.getCouponList();
 							},500)
 						}else{
 							alert(res.data.msg)

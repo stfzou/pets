@@ -198,7 +198,7 @@
 				   sessionStorage.setItem('id',JSON.stringify(returnArr.id));
 					
 			  
-			  },
+			 },
 	
 			handleScroll () {
 				
