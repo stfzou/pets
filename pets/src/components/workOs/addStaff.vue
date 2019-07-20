@@ -29,13 +29,20 @@
 						</div>
 					</div>
 				</li>
-				
+
 				<li class="flex_r_f_s">
 					<div class="list_l"><b>*</b>登录密码:</div>
 					<div class="list_r">
 						<input type="password" v-model="pwd"/>
 					</div>
 				</li>
+        <li class="flex_r_f_s">
+        	<div class="list_l"><b>*</b>查看权限:</div>
+        	<div class="list_r selelct">
+        		 <cube-select v-model="value" title="查看权限" :options="nameOpt">
+        		</cube-select>
+        	</div>
+        </li>
 			</ul>
 			<div class="confirmBtn flex_r_s_c" @click="addStaff"><cube-loading :size="28" v-if="loading"></cube-loading><span v-else>确定</span></div>
 		</div>
@@ -60,7 +67,10 @@
 				pwd:'',
 				phone:'',
 				reg: /^1[3456789]\d{9}$/,
-				loading:false
+				loading:false,
+
+        value:'',
+        nameOpt: [1, 2, 3, 4, 5, 6],
 			}
 		},
 		mounted() {
@@ -70,7 +80,7 @@
 				onSelect: this.selectHandle,
 				onCancel: this.cancelHandle
 			});
-			
+
 		},
 		methods:{
 			back(){
@@ -86,7 +96,7 @@
 				console.log(selectedText)
 			},
 			cancelHandle() {
-				
+
 			},
 			addStaff(){
 				let self = this;
@@ -98,7 +108,7 @@
 					toast.show()
 					return false;
 				}else if (this.phone == '') {
-							
+
 					let toast = this.$createToast({
 						txt: '手机号不能为空',
 						type: 'error'
@@ -106,7 +116,7 @@
 					toast.show()
 					return false;
 				}else if (!this.reg.test(this.phone)) {
-							
+
 					let toast = this.$createToast({
 						txt: '手机号格式错误',
 						type: 'error'
@@ -120,7 +130,7 @@
 					  })
 					toast.show()
 				}else if (this.pwd == '') {
-							
+
 					let toast = this.$createToast({
 						txt: '密码不能为空',
 						type: 'error'
@@ -153,9 +163,9 @@
 								self.$router.push({
 									name:'staffInfo'
 								})
-								
+
 							},500)
-							
+
 						}else{
 							alert(res.data.msg);
 							self.loading = false;
@@ -163,7 +173,7 @@
 					})
 				}
 			}
-			
+
 		}
 	}
 </script>
@@ -195,7 +205,7 @@
 		.addCustomer_list{
 			padding: 0 20px;
 			padding-bottom: 20px;
-			
+
 			li{
 				padding: 20px 0;
 			}
@@ -239,9 +249,16 @@
 					}
 
 				}
-				
-				
+
+
 			}
+      .selelct{
+        .cube-select{
+            width: 200px;
+            height: 50px;
+            padding: 5px 10px 5px 20px;
+         }
+      }
 			.confirmBtn{
 				color: #fff;
 				font-size: 30px;

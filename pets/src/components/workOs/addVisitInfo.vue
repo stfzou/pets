@@ -105,7 +105,6 @@
 
 <script>
 	import Api from '../common/apj.js'
-	import {provinceList,cityList,areaList} from '../../data/area'
 	import compress from '../../data/image'
 
 	export default {

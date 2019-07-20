@@ -556,6 +556,8 @@
 
 <style lang="scss">
 	.addCustomer{
+
+    background: #fff;
 		.amap-logo{
 			opacity:0;
 		}
