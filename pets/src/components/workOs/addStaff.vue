@@ -39,8 +39,15 @@
         <li class="flex_r_f_s">
         	<div class="list_l"><b>*</b>查看权限:</div>
         	<div class="list_r selelct">
-        		 <cube-select v-model="value" title="查看权限" :options="nameOpt">
-        		</cube-select>
+        		  <el-select v-model="value1" multiple placeholder="请选择">
+                <el-option
+                  v-for="item in nameOpt"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value">
+                </el-option>
+              </el-select>
+
         	</div>
         </li>
 			</ul>
@@ -68,9 +75,9 @@
 				phone:'',
 				reg: /^1[3456789]\d{9}$/,
 				loading:false,
-
+        value1:'',
         value:'',
-        nameOpt: [1, 2, 3, 4, 5, 6],
+        nameOpt: [{label:'选择1',value:1},{label:'选择2',value:2},{label:'选择3',value:3},{label:'选择4',value:4},{label:'选择5',value:5},],
 			}
 		},
 		mounted() {

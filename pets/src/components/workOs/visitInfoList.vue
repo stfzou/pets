@@ -93,12 +93,17 @@
             },
         }
       },
+      mounted() {
+        let self = this;
+        this.getStaffName();
+      },
       methods:{
         back(){
         	this.$router.push({
         		name:'workOsInfoList'
         	});
         },
+
       }
     }
 </script>

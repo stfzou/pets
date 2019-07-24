@@ -29,13 +29,27 @@
 						</div>
 					</div>
 				</li>
-				
+
 				<li class="flex_r_f_s">
 					<div class="list_l"><b>*</b>登录密码:</div>
 					<div class="list_r">
 						<input type="password" v-model="pwd"/>
 					</div>
 				</li>
+         <li class="flex_r_f_s">
+        	<div class="list_l"><b>*</b>查看权限:</div>
+        	<div class="list_r selelct">
+        		  <el-select v-model="value1" multiple placeholder="请选择">
+                <el-option
+                  v-for="item in nameOpt"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value">
+                </el-option>
+              </el-select>
+
+        	</div>
+        </li>
 			</ul>
 			<div class="confirmBtn flex_r_s_c" @click="addStaff"><cube-loading :size="28" v-if="loading"></cube-loading><span v-else>修改</span></div>
 		</div>
@@ -61,7 +75,9 @@
 				phone:'',
 				reg: /^1[3456789]\d{9}$/,
 				loading:false,
-				staffId:''
+				staffId:'',
+        value1:'',
+        nameOpt: [{label:'选择1',value:1},{label:'选择2',value:2},{label:'选择3',value:3},{label:'选择4',value:4},{label:'选择5',value:5},],
 			}
 		},
 		mounted() {
@@ -85,7 +101,7 @@
 				this.pwd = editStaffInfo.password;
 				this.phone = editStaffInfo.phone;
 				this.cityData = [editStaffInfo.province,editStaffInfo.city,editStaffInfo.area];
-				this.staffId = editStaffInfo.id	
+				this.staffId = editStaffInfo.id
 			},
 			showAddressPicker() {
 				this.addressPicker.show()
@@ -95,7 +111,7 @@
 				console.log(selectedText)
 			},
 			cancelHandle() {
-				
+
 			},
 			addStaff(){
 				let self = this;
@@ -107,7 +123,7 @@
 					toast.show()
 					return false;
 				}else if (this.phone == '') {
-							
+
 					let toast = this.$createToast({
 						txt: '手机号不能为空',
 						type: 'error'
@@ -115,7 +131,7 @@
 					toast.show()
 					return false;
 				}else if (!this.reg.test(this.phone)) {
-							
+
 					let toast = this.$createToast({
 						txt: '手机号格式错误',
 						type: 'error'
@@ -129,7 +145,7 @@
 					  })
 					toast.show()
 				}else if (this.pwd == '') {
-							
+
 					let toast = this.$createToast({
 						txt: '密码不能为空',
 						type: 'error'
@@ -162,9 +178,9 @@
 								self.$router.push({
 									name:'staffInfo'
 								})
-								
+
 							},500)
-							
+
 						}else{
 							alert(res.data.msg);
 							self.loading = false;
@@ -172,7 +188,7 @@
 					})
 				}
 			}
-			
+
 		}
 	}
 </script>
@@ -247,8 +263,8 @@
 					}
 
 				}
-				
-				
+
+
 			}
 			.confirmBtn{
 				color: #fff;

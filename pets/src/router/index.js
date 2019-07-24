@@ -50,9 +50,10 @@ import AddStaff from '@/components/workOs/addStaff'
 import EditStaff from '@/components/workOs/editStaff'
 import VisitRecords from '@/components/workOs/visitRecords'
 import AddVisitInfo from '@/components/workOs/addVisitInfo'
-import VisitXq from '@/components/workOs/visitXq'
+import VisitInfoList from '@/components/workOs/visitInfoList'
 import WorkTable from '@/components/workOs/workTable'
 import AddWorkTable from '@/components/workOs/addWorkTable'
+import WorkTableXq from '@/components/workOs/workTableXq'
 
 Vue.use(Router)
 export default new Router({
@@ -131,14 +132,19 @@ export default new Router({
       component:AddVisitInfo,
     },
     {
-      path:'/visitXq',
-      name:'visitXq',
-      component:VisitXq,
+      path:'/visitInfoList',
+      name:'visitInfoList',
+      component:VisitInfoList,
     },
     {
       path:'/workTable',
       name:'workTable',
       component:WorkTable,
+    },
+    {
+      path:'/workTableXq',
+      name:'workTableXq',
+      component:WorkTableXq
     },
     {
       path:'/addWorkTable',

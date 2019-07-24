@@ -11,7 +11,7 @@
         <div class="nameAndTime flex_r_s_b">
           <div class="name_l flex_r_f_s">
             <p>姓名:</p>
-            <cube-select v-model="value" title="选择员工" :options="nameOpt" @change="nameChange">
+            <cube-select v-model="staffVal" title="选择员工" :options="staffNameList" @change="nameChange">
             </cube-select>
           </div>
 
@@ -20,19 +20,19 @@
             <div class="flex_r_s_b timeBox">
               <cube-button class="cube-select" @click="showDatePicker">{{time1}}</cube-button>
               <span>-</span>
-              <cube-button class="cube-select" @click="showDatePicker">{{time1}}</cube-button>
+              <cube-button class="cube-select" @click="showDatePicker2">{{time2}}</cube-button>
             </div>
           </div>
         </div>
-         <div class="recordsNum">共查询到700条拜访记录</div>
+         <div class="recordsNum">共查询到{{workTableList.length}}条拜访记录</div>
       </div>
       <div class="cntList">
-        <cube-scroll ref="scroll" :options="options">
+        <cube-scroll ref="scroll" :options="options" @pulling-up="onPullingUp" @pulling-down="onPullingDown">
         <ul>
-          <li class="flex_r_s_b" v-for="item in nameOpt">
+          <li class="flex_r_s_b" v-for="item in workTableList" @click="link(item)">
             <div class="list_left">
-              <div class="userName">刘海洋</div>
-              <div class="time">2019/07/18   17:12:15</div>
+              <div class="userName">{{item.name}}</div>
+              <div class="time">{{item.createTime}}</div>
             </div>
             <div class="list_right">查看报表详情></div>
           </li>
@@ -47,11 +47,13 @@
   export default{
      data(){
        return{
-          nameOpt: [1, 2, 3, 4, 5, 6],
-          value1: '',
-          value: '',
-          time1:'',
-          time2:'',
+          staffNameList:[],
+          staffVal:'',
+          workTableList:[],
+          page:0,
+          isAdmin:'',
+          time1:'',//时间文本值
+          time2:'',//时间文本值
           options:{
           	pullDownRefresh:{
           		txt:'更新成功',
@@ -67,18 +69,46 @@
           },
        }
      },
+     mounted() {
+       if(JSON.parse(localStorage.getItem('staff'))== null){
+
+       	this.$router.push({
+       		name:'workOsLogin'
+       	})
+
+       }else{
+
+       	if(JSON.parse(localStorage.getItem('staff')).parentId === 0){
+       		this.isAdmin = 1;
+       	}else{
+          this.isAdmin = 0;
+          this.staffVal = JSON.parse(localStorage.getItem('staff')).staffId;
+          this.staffNameList.push({
+            value:JSON.parse(localStorage.getItem('staff')).staffId,
+            text:'自己'
+          })
+        }
+
+       }
+       this.getStaffName();
+       this.getWorkTable();
+     },
      methods:{
        back(){
        	this.$router.push({
        		name:'workOsInfoList'
        	});
        },
+       nameChange(){
+          this.getWorkTable();
+
+       },
        showDatePicker() {
          if (!this.datePicker) {
            this.datePicker = this.$createDatePicker({
-             title: 'Date Picker',
+             title: '时间选择',
              min: new Date(2008, 7, 8),
-             max: new Date(2020, 9, 20),
+             max: new Date(),
              value: new Date(),
              onSelect: this.selectHandle,
              onCancel: this.cancelHandle
@@ -88,12 +118,166 @@
          this.datePicker.show()
        },
        selectHandle(date, selectedVal, selectedText) {
-         this.time1 = selectedVal.join('/')
-
+         let self = this;
+         this.time1 = selectedText.join('-');
+         if(this.time2!=''&& new Date(selectedText.join('-')).getTime()>new Date(self.time2).getTime()){
+           let temp = this.time2;
+           this.time2 = this.time1;
+           this.time1 = temp;
+           this.workTableList = [];
+           this.getWorkTable();
+         }else if(this.time2!=''&& new Date(selectedText.join('-')).getTime()==new Date(self.time2).getTime()){
+           alert('不能选相同的时间');
+           this.time1 = '';
+         }else{
+           this.workTableList = [];
+           this.getWorkTable();
+         }
        },
        cancelHandle() {
-        alert(2)
-       }
+
+       },
+      showDatePicker2() {
+         if (!this.datePicker2) {
+           this.datePicker2 = this.$createDatePicker({
+             title: '时间选择',
+             min: new Date(2008, 7, 8),
+             max: new Date(),
+             value: new Date(),
+             onSelect: this.selectHandle2,
+             onCancel: this.cancelHandle2
+           })
+         }
+
+         this.datePicker2.show()
+       },
+      selectHandle2(date, selectedVal, selectedText) {
+        //this.time2 = selectedVal.join('/')
+         let self = this;
+         if(this.time1==''){
+           alert('请选择开始时间');
+           return false;
+         }
+         this.time2 = selectedText.join('-');
+         if(this.time1!=''&& new Date(selectedText.join('-')).getTime()<new Date(self.time1).getTime()){
+           let temp = this.time2;
+           this.time2 = this.time1;
+           this.time1 = temp;
+           this.workTableList = [];
+           this.getWorkTable();
+         }else if(this.time1!=''&& new Date(selectedText.join('-')).getTime()==new Date(self.time1).getTime()){
+           alert('不能选相同的时间');
+           this.time2 = '';
+         }else{
+           this.workTableList = [];
+           this.getWorkTable();
+         }
+       },
+      cancelHandle2() {
+
+      },
+      getStaffName(){//获取员工名字
+         let self = this;
+         this.axios.get(Api.staffApi+'/business/selectStaffAll', {
+         		headers: {
+         			'Content-Type': 'application/x-www-form-urlencoded'
+         		}
+         	}).then(function(res) {
+              if(res.data.code == 1){
+                 console.log(res.data.data)
+                 res.data.data.forEach((e)=>{
+                   self.staffNameList.push({
+                     value:e.id,
+                     text:e.name
+                   })
+                 })
+
+              }else{
+                alert(res.data.msg)
+              }
+         	})
+       },
+      getWorkTable(){
+        let self = this;
+        self.axios.post(Api.staffApi + '/workReport/selectWorkReportByCompetence', this.qs.stringify({
+        	isAdmin:self.isAdmin,
+          staffIds:self.staffVal,
+          startTime:self.time1,
+          endTime:self.time2,
+          pageNo:0,
+          pageSize:1
+        }), {
+        	headers: {
+        		'Content-Type': 'application/x-www-form-urlencoded'
+        	}
+        }).then((res)=>{
+          if(res.data.code == 1){
+            self.workTableList = res.data.data.list;
+            console.log(res.data.data.list)
+            setTimeout(() => {
+            	self.$refs.scroll.refresh();
+            	self.$refs.scroll.forceUpdate();
+            }, 500)
+          }else{
+            alert(res.data.msg)
+          }
+        })
+      },
+      link(item){
+        this.$router.push({
+          name:'workTableXq',
+          params:{
+            tbInfo:item
+          }
+        })
+      },
+      onPullingDown(){
+        this.page = 0;
+        this.getWorkTable();
+      },
+      onPullingUp(){
+        let self = this;
+        this.page++;
+        self.axios.post(Api.staffApi + '/workReport/selectWorkReportByCompetence', this.qs.stringify({
+        	isAdmin:self.isAdmin,
+        	staffIds:self.staffVal,
+        	startTime:self.time1,
+        	endTime:self.time2,
+        	pageNo:self.page,
+        	pageSize:1
+        }), {
+        	headers: {
+        		'Content-Type': 'application/x-www-form-urlencoded'
+        	}
+        }).then((res)=>{
+          if(res.data.code == 1){
+            // self.workTableList = res.data.data.list;
+            if(res.data.data.list.length>0){
+
+              setTimeout(() => {
+
+              	self.$refs.scroll.forceUpdate();
+              	setTimeout(() => {
+                  res.data.data.list.forEach((e)=>{
+                    self.workTableList.push(e)
+                  })
+              		self.$refs.scroll.refresh();
+              	}, 500)
+              }, 500)
+            }else{
+              setTimeout(() => {
+              	self.$refs.scroll.forceUpdate();
+              }, 500)
+            }
+
+          }else{
+            alert(res.data.msg)
+            setTimeout(() => {
+            	self.$refs.scroll.forceUpdate();
+            }, 500)
+          }
+        })
+      }
      }
    }
 </script>

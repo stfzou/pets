@@ -11,7 +11,7 @@
       <div class="nameAndTime flex_r_s_b">
         <div class="name_l flex_r_f_s">
           <p>姓名:</p>
-          <cube-select v-model="value" title="选择员工" :options="nameOpt" @change="nameChange">
+          <cube-select v-model="staffVal" title="选择员工" :options="staffNameList" @change="nameChange">
           </cube-select>
         </div>
 
@@ -20,7 +20,7 @@
           <div class="flex_r_s_b timeBox">
             <cube-button class="cube-select" @click="showDatePicker">{{time1}}</cube-button>
             <span>-</span>
-            <cube-button class="cube-select" @click="showDatePicker">{{time1}}</cube-button>
+            <cube-button class="cube-select" @click="showDatePicker2">{{time2}}</cube-button>
           </div>
         </div>
       </div>
@@ -38,7 +38,7 @@
     <div class="cntList">
       <cube-scroll ref="scroll" :options="options">
       <ul>
-        <li class="flex_r_s_b" v-for="item in nameOpt">
+        <li class="flex_r_s_b" v-for="item in staffNameList">
           <div class="list_left">
             <div class="userName">刘海洋</div>
             <div class="dataTime">
@@ -68,11 +68,13 @@
   export default {
     data() {
       return {
-        nameOpt: [1, 2, 3, 4, 5, 6],
+        value:'',
         value1: '',
-        value: '',
+        staffVal: '',
+        isAdmin:'',
         time1:'',
         time2:'',
+        staffNameList:[],
         options:{
         	pullDownRefresh:{
         		txt:'更新成功',
@@ -88,6 +90,31 @@
         },
       }
     },
+    mounted() {
+      if(JSON.parse(localStorage.getItem('staff'))== null){
+
+      	this.$router.push({
+      		name:'workOsLogin'
+      	})
+
+      }else{
+
+      	if(JSON.parse(localStorage.getItem('staff')).parentId === 0){
+      		this.isAdmin = 1;
+      	}else{
+         this.isAdmin = 0;
+         this.staffVal = JSON.parse(localStorage.getItem('staff')).staffId;
+         this.staffNameList.push({
+           value:JSON.parse(localStorage.getItem('staff')).staffId,
+           text:'自己'
+         })
+         this.getStaffName();
+       }
+
+      }
+
+
+    },
     methods: {
       nameChange() {
 
@@ -97,27 +124,101 @@
           name: 'workOsInfoList'
         });
       },
-      showDatePicker() {
-        if (!this.datePicker) {
-          this.datePicker = this.$createDatePicker({
-            title: 'Date Picker',
-            min: new Date(2008, 7, 8),
-            max: new Date(2020, 9, 20),
-            value: new Date(),
-            onSelect: this.selectHandle,
-            onCancel: this.cancelHandle
-          })
-        }
+       showDatePicker() {
+         if (!this.datePicker) {
+           this.datePicker = this.$createDatePicker({
+             title: '时间选择',
+             min: new Date(2008, 7, 8),
+             max: new Date(),
+             value: new Date(),
+             onSelect: this.selectHandle,
+             onCancel: this.cancelHandle
+           })
+         }
 
-        this.datePicker.show()
-      },
-      selectHandle(date, selectedVal, selectedText) {
-        this.time1 = selectedVal.join('/')
+         this.datePicker.show()
+       },
+       selectHandle(date, selectedVal, selectedText) {
+         let self = this;
+         this.time1 = selectedText.join('-');
+         if(this.time2!=''&& new Date(selectedText.join('-')).getTime()>new Date(self.time2).getTime()){
+           let temp = this.time2;
+           this.time2 = this.time1;
+           this.time1 = temp;
+
+
+         }else if(this.time2!=''&& new Date(selectedText.join('-')).getTime()==new Date(self.time2).getTime()){
+           alert('不能选相同的时间');
+           this.time1 = '';
+         }else{
+
+
+         }
+       },
+       cancelHandle() {
+
+       },
+      showDatePicker2() {
+         if (!this.datePicker2) {
+           this.datePicker2 = this.$createDatePicker({
+             title: '时间选择',
+             min: new Date(2008, 7, 8),
+             max: new Date(),
+             value: new Date(),
+             onSelect: this.selectHandle2,
+             onCancel: this.cancelHandle2
+           })
+         }
+
+         this.datePicker2.show()
+       },
+      selectHandle2(date, selectedVal, selectedText) {
+        //this.time2 = selectedVal.join('/')
+         let self = this;
+         if(this.time1==''){
+           alert('请选择开始时间');
+           return false;
+         }
+         this.time2 = selectedText.join('-');
+         if(this.time1!=''&& new Date(selectedText.join('-')).getTime()<new Date(self.time1).getTime()){
+           let temp = this.time2;
+           this.time2 = this.time1;
+           this.time1 = temp;
+
+
+         }else if(this.time1!=''&& new Date(selectedText.join('-')).getTime()==new Date(self.time1).getTime()){
+           alert('不能选相同的时间');
+           this.time2 = '';
+         }else{
+
+
+         }
+       },
+      cancelHandle2() {
 
       },
-      cancelHandle() {
-       alert(2)
-      }
+      getStaffName(){//获取员工名字
+        let self = this;
+        this.axios.get(Api.staffApi+'/business/selectStaffAll', {
+        		headers: {
+        			'Content-Type': 'application/x-www-form-urlencoded'
+        		}
+        	}).then(function(res) {
+             if(res.data.code == 1){
+                console.log(res.data.data)
+                res.data.data.forEach((e)=>{
+                  self.staffNameList.push({
+                    value:e.id,
+                    text:e.name
+                  })
+                })
+
+             }else{
+               alert(res.data.msg)
+             }
+        	})
+      },
+
     }
   }
 </script>

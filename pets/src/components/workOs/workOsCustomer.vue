@@ -12,7 +12,7 @@
 				<div class="region flex_r_f_s">
 					<div class="sheng flex_r_s_b" @click="showAddressPicker" v-for="item in cityData">
 						<span>{{item}}</span>
-						
+
 						<i class="cube-select-icon"></i>
 					</div>
 				</div>
@@ -20,7 +20,7 @@
 					<cube-select v-model="environmenVal" :options="storeEnvironmen" placeholder="店铺环境" @change="getCustomer"></cube-select>
 					<cube-select v-model="typeVal" :options="customerType" placeholder="客户类型" @change="getCustomer"></cube-select>
 					<cube-select v-model="projectTypeVal" :options="projectData" placeholder="产品类型" @change="getCustomer"></cube-select>
-					
+
 				</div>
 				<div class="customerTypeBox flex_r_f_s" v-if="parentId==0">
 					<cube-select v-model="staffVal" :options="staffData" placeholder="员工" @change="getCustomer"></cube-select>
@@ -40,7 +40,7 @@
 				<router-link class="active" :to="{name:'workOsCustomer'}">信息列表</router-link>
 				<router-link :to="{name:'workOsMap'}">地图详情</router-link>
 			</div>
-			
+
 		</div>
 		<div class="workOsCustomer_cnt" v-if="customerList.length>0">
 			<cube-scroll ref="scroll" :options="options"  @pulling-up="onPullingUp" @pulling-down="onPullingDown">
@@ -48,7 +48,7 @@
 				<li v-for="item in customerList">
 					<div class="storeName">
 						<!-- <a href="###"><img src="../../assets/ali-ed
-						
+
 						it.png" alt=""></a> -->
 						<router-link class="flex_r_f_s" :to="{name:'editCustomer',params:{
 							cityData:[item.province,item.city,item.area],
@@ -85,7 +85,7 @@
 							<a style="background: #0093dd;"  v-if="item.clientTypeName=='重点客户'" :href="'https://uri.amap.com/marker?position='+item.longitude+','+item.latitude+'&name='+item.address">
 								重点客户
 							</a>
-							<a style="background: #85c324;" v-if="item.clientTypeName=='优质客户'" :href="'https://uri.amap.com/marker?position='+item.longitude+','+item.latitude+'&name='+item.address"> 
+							<a style="background: #85c324;" v-if="item.clientTypeName=='优质客户'" :href="'https://uri.amap.com/marker?position='+item.longitude+','+item.latitude+'&name='+item.address">
 								优质客户
 							</a>
 							<a style="background: #ef9b48;" v-if="item.clientTypeName=='一般客户'" :href="'https://uri.amap.com/marker?position='+item.longitude+','+item.latitude+'&name='+item.address">
@@ -97,14 +97,14 @@
 							<a style="background: #aba9a9;" v-if="item.clientTypeName=='无效客户'" :href="'https://uri.amap.com/marker?position='+item.longitude+','+item.latitude+'&name='+item.address">
 								无效客户
 							</a>
-							
+
 						</div>
 					</div>
 					<div class="pdtext">产品类型:<span v-for="pItem in item.clientPTypeNames">{{pItem}}</span></div>
 					<div class="remark" v-if="item.remark!=''">客户备注:{{item.remark}}</div>
 					<div class="personCharge">负责人:{{item.businessName}}</div>
 				</li>
-					
+
 			</ul>
 			</cube-scroll>
 		</div>
@@ -156,21 +156,21 @@
 							more: '加载更多', noMore: '没有更多数据了',
 						},
 						threshold:40,
-						
+
 					}
 				},
 				parentId:'1',
-				
+
 			}
 		},
 		mounted() {
 			// console.log(JSON.parse(localStorage.getItem('staff'))==null)
 			if(JSON.parse(localStorage.getItem('staff'))== null){
-				
+
 				this.$router.push({
 					name:'workOsLogin'
 				})
-				
+
 			}else{
 				console.log(JSON.parse(localStorage.getItem('staff')))
 				this.addressPicker = this.$createCascadePicker({
@@ -192,7 +192,7 @@
 				this.getType();
 				this.getStaff();
 			}
-			
+
 			// console.log(JSON.parse(sessionStorage.getItem('staff')))
 		},
 		methods: {
@@ -213,14 +213,14 @@
 				}).then((res)=>{
 					if(res.data.code == 1){
 						// self.storeEnvironmen = res.data.data;
-						
+
 						res.data.data.forEach((e)=>{
 							self.staffData.push({
 								value:e.id,
 								text:e.name
 							})
 						})
-						
+
 					}else{
 						alert(res.data.msg);
 					}
@@ -229,7 +229,7 @@
 			getCondition(){
 				let self = this;
 				this.axios.post(Api.staffApi + '/business/selectBShopsConditionAll', this.qs.stringify({
-					
+
 				}), {
 					headers: {
 						'Content-Type': 'application/x-www-form-urlencoded'
@@ -237,7 +237,7 @@
 				}).then((res)=>{
 					if(res.data.code == 1){
 						// self.storeEnvironmen = res.data.data;
-						
+
 						res.data.data.forEach((e)=>{
 							self.storeEnvironmen.push({
 								value:e.conditionId,
@@ -252,7 +252,7 @@
 			getType(){
 				let self = this;
 				this.axios.post(Api.staffApi + '/business/selectBShopsTypeAll', this.qs.stringify({
-					
+
 				}), {
 					headers: {
 						'Content-Type': 'application/x-www-form-urlencoded'
@@ -275,7 +275,7 @@
 			getProjectType(){
 				let self = this;
 				this.axios.post(Api.staffApi + '/business/selectBClientPTypeAll', this.qs.stringify({
-					
+
 				}), {
 					headers: {
 						'Content-Type': 'application/x-www-form-urlencoded'
@@ -312,7 +312,7 @@
 				if(this.cityData[2] == '市辖区'){
 					this.qu = '';
 				}
-			
+
 				this.axios.post(Api.staffApi + '/business/selectBClientInfo', this.qs.stringify({
 					businessId:self.staffVal,
 					province:self.sheng,
@@ -334,8 +334,8 @@
 						self.customerList = res.data.data.bClientVos;
 						self.bcNum = res.data.data.bcNum;
 						setTimeout(() => {
-							this.$refs.scroll.refresh();
-							this.$refs.scroll.forceUpdate();
+							self.$refs.scroll.refresh();
+							self.$refs.scroll.forceUpdate();
 						}, 1000)
 					} else {
 						alert(res.data.msg)
@@ -350,14 +350,14 @@
 				this.getCustomer();
 			},
 			cancelHandle() {
-				
+
 			},
 			onPullingDown() {
 				// 模拟更新数据
-			
+
 				this.page = 0;
 				this.getCustomer();
-			
+
 			},
 			onPullingUp() {
 				let self = this;
@@ -393,9 +393,9 @@
 					}
 				}).then((res) => {
 					if (res.data.code == 1) {
-			
+
 						if (res.data.data.bClientVos.length > 0) {
-			
+
 							setTimeout(() => {
 								res.data.data.bClientVos.forEach((e) => {
 									self.customerList.push(e)
@@ -407,12 +407,12 @@
 								}, 100)
 							}, 500)
 						} else {
-			
+
 							setTimeout(() => {
 								self.$refs.scroll.forceUpdate();
 							}, 500)
 						}
-			
+
 					} else {
 						alert(res.data.msg);
 						setTimeout(() => {
@@ -450,7 +450,7 @@
 					right: 20px;
 					top: 50%;
 					margin-top: -21px;
-				
+
 					img {
 						width: 40px;
 						height: 40px;
@@ -507,7 +507,7 @@
 
 				.customerType {
 					padding-top: 20px;
-					
+
 					.cube-select {
 						padding-top: 3px;
 						padding-bottom: 3px;
@@ -591,7 +591,7 @@
 			left: 0;
 			right: 0;
 			padding: 0 20px;
-			
+
 			.listInfo{
 				&>li{
 					padding-top: 30px;
@@ -599,7 +599,7 @@
 						font-size: 34px;
 						font-weight: bold;
 						color: #333;
-						a{	
+						a{
 							color: #333;
 							img{
 								width: 40px;
@@ -642,7 +642,7 @@
 							}
 						}
 					}
-				
+
 					.pdtext{
 						padding-top: 20px;
 						color: #999;

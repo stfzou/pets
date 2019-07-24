@@ -9,14 +9,14 @@
 				<li class="flex_r_f_s">
 					<div class="list_l"><b>*</b>拜访对象:</div>
 					<div class="list_r">
-             <cube-select v-model="staffName" title="选择员工" :options="nameOpt" @change="nameChange"> </cube-select>
+             <cube-select v-model="storeVal" title="选择拜访对象" :options="staffNameList" @change="nameChange"> </cube-select>
 					</div>
 				</li>
 
 				<li class="flex_r_f_s">
 					<div class="list_l"><b>*</b>签到地点:</div>
 					<div class="list_r">
-						<div class="addr">大数据时代加粉的时间放假第三方接口都是富家女的司法鉴定所</div>
+						<div class="addr">{{addr}}</div>
 					</div>
 				</li>
 
@@ -96,7 +96,8 @@
 					</div>
 				</li>
 			</ul>
-			<div class="confirmBtn flex_r_s_c" @click="addCustomer">提交</div>
+			<div class="confirmBtn flex_r_s_c" @click="commit">提交</div>
+
 		</div>
 
 
@@ -112,19 +113,18 @@
 			let self = this;
 			return{
 				isCommit:false,
-        nameOpt: [1, 2, 3, 4, 5, 6],
+        addr:'',
 				remark:'',
+        staffNameList:[],
+        storeVal:'',//选择店铺的值
 				isMark:true,
 				lng:'',
 				lat:'',
-				staffName:'',//员工名字
-				addr:'',
 				//图片上传
 				action: {
 					target:Api.staffApi+'/business/updateImg',
 					prop: 'base64Value',
 					max:1
-
 				},
 				center:[0,0],
 				plugin: [{
@@ -144,7 +144,9 @@
 							self.lng = result.position.lng;
 							self.lat = result.position.lat;
 							self.center = [self.lng, self.lat];
-
+              // alert(JSON.parse(result));
+              // alert(result)
+              self.addr = result.formattedAddress;
 							// self.$nextTick();
 						  }
 						});
@@ -159,7 +161,10 @@
 							  self.lat = res.position.lat;
 							  self.center = [self.lng, self.lat];
 						 },200)
-					  }
+					  },
+            error(){
+              alert('定位失败，请刷新页面重新定位')
+            }
 					}
 				 }],
 				markers:{
@@ -181,21 +186,19 @@
 			}
 		},
 		mounted() {
-// 			if(JSON.parse(localStorage.getItem('staff'))== null){
-//
-// 				this.$router.push({
-// 					name:'workOsLogin'
-// 				})
-//
-// 			}else{
-//
-// 				let upLoad = document.querySelectorAll(".uploadBox input");
-// 				upLoad.forEach((e)=>{
-// 					e.setAttribute("capture","camera");
-// 				})
-// 			}
+			if(JSON.parse(localStorage.getItem('staff'))== null){
 
+				this.$router.push({
+					name:'workOsLogin'
+				})
 
+			}else{
+				let upLoad = document.querySelectorAll(".uploadBox input");
+				upLoad.forEach((e)=>{
+					e.setAttribute("capture","camera");
+				});
+        this.getStaffName();
+			}
 		},
 		methods:{
 			back(){
@@ -208,19 +211,85 @@
 				imgs: [this[img]]
 			  }).show()
 			},
+      commit(){
+         let self = this;
+        if(this.storeVal == ''){
+          self.erroTost('请选择拜访对象')
+        }else if(this.addr == ''){
+          self.erroTost('定位失败，请刷新页面重新定位')
+        }else if(this.imgOne == ''){
+          self.erroTost('请上传门头照片')
+        }else if(this.imgTwo == ''||this.imgThree==''){
+          self.erroTost('请上传陈列照片')
+        }else{
+          self.axios.post(Api.staffApi + '/visit/addVisit', this.qs.stringify({
+            clientId:self.storeVal,
+            staffId:JSON.parse(localStorage.getItem('staff')).staffId,
+            currentAddr:self.addr,
+            remark:self.remark,
+            gateImg:self.imgOne,
+            displayImgOne:self.imgTwo,
+            displayImgTwo:self.imgThree,
+            latitude:self.lat,
+            longitude:self.lng,
+          }), {
+          	headers: {
+          		'Content-Type': 'application/x-www-form-urlencoded'
+          	}
+          }).then((res)=>{
+            if(res.data.code == 1){
+              setTimeout(()=>{
+              	let toast = this.$createToast({
+              		txt: '添加成功',
+              		type: 'correct'
+              	  })
+              	toast.show();
+                self.$router.push({
+                  name:'visitRecords'
+                })
+              },500)
 
+            }else{
+              alert(res.data.msg)
+            }
+
+          })
+
+        }
+      },
+      erroTost(str){
+        let toast = this.$createToast({
+        	txt:str,
+        	type: 'error'
+          })
+        toast.show()
+        return false;
+      },
+      getStaffName(){//获取拜访客户名字
+        let self = this;
+        self.axios.post(Api.staffApi + '/visit/selectCompetenceBClient', this.qs.stringify({
+          staffId:JSON.parse(localStorage.getItem('staff')).staffId
+        }), {
+        	headers: {
+        		'Content-Type': 'application/x-www-form-urlencoded'
+        	}
+        }).then((res)=>{
+          if(res.data.code==1){
+            res.data.data.forEach((e)=>{
+              self.staffNameList.push({
+                value:e.clientId,
+                text:e.shopName
+              })
+            })
+          }else{
+            alert(res.data.msg)
+          }
+        })
+       },
 			addCustomer(){
 				let self = this;
 			},
-			showAddressPicker() {
-				this.addressPicker.show()
-			},
-			selectHandle(selectedVal, selectedIndex, selectedText) {
-				this.cityData = selectedText
-			},
-			cancelHandle() {
 
-			},
       nameChange() {
 
       },
@@ -365,9 +434,10 @@
 					font-size: 26px;
 				}
         .addr{
-          padding-left: 20px;
+
           line-height: 30px;
           color: #999;
+          font-size: 22px;
         }
         .cube-select{
           width: 200px;

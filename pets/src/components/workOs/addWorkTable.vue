@@ -8,28 +8,37 @@
      <ul>
        <li class="list1">
          <h3>本周工作总结:</h3>
-         <textarea v-model="val"></textarea>
+         <textarea id="summaryRef" v-model="summary" ref="summaryRef"></textarea>
        </li>
        <li>
          <h3>下周工作安排:</h3>
-         <textarea v-model="val"></textarea>
+         <textarea v-model="arrange" ref="arrangeRef"></textarea>
        </li>
        <li>
          <h3>需协助工作内容及建议:</h3>
-         <textarea v-model="val"></textarea>
+         <textarea v-model="proposal" ref="proposalRef"></textarea>
        </li>
      </ul>
    </div>
-   <div class="cmiBtn">提交</div>
+   <div class="cmiBtn" @click="commit">提交</div>
   </div>
 </template>
 
 <script>
+  import Api from '../common/apj.js'
   export default{
     data(){
       return{
-        val:''
+        summary:'',//总结
+        arrange:'',//安排
+        proposal:'',//建议
       }
+    },
+    mounted() {
+
+      // let t1 = new Date(2019,7,22).getTime();
+      // let t2 = new Date(2019,7,30).getTime();
+
     },
     methods:{
       back(){
@@ -37,6 +46,59 @@
       		name:'workOsInfoList'
       	});
       },
+      erroTost(str){
+        let toast = this.$createToast({
+        	txt:str,
+        	type: 'error'
+          })
+        toast.show()
+        return false;
+      },
+      replaceText(val) {
+        var v = val.replace(/\r/g, '');
+        if (v != '') {
+            v = '<p>' + v.replace(/\n*$/g, '').replace(/\n/g, '</p><p>') + '</p>';
+            // alert(v)
+            console.log(v)
+            return v
+        }
+      },
+      commit(){
+        let self = this;
+        if(self.summary == ''){
+          self.erroTost('请填写本周总结')
+        }else if(self.arrange == ''){
+          self.erroTost('请填写下周安排')
+        }else if(self.proposal == ''){
+          self.erroTost('请填写协助工作内容或建议')
+        }else{
+          let summaryHtml = self.replaceText(self.summary)
+          let arrangeHtml = self.replaceText(self.arrange)
+          let proposalHtml = self.replaceText(self.proposal)
+          self.axios.post(Api.staffApi + '/workReport/addWorkReport', this.qs.stringify({
+          	staffId:JSON.parse(localStorage.getItem('staff')).staffId,
+            thisWeekContent:summaryHtml,
+            nextWeekContent:arrangeHtml,
+            suggest:proposalHtml
+          }), {
+          	headers: {
+          		'Content-Type': 'application/x-www-form-urlencoded'
+          	}
+          }).then((res)=>{
+            if(res.data.code==1){
+              setTimeout(()=>{
+              	let toast = this.$createToast({
+              		txt: '添加成功',
+              		type: 'correct'
+              	  })
+              	toast.show();
+              },500)
+            }else{
+              alert(res.data.msg)
+            }
+          })
+        }
+      }
     }
   }
 </script>
