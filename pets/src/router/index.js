@@ -49,6 +49,7 @@ import StaffInfo from '@/components/workOs/staffInfo'
 import AddStaff from '@/components/workOs/addStaff'
 import EditStaff from '@/components/workOs/editStaff'
 import VisitRecords from '@/components/workOs/visitRecords'
+import ShopNameVisit from '@/components/workOs/shopNameVisit'
 import AddVisitInfo from '@/components/workOs/addVisitInfo'
 import VisitInfoList from '@/components/workOs/visitInfoList'
 import WorkTable from '@/components/workOs/workTable'
@@ -125,6 +126,11 @@ export default new Router({
       path:'/visitRecords',
       name:'visitRecords',
       component:VisitRecords,
+    },
+    {
+      path:'/shopNameVisit',
+      name:'shopNameVisit',
+      component:ShopNameVisit,
     },
     {
       path:'/addVisitInfo',

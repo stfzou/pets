@@ -103,6 +103,7 @@
 					<div class="pdtext">产品类型:<span v-for="pItem in item.clientPTypeNames">{{pItem}}</span></div>
 					<div class="remark" v-if="item.remark!=''">客户备注:{{item.remark}}</div>
 					<div class="personCharge">负责人:{{item.businessName}}</div>
+          <div class="visit">共{{item.visitNum}}条拜访记录 <span v-if="item.visitNum>0">最近{{item.newVisitTime}}更新</span><b @click="visitLink(item)">>></b></div>
 				</li>
 
 			</ul>
@@ -201,6 +202,18 @@
 					name:'workOsInfoList'
 				});
 			},
+      visitLink(item){
+        this.$router.push({
+          name:'shopNameVisit',
+          query:{
+            visitInfo:{
+              shopId:item.clientId,
+              shopName:item.shopName
+            }
+          }
+
+        })
+      },
 			getStaff(){
 				let self = this;
 				this.axios.post(Api.staffApi + '/business/selectBusinessStaffAll', this.qs.stringify({
@@ -661,9 +674,17 @@
 						color: #999;
 						font-size: 24px;
 						padding-top: 20px;
-						border-bottom: 1px dashed #e8e8e8;
-						padding-bottom: 20px;
+
 					}
+          .visit{
+            border-bottom: 1px dashed #e8e8e8;
+            padding: 20px 0;
+            font-size: 26px;
+            color: #000;
+            b{
+              margin-left: 50px;
+            }
+          }
 				}
 			}
 		}

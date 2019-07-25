@@ -18,7 +18,14 @@
 					<div>修改登录密码</div>
 					<img src="../../../../kugou/src/assets/images/arrow_icon.png" alt="">
 				</li>
-				
+				<li class="flex_r_s_b" @click="visitLink">
+					<div>拜访记录</div>
+					<img src="../../../../kugou/src/assets/images/arrow_icon.png" alt="">
+				</li>
+        <li class="flex_r_s_b" @click="workTableLink">
+        	<div>工作报表</div>
+        	<img src="../../../../kugou/src/assets/images/arrow_icon.png" alt="">
+        </li>
 			</ul>
 			<div class="quit" @click="quit">退出登录</div>
 		</div>
@@ -38,13 +45,13 @@
 			}
 		},
 		mounted() {
-			
+
 			if(JSON.parse(localStorage.getItem('staff'))== null){
-				
+
 				this.$router.push({
 					name:'workOsLogin'
 				})
-				
+
 			}else{
 				this.staffId = JSON.parse(localStorage.getItem('staff')).staffId;
 				this.parentId = JSON.parse(localStorage.getItem('staff')).parentId;
@@ -85,6 +92,16 @@
 					name:'staffInfo'
 				})
 			},
+      visitLink(){
+        this.$router.push({
+        	name:'visitRecords'
+        })
+      },
+      workTableLink(){
+        this.$router.push({
+        	name:'workTable'
+        })
+      },
 			getCustomer(){
 				let self = this;
 				this.axios.post(Api.staffApi + '/business/selectBClientInfo', this.qs.stringify({
@@ -104,16 +121,16 @@
 					}
 				}).then((res) => {
 					if (res.data.code == 1) {
-						
-						
+
+
 						self.clientNum = res.data.data.bcNum;
-						
+
 					} else {
 						alert(res.data.msg)
 					}
 				})
 			},
-			
+
 		}
 	}
 </script>
@@ -159,7 +176,7 @@
 						color: #ff523d;
 					}
 				}
-				
+
 			}
 			.quit{
 				font-size: 26px;

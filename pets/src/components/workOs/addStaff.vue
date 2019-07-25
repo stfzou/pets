@@ -39,12 +39,13 @@
         <li class="flex_r_f_s">
         	<div class="list_l"><b>*</b>查看权限:</div>
         	<div class="list_r selelct">
-        		  <el-select v-model="value1" multiple placeholder="请选择">
+        		  <el-select v-model="nameVal" multiple placeholder="请选择">
                 <el-option
                   v-for="item in nameOpt"
                   :key="item.value"
                   :label="item.label"
-                  :value="item.value">
+                  :value="item.value"
+                  >
                 </el-option>
               </el-select>
 
@@ -75,9 +76,9 @@
 				phone:'',
 				reg: /^1[3456789]\d{9}$/,
 				loading:false,
-        value1:'',
+        nameVal:[],
         value:'',
-        nameOpt: [{label:'选择1',value:1},{label:'选择2',value:2},{label:'选择3',value:3},{label:'选择4',value:4},{label:'选择5',value:5},],
+        nameOpt: [],
 			}
 		},
 		mounted() {
@@ -87,7 +88,7 @@
 				onSelect: this.selectHandle,
 				onCancel: this.cancelHandle
 			});
-
+      this.getNameList();
 		},
 		methods:{
 			back(){
@@ -105,6 +106,31 @@
 			cancelHandle() {
 
 			},
+      nameChange(val){
+        console.log(this.nameVal.join(','))
+
+      },
+      getNameList(){
+        let self = this;
+         this.axios.get(Api.staffApi+'/business/selectStaffAll',{
+        		headers: {
+        			'Content-Type': 'application/x-www-form-urlencoded'
+        		}
+        	}).then(function(res) {
+             if(res.data.code == 1){
+                console.log(res.data.data)
+                res.data.data.forEach((e)=>{
+                  self.nameOpt.push({
+                    value:e.id,
+                    label:e.name
+                  })
+                })
+
+             }else{
+               alert(res.data.msg)
+             }
+        	})
+      },
 			addStaff(){
 				let self = this;
 				if(this.staffName == ''){
@@ -153,6 +179,7 @@
 						province:this.cityData[0],
 						city:this.cityData[1],
 						area:this.cityData[2],
+            viewCompetence:this.nameVal.join(','),
 						parentId:JSON.parse(localStorage.getItem('staff')).staffId
 					}), {
 						headers: {

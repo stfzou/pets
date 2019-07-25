@@ -4,7 +4,7 @@
         <div class="login_nav">
           <div class="back" @click="back"></div>
           <div class="title">工作报表</div>
-          <router-link class="addStaffData" :to="{name:'addCustomer'}">
+          <router-link class="addStaffData" :to="{name:'addWorkTable'}">
             <img src="../../assets/ali-add.png" alt="">
           </router-link>
         </div>
@@ -24,7 +24,7 @@
             </div>
           </div>
         </div>
-         <div class="recordsNum">共查询到{{workTableList.length}}条拜访记录</div>
+         <div class="recordsNum">共查询到{{num}}条工作表</div>
       </div>
       <div class="cntList">
         <cube-scroll ref="scroll" :options="options" @pulling-up="onPullingUp" @pulling-down="onPullingDown">
@@ -47,11 +47,13 @@
   export default{
      data(){
        return{
-          staffNameList:[],
+          staffNameList:[{text:'王保长',value:'1'}],
           staffVal:'',
           workTableList:[],
           page:0,
           isAdmin:'',
+          num:0,
+          viewCompetence:'',
           time1:'',//时间文本值
           time2:'',//时间文本值
           options:{
@@ -80,18 +82,21 @@
 
        	if(JSON.parse(localStorage.getItem('staff')).parentId === 0){
        		this.isAdmin = 1;
+          this.staffVal = -1;
+          this.staffNameList = [{value:-1,text:'全部'}]
+
        	}else{
           this.isAdmin = 0;
           this.staffVal = JSON.parse(localStorage.getItem('staff')).staffId;
-          this.staffNameList.push({
-            value:JSON.parse(localStorage.getItem('staff')).staffId,
-            text:'自己'
-          })
+          this.viewCompetence = JSON.parse(localStorage.getItem('staff')).viewCompetence;
+          console.log(JSON.parse(localStorage.getItem('staff')).viewCompetence)
+          this.staffNameList = [{value:JSON.parse(localStorage.getItem('staff')).staffI,text:'自己'}]
         }
-
+        this.getStaffName();
+        this.getWorkTable();
        }
-       this.getStaffName();
-       this.getWorkTable();
+
+
      },
      methods:{
        back(){
@@ -100,8 +105,8 @@
        	});
        },
        nameChange(){
-          this.getWorkTable();
-
+         // console.log(this.staffNameList)
+        this.getWorkTable();
        },
        showDatePicker() {
          if (!this.datePicker) {
@@ -177,8 +182,11 @@
 
       },
       getStaffName(){//获取员工名字
-         let self = this;
-         this.axios.get(Api.staffApi+'/business/selectStaffAll', {
+       let self = this;
+
+       if(this.isAdmin === 1){
+
+         this.axios.get(Api.staffApi+'/business/selectStaffAll',{
          		headers: {
          			'Content-Type': 'application/x-www-form-urlencoded'
          		}
@@ -196,7 +204,32 @@
                 alert(res.data.msg)
               }
          	})
-       },
+          return false;
+       }else if(this.isAdmin === 0&&this.viewCompetence!=''){
+
+         this.axios.get(Api.staffApi+'/business/selectStaffByCompetence?viewCompetence='+self.viewCompetence,{
+         		headers: {
+         			'Content-Type': 'application/x-www-form-urlencoded'
+         		}
+         	}).then(function(res) {
+              if(res.data.code == 1){
+                 // console.log(res.data.data)
+                 res.data.data.forEach((e)=>{
+                   self.staffNameList.push({
+                     value:e.id,
+                     text:e.name
+                   })
+                 })
+
+              }else{
+                alert(res.data.msg)
+              }
+         	})
+       }else{
+          self.staffNameList = [{value:self.staffVal,text:'自己'}]
+       }
+
+     },
       getWorkTable(){
         let self = this;
         self.axios.post(Api.staffApi + '/workReport/selectWorkReportByCompetence', this.qs.stringify({
@@ -213,6 +246,7 @@
         }).then((res)=>{
           if(res.data.code == 1){
             self.workTableList = res.data.data.list;
+            self.num = res.data.data.num;
             console.log(res.data.data.list)
             setTimeout(() => {
             	self.$refs.scroll.refresh();
@@ -388,18 +422,18 @@
           padding: 15px 0;
           .list_left{
             .userName{
-              font-size:22px;
+              font-size:28px;
               color: #333;
             }
             .time{
-              font-size:22px;
+              font-size:26px;
               color: #333;
               padding-top: 10px;
             }
           }
           .list_right{
             color: #999;
-            font-size: 22px;
+            font-size: 28px;
           }
         }
       }

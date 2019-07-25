@@ -18,7 +18,7 @@
 					<input type="password" v-model="pwd" @blur.prevent="inputLoseFocus" placeholder="请输入您的密码" />
 				</li>
 			</ul>
-			
+
 			<div class="login_btn flex_r_s_c" @click="login"><cube-loading :size="28" v-if="loading"></cube-loading><span v-else>登录</span></div>
 		</div>
 	</div>
@@ -46,14 +46,14 @@
 				  const scrollHeight = document.documentElement.scrollTop || document.body.scrollTop || 0;
 					window.scrollTo(0, Math.max(scrollHeight - 1, 0));
 				},100);
-				
-			},  
+
+			},
 			login() {
 				//注册
 				let self = this;
-				
+
 				if (this.phone == '') {
-			
+
 					let toast = this.$createToast({
 						txt: '手机号不能为空',
 						type: 'error'
@@ -61,7 +61,7 @@
 					toast.show()
 					return false;
 				} else if (!this.reg.test(this.phone)) {
-			
+
 					let toast = this.$createToast({
 						txt: '手机号格式错误',
 						type: 'error'
@@ -69,7 +69,7 @@
 					toast.show()
 					return false;
 				} else if (this.pwd == '') {
-			
+
 					let toast = this.$createToast({
 						txt: '密码不能为空',
 						type: 'error'
@@ -93,7 +93,8 @@
 								staffId:res.data.data.id,
 								parentId:res.data.data.parentId,
 								phone:res.data.data.phone,
-								staffNum:res.data.data.staffNum
+								staffNum:res.data.data.staffNum,
+                viewCompetence:res.data.data.viewCompetence
 							}
 // 							self.$store.commit('setStaffNum',res.data.data.staffNum);
 // 							self.$store.commit('setCustomerNum',res.data.data.clientNum);
@@ -104,10 +105,10 @@
 									name:'workOsInfoList'
 								})
 							},500)
-			
+
 						} else {
 							console.log(res)
-							
+
 							setTimeout(()=>{
 								self.loading = false;
 							},500)
@@ -117,7 +118,7 @@
 							  })
 							toast.show();
 						}
-			
+
 					}).catch(function(err) {
 						let toast = self.$createToast({
 							txt:err,
@@ -127,8 +128,8 @@
 						self.loading = false;
 						// console.log(err)
 					})
-			
-			
+
+
 				}
 			},
 		},
@@ -171,7 +172,7 @@
 			img{
 				width: 152px;
 			}
-		
+
 		}
 		.form_cnt{
 			padding: 0 74px;
@@ -192,7 +193,7 @@
 						color: #fff;
 						// background: #FF523D;
 					}
-					
+
 					input::-webkit-input-placeholder {
 			         /* placeholder颜色  */
 						color: #fff;

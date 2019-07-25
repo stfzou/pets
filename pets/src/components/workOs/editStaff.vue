@@ -39,7 +39,7 @@
          <li class="flex_r_f_s">
         	<div class="list_l"><b>*</b>查看权限:</div>
         	<div class="list_r selelct">
-        		  <el-select v-model="value1" multiple placeholder="请选择">
+        		  <el-select v-model="nameVal" multiple placeholder="请选择">
                 <el-option
                   v-for="item in nameOpt"
                   :key="item.value"
@@ -76,8 +76,8 @@
 				reg: /^1[3456789]\d{9}$/,
 				loading:false,
 				staffId:'',
-        value1:'',
-        nameOpt: [{label:'选择1',value:1},{label:'选择2',value:2},{label:'选择3',value:3},{label:'选择4',value:4},{label:'选择5',value:5},],
+        nameVal:[],
+        nameOpt: [],
 			}
 		},
 		mounted() {
@@ -87,8 +87,14 @@
 				onSelect: this.selectHandle,
 				onCancel: this.cancelHandle
 			});
-			this.getEditStaff();
+      this.getNameList();
+
 		},
+    watch:{
+      nameOpt(val){
+        this.getEditStaff();
+      }
+    },
 		methods:{
 			back(){
 				this.$router.push({
@@ -96,12 +102,20 @@
 				});
 			},
 			getEditStaff(){
-				let editStaffInfo = this.$route.query.editStaff;
-				this.staffName = editStaffInfo.name;
-				this.pwd = editStaffInfo.password;
-				this.phone = editStaffInfo.phone;
-				this.cityData = [editStaffInfo.province,editStaffInfo.city,editStaffInfo.area];
-				this.staffId = editStaffInfo.id
+        let self = this;
+				let editStaffInfo = self.$route.query.editStaff;
+				self.staffName = editStaffInfo.name;
+				self.pwd = editStaffInfo.password;
+				self.phone = editStaffInfo.phone;
+				self.cityData = [editStaffInfo.province,editStaffInfo.city,editStaffInfo.area];
+				self.staffId = editStaffInfo.id;
+        // self.nameVal = editStaffInfo.viewCompetence.split(',');
+
+        if(editStaffInfo.viewCompetence!=''){
+          editStaffInfo.viewCompetence.split(',').forEach((e)=>{
+            self.nameVal.push(parseInt(e))
+          });
+        }
 			},
 			showAddressPicker() {
 				this.addressPicker.show()
@@ -113,6 +127,27 @@
 			cancelHandle() {
 
 			},
+      getNameList(){
+        let self = this;
+         this.axios.get(Api.staffApi+'/business/selectStaffAll',{
+        		headers: {
+        			'Content-Type': 'application/x-www-form-urlencoded'
+        		}
+        	}).then(function(res) {
+             if(res.data.code == 1){
+                console.log(res.data.data)
+                res.data.data.forEach((e)=>{
+                  self.nameOpt.push({
+                    value:e.id,
+                    label:e.name
+                  })
+                })
+
+             }else{
+               alert(res.data.msg)
+             }
+        	})
+      },
 			addStaff(){
 				let self = this;
 				if(this.staffName == ''){
@@ -161,6 +196,7 @@
 						area:this.cityData[2],
 						city:this.cityData[1],
 						province:this.cityData[0],
+            viewCompetence:this.nameVal.join(','),
 						id:this.staffId
 					}), {
 						headers: {

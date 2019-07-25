@@ -1,19 +1,19 @@
 <template>
-  <div class="visitRecords">
+  <div class="shopNameVisit">
     <div class="cntTop">
       <div class="login_nav">
         <div class="back" @click="back"></div>
-        <div class="title">拜访记录</div>
-        <router-link class="addStaffData" :to="{name:'addVisitInfo'}">
+        <div class="title">{{shopName}}拜访记录</div>
+        <router-link class="addStaffData" :to="{name:'addCustomer'}">
           <img src="../../assets/ali-add.png" alt="">
         </router-link>
       </div>
       <div class="nameAndTime flex_r_s_b">
-        <div class="name_l flex_r_f_s">
+        <!-- <div class="name_l flex_r_f_s">
           <p>姓名:</p>
           <cube-select v-model="staffVal" title="选择员工" :options="staffNameList" @change="nameChange">
           </cube-select>
-        </div>
+        </div> -->
 
         <div class="name_r flex_r_s_b">
           <p>时间:</p>
@@ -24,14 +24,14 @@
           </div>
         </div>
       </div>
-      <div class="search_box">
+     <!-- <div class="search_box">
       	<div class="search flex_r_s_b">
       		<input type="text" placeholder="输入你要查询的店铺名字" v-model="shopName">
       		<div class="sIcon flex_r_s_c" @click="search">
       			<img src="../../assets/ali-sousuo.png" alt="">
       		</div>
       	</div>
-      </div>
+      </div> -->
       <div class="recordsNum">共查询到{{totalNum}}条拜访记录</div>
      <!-- <div class="dataNum">2019/7/19共<span>7</span>条拜访记录</div> -->
     </div>
@@ -76,6 +76,7 @@
         time1:'',
         time2:'',
         page:0,
+        clientId:'',
         viewCompetence:'',//权限
         staffNameList:[],
         options:{
@@ -102,20 +103,9 @@
 
       }else{
 
-      	if(JSON.parse(localStorage.getItem('staff')).parentId === 0){
-      		this.isAdmin = 1;
-          this.staffVal = -1;
-          this.staffNameList.push({
-            value:'-1',
-            text:'全部'
-          })
-      	}else{
-         this.isAdmin = 0;
-         this.staffVal = JSON.parse(localStorage.getItem('staff')).staffId;
-         this.viewCompetence = JSON.parse(localStorage.getItem('staff')).viewCompetence;
-
-       }
-        this.getStaffName();
+        this.clientId = this.$route.query.visitInfo.shopId;
+        this.shopName = this.$route.query.visitInfo.shopName;
+        console.log(this.$route.query)
         this.getList();
       }
 
@@ -231,7 +221,7 @@
                  alert(res.data.msg)
                }
           	})
-        }else if(this.isAdmin === 0&&this.viewCompetence!=''){
+        }else if(this.isAdmin === 0){
 
           this.axios.get(Api.staffApi+'/business/selectStaffByCompetence?viewCompetence='+self.viewCompetence,{
           		headers: {
@@ -251,16 +241,13 @@
                  alert(res.data.msg)
                }
           	})
-        }else{
-          self.staffNameList = [{value:self.staffVal,text:'自己'}]
         }
 
       },
       getList(){//获取拜访记录
         let self = this;
-        self.axios.post(Api.staffApi + '/visit/selectVisitByCompetence', this.qs.stringify({
-          isAdmin:self.isAdmin,
-          staffIds:self.staffVal,
+        self.axios.post(Api.staffApi + '/visit/selectClientVisit', this.qs.stringify({
+          clientId:self.clientId,
           startTime:self.time1,
           endTime:self.time2,
           shopName:self.shopName,
@@ -279,7 +266,7 @@
             setTimeout(() => {
               self.visitList = res.data.data.list;
               self.totalNum = res.data.data.num;
-              console.log(res.data.data)
+              console.log(res.data)
             	self.$refs.scroll.refresh();
             }, 500);
           }else{
@@ -294,9 +281,8 @@
       onPullingUp(){
         let self = this;
         this.page++;
-        self.axios.post(Api.staffApi + '/visit/selectVisitByCompetence', this.qs.stringify({
-        	isAdmin:self.isAdmin,
-        	staffIds:self.staffVal,
+        self.axios.post(Api.staffApi + '/visit/selectClientVisit', this.qs.stringify({
+        	clientId:self.clientId,
         	startTime:self.time1,
         	endTime:self.time2,
         	shopName:self.shopName,
@@ -310,7 +296,7 @@
           if(res.data.code == 1){
             // self.workTableList = res.data.data.list;
             if(res.data.data.list.length>0){
-
+              console.log(res.data.data.list)
               setTimeout(() => {
 
               	self.$refs.scroll.forceUpdate();
@@ -340,12 +326,11 @@
 </script>
 
 <style lang="scss">
-  .visitRecords {
+  .shopNameVisit {
     height: 100%;
     position: relative;
-
     .cntTop {
-      height: 360px;
+      height: 260px;
       .login_nav {
         height: 42px;
         padding: 22px 0;
@@ -378,8 +363,8 @@
         }
 
         .title {
-          font-size: 30px;
-          color: #333;
+          font-size: 26px;
+          color: #ff523d;
           line-height: 42px;
           text-align: center;
 
@@ -472,7 +457,7 @@
     .cntList{
       position: absolute;
       left: 0;
-      top: 360px;
+      top: 260px;
       right: 0;
       bottom: 0;
       ul{
