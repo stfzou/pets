@@ -42,9 +42,7 @@
     },
     methods:{
       back(){
-      	this.$router.push({
-      		name:'workOsInfoList'
-      	});
+      	 this.$router.go(-1)
       },
     }
   }

@@ -4,7 +4,7 @@
       <div class="login_nav">
         <div class="back" @click="back"></div>
         <div class="title">{{shopName}}拜访记录</div>
-        <router-link class="addStaffData" :to="{name:'addCustomer'}">
+        <router-link class="addStaffData" :to="{name:'addVisitInfo'}">
           <img src="../../assets/ali-add.png" alt="">
         </router-link>
       </div>
@@ -116,9 +116,10 @@
         this.getList();
       },
       back() {
-        this.$router.push({
-          name: 'workOsInfoList'
-        });
+        // this.$router.push({
+        //   name: 'workOsInfoList'
+        // });
+        this.$router.go(-1)
       },
       showDatePicker() {
          if (!this.datePicker) {
@@ -246,12 +247,13 @@
       },
       getList(){//获取拜访记录
         let self = this;
+        self.page = 0;
         self.axios.post(Api.staffApi + '/visit/selectClientVisit', this.qs.stringify({
           clientId:self.clientId,
           startTime:self.time1,
           endTime:self.time2,
           shopName:self.shopName,
-          pageNo:0,
+          pageNo:self.page,
           pageSize:1
         }), {
           headers: {
@@ -259,15 +261,15 @@
           }
         }).then((res)=>{
           if(res.data.code==1){
-            setTimeout(() => {
-            	self.$refs.scroll.refresh();
-            	self.$refs.scroll.forceUpdate();
-            }, 300);
+
             setTimeout(() => {
               self.visitList = res.data.data.list;
               self.totalNum = res.data.data.num;
-              console.log(res.data)
-            	self.$refs.scroll.refresh();
+              self.$refs.scroll.forceUpdate();
+               setTimeout(() => {
+              	self.$refs.scroll.refresh();
+
+              }, 100);
             }, 500);
           }else{
             alert(res.data.msg)
@@ -275,7 +277,7 @@
         })
       },
       onPullingDown(){
-        this.page = 0;
+
         this.getList();
       },
       onPullingUp(){
@@ -297,16 +299,14 @@
             // self.workTableList = res.data.data.list;
             if(res.data.data.list.length>0){
               console.log(res.data.data.list)
-              setTimeout(() => {
+              setTimeout(()=>{
+                self.visitList.push(...res.data.data.list)
+                self.$refs.scroll.forceUpdate();
+                setTimeout(()=>{
+                  self.$refs.scroll.refresh()
+                },100)
 
-              	self.$refs.scroll.forceUpdate();
-              	setTimeout(() => {
-                  res.data.data.list.forEach((e)=>{
-                    self.visitList.push(e)
-                  })
-              		self.$refs.scroll.refresh();
-              	}, 500)
-              }, 500)
+              },500)
             }else{
               setTimeout(() => {
               	self.$refs.scroll.forceUpdate();

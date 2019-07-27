@@ -131,6 +131,9 @@ export default new Router({
       path:'/shopNameVisit',
       name:'shopNameVisit',
       component:ShopNameVisit,
+      meta:{
+        keepAlive:true
+      }
     },
     {
       path:'/addVisitInfo',
@@ -146,6 +149,9 @@ export default new Router({
       path:'/workTable',
       name:'workTable',
       component:WorkTable,
+      meta:{
+        keepAlive:true
+      }
     },
     {
       path:'/workTableXq',
@@ -177,6 +183,9 @@ export default new Router({
 			path:'/workOsCustomer',
 			name:'workOsCustomer',
 			component:WorkOsCustomer,
+      meta:{
+        keepAlive:true
+      }
 
 		},
 		{

@@ -94,36 +94,44 @@
       }
     },
     mounted() {
-      if(JSON.parse(localStorage.getItem('staff'))== null){
 
-      	this.$router.push({
-      		name:'workOsLogin'
-      	})
-
-      }else{
-
-      	if(JSON.parse(localStorage.getItem('staff')).parentId === 0){
-      		this.isAdmin = 1;
-          this.staffVal = -1;
-          this.staffNameList.push({
-            value:'-1',
-            text:'全部'
-          })
-      	}else{
-         this.isAdmin = 0;
-         this.staffVal = JSON.parse(localStorage.getItem('staff')).staffId;
-         this.viewCompetence = JSON.parse(localStorage.getItem('staff')).viewCompetence;
-
-       }
-        this.getStaffName();
-        this.getList();
-      }
-
+      this.initial();
 
     },
     methods: {
       nameChange() {
+        // this.page = 0;
         this.getList();
+      },
+      initial(){
+        let self = this;
+        if(JSON.parse(localStorage.getItem('staff'))== null){
+
+        	this.$router.push({
+        		name:'workOsLogin'
+        	})
+
+        }else{
+
+        	if(JSON.parse(localStorage.getItem('staff')).parentId === 0){
+        		this.isAdmin = 1;
+            this.staffVal = -1;
+            this.staffNameList.push({
+              value:'-1',
+              text:'全部'
+            })
+        	}else{
+           this.isAdmin = 0;
+           this.staffVal = JSON.parse(localStorage.getItem('staff')).staffId;
+           this.viewCompetence = JSON.parse(localStorage.getItem('staff')).viewCompetence;
+           this.staffNameList.push({
+              value:self.staffVal,
+              text:'自己'
+           })
+         }
+          this.getStaffName();
+          this.getList();
+        }
       },
       back() {
         this.$router.push({
@@ -258,14 +266,15 @@
       },
       getList(){//获取拜访记录
         let self = this;
+        self.page = 0;
         self.axios.post(Api.staffApi + '/visit/selectVisitByCompetence', this.qs.stringify({
           isAdmin:self.isAdmin,
           staffIds:self.staffVal,
           startTime:self.time1,
           endTime:self.time2,
           shopName:self.shopName,
-          pageNo:0,
-          pageSize:1
+          pageNo:self.page,
+          pageSize:2
         }), {
           headers: {
             'Content-Type': 'application/x-www-form-urlencoded'
@@ -273,14 +282,13 @@
         }).then((res)=>{
           if(res.data.code==1){
             setTimeout(() => {
-            	self.$refs.scroll.refresh();
-            	self.$refs.scroll.forceUpdate();
-            }, 300);
-            setTimeout(() => {
               self.visitList = res.data.data.list;
               self.totalNum = res.data.data.num;
-              console.log(res.data.data)
-            	self.$refs.scroll.refresh();
+              self.$refs.scroll.forceUpdate();
+              setTimeout(()=>{
+                self.$refs.scroll.refresh();
+              },100)
+
             }, 500);
           }else{
             alert(res.data.msg)
@@ -288,8 +296,9 @@
         })
       },
       onPullingDown(){
-        this.page = 0;
+
         this.getList();
+
       },
       onPullingUp(){
         let self = this;
@@ -301,7 +310,7 @@
         	endTime:self.time2,
         	shopName:self.shopName,
         	pageNo:self.page,
-        	pageSize:1
+        	pageSize:2
         }), {
         	headers: {
         		'Content-Type': 'application/x-www-form-urlencoded'
@@ -310,27 +319,26 @@
           if(res.data.code == 1){
             // self.workTableList = res.data.data.list;
             if(res.data.data.list.length>0){
+               setTimeout(()=>{
+                 self.visitList.push(...res.data.data.list)
+                 self.$refs.scroll.forceUpdate();
+                 setTimeout(()=>{
+                   self.$refs.scroll.refresh()
+                 },100)
 
-              setTimeout(() => {
-
-              	self.$refs.scroll.forceUpdate();
-              	setTimeout(() => {
-                  res.data.data.list.forEach((e)=>{
-                    self.visitList.push(e)
-                  })
-              		self.$refs.scroll.refresh();
-              	}, 500)
-              }, 500)
+               },500)
             }else{
               setTimeout(() => {
-              	self.$refs.scroll.forceUpdate();
+                self.$refs.scroll.forceUpdate()
+
               }, 500)
             }
 
           }else{
             alert(res.data.msg)
             setTimeout(() => {
-            	self.$refs.scroll.forceUpdate();
+              self.$refs.scroll.forceUpdate()
+
             }, 500)
           }
         })

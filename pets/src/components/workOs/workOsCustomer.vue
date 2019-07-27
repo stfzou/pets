@@ -344,11 +344,14 @@
 				}).then((res) => {
 					if (res.data.code == 1) {
 						console.log(res)
-						self.customerList = res.data.data.bClientVos;
-						self.bcNum = res.data.data.bcNum;
+
 						setTimeout(() => {
-							self.$refs.scroll.refresh();
+              self.customerList = res.data.data.bClientVos;
+              self.bcNum = res.data.data.bcNum;
 							self.$refs.scroll.forceUpdate();
+              setTimeout(() => {
+              	self.$refs.scroll.refresh();
+              }, 100)
 						}, 1000)
 					} else {
 						alert(res.data.msg)
@@ -410,15 +413,15 @@
 						if (res.data.data.bClientVos.length > 0) {
 
 							setTimeout(() => {
-								res.data.data.bClientVos.forEach((e) => {
-									self.customerList.push(e)
-								});
+                self.customerList.push(...res.data.data.bClientVos)
 								self.bcNum = res.data.data.bcNum;
 								self.$refs.scroll.forceUpdate();
 								setTimeout(() => {
 									self.$refs.scroll.refresh();
 								}, 100)
 							}, 500)
+
+
 						} else {
 
 							setTimeout(() => {

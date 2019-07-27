@@ -86,12 +86,17 @@
           	}
           }).then((res)=>{
             if(res.data.code==1){
+
+              let toast = this.$createToast({
+                txt: '添加成功',
+                type: 'correct'
+                })
+              toast.show();
+
               setTimeout(()=>{
-              	let toast = this.$createToast({
-              		txt: '添加成功',
-              		type: 'correct'
-              	  })
-              	toast.show();
+              	self.$router.push({
+                  name:'workTable'
+                })
               },500)
             }else{
               alert(res.data.msg)
@@ -141,7 +146,8 @@
           width: 100%;
           height: 200px;
           box-sizing: border-box;
-          outline: none;
+          // outline: none;
+          border: 1px solid #e8e8e8;/*no*/
         }
       }
       .list1{

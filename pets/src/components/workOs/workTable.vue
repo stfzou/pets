@@ -232,12 +232,13 @@
      },
       getWorkTable(){
         let self = this;
+        self.page = 0;
         self.axios.post(Api.staffApi + '/workReport/selectWorkReportByCompetence', this.qs.stringify({
         	isAdmin:self.isAdmin,
           staffIds:self.staffVal,
           startTime:self.time1,
           endTime:self.time2,
-          pageNo:0,
+          pageNo:self.page,
           pageSize:1
         }), {
         	headers: {
@@ -245,12 +246,16 @@
         	}
         }).then((res)=>{
           if(res.data.code == 1){
-            self.workTableList = res.data.data.list;
-            self.num = res.data.data.num;
-            console.log(res.data.data.list)
+
+
             setTimeout(() => {
-            	self.$refs.scroll.refresh();
+              self.workTableList = res.data.data.list;
+              self.num = res.data.data.num;
+
             	self.$refs.scroll.forceUpdate();
+              setTimeout(() => {
+              	self.$refs.scroll.refresh();
+              }, 100)
             }, 500)
           }else{
             alert(res.data.msg)
@@ -289,15 +294,14 @@
             if(res.data.data.list.length>0){
 
               setTimeout(() => {
-
+                self.workTableList.push(...res.data.data.list)
               	self.$refs.scroll.forceUpdate();
               	setTimeout(() => {
-                  res.data.data.list.forEach((e)=>{
-                    self.workTableList.push(e)
-                  })
               		self.$refs.scroll.refresh();
-              	}, 500)
+              	}, 100)
               }, 500)
+
+
             }else{
               setTimeout(() => {
               	self.$refs.scroll.forceUpdate();
@@ -378,7 +382,7 @@
           .cube-select{
             width: 150px;
             height: 50px;
-            padding: 5px 10px 5px 20px;
+            padding: 10px 10px 5px 20px;
           }
         }
         .name_r{

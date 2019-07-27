@@ -79,11 +79,14 @@
 				}).then((res) => {
 					if (res.data.code == 1) {
 						console.log(res)
-						self.staffInfo = res.data.data;
+
 						setTimeout(() => {
-							this.$refs.scroll.refresh();
+              self.staffInfo = res.data.data;
 							this.$refs.scroll.forceUpdate();
-						}, 1000)
+              setTimeout(() => {
+              	this.$refs.scroll.refresh();
+              }, 100)
+						}, 500)
 					} else {
 						alert(res.data.msg)
 					}
@@ -113,9 +116,7 @@
 						if (res.data.data.length > 0) {
 
 							setTimeout(() => {
-								res.data.data.forEach((e) => {
-									self.staffInfo.push(e)
-								})
+                self.staffInfo.push(...res.data.data)
 								self.$refs.scroll.forceUpdate();
 								setTimeout(() => {
 									self.$refs.scroll.refresh();
@@ -136,7 +137,7 @@
 					}
 				})
 			},
-			
+
 		}
 	}
 </script>
