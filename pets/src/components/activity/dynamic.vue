@@ -1,14 +1,14 @@
 <template>
 	<div class="dynamic">
-		
-		<div class="dynamic-list" v-if="dynamicList.length>0">
+
+		<div class="dynamic-list">
 			<cube-scroll ref="scroll" :options="options" @pulling-up="onPullingUp" @pulling-down="onPullingDown">
 				<div class="dynamic-item" v-for="item in dynamicList">
 					<div class="item-box">
 						<div class="authorInfo flex_r_f_s">
 							<div class="author-img">
 								<img :src="item.userHeadImage" alt="">
-								<div class="author-vip flex_r_s_c">V</div>	
+								<div class="author-vip flex_r_s_c">V</div>
 							</div>
 							<div class="authorNameBox">
 								<div class="author-name">自由犬</div>
@@ -20,12 +20,12 @@
 								{{item.content}}
 							</div>
 							<div class="trend_img" v-show="item.images!=''">
-								<!-- <img :src="item" alt="" v-for="(item,index) in images" :key="index"> -->
+
 								<div class="imgs-container flex_r_f_s">
 									<div class="img-box" v-for="(img,index) in item.images.split(',')" :key="img">
 										<img :src="img"  @click="handleImgsClick(item.images,index)">
 									</div>
-									
+
 								</div>
 							</div>
 						</div>
@@ -46,14 +46,12 @@
 							</div>
 						</div>
 					</div>
-					
+
 					<div class="line"></div>
 				</div>
 			</cube-scroll>
 		</div>
-		<div class="dynamic-list flex_r_s_c" v-else>
-			<cube-loading :size="30"></cube-loading>
-		</div>
+
 	</div>
 </template>
 
@@ -76,7 +74,7 @@
 							more: '加载更多', noMore: '没有更多数据了',
 						},
 						threshold:40,
-						
+
 					}
 				},
 				userId:-1
@@ -90,7 +88,7 @@
 			setTimeout(()=>{
 				this.getDynamic();
 			},100)
-			
+
 		},
 		methods:{
 			handleImgsClick(imges,index) {
@@ -134,12 +132,16 @@
 					if(res.data.code == 1){
 						console.log(res)
 						setTimeout(()=>{
-							self.dynamicList = res.data.data;
-							self.dynamicList.forEach((e)=>{
+
+							res.data.data.forEach((e)=>{
 								e.content = self.decodeUnicode(e.content)
 							})
+              self.dynamicList = res.data.data;
 							self.$refs.scroll.forceUpdate();
-							self.$refs.scroll.refresh();
+              setTimeout(()=>{
+                self.$refs.scroll.refresh();
+              },100)
+
 						},500)
 					}else{
 						alert(res.data.msg);
@@ -149,11 +151,11 @@
 			onPullingDown() {
 			// 模拟更新数据
 				this.getDynamic();
-				
+
 			},
 			onPullingUp() {
 			// 模拟更新数据
-				
+
 				let self = this;
 				this.page++;
 				self.axios.get(Api.trendApi + '/community/selectDynamicByUserId', {
@@ -170,7 +172,7 @@
 				}).then((res)=>{
 					if(res.data.code == 1){
 						if(res.data.data.length>0){
-							
+
 							setTimeout(()=>{
 								self.$refs.scroll.forceUpdate();
 								res.data.data.forEach((e)=>{
@@ -181,19 +183,19 @@
 									self.$refs.scroll.refresh();
 								},100)
 							},500)
-							
+
 						}else{
 							setTimeout(()=>{
 								self.$refs.scroll.forceUpdate();
 							},500)
 						}
-						
+
 					}else{
 						alert(res.data.msg);
 						self.$refs.scroll.forceUpdate();
 					}
 				})
-			
+
 			},
 			goLogin(msg) {
 				let self = this;
@@ -219,14 +221,14 @@
 						self.$router.push({
 							name: 'login'
 						})
-			
+
 					},
-			
+
 				}).show()
-			
+
 			},
 			clikeLike(item) {
-				
+
 				if (this.userId == -1) {
 					this.goLogin('登录后才能点赞');
 				} else {
@@ -249,10 +251,10 @@
 						}
 					})
 				}
-			
+
 			},
 			cancelLike(item) {
-			
+
 				let self = this;
 				this.axios.post(Api.trendApi + '/community/disLikeDynamic', this.qs.stringify({
 					byLikeUserId: item.userId,
@@ -283,7 +285,7 @@
 				str = str.replace(/\\/g, "%");
 				return unescape(str);
 			}
-			
+
 		}
 	}
 </script>
@@ -332,7 +334,7 @@
 								margin-top: 15px;
 							}
 						}
-						
+
 					}
 					.author-cnt{
 						.text_cnt{
@@ -350,7 +352,7 @@
 									position: relative;
 									overflow: hidden;
 									margin-bottom: 10px;
-									
+
 									border-radius: 4px;
 									margin-right: 15px;
 									img {
@@ -360,16 +362,16 @@
 										top: 0;
 										left: 0;
 										// display: block;
-										
+
 									}
 								}
 
-								
+
 							}
-							
-						
+
+
 						}
-					
+
 					}
 					.addr{
 						padding: 12px 0;
@@ -381,7 +383,7 @@
 						span{
 							font-size: 22px;
 							color: #666;
-							
+
 						}
 					}
 					.item-foot{
@@ -395,7 +397,7 @@
 							img{
 								width: 36px;
 							}
-							
+
 						}
 						.browse-num{
 							img{
@@ -408,9 +410,9 @@
 							}
 						}
 					}
-					
+
 				}
-				
+
 				.line{
 					height: 10px;
 					background: #e8e8e8;

@@ -167,7 +167,7 @@
           }
 
           .addr {
-            font-size: 20px;
+            font-size: 24px;
             color: #999;
             line-height: 28px;
           }
@@ -183,7 +183,7 @@
           }
 
           .remarks {
-            font-size: 20px;
+            font-size: 24px;
             color: #999;
             line-height: 28px;
 

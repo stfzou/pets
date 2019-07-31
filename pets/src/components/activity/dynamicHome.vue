@@ -75,6 +75,7 @@
 			}
 			this.getUrlData();
 			this.getAuthorInfo();
+      alert(1)
 			// console.log(window.location.href)
 		},
 		methods: {

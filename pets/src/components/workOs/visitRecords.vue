@@ -196,7 +196,7 @@
            let temp = this.time2;
            this.time2 = this.time1;
            this.time1 = temp;
-          this.getList();
+           this.getList();
 
          }else if(this.time1!=''&& new Date(selectedText.join('-')).getTime()==new Date(self.time1).getTime()){
            alert('不能选相同的时间');
@@ -274,7 +274,7 @@
           endTime:self.time2,
           shopName:self.shopName,
           pageNo:self.page,
-          pageSize:2
+          pageSize:10
         }), {
           headers: {
             'Content-Type': 'application/x-www-form-urlencoded'
@@ -283,7 +283,11 @@
           if(res.data.code==1){
             setTimeout(() => {
               self.visitList = res.data.data.list;
-              self.totalNum = res.data.data.num;
+               if(res.data.data.num==''||res.data.data.num==null){
+                self.totalNum = 0;
+              }else{
+                self.totalNum = res.data.data.num;
+              }
               self.$refs.scroll.forceUpdate();
               setTimeout(()=>{
                 self.$refs.scroll.refresh();
@@ -296,9 +300,7 @@
         })
       },
       onPullingDown(){
-
         this.getList();
-
       },
       onPullingUp(){
         let self = this;
@@ -310,7 +312,7 @@
         	endTime:self.time2,
         	shopName:self.shopName,
         	pageNo:self.page,
-        	pageSize:2
+        	pageSize:10
         }), {
         	headers: {
         		'Content-Type': 'application/x-www-form-urlencoded'
@@ -513,7 +515,7 @@
               padding-bottom: 10px;
             }
             .addr{
-              font-size: 20px;
+              font-size: 24px;
               color: #999;
               line-height: 28px;
             }
@@ -526,7 +528,7 @@
               }
             }
             .remarks{
-              font-size: 20px;
+              font-size: 24px;
               color: #999;
               line-height: 28px;
 

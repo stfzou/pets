@@ -83,7 +83,7 @@
             margin-bottom: 20px;
           }
           div{
-            font-size: 22px;
+            font-size: 26px;
             color: #000;
             line-height: 30px;
             border: 1px solid #999;/*no*/

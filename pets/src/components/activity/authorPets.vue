@@ -69,7 +69,7 @@
 							noMore: '没有更多数据了',
 						},
 						threshold: 40,
-				
+
 					}
 				},
 				petList:[],
@@ -81,7 +81,7 @@
 			let elTop = document.querySelector(".dynamicNav").offsetTop;
 			let h = document.documentElement.clientHeight - elTop;
 			document.querySelector(".authorPetsList").style.height = h + 'px';
-			
+
 			this.getPets();
 		},
 		methods:{
@@ -101,9 +101,8 @@
 					if(res.data.code == 1){
 						setTimeout(()=>{
 							 self.petList = res.data.data;
-							
+               self.$refs.scroll.forceUpdate();
 							 setTimeout(()=>{
-								  self.$refs.scroll.forceUpdate();
 							 	  self.$refs.scroll.refresh();
 							 },100);
 						},500);
@@ -116,11 +115,11 @@
 			onPullingDown() {
 			// 模拟更新数据
 				this.getPets();
-				
+
 			},
 			onPullingUp() {
 			// 模拟更新数据
-				
+
 				let self = this;
 				this.page++;
 				self.axios.get(Api.trendApi + '/userPet/selectUserPet', {
@@ -135,19 +134,17 @@
 					}
 				}).then((res)=>{
 					if(res.data.code == 1){
-					
+
 						if(res.data.data.length>0){
-							
+
 							setTimeout(()=>{
-								self.$refs.scroll.forceUpdate();
-								res.data.data.forEach((e)=>{
-									self.petList.push(e)
-								});
+                self.petList.push(...res.data.data)
+                self.$refs.scroll.forceUpdate();
 								setTimeout(()=>{
 									self.$refs.scroll.refresh();
 								},100)
 							},500)
-							
+
 						}else{
 							setTimeout(()=>{
 								self.$refs.scroll.forceUpdate();
@@ -157,11 +154,11 @@
 						alert(res.data.msg);
 					}
 				})
-				
-			
+
+
 			},
 		},
-		
+
 		filters:{
 			sexFilter(val){
 				if(val == 1){
@@ -214,7 +211,7 @@
 					}
 					.pingzhong{
 						margin-top: 20px;
-						
+
 						div{
 							float: left;
 							width: initial;
@@ -231,9 +228,9 @@
 							margin: 0;
 							img{
 								width: 22px;
-								
+
 							}
-							
+
 						}
 						.shengri{
 							img{
@@ -269,7 +266,7 @@
 								margin-right: 20px;
 							}
 						}
-						
+
 					}
 					.pet-describe{
 						margin-top: 10px;

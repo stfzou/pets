@@ -34,7 +34,7 @@
 		</div>
 		<div class="amap-page-container" v-show="false">
 			<el-amap ref="map" vid="amapDemo" :plugin="plugin" class="amap-demo"></el-amap>
-			
+
 		</div>
 	</div>
 </template>
@@ -88,10 +88,10 @@
 										self.lng = result.position.lng;
 										self.lat = result.position.lat;
 										self.getActivityListOne();
-									
+
 									} else {
 										self.getActivityListOne();
-										
+
 									}
 								});
 							}
@@ -105,7 +105,7 @@
 			let elTop = document.querySelector(".dynamicNav").offsetTop;
 			let h = document.documentElement.clientHeight - elTop;
 			document.querySelector(".activityList").style.height = h + 'px';
-			
+
 		},
 		methods: {
 			getActivityListOne() {
@@ -123,13 +123,12 @@
 				}).then((res) => {
 					if (res.data.code == 1) {
 						self.activityList = res.data.data;
-						console.log(self.activityList)
 						setTimeout(() => {
 							self.$refs.scroll.refresh();
 						}, 500)
 					}else{
 						alert(res.data.msg)
-						
+
 					}
 				})
 			},
@@ -147,11 +146,14 @@
 					}
 				}).then((res) => {
 					if (res.data.code == 1) {
-						
+
 						setTimeout(() => {
 							self.activityList = res.data.data;
 							self.$refs.scroll.forceUpdate();
-							self.$refs.scroll.refresh();
+              setTimeout(()=>{
+                self.$refs.scroll.refresh();
+              },100)
+
 						}, 500)
 					}else{
 						alert(res.data.msg)
@@ -180,29 +182,28 @@
 				}).then((res)=>{
 					if(res.data.code == 1){
 						if(res.data.data.length>0){
-							
+
 							setTimeout(()=>{
-								self.$refs.scroll.forceUpdate();
-								res.data.data.forEach((e)=>{
-									self.activityList.push(e);
-								});
+
+                self.activityList.push(...res.data.data)
+                self.$refs.scroll.forceUpdate();
 								setTimeout(()=>{
 									self.$refs.scroll.refresh();
 								},100)
 							},500)
-							
+
 						}else{
 							setTimeout(()=>{
 								self.$refs.scroll.forceUpdate();
 							},500)
 						}
-						
+
 					}else{
 						alert(res.data.msg);
 						self.$refs.scroll.forceUpdate();
 					}
 				})
-			
+
 			}
 		}
 	}

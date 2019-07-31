@@ -55,7 +55,7 @@
 					<div class="img-box" v-for="(img,index) in images" :key="img">
 						<img :src="img" @click="handleImgsClick(index)">
 					</div>
-					
+
 				</div>
 			</div>
 			<div class="trend_label">
@@ -114,9 +114,9 @@
 				</cube-scroll>
 			</div>
 			<div class="comment_list" v-else>
-				<div class="tx">暂无评论</div> 
+				<div class="tx">暂无评论</div>
 			</div>
-			
+
 			<!-- " -->
 			<div class="send_comment flex_r_s_b">
 				<input type="text" @blur.prevent="inputLoseFocus" v-model="val" placeholder="添加一条评论" />
@@ -181,7 +181,7 @@
 
 		},
 		mounted() {
-			
+
 			let h = document.documentElement.clientHeight - document.querySelector(".title").offsetTop;
 			let bottomH = document.querySelector(".send_comment").offsetHeight;
 			document.querySelector(".comment_list").style.height = (h-bottomH-100)+'px';
@@ -242,7 +242,7 @@
 				  const scrollHeight = document.documentElement.scrollTop || document.body.scrollTop || 0;
 					window.scrollTo(0, Math.max(scrollHeight - 1, 0));
 				},100);
-				
+
 			},
 			back() {
 				this.$router.go(-1); //返回上一层
@@ -382,9 +382,9 @@
 								setTimeout(() => {
 									self.$refs.scroll.refresh();
 								}, 200)
-							}, 800)
+							}, 500)
 						}
-						
+
 
 						// console.log(res)
 					} else {
@@ -398,9 +398,7 @@
 				// 模拟更新数据
 				this.page = 1;
 				this.getComment();
-				setTimeout(() => {
-					this.$refs.scroll.refresh();
-				}, 1000)
+
 			},
 			onPullingUp() {
 				// 模拟更新数据
@@ -424,11 +422,12 @@
 						// self.dynamicComments = res.data.data;
 						if (res.data.data.length > 0) {
 
-						
+
 							setTimeout(() => {
 								res.data.data.forEach((e) => {
-									self.dynamicComments.push(e)
+                  e.userContent = self.decodeUnicode(e.userContent);
 								})
+                self.dynamicComments.push(...res.data.data)
 								self.$refs.scroll.forceUpdate();
 								setTimeout(() => {
 									self.$refs.scroll.refresh();
@@ -444,7 +443,6 @@
 					} else {
 						setTimeout(() => {
 							self.$refs.scroll.forceUpdate();
-							
 						}, 500)
 						alert(res.data.msg)
 					}
@@ -497,7 +495,7 @@
 
 			},
 			clikeLike() {
-				
+
 				if (this.userId == -1) {
 					this.goLogin('登录后才能点赞');
 				} else {
@@ -595,7 +593,7 @@
 				if (this.userId == -1) {
 					this.isMask = false;
 					this.goLogin('登录后才举报');
-					
+
 				}else{
 					let self = this;
 					this.axios.post(Api.trendApi + '/community/reportDynamic', this.qs.stringify({
@@ -620,7 +618,7 @@
 						}
 					})
 				}
-				
+
 			},
 			decodeUnicode(str) {
 				str = str.replace(/\\/g, "%");
@@ -835,14 +833,14 @@
 							width: 100%;
 							height: 100%;
 							display: block;
-							
+
 							// display: block;
-							
+
 						}
 					}
-					
+
 				}
-				
+
 
 			}
 

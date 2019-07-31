@@ -38,7 +38,7 @@
 		<div class="line" v-if="isInnerHtml"></div>
 		<div class="activity_cnt" v-if="isInnerHtml">
 			<!-- <img src="../../assets/active_bg.png" alt=""> -->
-			
+
 		</div>
 		<div class="line"></div>
 		<div class="message_cnt">
@@ -52,7 +52,7 @@
 						<li class="flex_r_s_b list_item" v-for="(item,index) in evalList" :key="index">
 							<div class="head_icon">
 								<img :src="item.userHeadImgAddr" alt="">
-								
+
 							</div>
 							<div class="right">
 								<div class="r_top flex_r_s_b">
@@ -63,13 +63,13 @@
 										</div>
 										<div class="text">{{item.content}}</div>
 									</div>
-								
+
 								</div>
-								
+
 								<div class="data">{{item.createTime}}</div>
 							</div>
 						</li>
-						
+
 					</ul>
 				</cube-scroll>
 			</div>
@@ -134,14 +134,14 @@
 							more: '加载更多', noMore: '没有更多数据了',
 						},
 						threshold:40,
-						
+
 					}
 				},
 				collectionImg:'',
 				isCollection:'',
 				uId:'-1',
 				isDown:true
-				
+
 			}
 		},
 		components:{
@@ -150,7 +150,7 @@
 		mounted() {
 			let self = this;
 			window.addEventListener('scroll', self.handleScroll)
-			
+
 			this.getUrlData();
 			if(JSON.parse(sessionStorage.getItem('user')) == null){
 				// this.$store.commit('setRouterName','activity');
@@ -158,12 +158,12 @@
 			}else{
 				this.uId = JSON.parse(sessionStorage.getItem('user')).userId;
 			}
-			
+
 			// console.log(JSON.parse(sessionStorage.getItem('user')))
 			this.getActivity();
 			this.getEval();
-			
-			
+
+
 		},
 		methods:{
 			closeDown(){
@@ -177,10 +177,10 @@
 				  const scrollHeight = document.documentElement.scrollTop || document.body.scrollTop || 0;
 					window.scrollTo(0, Math.max(scrollHeight - 1, 0));
 				},100);
-				
+
 			},
 			getUrlData() {// 截取url中的数据
-			    
+
 				   let tempStr = window.location.href
 				   /**
 				   * tempArr 是一个字符串数组 格式是["key=value", "key=value", ...]
@@ -194,23 +194,23 @@
 				   returnArr[element.split('=')[0]] = element.split('=')[1]
 				   })
 				  /*输出日志*/
-				   
+
 				   sessionStorage.setItem('id',JSON.stringify(returnArr.id));
-					
-			  
+
+
 			 },
-	
+
 			handleScroll () {
-				
+
 				setTimeout(()=>{
 					var scrollTop = window.scrollY;
 					let elHeight = document.querySelector(".activity_filter").offsetHeight;
 					if(scrollTop>elHeight){
-						
+
 						this.isActiveColor = true;
 					}else{
 						this.isActiveColor = false;
-						
+
 					}
 					if(scrollTop>0){
 						this.isDown = false;
@@ -218,7 +218,7 @@
 						this.isDown = true;
 					}
 				},200)
-			  
+
 			},
 			getEval(){
 				let self = this;
@@ -234,16 +234,21 @@
 					if(res.data.code == 1){
 						if(res.data.data.doList.length>0){
 							setTimeout(() => {
-								
+
 								self.evalList = res.data.data.doList;
 								self.evalList.forEach((e)=>{
 									e.content = self.decodeUnicode(e.content);
 								})
-								
 								self.commentNum = res.data.data.commentNum;
+                self.$refs.scroll.forceUpdate();
+                setTimeout(()=>{
+                  self.$refs.scroll.refresh();
+                },100)
 							}, 500)
+
+
 						}
-						
+
 					}else{
 						let toast = self.$createToast({
 							txt:res.data.msg,
@@ -295,7 +300,7 @@
 						self.lat = res.data.data.latitude;
 						self.lng = res.data.data.longitude;
 						self.isCollection = res.data.data.isKeep;
-						
+
 						if(res.data.data.description==''){
 							self.isInnerHtml = false;
 						}else{
@@ -318,16 +323,11 @@
 			// 模拟更新数据
 				this.page = 0;
 				this.getEval();
-				setTimeout(() => {
-					this.$refs.scroll.forceUpdate()
-				}, 600)
-				setTimeout(() => {
-					this.$refs.scroll.refresh();
-				}, 800)
+
 			},
 			onPullingUp() {
 			// 模拟更新数据
-				
+
 				let self = this;
 				this.page++;
 				self.axios.post(Api.userApi+'/ca/selectCommunityActivityComment',self.qs.stringify({
@@ -339,38 +339,39 @@
 						'Content-Type': 'application/x-www-form-urlencoded'
 					}
 				}).then((res)=>{
-					
+
 					if(res.data.code == 1){
-						
+
 						if(res.data.data.doList.length>0){
-							
+
 							setTimeout(()=>{
-								self.$refs.scroll.forceUpdate();
+
 								res.data.data.doList.forEach((e)=>{
 									e.content = self.decodeUnicode(e.content);
 									self.evalList.push(e)
 								})
-								
+                self.$refs.scroll.forceUpdate();
+                setTimeout(()=>{
+                  self.$refs.scroll.refresh()
+                },100)
 							},500)
-							setTimeout(() => {
-								self.$refs.scroll.refresh();
-							}, 600)
-							
+
+
 						}else{
-							
+
 							setTimeout(()=>{
 								self.$refs.scroll.forceUpdate();
 							},500)
 						}
-						
+
 					}else{
 						self.$refs.scroll.forceUpdate()
 					}
 				})
-			
+
 			},
 			commitComment(){
-				
+
 				if(JSON.parse(sessionStorage.getItem('user')) == null){
 					let self = this;
 					let url = window.location.href;
@@ -396,9 +397,9 @@
 						  	name:'login'
 						  })
 						},
-						
+
 					 }).show()
-					
+
 				}else if(self.msg == ''){
 					let toast = self.$createToast({
 						txt: '评论不能为空',
@@ -426,13 +427,13 @@
 							  })
 							toast.show()
 							setTimeout(()=>{
-								
+
 								self.$refs.scroll.scrollTo(0,0);
-								
+
 							},500)
-							
+
 						}else{
-							
+
 							let toast = self.$createToast({
 								txt:res.data.msg,
 								type: 'error'
@@ -441,7 +442,7 @@
 						}
 					})
 				}
-				
+
 			},
 			collection(){
 				let self = this;
@@ -523,15 +524,15 @@
 						  	name:'login'
 						  })
 						},
-						
+
 					 }).show()
-					
+
 				}else{
 					this.$router.push({
 						name:'selectCoupon'
 					})
 				}
-				
+
 			},
 			share(){
 				let toast = this.$createToast({
@@ -545,13 +546,13 @@
 				return unescape(str);
 			}
 		}
-	
+
 	}
 </script>
 
 <style lang="scss">
 	.activity_warp{
-		
+
 		.line{
 			height: 10px;
 			background: #e8e8e8;
@@ -570,7 +571,7 @@
 				background: url(../../assets/icon/back@2x.png) no-repeat center 0;
 				background-size: cover;
 			}
-		
+
 			.nav_title {
 				font-size: 30px;
 				color: #fff;
@@ -578,7 +579,7 @@
 				left: 50%;
 				top: 50%;
 				transform: translate(-50%, -50%);
-		
+
 			}
 			.share{
 				width: 50px;
@@ -608,7 +609,7 @@
 				height: 100%;
 				-webkit-filter: blur(30px); /* Chrome, Opera */
 				-moz-filter: blur(30px);
-				-ms-filter: blur(30px);    
+				-ms-filter: blur(30px);
 				filter: blur(30px);
 			}
 		}
@@ -655,17 +656,17 @@
 					p{
 						font-size: 26px;
 						color: #000;
-						
+
 					}
-					
+
 				}
-				
+
 				.richeng{
 					background: url("../../assets/icon/icon_she55@3x.png") no-repeat 100% center;
 					background-size: 22px;
 				}
 				.right_sjx{
-					
+
 					background: url("../../assets/icon/icon_she56@3x.png") no-repeat 100% center;
 					background-size: 24px;
 					margin: 35px 0;
@@ -707,11 +708,11 @@
 			}
 			.eval_list{
 				height: auto;
-				
+
 				.list_item{
 					padding: 30px 20px;
 					box-sizing: border-box;
-					
+
 					align-items:flex-start;
 					border-bottom: 1px solid #e8e8e8;/*no*/
 					.head_icon{
@@ -740,12 +741,12 @@
 									color: #000;
 									margin-top: 26px;
 								}
-								
+
 							}
 							.cube-rate-item{
 								height: 24px;
 								width: 25px;
-								
+
 							}
 						}
 						.data{
@@ -753,7 +754,7 @@
 							color: #999;
 							margin-top: 40px;
 						}
-						
+
 					}
 				}
 			}
@@ -810,6 +811,6 @@
 				}
 			}
 		}
-		
+
 	}
 </style>

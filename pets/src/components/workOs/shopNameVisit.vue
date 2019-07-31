@@ -254,7 +254,7 @@
           endTime:self.time2,
           shopName:self.shopName,
           pageNo:self.page,
-          pageSize:1
+          pageSize:10
         }), {
           headers: {
             'Content-Type': 'application/x-www-form-urlencoded'
@@ -264,7 +264,11 @@
 
             setTimeout(() => {
               self.visitList = res.data.data.list;
-              self.totalNum = res.data.data.num;
+              if(res.data.data.num==''||res.data.data.num==null){
+                self.totalNum = 0;
+              }else{
+                self.totalNum = res.data.data.num;
+              }
               self.$refs.scroll.forceUpdate();
                setTimeout(() => {
               	self.$refs.scroll.refresh();
@@ -289,7 +293,7 @@
         	endTime:self.time2,
         	shopName:self.shopName,
         	pageNo:self.page,
-        	pageSize:1
+        	pageSize:10
         }), {
         	headers: {
         		'Content-Type': 'application/x-www-form-urlencoded'

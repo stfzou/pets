@@ -11,7 +11,7 @@
 				<img v-if="index === navIndex" src="../../assets/icon/blank_top.png" alt="">
 				<img v-else src="../../assets/icon/blank_btom.png" alt="">
 			</div>
-			
+
 			<div class="distanceSelect subNav" v-show="navIndex === 0">
 				<ul>
 					<li @click="subNavClick(item,index)" class="flex_r_s_b" :class="{activeSub:index===subNavIndex}" v-for="(item,index) in distanceList"><span>{{item.text}}</span>
@@ -75,7 +75,7 @@
 		</div>
 		<div class="amap-page-container" v-show="false">
 			<el-amap ref="map" vid="amapDemo" :plugin="plugin" class="amap-demo"></el-amap>
-			
+
 		</div>
 	</div>
 </template>
@@ -124,11 +124,11 @@
 							more: '加载更多', noMore: '没有更多数据了',
 						},
 						threshold:40,
-						
+
 					}
 				},
 				plugin: [
-				
+
 					{
 						pName: 'Geolocation',
 						enableHighAccuracy: true, //是否使用高精度定位，默认:true
@@ -146,12 +146,12 @@
 							init(o) {
 								// o 是高德地图定位插件实例
 								o.getCurrentPosition((status, result) => {
-				
+
 									if (result && result.position) {
-				
+
 										self.lng = result.position.lng;
 										self.lat = result.position.lat;
-										
+
 									} else {
 										// self.getActivityListOne();
 										let toast = self.$createToast({
@@ -196,17 +196,19 @@
 					}
 				}).then((res)=>{
 					if(res.data.code == 1){
-						self.couponList = res.data.data;
-						self.couponList.forEach((e)=>{
-							e.styleObj = {
-								width:Math.round((e.receiveNum/e.circulation * 10000)/100).toFixed(4) + '%'
-							}
-							e.sx = (100-Math.round((e.receiveNum/e.circulation * 10000)/100).toFixed(4))+'%'
-						})
-						console.log(self.couponList)
 						setTimeout(()=>{
+              self.couponList = res.data.data;
+              self.couponList.forEach((e)=>{
+              	e.styleObj = {
+              		width:Math.round((e.receiveNum/e.circulation * 10000)/100).toFixed(4) + '%'
+              	}
+              	e.sx = (100-Math.round((e.receiveNum/e.circulation * 10000)/100).toFixed(4))+'%'
+              })
 							self.$refs.scroll.forceUpdate();
-							self.$refs.scroll.refresh();
+              setTimeout(()=>{
+              	self.$refs.scroll.forceUpdate();
+              	self.$refs.scroll.refresh();
+              },100)
 						},500)
 					}else{
 						alert(res.data.msg)
@@ -214,7 +216,7 @@
 							self.$refs.scroll.forceUpdate();
 						},500)
 					}
-					
+
 				})
 			},
 			back() {
@@ -262,24 +264,25 @@
 				}).then((res)=>{
 					if(res.data.code == 1){
 						if(res.data.data.length>0){
-							
+
 							setTimeout(()=>{
-								self.$refs.scroll.forceUpdate();
+
 								res.data.data.forEach((e)=>{
 									e.styleObj = {
 										width:Math.round((e.receiveNum/e.circulation * 10000)/100).toFixed(4) + '%'
 									}
 									e.sx = (100-Math.round((e.receiveNum/e.circulation * 10000)/100).toFixed(4))+'%'
-									self.couponList.push(e)
+
 								});
-								
+                self.couponList.push(...res.data.data);
+								self.$refs.scroll.forceUpdate();
 								setTimeout(()=>{
 									self.$refs.scroll.refresh();
-								},200)
-								
+								},100)
+
 							},500)
 						}else{
-							
+
 							setTimeout(()=>{
 								self.$refs.scroll.forceUpdate();
 							},500)
@@ -290,17 +293,17 @@
 							self.$refs.scroll.forceUpdate();
 						},500)
 					}
-					
+
 				})
 			},
 			navClick(index){ //条件筛选显示
 				if(this.navIndex === index){
 					this.navIndex = '';
-					
+
 				}else{
 					this.navIndex = index;
 				}
-				
+
 			},
 			subNavClick(item,index){//条件筛选
 				this.subNavIndex = index;
@@ -326,7 +329,7 @@
 			receive(item){
 				let self = this;
 				if(JSON.parse(sessionStorage.getItem('user')) == null){
-					
+
 					let url = window.location.href;
 					this.$store.commit('setLoginUrl',url);
 					this.$createDialog({
@@ -350,15 +353,15 @@
 						  	name:'login'
 						  })
 						},
-						
+
 					 }).show()
-					
+
 				}else{
-					
+
 					self.axios.post(Api.userApi + '/coupon/addUserCoupon', self.qs.stringify({
 						userId: self.uId,
 						couponId:item.couponId,
-						
+
 					}), {
 						headers: {
 							'Content-Type': 'application/x-www-form-urlencoded'
@@ -380,7 +383,7 @@
 					})
 				}
 			}
-			
+
 		}
 	}
 </script>
@@ -401,7 +404,7 @@
 				background: url(../../assets/icon/backColory.png) no-repeat center 0;
 				background-size: cover;
 			}
-		
+
 			.nav_title {
 				font-size: 30px;
 				color: #000;
@@ -473,7 +476,7 @@
 			background: #f5f5f5;
 			ul{
 				padding:0 20px 10px 20px;
-				
+
 				overflow: hidden;
 				li{
 					margin-top: 30px;
@@ -530,7 +533,7 @@
 						}
 						.addr{
 							padding-top: 35px;
-							
+
 							img{
 								width: 18px;
 								margin-right: 12px;
@@ -574,14 +577,14 @@
 								width:120px;
 								height:40px;
 								background:#ff523d;
-								border-radius:6px; 
+								border-radius:6px;
 								color: #fff;
 								font-size: 26px;
 							}
 							.receivedBtn{
 								background:#B0B0B0;
 							}
-							
+
 						}
 						.saleNum{
 							font-size: 22px;

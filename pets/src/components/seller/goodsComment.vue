@@ -13,10 +13,10 @@
 			<span class="flex_r_s_c" :class="{'active':curunt == index}" @click="select(item,index)" :key="index" v-for="(item,index) in evalNav">
 				{{item.text}}
 			</span>
-			
+
 		</div>
 		<div class="line" v-if="evalList.length>0"></div>
-		
+
 		<div class="comment_cnt" v-if="evalList.length>0">
 			<cube-scroll ref="scroll" @pulling-up="onPullingUp" @pulling-down="onPullingDown" :options="options">
 				<ul class="eval_list">
@@ -47,13 +47,13 @@
 
 				</ul>
 			</cube-scroll>
-			
+
 		</div>
 		<div class="comment_cnt cntTx flex_r_s_c" v-else>
 			暂无评论
 		</div>
 		<div class="mask" v-show="isMask" @click.stop = "maskHide">
-		
+
 			<div class="product_spec" @click.stop>
 				<div class="spec_head flex_r_f_s">
 					<div class="product_img">
@@ -66,16 +66,16 @@
 					</div>
 				</div>
 				<div class="selct_spec">
-					
+
 					<ul>
-						
+
 						<li v-for="(item,index) in guige">
 							<div class="spec_name">{{item.anName}}</div>
 							<div class="spec_attr flex_r_f_s">
 								<span @click="slectAttr(item,im)" :class="{active:item.selectId == im.attrValueId}" class="flex_r_s_c" v-for="im in item.avs" :key="im.attrValueId">{{im.attrValueName}}</span>
 							</div>
 						</li>
-						
+
 					</ul>
 					<div class="select_num flex_r_s_b">
 						<div class="select_title">数量选择</div>
@@ -87,7 +87,7 @@
 							<div @click="addGoods" class="add flex_r_s_c">
 								<img src="../../assets/add.png" alt="">
 							</div>
-							
+
 						</div>
 					</div>
 					<div class="spec_foot flex_r_f_s">
@@ -95,9 +95,9 @@
 						<div class="purchase flex_r_s_c">立即购买</div>
 					</div>
 				</div>
-				
+
 			</div>
-			
+
 		</div>
 		<div class="foot flex_r_f_s">
 			<div class="collection flex_r_f_e">
@@ -119,46 +119,46 @@
 <script>
 	import Api from '../common/apj.js'
 	export default {
-		
+
 		data() {
 			return {
 				evalNav:[
 					{
-						
+
 						text:'全部',
 						num:453,
 						isImg:'-1',
 						isPraise:'-1'
 					},
 					{
-						
+
 						text:'有图',
 						num:26,
 						isImg:'1',
 						isPraise:'-1'
 					},
 					{
-						
+
 						text:'好评',
 						num:365,
 						isImg:'-1',
 						isPraise:'5'
 					},
 					{
-						
+
 						text:'中评',
 						num:35,
 						isImg:'-1',
 						isPraise:'3'
 					},
 					{
-						
+
 						text:'差评',
 						num:4,
 						isImg:'-1',
 						isPraise:'1'
 					}
-					
+
 				],
 				evalList: [],
 				disabled: true,
@@ -173,7 +173,7 @@
 							more: '加载更多', noMore: '没有更多数据了',
 						},
 						threshold:40,
-						
+
 					}
 				},
 				isImgCode:'-1',
@@ -211,8 +211,8 @@
 				setTimeout(()=>{
 					this.getEval(item.isImg,item.isPraise);
 				},100)
-				
-				 
+
+
 			},
 			addShopCar(){//加入购物车
 				let self = this;
@@ -254,7 +254,7 @@
 						}
 					})
 				}
-				
+
 			},
 			getEval(isImg, isPraise) {
 				let self = this;
@@ -270,12 +270,15 @@
 					}
 				}).then((res) => {
 					if (res.data.code == 1) {
-						self.evalList = res.data.data;
-						
 						setTimeout(() => {
-							self.$refs.scroll.forceUpdate();
+              self.evalList = res.data.data;
+              self.$refs.scroll.forceUpdate();
+              setTimeout(() => {
+              	self.$refs.scroll.refresh();
+              }, 100)
+
 						}, 500)
-						
+
 					}
 				})
 			},
@@ -283,18 +286,15 @@
 			// 模拟更新数据
 				this.page = 0;
 				this.getEval(this.isImgCode,this.isPraiseCode);
-				setTimeout(() => {
-					this.$refs.scroll.refresh();
-				}, 1000)
 			},
 			onPullingUp() {
 			// 模拟更新数据
-				
+
 				let self = this;
 				this.page++;
 				console.log(this.page)
 				setTimeout(() => {
-					
+
 					self.axios.post(Api.shopApi+'/webShop/selectShopAssessPage',self.qs.stringify({
 						shopId:23,
 						isImg:self.isImgCode,
@@ -306,28 +306,27 @@
 							'Content-Type': 'application/x-www-form-urlencoded'
 						}
 					}).then((res)=>{
-						
+
 						if(res.data.code == 1){
 							console.log(res)
-							
+
 							if(res.data.data.length>0){
-								res.data.data.forEach((e)=>{
-									self.evalList.push(e)
-								})
+
 								setTimeout(()=>{
+                  self.evalList.push(...res.data.data)
 									self.$refs.scroll.forceUpdate();
-									
+									setTimeout(()=>{
+										self.$refs.scroll.refresh();
+									},100)
 								},500)
-								setTimeout(()=>{
-									
-									self.$refs.scroll.refresh();
-								},800)
+
 							}else{
 								self.$refs.scroll.forceUpdate();
 							}
-							
-							
+
+
 						}else{
+              alert(res.data.msg)
 							self.$refs.scroll.forceUpdate()
 						}
 					})
@@ -348,10 +347,10 @@
 			},
 			maskHide(){
 				this.isMask = false;
-				
+
 			},
 			slectAttr(item,im){
-				
+
 				item.selectId = im.attrValueId;
 				if(this.guige.length==2){
 					this.specAttr.forEach((e)=>{
@@ -370,7 +369,7 @@
 						}
 					})
 				}
-				
+
 			},
 			getSpec(){
 				let self = this;
@@ -385,7 +384,7 @@
 					}
 				}).then((res)=>{
 					if(res.data.code == 1){
-						
+
 						self.shopName = res.data.data.shopInfo.shopName;
 						self.price = res.data.data.skus[0].original;
 						if(res.data.data.activityPrice){
@@ -394,7 +393,7 @@
 						self.productNum = res.data.data.shopInfo.productNum;
 						self.specAttr = res.data.data.skus;
 						self.skuImg = res.data.data.skus[0].skuImgAddr;
-						
+
 						if(res.data.data.guige.length>0){
 							// self.guige = res.data.data.guige;
 							res.data.data.guige.forEach((e)=>{
@@ -405,14 +404,14 @@
 									selectId:''
 								})
 							})
-							
+
 						}else if(res.data.data.guige.length==0){
 							self.skuId = res.data.data.skus[0].skuId;
 							self.skuImg = res.data.data.skus[0].skuImgAddr;
 						}
-						
+
 						console.log(res)
-						
+
 					}else{
 						console.log(res)
 					}
@@ -510,7 +509,7 @@
 						.select_title{
 							font-size: 24px;
 							color: #666;
-							
+
 						}
 						.num_box{
 							width: 180px;
