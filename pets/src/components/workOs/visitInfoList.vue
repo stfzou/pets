@@ -142,14 +142,15 @@
           width: 20%;
 
           .userName {
-            font-size: 28px;
+            font-size: 30px;
+            font-weight: bold;
             color: #333;
             text-align: center;
             padding-bottom: 10px;
           }
 
           .dataTime {
-            font-size: 20px;
+            font-size: 26px;
             color: #999;
             text-align: center;
             line-height: 28px;
@@ -161,15 +162,16 @@
           padding-bottom: 15px;
 
           .shopName {
-            font-size: 28px;
+           font-size: 32px;
+           font-weight: bold;
             color: #333;
             padding-bottom: 10px;
           }
 
           .addr {
-            font-size: 24px;
+            font-size: 26px;
             color: #999;
-            line-height: 28px;
+            line-height: 32px;
           }
 
           .img-box {
@@ -183,9 +185,9 @@
           }
 
           .remarks {
-            font-size: 24px;
+            font-size: 26px;
             color: #999;
-            line-height: 28px;
+            line-height: 32px;
 
           }
         }

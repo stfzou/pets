@@ -1,16 +1,16 @@
 <template>
   <div id="app">
-    
+
 		<!-- <transition name="fade"> -->
 			<keep-alive>
 				<router-view v-if="$route.meta.keepAlive"></router-view>
 			</keep-alive>
 		<!-- </transition> -->
-		
+
 		<!-- <transition name="fade"> -->
 			<router-view v-if="!$route.meta.keepAlive"></router-view>
 		<!-- </transition> -->
-		
+
   </div>
 </template>
 
@@ -20,10 +20,10 @@ import {mapState} from 'vuex'
 export default {
 	name: 'App',
 	created() {
-		
+
 	}
-	
-	
+
+
 }
 </script>
 
@@ -35,12 +35,18 @@ export default {
   -moz-osx-font-smoothing: grayscale;
   color: #2c3e50;
   height: 100%;
-  
+
 }
 
 .div1{
 	// @include font-dpr(16px);
 	font-size: 16px;/*no*/
+}
+.cube-pullup-wrapper .before-trigger{
+  font-size: 28px;
+}
+.cube-pulldown-wrapper .after-trigger .cube-pulldown-loaded{
+  font-size: 28px;
 }
 // .fade-enter {
 //   opacity:0;

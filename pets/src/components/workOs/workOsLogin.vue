@@ -35,6 +35,9 @@
 				loading:false
 			}
 		},
+    mounted() {
+
+    },
 		methods: {
 			back() {
 				this.$router.push({

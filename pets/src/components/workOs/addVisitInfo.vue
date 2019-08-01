@@ -9,7 +9,11 @@
 				<li class="flex_r_f_s">
 					<div class="list_l"><b>*</b>拜访对象:</div>
 					<div class="list_r">
-             <cube-select v-model="storeVal" title="选择拜访对象" :options="staffNameList" @change="nameChange"> </cube-select>
+             <!-- <cube-select v-model="storeVal" title="选择拜访对象" :options="staffNameList" @change="nameChange"> </cube-select> -->
+
+              <i-select :model.sync="storeVal" filterable @on-change="change">
+                <i-option v-for="item in staffNameList" :key="item.value" :value="item.value+''">{{ item.text }}</i-option>
+              </i-select>
 					</div>
 				</li>
 
@@ -87,7 +91,7 @@
 					<div class="list_l"><b>*</b>地理位置:</div>
 					<div class="list_r">
 						<div class="customer_map">
-							<el-amap ref="map" vid="amapDemo" :center="center" :zoom="15" class="amap-demo" :plugin="plugin">
+							<el-amap ref="map" vid="amapDemo" :dragEnable="false" :zoomEnable="false" :center="center" :zoom="18" class="amap-demo" :plugin="plugin">
 
 								<el-amap-marker v-if="isMark" :draggable="true" :events="markers" :icon="require('../../assets/icon/map@2x.png')" vid="component-marker"></el-amap-marker>
 
@@ -107,7 +111,6 @@
 <script>
 	import Api from '../common/apj.js'
 	import compress from '../../data/image'
-
 	export default {
 		data(){
 			let self = this;
@@ -116,7 +119,7 @@
         addr:'',
 				remark:'',
         staffNameList:[],
-        storeVal:'',//选择店铺的值
+        storeVal:null,//选择店铺的值
 				isMark:true,
 				lng:'',
 				lat:'',
@@ -143,7 +146,7 @@
 						  if (result && result.position) {
 							self.lng = result.position.lng;
 							self.lat = result.position.lat;
-							self.center = [self.lng, self.lat];
+							self.center = [result.position.lng, result.position.lat];
               // alert(JSON.parse(result));
               // alert(result)
               self.addr = result.formattedAddress;
@@ -159,7 +162,7 @@
 							  self.isMark = true;
 							  self.lng = res.position.lng;
 							  self.lat = res.position.lat;
-							  self.center = [self.lng, self.lat];
+							  self.center = [res.position.lng, res.position.lat];
 						 },200)
 					  },
             error(){
@@ -171,9 +174,9 @@
 					position:self.center,
 					dragend: (e) => {
 						// var geocoder = new AMap.Geocoder();
-						let lng = e.lnglat.lng;
-						let lat = e.lnglat.lat;
-						self.center = [lng,lat];
+						self.lng = e.lnglat.lng;
+						self.lat = e.lnglat.lat;
+						// self.center = [lng,lat];
 
 					}
 				},
@@ -198,9 +201,13 @@
 					e.setAttribute("capture","camera");
 				});
         this.getStaffName();
+        console.log(this.staffNameList)
 			}
 		},
 		methods:{
+      change(val){
+       this.storeVal = val;
+      },
 			back(){
 				this.$router.push({
 					name:'workOsInfoList'
@@ -213,6 +220,7 @@
 			},
       commit(){
          let self = this;
+         console.log(this.storeVal)
         if(this.storeVal == ''){
           self.erroTost('请选择拜访对象')
         }else if(this.addr == ''){
@@ -375,6 +383,7 @@
 </script>
 
 <style lang="scss">
+
 	.addVisitInfo{
 		.amap-logo{
 			opacity:0;
@@ -426,6 +435,12 @@
 			.list_r{
 				margin-left: 20px;
 				flex-wrap:wrap;
+        .ivu-select-item{
+          padding-left: 15px;
+          .ivu-select-single .ivu-select-input{
+            font-size: 28px;
+          }
+         }
 				&>input{
 					border: 1px solid #e8e8e8;
 					height: 50px;
@@ -437,7 +452,7 @@
 
           line-height: 30px;
           color: #999;
-          font-size: 22px;
+          font-size: 24px;
         }
         .cube-select{
           width: 200px;

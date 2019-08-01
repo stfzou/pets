@@ -22,9 +22,9 @@
 					<cube-select v-model="projectTypeVal" :options="projectData" placeholder="产品类型" @change="getCustomer"></cube-select>
 
 				</div>
-				<div class="customerTypeBox flex_r_f_s" v-if="parentId==0">
-					<cube-select v-model="staffVal" :options="staffData" placeholder="员工" @change="getCustomer"></cube-select>
-					<router-link :to="{name:'workOsPcMap'}">PC端链接</router-link>
+				<div class="customerTypeBox flex_r_f_s">
+					<cube-select v-model="staffVal" :options="staffData" placeholder="员工" @change="listChange"></cube-select>
+					<router-link v-if="parentId==0" :to="{name:'workOsPcMap'}">PC端链接</router-link>
 				</div>
 				<div class="search_box">
 					<div class="search flex_r_s_b">
@@ -130,7 +130,7 @@
 			return {
 				storeEnvironmen: [{value:'',text:'店铺星级'}],
 				customerType: [{value:'',text:'客户类型'}],
-				staffData:[{value:'-1',text:'选择员工'}],
+				staffData:[],
 				projectData:[{value:'',text:'产品类型'}],
 				environmenVal: '',
 				typeVal: '',
@@ -147,6 +147,7 @@
 				starVal:5,
 				shopName:'',
 				name:'',
+        viewCompetence:'',
 				options:{
 					pullDownRefresh:{
 						txt:'更新成功',
@@ -161,10 +162,12 @@
 					}
 				},
 				parentId:'1',
+        businessId:'',
 
 			}
 		},
 		mounted() {
+      let self = this;
 			// console.log(JSON.parse(localStorage.getItem('staff'))==null)
 			if(JSON.parse(localStorage.getItem('staff'))== null){
 
@@ -184,14 +187,28 @@
 				this.parentId = JSON.parse(localStorage.getItem('staff')).parentId;
 				if(this.parentId == 0){
 					this.staffVal = '-1';
+          this.businessId = '-1';
+          this.staffData.push({
+            value:'-1',
+            text:'全部'
+          });
 				}else{
 					this.staffVal = JSON.parse(localStorage.getItem('staff')).staffId;
+          this.viewCompetence = JSON.parse(localStorage.getItem('staff')).viewCompetence;
+
+          if(this.viewCompetence!=''){
+            this.businessId = this.viewCompetence+','+this.staffVal;
+            this.staffData = [{value:self.businessId,text:'全部'},{value:self.staffVal,text:'自己'}]
+          }else{
+            this.businessId = this.staffVal;
+            this.staffData=[{value:self.staffVal,text:'自己'}]
+          }
 				}
 				this.getCustomer();
 				this.getCondition();
 				this.getProjectType();
 				this.getType();
-				this.getStaff();
+				this.getStaffName();
 			}
 
 			// console.log(JSON.parse(sessionStorage.getItem('staff')))
@@ -214,31 +231,53 @@
 
         })
       },
-			getStaff(){
-				let self = this;
-				this.axios.post(Api.staffApi + '/business/selectBusinessStaffAll', this.qs.stringify({
-					pageNo:0,
-					pageSize:100
-				}), {
-					headers: {
-						'Content-Type': 'application/x-www-form-urlencoded'
-					}
-				}).then((res)=>{
-					if(res.data.code == 1){
-						// self.storeEnvironmen = res.data.data;
+      getStaffName(){//获取员工名字
+        let self = this;
+        if(this.staffVal === '-1'){
+          this.axios.get(Api.staffApi+'/business/selectStaffAll',{
+          		headers: {
+          			'Content-Type': 'application/x-www-form-urlencoded'
+          		}
+          	}).then(function(res) {
+               if(res.data.code == 1){
+                  console.log(res.data.data)
+                  res.data.data.forEach((e)=>{
+                    self.staffData.push({
+                      value:e.id,
+                      text:e.name
+                    })
+                  })
 
-						res.data.data.forEach((e)=>{
-							self.staffData.push({
-								value:e.id,
-								text:e.name
-							})
-						})
+               }else{
+                 alert(res.data.msg)
+               }
+          	})
+        }else if(self.viewCompetence!=''){
+           // alert(self.staffId)
+          this.axios.get(Api.staffApi+'/business/selectStaffByCompetence?viewCompetence='+self.viewCompetence,{
+          		headers: {
+          			'Content-Type': 'application/x-www-form-urlencoded'
+          		}
+          	}).then(function(res) {
+               if(res.data.code == 1){
+                  console.log(res.data.data)
+                  res.data.data.forEach((e)=>{
+                    self.staffData.push({
+                      value:e.id,
+                      text:e.name
+                    })
+                  })
 
-					}else{
-						alert(res.data.msg);
-					}
-				})
-			},
+               }else{
+                 alert(res.data.msg)
+               }
+          	})
+        }else{
+          this.staffData = [{value:self.staffVal,text:'自己'}]
+        }
+
+
+      },
 			getCondition(){
 				let self = this;
 				this.axios.post(Api.staffApi + '/business/selectBShopsConditionAll', this.qs.stringify({
@@ -327,7 +366,7 @@
 				}
 
 				this.axios.post(Api.staffApi + '/business/selectBClientInfo', this.qs.stringify({
-					businessId:self.staffVal,
+					businessId:self.businessId,
 					province:self.sheng,
 					city:self.shi,
 					area:self.qu,
@@ -365,9 +404,14 @@
 				this.cityData = selectedText;
 				this.getCustomer();
 			},
+
 			cancelHandle() {
 
 			},
+      listChange(val){
+        this.businessId = val;
+        this.getCustomer();
+      },
 			onPullingDown() {
 				// 模拟更新数据
 
@@ -394,7 +438,7 @@
 				}
 				this.page++;
 				this.axios.post(Api.staffApi + '/business/selectBClientInfo', this.qs.stringify({
-					businessId:self.staffVal,
+					businessId:self.businessId,
 					province:self.sheng,
 					city:self.shi,
 					area:self.qu,

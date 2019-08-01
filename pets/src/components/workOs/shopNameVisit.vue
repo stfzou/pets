@@ -383,7 +383,7 @@
         .name_l{
           width: 280px;
           p{
-            font-size: 22px;
+            font-size: 26px;
             color: #333;
             margin-right: 15px;
           }
@@ -396,7 +396,7 @@
         .name_r{
           width: 400px;
           p{
-            font-size: 22px;
+            font-size: 26px;
             color: #333;
           }
           .cube-btn{
@@ -472,13 +472,14 @@
           .list_left{
             width: 25%;
             .userName{
-              font-size: 28px;
+             font-size: 30px;
+             font-weight: bold;
               color: #333;
               text-align: center;
               padding-bottom: 10px;
             }
             .dataTime{
-              font-size: 20px;
+              font-size: 26px;
               color: #999;
               text-align: center;
               line-height: 28px;
@@ -489,14 +490,15 @@
              padding-bottom: 15px;
              border-bottom: 2px solid #e8e8e8;/*no*/
             .shopName{
-              font-size: 28px;
+              font-size: 32px;
+              font-weight: bold;
               color: #333;
               padding-bottom: 10px;
             }
             .addr{
-              font-size: 20px;
+              font-size: 26px;
               color: #999;
-              line-height: 28px;
+              line-height: 32px;
             }
             .img-box{
               padding: 10px 0;
@@ -507,9 +509,9 @@
               }
             }
             .remarks{
-              font-size: 20px;
+              font-size: 26px;
               color: #999;
-              line-height: 28px;
+              line-height: 32px;
 
             }
           }

@@ -133,7 +133,7 @@
 					<div class="list_l"><b>*</b>地理位置:</div>
 					<div class="list_r">
 						<div class="customer_map">
-							<el-amap ref="map" vid="amapDemo" :center="center" :zoom="15" class="amap-demo" :plugin="plugin">
+							<el-amap ref="map" vid="amapDemo" :center="center" :zoom="18" :dragEnable="false" :zoomEnable="false" class="amap-demo" :plugin="plugin">
 
 								<el-amap-marker v-if="isMark" :draggable="true" :events="markers" :icon="require('../../assets/icon/map@2x.png')" vid="component-marker"></el-amap-marker>
 
@@ -201,7 +201,7 @@
 						  if (result && result.position) {
 							self.lng = result.position.lng;
 							self.lat = result.position.lat;
-							self.center = [self.lng, self.lat];
+							self.center = [result.position.lng, result.position.lat];
 
 							// self.$nextTick();
 						  }
@@ -215,7 +215,7 @@
 							  self.isMark = true;
 							  self.lng = res.position.lng;
 							  self.lat = res.position.lat;
-							  self.center = [self.lng, self.lat];
+							  self.center = [result.position.lng, result.position.lat];
 						 },200)
 					  }
 					}
@@ -224,9 +224,9 @@
 					position:self.center,
 					dragend: (e) => {
 						// var geocoder = new AMap.Geocoder();
-						let lng = e.lnglat.lng;
-						let lat = e.lnglat.lat;
-						self.center = [lng,lat];
+						self.lng = e.lnglat.lng;
+						self.lat = e.lnglat.lat;
+
 
 					}
 				},

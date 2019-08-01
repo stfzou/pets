@@ -355,7 +355,7 @@
     position: relative;
 
     .cntTop {
-      height: 360px;
+      height: 330px;
       .login_nav {
         height: 42px;
         padding: 22px 0;
@@ -404,7 +404,7 @@
         .name_l{
           width: 280px;
           p{
-            font-size: 22px;
+            font-size: 26px;
             color: #333;
             margin-right: 15px;
           }
@@ -417,7 +417,7 @@
         .name_r{
           width: 400px;
           p{
-            font-size: 22px;
+            font-size: 26px;
             color: #333;
           }
           .cube-btn{
@@ -482,24 +482,25 @@
     .cntList{
       position: absolute;
       left: 0;
-      top: 360px;
+      top: 330px;
       right: 0;
       bottom: 0;
       ul{
-        padding: 0 20px;
+        padding-bottom: 20px;
         li{
           align-items: flex-start;
-          margin-top: 30px;
+          padding-top: 20px;
           .list_left{
             width: 25%;
             .userName{
-              font-size: 28px;
+              font-size: 30px;
+              font-weight: bold;
               color: #333;
               text-align: center;
               padding-bottom: 10px;
             }
             .dataTime{
-              font-size: 20px;
+              font-size: 26px;
               color: #999;
               text-align: center;
               line-height: 28px;
@@ -510,14 +511,15 @@
              padding-bottom: 15px;
              border-bottom: 2px solid #e8e8e8;/*no*/
             .shopName{
-              font-size: 28px;
+              font-size: 32px;
+              font-weight: bold;
               color: #333;
               padding-bottom: 10px;
             }
             .addr{
-              font-size: 24px;
+              font-size: 26px;
               color: #999;
-              line-height: 28px;
+              line-height: 32px;
             }
             .img-box{
               padding: 10px 0;
@@ -528,9 +530,10 @@
               }
             }
             .remarks{
-              font-size: 24px;
+              padding-top: 5px;
+              font-size: 26px;
               color: #999;
-              line-height: 28px;
+              line-height: 32px;
 
             }
           }

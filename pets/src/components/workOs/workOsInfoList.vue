@@ -72,9 +72,11 @@
 				});
 			},
 			khRouter(){
+
 				this.$router.push({
 					name:'workOsCustomer'
-				})
+				});
+
 			},
 			pwRouter(){
 				this.$router.push({
@@ -83,6 +85,7 @@
 			},
 			quit(){
 				localStorage.removeItem('staff');
+        this.$router.go(0);
 				this.$router.push({
 					name:'workOsLogin'
 				})

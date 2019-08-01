@@ -131,9 +131,7 @@ export default new Router({
       path:'/shopNameVisit',
       name:'shopNameVisit',
       component:ShopNameVisit,
-      meta:{
-        keepAlive:true
-      }
+
     },
     {
       path:'/addVisitInfo',

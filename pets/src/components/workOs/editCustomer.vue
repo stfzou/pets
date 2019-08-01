@@ -2,7 +2,7 @@
 	<div class="editCustomer">
 		<div class="login_nav">
 			<div class="back" @click="back"></div>
-			<div class="title">添加客户信息</div>
+			<div class="title">修改客户信息</div>
 		</div>
 		<div class="addCustomer_list">
 			<ul>
@@ -29,7 +29,7 @@
 						<input type="text" v-model="addr" />
 					</div>
 				</li>
-				
+
 				<li class="flex_r_f_s">
 					<div class="list_l"><b>*</b>联系电话:</div>
 					<div class="list_r">
@@ -70,14 +70,14 @@
 				<li class="flex_r_f_s">
 					<div class="list_l"><b>*</b>店铺照片:</div>
 					<div class="list_r">
-						
+
 							<div class="flex_r_f_s">
 								<div class="uploadBox">
-									
+
 									<cube-upload v-if="imgOne==''" ref="uploadOne":action="action":simultaneous-uploads="1" :max="1"
-									:process-file="processFile"@file-submitted="fileSubmitted" @file-success="function(file){return uploadSuccess(file,'imgOne','loadOne')}" 
+									:process-file="processFile"@file-submitted="fileSubmitted" @file-success="function(file){return uploadSuccess(file,'imgOne','loadOne')}"
 									@files-added="function(file){return filesAdded('loadOne')}" />
-									
+
 									<div class="img-box" v-if="imgOne!=''">
 										<img :src="imgOne" alt="" @click="showImagePreview('imgOne')">
 										<i class="cubeic-wrong" @click="fileRemove('imgOne')"></i>
@@ -85,15 +85,15 @@
 									<p>
 										<cube-loading v-show="loadOne" class="flex_r_s_c" :size="28"></cube-loading>
 										<span>门头照片</span>
-						
+
 									</p>
 								</div>
 								<div class="uploadBox">
-									
+
 									<cube-upload v-if="imgTwo==''" :max="1" ref="uploadTwo":action="action":simultaneous-uploads="1" :process-file="processFile"
 									@file-submitted="fileSubmitted" @file-success="function(file){return uploadSuccess(file,'imgTwo','loadTwo')}"
 									@files-added="function(file){return filesAdded('loadTwo')}"/>
-									
+
 									<div class="img-box" v-if="imgTwo!=''">
 										<img :src="imgTwo" alt="" @click="showImagePreview('imgTwo')">
 										<i class="cubeic-wrong" @click="fileRemove('imgTwo')"></i>
@@ -104,11 +104,11 @@
 									</p>
 								</div>
 								<div class="uploadBox">
-									
+
 									<cube-upload v-if="imgThree==''" :max="1" ref="uploadThree":action="action":simultaneous-uploads="1" :process-file="processFile"
 									@file-submitted="fileSubmitted" @file-success="function(file){return uploadSuccess(file,'imgThree','loadThree')}"
 									 @files-added="function(file){return filesAdded('loadThree')}"/>
-									
+
 									<div class="img-box" v-if="imgThree!=''">
 										<img :src="imgThree" alt="" @click="showImagePreview('imgThree')">
 										<i class="cubeic-wrong" @click="fileRemove('imgThree')"></i>
@@ -119,9 +119,9 @@
 									</p>
 								</div>
 							</div>
-							
-					
-						
+
+
+
 					</div>
 				</li>
 				<li class="flex_r_f_s">
@@ -132,15 +132,15 @@
 						</div>
 					</div>
 				</li>
-				
+
 				<li>
 					<div class="list_l"><b>*</b>地理位置:</div>
 					<div class="list_r">
 						<div class="customer_map">
-							<el-amap ref="map" vid="amapDemo" :center="center" :zoom="15" class="amap-demo">
-							
+							<el-amap ref="map" vid="amapDemo" :zoomEnable="false" :center="center" :zoom="18" class="amap-demo">
+
 								<el-amap-marker :draggable="true" :events="markers" :icon="require('../../assets/icon/map@2x.png')" vid="component-marker" :position="center"></el-amap-marker>
-								
+
 							</el-amap>
 						</div>
 					</div>
@@ -175,6 +175,8 @@
 				storeName:'',
 				addr:'',
 				phone:'',
+        lng:'',
+        lat:'',
 				environmenVal: '',
 				typeVal: '',
 				//图片上传
@@ -182,16 +184,14 @@
 					target:Api.staffApi+'/business/updateImg',
 					prop: 'base64Value',
 					max:1
-					
+
 				},
 				center:[0,0],
 				markers:{
 					dragend: (e) => {
 						// var geocoder = new AMap.Geocoder();
-						let lng = e.lnglat.lng;
-						let lat = e.lnglat.lat;
-						self.center = [lng,lat];
-						
+            self.lng = e.lnglat.lng;
+						self.lat = e.lnglat.lat;
 					}
 				},
 				imgOne:'',
@@ -202,7 +202,7 @@
 				loadThree:false,
 				reg: /^1[3456789]\d{9}$/,
 				clientId:'',
-				
+
 			}
 		},
 		mounted() {
@@ -212,12 +212,12 @@
 				onSelect: this.selectHandle,
 				onCancel: this.cancelHandle
 			});
-			
+
 			this.getCondition();
 			this.getType();
 			this.getProjectType();
 			this.getEditInfo();
-			
+
 		},
 		methods:{
 			back(){
@@ -233,7 +233,7 @@
 			getProjectType(){
 				let self = this;
 				this.axios.post(Api.staffApi + '/business/selectBClientPTypeAll', this.qs.stringify({
-					
+
 				}), {
 					headers: {
 						'Content-Type': 'application/x-www-form-urlencoded'
@@ -241,14 +241,14 @@
 				}).then((res)=>{
 					if(res.data.code == 1){
 						// self.customerType = res.data.data;
-						
+
 						res.data.data.forEach((e)=>{
 							self.projectData.push({
 								value:e.typeId,
 								label:e.name
 							})
 						})
-						
+
 					}else{
 						alert(res.data.msg);
 					}
@@ -275,7 +275,7 @@
 			getCondition(){
 				let self = this;
 				this.axios.post(Api.staffApi + '/business/selectBShopsConditionAll', this.qs.stringify({
-					
+
 				}), {
 					headers: {
 						'Content-Type': 'application/x-www-form-urlencoded'
@@ -283,7 +283,7 @@
 				}).then((res)=>{
 					if(res.data.code == 1){
 						// self.storeEnvironmen = res.data.data;
-						
+
 						res.data.data.forEach((e)=>{
 							self.storeEnvironmen.push({
 								value:e.conditionId,
@@ -298,7 +298,7 @@
 			getType(){
 				let self = this;
 				this.axios.post(Api.staffApi + '/business/selectBShopsTypeAll', this.qs.stringify({
-					
+
 				}), {
 					headers: {
 						'Content-Type': 'application/x-www-form-urlencoded'
@@ -322,7 +322,7 @@
 				let self = this;
 				if(this.center[0] == 0){
 					let toast = this.$createToast({
-						txt: '定位失败，请刷新页面尝试重新定位',
+						txt: '定位失败，请返回至上一页面重新点击编辑',
 						type: 'error'
 					  })
 					toast.show()
@@ -349,7 +349,7 @@
 					toast.show()
 					return false;
 				}else if (this.phone == '') {
-							
+
 					let toast = this.$createToast({
 						txt: '手机号不能为空',
 						type: 'error'
@@ -357,7 +357,7 @@
 					toast.show()
 					return false;
 				}else if (!this.reg.test(this.phone)) {
-							
+
 					let toast = this.$createToast({
 						txt: '手机号格式错误',
 						type: 'error'
@@ -365,7 +365,7 @@
 					toast.show()
 					return false;
 				}else if (this.environmenVal == '') {
-							
+
 					let toast = this.$createToast({
 						txt: '请选择店铺环境',
 						type: 'error'
@@ -394,8 +394,8 @@
 						city:self.cityData[1],
 						area:self.cityData[2],
 						address:self.addr,
-						latitude:self.center[1],
-						longitude:self.center[0],
+						latitude:self.lat,
+						longitude:self.lng,
 						phone:self.phone,
 						conditionId:self.environmenVal,
 						typeId:self.typeVal,
@@ -425,7 +425,7 @@
 						}
 					})
 				}
-				
+
 			},
 			showAddressPicker() {
 				this.addressPicker.show()
@@ -434,7 +434,7 @@
 				this.cityData = selectedText
 			},
 			cancelHandle() {
-				
+
 			},
 			processFile(file, next) {
 			  compress(file, {
@@ -455,7 +455,7 @@
 			filesAdded(load){
 				console.log(this[load])
 				this[load] = true;
-				
+
 			},
 			fileRemove(img){
 				let self = this;
@@ -497,18 +497,18 @@
 									upLoad.setAttribute("capture","camera");
 								},200)
 								self.addCustomer();
-								
+
 							}else{
 								alert(res.data.msg);
 							}
 						})
 					},
 					onCancel: () => {
-						
+
 					}
 				}).show()
 			}
-			
+
 		}
 	}
 </script>
@@ -593,7 +593,7 @@
 					img{
 						width: 100%;
 						height: 100%;
-						
+
 					}
 				}
 				.region {
@@ -622,7 +622,7 @@
 
 				}
 				.customerType {
-					
+
 					.cube-select {
 						padding-top: 2px;
 						padding-bottom: 2px;
@@ -653,7 +653,7 @@
 					height: 350px;
 					padding-top: 20px;
 				}
-				
+
 			}
 			.confirmBtn{
 				color: #fff;

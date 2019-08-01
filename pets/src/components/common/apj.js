@@ -4,3 +4,4 @@ export default{
 	shopApi:'http://192.168.0.109:8084',
 	staffApi:'https://customer.gutouzu.com'
 }
+//https://customer.gutouzu.com

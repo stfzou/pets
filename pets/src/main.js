@@ -3,10 +3,14 @@
 import Vue from 'vue'
 import App from './App'
 import router from './router'
+import 'iview/dist/styles/iview.css'
 import 'element-ui/lib/theme-chalk/index.css';
 import 'lib-flexible/flexible.js'
 import '@/style/style.scss'
 import ElementUI from 'element-ui';
+import iView from 'iview'
+
+
 
 import axios from "axios"
 import http from "axios"
@@ -19,6 +23,7 @@ import VueAMap from 'vue-amap'
 Vue.use(Cube);
 Vue.use(VueAMap);
 Vue.use(ElementUI);
+Vue.use(iView)
 Vue.prototype.axios = axios;
 Vue.prototype.http = http;
 Vue.prototype.qs = Qs;
@@ -28,7 +33,7 @@ Vue.config.productionTip = false
 
 // http.defaults.baseURL = 'http://192.168.0.109:8082'
 
-VueAMap.initAMapApiLoader({ 
+VueAMap.initAMapApiLoader({
 	key: 'fe2312e4704c6f8f7787c7864ecebae6',
 	plugin: ['AMap.Icon', 'AMap.Geocoder', 'AMap.Geolocation', 'AMap.CitySearch', 'AMap.Autocomplete',
 		'AMap.PlaceSearch', 'AMap.Scale', 'AMap.OverView', 'AMap.ToolBar', 'AMap.MapType', 'AMap.PolyEditor',

@@ -19,7 +19,7 @@
 					<!-- <cube-select v-model="staffVal" :options="staffData" placeholder="员工" v-if="parentId==0" @change="getCustomer"></cube-select> -->
 				</div>
 				<div class="customerTypeBox">
-					<cube-select v-model="staffVal" :options="staffData" placeholder="员工" v-if="parentId==0" @change="getCustomer"></cube-select>
+					<cube-select v-model="staffVal" :options="staffData"  @change="listChange"></cube-select>
 				</div>
 				<div class="search_box">
 					<div class="search flex_r_s_b">
@@ -35,14 +35,14 @@
 				<router-link  :to="{name:'workOsCustomer'}">信息列表</router-link>
 				<router-link class="active" :to="{name:'workOsMap'}">地图详情</router-link>
 			</div>
-			
+
 		</div>
 		<div class="workOsCustomer_cnt">
 			<div class="workOsCustomer_map">
 				<el-amap ref="map" vid="amapDemo" :center="center" :zoom="13" class="amap-demo" :plugin="plugin">
 					<!-- <el-amap-text v-for="text in texts" :text="text.text" :offset="text.offset" :position="text.position" :events="text.events"></el-amap-text> -->
 					<el-amap-text v-for="(item,index) in customerList" :key="item.clientId" :text="item.shopName" :position="[item.longitude,item.latitude]"></el-amap-text>
-					<el-amap-marker v-for="(item,index) in customerList" :key="index" :icon="item.clientTypeIcom" :events="events" 
+					<el-amap-marker v-for="(item,index) in customerList" :key="index" :icon="item.clientTypeIcom" :events="events"
 					vid="component-marker" :position="[item.longitude,item.latitude]" @click="markClick"></el-amap-marker>
 					<!-- <el-amap-marker v-for="item in customerList" :icon="item.clientTypeIcom" vid="component-marker" :position="[item.latitude,item.longitude]"></el-amap-marker> -->
 				</el-amap>
@@ -70,7 +70,7 @@
 				center:[116.397428, 39.90923],
 				events: {
 					click: (e) => {
-						
+
 					  self.$createDialog({
 						type: 'confirm',
 						icon: 'cubeic-alert',
@@ -90,16 +90,16 @@
 						onConfirm: () => {
 						  // window.location.href = 'https://uri.amap.com/marker?position='+e.lnglat.lng+','+e.lnglat.lat+'&name=' ';
 						  window.open("https://uri.amap.com/marker?position="+e.lnglat.lng+","+e.lnglat.lat+"&name= ")
-						
+
 						},
-					
+
 					  }).show()
 					}
 				},
-				storeEnvironmen: [{value:'',text:'店铺星级'}],
-				customerType: [{value:'',text:'客户类型'}],
-				staffData:[{value:'-1',text:'选择员工'}],
-				projectData:[{value:'',text:'产品类型'}],
+				storeEnvironmen: [{value:'',text:'全部星级'}],
+				customerType: [{value:'',text:'全部类型'}],
+				staffData:[],
+				projectData:[{value:'',text:'全部产品'}],
 				environmenVal: '',
 				projectTypeVal:'',
 				shopName:'',
@@ -126,11 +126,12 @@
 							more: '加载更多', noMore: '没有更多数据了',
 						},
 						threshold:40,
-						
+
 					}
 				},
+        businessId:'',
 				plugin: [
-				
+
 					{
 						pName: 'Geolocation',
 						enableHighAccuracy: true,//是否使用高精度定位，默认:true
@@ -149,7 +150,7 @@
 							init(o) {
 								// o 是高德地图定位插件实例
 								o.getCurrentPosition((status, result) => {
-									
+
 									if (result && result.position) {
 										self.center = [result.position.lng,result.position.lat];
 									}
@@ -161,12 +162,13 @@
 			}
 		},
 		mounted() {
+      let self = this;
 			if(JSON.parse(localStorage.getItem('staff'))== null){
-				
+
 				this.$router.push({
 					name:'workOsLogin'
 				})
-				
+
 			}else{
 				this.addressPicker = this.$createCascadePicker({
 					title: '城市选择',
@@ -174,26 +176,38 @@
 					onSelect: this.selectHandle,
 					onCancel: this.cancelHandle
 				});
-				
+
 				this.name = JSON.parse(localStorage.getItem('staff')).name;
 				this.parentId = JSON.parse(localStorage.getItem('staff')).parentId;
 				this.staffVal = JSON.parse(localStorage.getItem('staff')).staffId;
-				
 				if(this.parentId == 0){
 					this.staffVal = '-1';
+				  this.businessId = '-1';
+				  this.staffData.push({
+				    value:'-1',
+				    text:'全部'
+				  });
 				}else{
 					this.staffVal = JSON.parse(localStorage.getItem('staff')).staffId;
+				  this.viewCompetence = JSON.parse(localStorage.getItem('staff')).viewCompetence;
+
+				  if(this.viewCompetence!=''){
+				    this.businessId = this.viewCompetence+','+this.staffVal;
+				    this.staffData = [{value:self.businessId,text:'全部'},{value:self.staffVal,text:'自己'}]
+				  }else{
+				    this.businessId = this.staffVal;
+				    this.staffData=[{value:self.staffVal,text:'自己'}]
+				  }
 				}
-				
 				this.getCustomer();
 				this.getCondition();
 				this.getType();
 				this.getProjectType();
-				this.getStaff();
-				
-				
+				this.getStaffName();
+
+
 			}
-			
+
 			//let upLoad = document.querySelector(".upPic input");
 			//upLoad.setAttribute("capture","camera");
 		},
@@ -203,13 +217,17 @@
 					name:'workOsInfoList'
 				});
 			},
+      listChange(val){
+        this.businessId = val;
+        this.getCustomer();
+      },
 			markClick(){
 				alert('11111')
 			},
 			getProjectType(){
 				let self = this;
 				this.axios.post(Api.staffApi + '/business/selectBClientPTypeAll', this.qs.stringify({
-					
+
 				}), {
 					headers: {
 						'Content-Type': 'application/x-www-form-urlencoded'
@@ -217,42 +235,65 @@
 				}).then((res)=>{
 					if(res.data.code == 1){
 						// self.customerType = res.data.data;
-						
+
 						res.data.data.forEach((e)=>{
 							self.projectData.push({
 								value:e.typeId,
 								text:e.name
 							})
 						})
-						
+
 					}else{
 						alert(res.data.msg);
 					}
 				})
 			},
-			getStaff(){
-				let self = this;
-				this.axios.post(Api.staffApi + '/business/selectBusinessStaffAll', this.qs.stringify({
-					pageNo:0,
-					pageSize:100
-				}), {
-					headers: {
-						'Content-Type': 'application/x-www-form-urlencoded'
-					}
-				}).then((res)=>{
-					if(res.data.code == 1){
-						// self.storeEnvironmen = res.data.data;
-						
-						res.data.data.forEach((e)=>{
-							self.staffData.push({
-								value:e.id,
-								text:e.name
-							})
-						})
-					}else{
-						alert(res.data.msg);
-					}
-				})
+			getStaffName(){//获取员工名字
+			  let self = this;
+			  if(this.staffVal === '-1'){
+			    this.axios.get(Api.staffApi+'/business/selectStaffAll',{
+			    		headers: {
+			    			'Content-Type': 'application/x-www-form-urlencoded'
+			    		}
+			    	}).then(function(res) {
+			         if(res.data.code == 1){
+			            console.log(res.data.data)
+			            res.data.data.forEach((e)=>{
+			              self.staffData.push({
+			                value:e.id,
+			                text:e.name
+			              })
+			            })
+
+			         }else{
+			           alert(res.data.msg)
+			         }
+			    	})
+			  }else if(self.viewCompetence!=''){
+			     // alert(self.staffId)
+			    this.axios.get(Api.staffApi+'/business/selectStaffByCompetence?viewCompetence='+self.viewCompetence,{
+			    		headers: {
+			    			'Content-Type': 'application/x-www-form-urlencoded'
+			    		}
+			    	}).then(function(res) {
+			         if(res.data.code == 1){
+			            console.log(res.data.data)
+			            res.data.data.forEach((e)=>{
+			              self.staffData.push({
+			                value:e.id,
+			                text:e.name
+			              })
+			            })
+
+			         }else{
+			           alert(res.data.msg)
+			         }
+			    	})
+			  }else{
+			    this.staffData = [{value:self.staffVal,text:'自己'}]
+			  }
+
+
 			},
 			showAddressPicker() {
 				this.addressPicker.show()
@@ -277,7 +318,7 @@
 						self.center=[result.districtList[0].center.lng,result.districtList[0].center.lat]
 					});
 				}
-				
+
 				this.getCustomer();
 			},
 			cancelHandle() {
@@ -287,11 +328,11 @@
 					time: 1000
 				}).show()
 			},
-		
+
 			getCondition(){
 				let self = this;
 				this.axios.post(Api.staffApi + '/business/selectBShopsConditionAll', this.qs.stringify({
-					
+
 				}), {
 					headers: {
 						'Content-Type': 'application/x-www-form-urlencoded'
@@ -299,7 +340,7 @@
 				}).then((res)=>{
 					if(res.data.code == 1){
 						// self.storeEnvironmen = res.data.data;
-						
+
 						res.data.data.forEach((e)=>{
 							self.storeEnvironmen.push({
 								value:e.conditionId,
@@ -314,7 +355,7 @@
 			getType(){
 				let self = this;
 				this.axios.post(Api.staffApi + '/business/selectBShopsTypeAll', this.qs.stringify({
-					
+
 				}), {
 					headers: {
 						'Content-Type': 'application/x-www-form-urlencoded'
@@ -353,7 +394,7 @@
 					this.qu = '';
 				}
 				this.axios.post(Api.staffApi + '/business/selectBClientInfo', this.qs.stringify({
-					businessId:this.staffVal,
+					businessId:self.businessId,
 					province:self.sheng,
 					city:self.shi,
 					area:self.qu,
@@ -377,9 +418,9 @@
 					}
 				})
 			},
-		
-			
-		
+
+
+
 		}
 	}
 </script>
@@ -452,7 +493,7 @@
 
 				.customerType {
 					padding-top: 20px;
-					
+
 					.cube-select {
 						padding-top: 3px;
 						padding-bottom: 3px;
@@ -523,7 +564,7 @@
 			bottom: 0;
 			left: 0;
 			right: 0;
-			
+
 			.workOsCustomer_map{
 				height: 100%;
 			}
