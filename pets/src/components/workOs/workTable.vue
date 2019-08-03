@@ -239,7 +239,7 @@
           startTime:self.time1,
           endTime:self.time2,
           pageNo:self.page,
-          pageSize:1
+          pageSize:10
         }), {
         	headers: {
         		'Content-Type': 'application/x-www-form-urlencoded'
@@ -283,7 +283,7 @@
         	startTime:self.time1,
         	endTime:self.time2,
         	pageNo:self.page,
-        	pageSize:1
+        	pageSize:10
         }), {
         	headers: {
         		'Content-Type': 'application/x-www-form-urlencoded'

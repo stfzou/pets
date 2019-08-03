@@ -1,5 +1,8 @@
 <template>
 	<div class="editCustomer">
+    <div class="dialogMask" @click.stop v-show="dialogMask">
+      <cube-loading :size="40"></cube-loading>
+    </div>
 		<div class="login_nav">
 			<div class="back" @click="back"></div>
 			<div class="title">修改客户信息</div>
@@ -137,7 +140,7 @@
 					<div class="list_l"><b>*</b>地理位置:</div>
 					<div class="list_r">
 						<div class="customer_map">
-							<el-amap ref="map" vid="amapDemo" :zoomEnable="false" :center="center" :zoom="18" class="amap-demo">
+							<el-amap ref="map" vid="amapDemo" :zoomEnable="false" :center="center" :zoom="18" :dragEnable="false" class="amap-demo">
 
 								<el-amap-marker :draggable="true" :events="markers" :icon="require('../../assets/icon/map@2x.png')" vid="component-marker" :position="center"></el-amap-marker>
 
@@ -167,6 +170,7 @@
 			let self = this;
 			return{
 				cityData: ['省份', '城市', '地区'],
+        dialogMask:false,
 				remark:'',
 				storeEnvironmen: [],
 				customerType: [],
@@ -256,6 +260,7 @@
 			},
 			getEditInfo(){
 				let re = this.$route.params;
+        console.log(re)
 				this.storeName = re.shopName;
 				this.cityData = re.cityData;
 				this.addr = re.addr;
@@ -263,6 +268,8 @@
 				this.environmenVal = re.conditionId;
 				this.typeVal = re.typeId;
 				this.center = [re.longitude,re.latitude];
+        this.lat = re.latitude;
+        this.lng = re.longitude;
 				this.imgOne = re.imgOne;
 				this.imgTwo = re.imgTwo;
 				this.imgThree = re.imgThree;
@@ -419,9 +426,11 @@
 								self.$router.push({
 									name:'workOsCustomer'
 								})
+                self.dialogMask = false;
 							},500)
 						}else{
 							alert(res.data.msg);
+              self.dialogMask = false;
 						}
 					})
 				}
@@ -515,6 +524,22 @@
 
 <style lang="scss">
 	.editCustomer{
+     .dialogMask{
+      height: 100%;
+      width: 100%;
+      position: fixed;
+      top: 0;
+      left: 0;
+      background: rgba(0,0,0,0.6);
+      z-index: 10000;
+      .cube-loading-spinners{
+        color: #fff;
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%,-50%);
+      }
+    }
 		.amap-logo{
 			opacity:0;
 		}

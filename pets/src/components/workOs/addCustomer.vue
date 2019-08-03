@@ -1,5 +1,8 @@
 <template>
 	<div class="addCustomer">
+    <div class="dialogMask" @click.stop v-show="dialogMask">
+      <cube-loading :size="40"></cube-loading>
+    </div>
 		<div class="login_nav">
 			<div class="back" @click="back"></div>
 			<div class="title">添加客户信息</div>
@@ -167,6 +170,7 @@
 				isCommit:false,
 				remark:'',
 				isMark:true,
+        dialogMask:false,
 				lng:'',
 				lat:'',
 				cityData: ['省份', '城市', '地区'],
@@ -424,6 +428,7 @@
 					toast.show()
 					return false;
 				}else{
+          this.dialogMask = true;
 					this.axios.post(Api.staffApi + '/ca/addBClient', this.qs.stringify({
 						businessId:JSON.parse(localStorage.getItem('staff')).staffId,
 						shopName:self.storeName,
@@ -447,18 +452,21 @@
 						}
 					}).then((res)=>{
 						if(res.data.code == 1){
+
 							let toast = this.$createToast({
 								txt: '添加成功',
 								type: 'correct'
-							 })
+							})
 							toast.show();
 							setTimeout(()=>{
 								self.$router.push({
 									name:'workOsCustomer'
 								})
+                self.dialogMask = false;
 							},500)
 						}else{
 							alert(res.data.msg);
+              self.dialogMask = false;
 						}
 					})
 				}
@@ -556,7 +564,22 @@
 
 <style lang="scss">
 	.addCustomer{
-
+    .dialogMask{
+      height: 100%;
+      width: 100%;
+      position: fixed;
+      top: 0;
+      left: 0;
+      background: rgba(0,0,0,0.6);
+      z-index: 10000;
+      .cube-loading-spinners{
+        color: #fff;
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%,-50%);
+      }
+    }
     background: #fff;
 		.amap-logo{
 			opacity:0;

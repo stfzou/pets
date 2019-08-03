@@ -45,30 +45,38 @@
 		<div class="workOsCustomer_cnt" v-if="customerList.length>0">
 			<cube-scroll ref="scroll" :options="options"  @pulling-up="onPullingUp" @pulling-down="onPullingDown">
 			<ul class="listInfo">
-				<li v-for="item in customerList">
-					<div class="storeName">
+				<li v-for="(item,index) in customerList">
+					<div class="storeName flex_r_s_b">
 						<!-- <a href="###"><img src="../../assets/ali-ed
 
 						it.png" alt=""></a> -->
-						<router-link class="flex_r_f_s" :to="{name:'editCustomer',params:{
-							cityData:[item.province,item.city,item.area],
-							addr:item.address,
-							shopName:item.shopName,
-							imgOne:item.storeImg,
-							imgTwo:item.displayOneImg,
-							imgThree:item.displayTwoImg,
-							latitude:item.latitude,
-							longitude:item.longitude,
-							phone:item.phone,
-							typeId:item.typeId,
-							conditionId:item.conditionId,
-							clientId:item.clientId,
-							productTypeId:item.productTypeId,
-							remark:item.remark
-						}}">
-							<span><b>{{item.shopName}}</b></span>
-							<img src="../../assets/ali-edit.png" alt="">
-						</router-link>
+
+            <div class="link flex_r_f_s">
+              <span><b>{{item.shopName}}</b></span>
+              <router-link v-if="item.businessId == staffId" :to="{name:'editCustomer',params:{
+              	cityData:[item.province,item.city,item.area],
+              	addr:item.address,
+              	shopName:item.shopName,
+              	imgOne:item.storeImg,
+              	imgTwo:item.displayOneImg,
+              	imgThree:item.displayTwoImg,
+              	latitude:item.latitude,
+              	longitude:item.longitude,
+              	phone:item.phone,
+              	typeId:item.typeId,
+              	conditionId:item.conditionId,
+              	clientId:item.clientId,
+              	productTypeId:item.productTypeId,
+              	remark:item.remark
+              }}">
+                <img src="../../assets/ali-edit.png" alt="">
+              </router-link>
+            </div>
+
+
+            <div class="delete" v-if="parentId===0" @click="deletCustomer(item,index)">
+              <img src="../../assets/ali-delete.png" alt="">
+            </div>
 					</div>
 					<div class="addr">
 						{{item.province}}-{{item.city}}-{{item.area}}
@@ -194,13 +202,14 @@
           });
 				}else{
 					this.staffVal = JSON.parse(localStorage.getItem('staff')).staffId;
+          this.businessId = JSON.parse(localStorage.getItem('staff')).staffId;
+          this.staffId = JSON.parse(localStorage.getItem('staff')).staffId;
           this.viewCompetence = JSON.parse(localStorage.getItem('staff')).viewCompetence;
-
           if(this.viewCompetence!=''){
-            this.businessId = this.viewCompetence+','+this.staffVal;
-            this.staffData = [{value:self.businessId,text:'全部'},{value:self.staffVal,text:'自己'}]
+            let all = this.viewCompetence+','+this.staffId;
+            this.staffData = [{value:all,text:'全部'},{value:self.staffId,text:'自己'}];
           }else{
-            this.businessId = this.staffVal;
+            this.businessId = this.staffId;
             this.staffData=[{value:self.staffVal,text:'自己'}]
           }
 				}
@@ -219,6 +228,53 @@
 					name:'workOsInfoList'
 				});
 			},
+      deletCustomer(item,index){
+      	let self = this;
+      	this.$createDialog({
+      		type: 'confirm',
+      		icon: 'cubeic-alert',
+      		title: '删除',
+      		content: '是否确定删除该客户信息？',
+      		confirmBtn: {
+      			text: '确定',
+      			active: true,
+      			disabled: false,
+      			href: 'javascript:;'
+      		},
+      		cancelBtn: {
+      			text: '取消',
+      			active: false,
+      			disabled: false,
+      			href: 'javascript:;'
+      		},
+      		onConfirm: () => {
+      			// let self = this;
+      			this.axios.post(Api.staffApi + '/business/deleteBClient', this.qs.stringify({
+      				clientId:item.clientId,
+              id:JSON.parse(localStorage.getItem('staff')).staffId
+      			}), {
+      				headers: {
+      					'Content-Type': 'application/x-www-form-urlencoded'
+      				}
+      			}).then((res)=>{
+      				if(res.data.code == 1){
+      					let toast = this.$createToast({
+      						txt: '删除成功',
+      						type: 'correct'
+      					 })
+      					toast.show();
+      					self.customerList.splice(index,1);
+
+      				}else{
+      					alert(res.data.msg);
+      				}
+      			})
+      		},
+      		onCancel: () => {
+
+      		}
+      	}).show()
+      },
       visitLink(item){
         this.$router.push({
           name:'shopNameVisit',
@@ -655,6 +711,14 @@
 			.listInfo{
 				&>li{
 					padding-top: 30px;
+          .link{
+            width: 400px;
+          }
+          .delete{
+            img{
+              width: 38px;
+            }
+          }
 					.storeName{
 						font-size: 34px;
 						font-weight: bold;

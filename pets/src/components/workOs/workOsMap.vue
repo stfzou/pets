@@ -38,11 +38,11 @@
 
 		</div>
 		<div class="workOsCustomer_cnt">
-			<div class="workOsCustomer_map">
+			<div class="workOsCustomer_map" v-if="customerList.length>0">
 				<el-amap ref="map" vid="amapDemo" :center="center" :zoom="13" class="amap-demo" :plugin="plugin">
 					<!-- <el-amap-text v-for="text in texts" :text="text.text" :offset="text.offset" :position="text.position" :events="text.events"></el-amap-text> -->
 					<el-amap-text v-for="(item,index) in customerList" :key="item.clientId" :text="item.shopName" :position="[item.longitude,item.latitude]"></el-amap-text>
-					<el-amap-marker v-for="(item,index) in customerList" :key="index" :icon="item.clientTypeIcom" :events="events"
+					<el-amap-marker v-for="(item,index) in customerList" :key="index+'a'" :icon="item.clientTypeIcom" :events="events"
 					vid="component-marker" :position="[item.longitude,item.latitude]" @click="markClick"></el-amap-marker>
 					<!-- <el-amap-marker v-for="item in customerList" :icon="item.clientTypeIcom" vid="component-marker" :position="[item.latitude,item.longitude]"></el-amap-marker> -->
 				</el-amap>

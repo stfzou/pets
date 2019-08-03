@@ -180,10 +180,7 @@ export default new Router({
 		{
 			path:'/workOsCustomer',
 			name:'workOsCustomer',
-			component:WorkOsCustomer,
-      meta:{
-        keepAlive:true
-      }
+			component:WorkOsCustomer
 
 		},
 		{

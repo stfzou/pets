@@ -206,7 +206,6 @@
               })
 							self.$refs.scroll.forceUpdate();
               setTimeout(()=>{
-              	self.$refs.scroll.forceUpdate();
               	self.$refs.scroll.refresh();
               },100)
 						},500)
