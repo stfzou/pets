@@ -2,7 +2,7 @@
 	<div class="main-cnt">
 		<ul class="nav flex_r_f_s">
 			<li class="active">
-				
+
 				<span>①</span>
 				商家信息
 			</li>
@@ -10,12 +10,12 @@
 				<img src="../assets/condition/icon_01.png" alt="">
 			</li>
 			<li>
-				
+
 				<span>②</span>
 				资质信息
 			</li>
 			<li>
-				
+
 				<img src="../assets/condition/icon_01.png" alt="">
 			</li>
 			<li>
@@ -25,7 +25,7 @@
 		</ul>
 		<div class="view_warpper">
 			<div class="sellerInfo">
-					
+
 					<ul class="seller_info_list">
 						<li>
 							<p>商家名称<span>*</span></p>
@@ -82,21 +82,21 @@
 							<div class="list_r">
 								<input id="input_id" v-model="searchMap" class="active_input" type="text" placeholder="请输入详细街道名称和门牌号，请与执照地址一致">
 								<span class="map_button pointer" @click="mapShow = !mapShow">去定位</span>
-							
+
 							</div>
 						</li>
 						<li v-show="mapShow">
 							<p></p>
 							<div class="list_r map_r flex_r_s_b">
-								
+
 								<div class="amap-page-container">
 								 <el-amap-search-box class="search-box" :search-option="searchOption" :on-search-result="onSearchResult"></el-amap-search-box>
 								  <el-amap vid="amap" :zoom="zoom" :plugin="plugin" class="amap-demo" :center="mapCenter">
-									 
+
 									  <el-amap-marker :events="markers" draggable="true" vid="component-marker" :position="mapCenter"></el-amap-marker>
-			
+
 								  </el-amap>
-								
+
 								</div>
 							</div>
 						</li>
@@ -123,7 +123,7 @@
 													<i class="el-icon-plus avatar-uploader-icon"></i>
 												</el-upload>
 										</div>
-										
+
 										<div class="mid">
 											<h3>门店照片</h3>
 											<p>需拍出完整门框、门匾（建议正对门脸2米处拍摄）</p>
@@ -193,14 +193,14 @@
 											<img src="../assets/condition/shili03.png" alt="">
 										</div>
 									</div>
-									
+
 								</div>
 							</div>
 						</li>
 						<li>
 							<p>商家简介<span>*</span></p>
 							<div class="list_r">
-								
+
 								<el-input
 								  class="sellerTextarea"
 								  type="textarea"
@@ -211,11 +211,11 @@
 						</li>
 					</ul>
 					<div class="pointer next_btn" @click="next">点击进入下一步</div>
-					
+
 				</div>
 		</div>
 	</div>
-	
+
 </template>
 
 <script>
@@ -261,6 +261,7 @@
 					logo:'',
 					logoId:''
 				},
+        shopId:'',
 				city:'',
 				searchMap:'',
 				lng: 0,
@@ -285,10 +286,10 @@
 					init(o) {
 					  // o 是高德地图定位插件实例
 					  o.getCurrentPosition((status, result) => {
-							
+
 							if (result && result.position) {
-								
-								
+
+
 								self.lng = result.position.lng;
 								self.lat = result.position.lat;
 								self.mapCenter = [self.lng, self.lat];
@@ -296,9 +297,9 @@
 								self.loaded = true;
 								self.$nextTick();
 								// console.log(result.addressComponent.city)
-								
+
 							}
-					  
+
 						});
 					}
 				  }
@@ -307,7 +308,7 @@
 					pName:'Geocoder',
 					events:{
 						init(o){
-							
+
 						}
 					}
 				}]
@@ -316,9 +317,12 @@
 		},
 		mounted:function(){
 			let self = this;
+      if(JSON.parse(sessionStorage.getItem('user')).shopId!=''){
+        this.shopId = JSON.parse(sessionStorage.getItem('user')).shopId;
+      }
 			this.axios.post(Api.shopApi+'/selectShopUserInfo', this.qs.stringify({
 				userId:JSON.parse(sessionStorage.getItem('user')).userId
-				
+
 			}), {
 				headers: {
 					'Content-Type': 'application/x-www-form-urlencoded'
@@ -326,33 +330,33 @@
 			}).then((res)=>{
 				if(res.data.code == 1){
 					if(res.data.user.userShops.shopStatus === 3){
-						
+
 						self.$router.push({
 							name: 'login'
 						})
-						
+
 					}else if(res.data.user.userShops.shopStatus === 4) {
-								
+
 						self.$router.push({
 							name: 'qualificationsInfo',
 							params: { shopTypeName: res.data.user.userShops.shopName }
 						})
 					}else if(res.data.user.userShops.shopStatus === 2){
-						
+
 						self.$router.push({
 							name: 'addGoods'
 						})
 					}else if(res.data.user.userShops.shopStatus === 1){
-						
+
 						self.$router.push({
 							name: 'storeSuccess'
 						})
-						
+
 					}
 				}
 			})
-			
-			
+
+
 			this.axios.all([
 				this.axios.post(Api.shopApi+'/getOperateAll',{
 					headers: { //经营品类
@@ -376,13 +380,13 @@
 							type: 'error',
 						});
 					}
-					
+
 			}));
-			
+
 		},
 		methods: {
 				beforeAvatarUpload(file) {
-							
+
 					const isLt2M = file.size / 1024 / 1024 < 2;
 					if (!isLt2M) {
 					  this.$message.error('上传图片大小不能超过 2MB!');
@@ -392,7 +396,7 @@
 				handleStoreSuccess(res,file,fileList) { //门店照片
 					this.sellerInfo.outImg = file.response.data.imgAddr;
 					this.sellerInfo.outId = file.response.data.imgId;
-					
+
 				},
 				handleStoreInSuccess(res,file,fileList) {//店内照片
 					this.sellerInfo.inImg = file.response.data.imgAddr;
@@ -403,9 +407,9 @@
 					this.sellerInfo.logoId = file.response.data.imgId;
 				},
 				deleteImg(arr,img){ //照片删除
-					
+
 					let self = this;
-					
+
 					this.$confirm('此操作将永久删除该文件, 是否继续?', '提示', {
 							confirmButtonText: '确定',
 							cancelButtonText: '取消',
@@ -429,7 +433,7 @@
 												type: 'error',
 											});
 										}
-									
+
 									}).catch(function(res){
 											self.$message({
 												showClose: true,
@@ -437,7 +441,7 @@
 												type: 'error',
 											});
 									})
-									
+
 								}
 							}
 					})
@@ -448,11 +452,11 @@
 				  this.markers.push([lng, lat]);
 				},
 				onSearchResult(pois) {
-				  
+
 				  if (pois.length > 0) {
-					
+
 					this.mapCenter = [pois[0].lng, pois[0].lat];
-					
+
 				  }
 				},
 				//省市区赋值
@@ -462,11 +466,11 @@
 				},
 				onChangeCity(data){
 					this.shi = data.value;
-					
+
 				},
 				onChangeArea(data){
 					this.qu = data.value;
-					
+
 				},
 				onSearchResult(pois){
 					let self = this;
@@ -517,8 +521,9 @@
 							background: 'rgba(0, 0, 0, 0.7)'
 						});
 						this.axios.post(Api.shopApi+'/webShop/editShopsInfo', this.qs.stringify({
-							
-							shopId:JSON.parse(sessionStorage.getItem('user')).shopId,
+
+							shopId:self.shopId,
+              userId:JSON.parse(sessionStorage.getItem('user')).userId,
 							shopName:self.storeNameInput,
 							contactName:self.userNameInput,
 							contactTel:JSON.parse(sessionStorage.getItem('user')).userPhone,
@@ -534,14 +539,14 @@
 							latitude:self.mapCenter[1],
 							longitude:self.mapCenter[0],
 							shopDesc:self.sellerTextarea
-							
+
 						}), {
 							headers: {
 								'Content-Type': 'application/x-www-form-urlencoded'
 							}
 						}).then(function(res){
 							if(res.data.code == 1){
-								
+
 								setTimeout(() => {
 									loading.close();
 								}, 1000);
@@ -553,12 +558,15 @@
 								self.$router.push({name:'qualificationsInfo'});
 							}else{
 								self.$message.error(res.data.msg);
+                setTimeout(() => {
+                	loading.close();
+                }, 1000);
 							}
 						})
 					}
 				}
-				
-			
+
+
 		//
 		},
 		created(){
@@ -631,8 +639,8 @@
 			  left: 20px;
 			}
 		}
-		
-		
+
+
 		.next_btn{
 			width:300px;
 			height:38px;
@@ -667,7 +675,7 @@
 						color: #FF523D;
 					}
 				}
-				
+
 				.list_r{
 					float: left;
 					position: relative;
@@ -692,7 +700,7 @@
 							font-size: 16px;
 							border-color: #ddd;
 						}
-						
+
 					}
 					.active_input{
 						width: 420px;
@@ -726,7 +734,7 @@
 						width:80px;
 						height:30px;
 						background:rgba(255,82,61,1);
-						border-radius:15px;	
+						border-radius:15px;
 						color: #fff;
 						line-height: 30px;
 						font-size: 16px;
@@ -773,7 +781,7 @@
 							img{
 								height: 110px;
 								width: 110px;
-								
+
 							}
 							.el-icon-circle-close{
 								position:absolute;
@@ -813,11 +821,11 @@
 							}
 						}
 					}
-					
+
 				}
 			}
-			
-			
+
+
 		}
 	}
 </style>

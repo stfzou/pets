@@ -105,7 +105,7 @@
 									console.log(error);
 								});
 						}
-						
+
 						this.timer = setInterval(() => {
 							if (this.count > 0 && this.count <= TIME_COUNT) {
 								this.count--;
@@ -291,7 +291,7 @@
 							'Content-Type': 'application/x-www-form-urlencoded'
 						}
 					}).then(function(res){
-						
+
 						if(res.data.code == 1){
 							let loading = self.$loading({
 													lock: true,
@@ -299,8 +299,8 @@
 													spinner: 'el-icon-loading',
 													background: 'rgba(0, 0, 0, 0.7)'
 											});
-							
-							
+
+
 							setTimeout(() => {
 								loading.close();
 								self.$message({
@@ -329,9 +329,9 @@
 								type: 'success',
 							});
 						}
-						
+
 					})
-					
+
 				}
 
 
@@ -370,8 +370,8 @@
 													spinner: 'el-icon-loading',
 													background: 'rgba(0, 0, 0, 0.7)'
 											});
-							
-							
+
+
 							setTimeout(() => {
 								loading.close();
 								self.$message({
@@ -381,7 +381,7 @@
 								});
 							}, 2000);
 							self.login();
-							
+
 						}else{
 							self.$message({
 								showClose: true,
@@ -390,12 +390,12 @@
 							});
 						}
 					})
-					
+
 				}
 			},
-			loginRuler() { 
+			loginRuler() {
 				//登录验证
-				
+
 				let self = this;
 
 				if (this.phone === '') {
@@ -438,9 +438,9 @@
 							'Content-Type': 'application/x-www-form-urlencoded'
 						}
 					}).then(function(res) {
-						
+
 						if (res.data.code === 1) {
-						
+
 							var userEntity = {
 								userName: res.data.user.userName,
 								userId: res.data.user.userId,
@@ -458,43 +458,46 @@
 							setTimeout(() => {
 								loading.close();
 							}, 1000);
-							if (res.data.user.userShops.shopStatus === 0) {
-								
+							if (res.data.user.userShops.shopStatus === 0||res.data.user.userShops.shopStatus==null) {
+
 								self.$router.push({
 									name: 'dataReady'
 								})
+                console.log(res.data)
 							}else if(res.data.user.userShops.shopStatus === 4) {
-								
+
 								self.$router.push({
 									name: 'qualificationsInfo',
 									params: { shopTypeName: res.data.user.userShops.shopName }
 								})
-							}else if(res.data.user.userShops.shopStatus === 3){
-								
+                // console.log(res.data)
+							}
+              else if(res.data.user.userShops.shopStatus === 3){
+
 								self.$message.error('审核失败');
-								
+
 							}else if(res.data.user.userShops.shopStatus === 2){
-								
+
 								self.$router.push({
 									name: 'addGoods'
 								})
 							}else if(res.data.user.userShops.shopStatus === 1){
-								
+
 								self.$router.push({
 									name: 'storeSuccess'
 								})
-								
+
 							}
-							
+
 						}else {
 							loading.close();
 							self.$message.error(res.data.msg);
 						}
 					}).catch(function(err){
-						
+
 						self.$message.error('网络出了一点问题');
 						loading.close();
-						
+
 					})
 
 				}

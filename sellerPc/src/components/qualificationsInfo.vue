@@ -224,6 +224,7 @@
 					zlzP: 0,
 					zlzId: ''
 				},
+        shopId:'',
 				inputData: {
 					userNameVal: '',
 					sfzVal: '',
@@ -237,57 +238,9 @@
 				regId: /(^\d{15}$)|(^\d{18}$)|(^\d{17}(\d|X|x)$)/
 			};
 		},
-		mounted: function() {
-			let self = this;
-			
-			this.axios.post(Api.shopApi+'/selectShopUserInfo', this.qs.stringify({
-				userId:JSON.parse(sessionStorage.getItem('user')).userId
-				
-			}), {
-				headers: {
-					'Content-Type': 'application/x-www-form-urlencoded'
-				}
-			}).then((res)=>{
-				if(res.data.code == 1){
-					if (res.data.user.userShops.shopStatus === 0) {
-						
-						self.$router.push({
-							name: 'dataReady'
-						})
-					}else if(res.data.user.userShops.shopStatus === 3){
-						
-						self.$message.error('审核失败');
-						
-					}else if(res.data.user.userShops.shopStatus === 2){
-						
-						self.$router.push({
-							name: 'addGoods'
-						})
-					}else if(res.data.user.userShops.shopStatus === 1){
-						
-						self.$router.push({
-							name: 'storeSuccess'
-						})
-						
-					}
-				}
-			})
-			
-			this.axios.post(Api.shopApi+'/webShop/selectShopsType ', this.qs.stringify({
-				shopId: JSON.parse(sessionStorage.getItem('user')).shopId
-			}), {
-				headers: {
-					'Content-Type': 'application/x-www-form-urlencoded'
-				}
-			}).then(function(res) {
-				if (res.data.code == 1) {
-					console.log(res)
-					self.shopTypeName = res.data.data.shopTypeName
-					
-				} else {
-					self.$message.error(res.data.msg);
-				}
-			})
+		mounted(){
+			this.getShopId();
+
 		},
 		watch: {
 			checked(newValue, oldValue) {
@@ -301,8 +254,8 @@
 			}
 		},
 		methods: {
-			 beforeAvatarUpload(file) {
-				
+			beforeAvatarUpload(file) {
+
 				const isLt2M = file.size / 1024 / 1024 < 2;
 
 				if (!isLt2M) {
@@ -310,6 +263,46 @@
 				}
 				return isLt2M;
 			},
+      getShopId(){
+        let self = this;
+        this.axios.post(Api.shopApi+'/selectShopUserInfo', this.qs.stringify({
+        	userId:JSON.parse(sessionStorage.getItem('user')).userId
+
+        }), {
+        	headers: {
+        		'Content-Type': 'application/x-www-form-urlencoded'
+        	}
+        }).then((res)=>{
+        	if(res.data.code == 1){
+            console.log(res.data)
+            self.shopId = res.data.user.userShops.shopId;
+            self.shopTypeName = res.data.user.userShops.shopTypeName;
+        		if (res.data.user.userShops.shopStatus === 0) {
+
+        			self.$router.push({
+        				name: 'dataReady'
+        			})
+        		}else if(res.data.user.userShops.shopStatus === 3){
+
+        			self.$message.error('审核失败');
+
+        		}else if(res.data.user.userShops.shopStatus === 2){
+
+        			self.$router.push({
+        				name: 'addGoods'
+        			})
+        		}else if(res.data.user.userShops.shopStatus === 1){
+
+        			self.$router.push({
+        				name: 'storeSuccess'
+        			})
+
+        		}
+        	}else{
+            alert(res.data.msg)
+          }
+        })
+      },
 			handleSfzzSuccess(res, file, fileList) { //身份证正面上传
 
 				this.imgData.sfzz = file.response.data.imgAddr;
@@ -389,9 +382,9 @@
 			next() {
 				let self = this;
 				let shopInfoData = {};
-				
+
 				if (self.shopTypeName == '医疗诊所') {
-					
+
 					if (this.inputData.userNameVal == '') {
 
 						this.$message.error('真实姓名不能为空');
@@ -473,17 +466,17 @@
 							}
 						}).then(function(res) {
 							if (res.data.code == 1) {
-								
+
 								self.$router.push({name:'storeSuccess'})
 							} else {
 								self.$message.error(res.data.msg);
 							}
 						})
 					}
-					// 
+					//
 
 				} else {
-					
+
 					if (this.inputData.userNameVal == '') {
 
 						this.$message.error('真实姓名不能为空');
@@ -533,7 +526,7 @@
 							unitName: self.inputData.companyName,
 							//资质信息
 							isQualification: 0,
-							
+
 						}
 						this.axios.post(Api.shopApi+'/webShop/editShopsQualification', this.qs.stringify(shopInfoData), {
 							headers: {
@@ -541,7 +534,7 @@
 							}
 						}).then(function(res) {
 							if (res.data.code == 1) {
-								
+
 								self.$router.push({name:'storeSuccess'})
 							} else {
 								self.$message.error(res.data.msg);

@@ -27,17 +27,17 @@ Vue.prototype.qs = Qs;
 
 /** 验证用户是否登录 **/
 router.beforeEach((to,from,next) => {
-   
+
 	if(to.name == 'login'){
 		next();
 	}else if(sessionStorage.getItem('user')){
-		
+
 		next();
-		
+
 	}else{
 		next('/login');
 	}
-	
+
 })
 
 AMap.initAMapApiLoader({
