@@ -36,7 +36,10 @@ import AnswerOne from '@/components/answer/answerOne'
 import CouponList from '@/components/shareCoupon/couponList'
 import ShopCoupon from '@/components/shareCoupon/shopCoupon'
 import CouponXq from '@/components/shareCoupon/couponXq'
+import GumiCard from '@/components/gumika/gumiCard'
 
+
+/*workOs*/
 import WorkOsLogin from '@/components/workOs/workOsLogin'
 import WorkOsInfoList from '@/components/workOs/workOsInfoList'
 import WorkOsCustomer from '@/components/workOs/workOsCustomer'
@@ -82,6 +85,11 @@ export default new Router({
 
 			]
 		},
+    {
+      path:'/gumiCard',
+      name:'gumiCard',
+      component:GumiCard
+    },
 		{
 			path:'/couponList',
 			name:'couponList',

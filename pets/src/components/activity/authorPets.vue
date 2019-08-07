@@ -1,6 +1,6 @@
 <template>
 	<div class="authorPets">
-		<div class="authorPetsList" v-if="petList.length>0">
+		<div class="authorPetsList">
 			<cube-scroll ref="scroll" :options="options" @pulling-up="onPullingUp" @pulling-down="onPullingDown">
 			<div class="authorPetsItem flex_r_s_b" v-for="item in petList">
 				<div class="pet-img">
@@ -46,9 +46,10 @@
 			</div>
 			</cube-scroll>
 		</div>
-		<div class="authorPetsList flex_r_s_c" v-else>
+		<div class="authorPetsList flex_r_s_c" v-if="isLoading">
 			<cube-loading :size="30"></cube-loading>
 		</div>
+
 	</div>
 </template>
 
@@ -58,6 +59,7 @@
 		data(){
 			return{
 				arr:[1,2,3,4,5],
+        isLoading:true,
 				options: {
 					pullDownRefresh: {
 						txt: '更新成功',
@@ -85,6 +87,13 @@
 			this.getPets();
 		},
 		methods:{
+       showToastType() {
+        const toast = this.$createToast({
+          txt: 'TA还没有添加宠物',
+          type: 'warn'
+        })
+        toast.show()
+      },
 			getPets(){
 				let self = this;
 				self.axios.get(Api.trendApi + '/userPet/selectUserPet', {
@@ -99,13 +108,19 @@
 					}
 				}).then((res)=>{
 					if(res.data.code == 1){
-						setTimeout(()=>{
-							 self.petList = res.data.data;
-               self.$refs.scroll.forceUpdate();
-							 setTimeout(()=>{
-							 	  self.$refs.scroll.refresh();
-							 },100);
-						},500);
+            if(res.data.data.length<1){
+              self.isLoading=false;
+              self.showToastType();
+            }else{
+               setTimeout(()=>{
+              	 self.petList = res.data.data;
+                 self.$refs.scroll.forceUpdate();
+              	 setTimeout(()=>{
+              	 	  self.$refs.scroll.refresh();
+              	 },100);
+              },500);
+            }
+
 						console.log(res.data.data)
 					}else{
 						alert(res.data.msg);
@@ -185,9 +200,10 @@
 					border-radius: 50%;
 					background: #FFDFDF;
 					img{
-						width: 100%;
-						height: 100%;
+						width: 80px;
+						height: 80px;
 						border-radius: 50%;
+            object-fit: cover;
 					}
 				}
 				.pet-info{

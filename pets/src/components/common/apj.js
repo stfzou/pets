@@ -1,6 +1,6 @@
 export default{
-	trendApi:'http://192.168.0.112:8082',
-	userApi:'http://192.168.0.109:8082',
+	trendApi:'http://app.gutouzu.com',
+	userApi:'http://app.gutouzu.com',
 	shopApi:'http://192.168.0.109:8084',
 	staffApi:'http://192.168.0.109:8090'
 }

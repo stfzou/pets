@@ -73,9 +73,9 @@
 			if (JSON.parse(sessionStorage.getItem('user')) != null) {
 				this.userId = JSON.parse(sessionStorage.getItem('user')).userId;
 			}
-			this.getUrlData();
+
 			this.getAuthorInfo();
-      alert(1)
+
 			// console.log(window.location.href)
 		},
 		methods: {
@@ -192,25 +192,7 @@
 				}).show()
 
 			},
-			getUrlData() { // 截取url中的数据
 
-				let tempStr = window.location.href
-				/**
-				 * tempArr 是一个字符串数组 格式是["key=value", "key=value", ...]
-				 */
-				let tempArr = tempStr.split('?')[1] ? tempStr.split('?')[1].split('&') : []
-				/**
-				 * returnArr 是要返回出去的数据对象 格式是 { key: value, key: value, ... }
-				 */
-				let returnArr = {}
-				tempArr.forEach(element => {
-					returnArr[element.split('=')[0]] = element.split('=')[1]
-				})
-				/*输出日志*/
-				if(returnArr.aId!=undefined){
-					sessionStorage.setItem('Aid',JSON.stringify(returnArr.aId));
-				}
-			},
 		},
 	}
 </script>

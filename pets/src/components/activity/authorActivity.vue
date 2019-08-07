@@ -1,6 +1,6 @@
 <template>
 	<div class="authorActivity">
-		<div class="activityList" v-if="activityList.length>0">
+		<div class="activityList">
 			<cube-scroll ref="scroll" :options="options" @pulling-up="onPullingUp" @pulling-down="onPullingDown">
 				<div class="activity-item" v-for="item in activityList">
 					<img class="cover" :src="item.activityCover" alt="">
@@ -29,7 +29,7 @@
 				</div>
 			</cube-scroll>
 		</div>
-		<div class="activityList flex_r_s_c" v-else>
+		<div class="activityList flex_r_s_c" v-if="isLoading">
 			<cube-loading :size="30"></cube-loading>
 		</div>
 		<div class="amap-page-container" v-show="false">
@@ -46,6 +46,7 @@
 			let self = this;
 			return {
 				activityList: [],
+        isLoading:true,
 				options: {
 					pullDownRefresh: {
 						txt: '更新成功',
@@ -105,9 +106,17 @@
 			let elTop = document.querySelector(".dynamicNav").offsetTop;
 			let h = document.documentElement.clientHeight - elTop;
 			document.querySelector(".activityList").style.height = h + 'px';
-
+      this.getUrlData();
+      this.getActivityList();
 		},
 		methods: {
+      showToastType() {
+        const toast = this.$createToast({
+          txt: 'TA还没有活动',
+          type: 'warn'
+        })
+        toast.show()
+      },
 			getActivityListOne() {
 				let self = this;
 				self.axios.post(Api.userApi + '/ca/selectCommunityActivityListByUserId', self.qs.stringify({
@@ -123,6 +132,10 @@
 				}).then((res) => {
 					if (res.data.code == 1) {
 						self.activityList = res.data.data;
+            if(res.data.data.length<1){
+              self.showToastType();
+              self.isLoading=false;
+            }
 						setTimeout(() => {
 							self.$refs.scroll.refresh();
 						}, 500)
@@ -132,6 +145,25 @@
 					}
 				})
 			},
+      getUrlData() { // 截取url中的数据
+
+      	let tempStr = window.location.href
+      	/**
+      	 * tempArr 是一个字符串数组 格式是["key=value", "key=value", ...]
+      	 */
+      	let tempArr = tempStr.split('?')[1] ? tempStr.split('?')[1].split('&') : []
+      	/**
+      	 * returnArr 是要返回出去的数据对象 格式是 { key: value, key: value, ... }
+      	 */
+      	let returnArr = {}
+      	tempArr.forEach(element => {
+      		returnArr[element.split('=')[0]] = element.split('=')[1]
+      	})
+      	/*输出日志*/
+      	if(returnArr.aId!=undefined){
+      		sessionStorage.setItem('Aid',JSON.stringify(returnArr.aId));
+      	}
+      },
 			getActivityList() {
 				let self = this;
 				self.axios.post(Api.userApi + '/ca/selectCommunityActivityListByUserId', self.qs.stringify({
@@ -232,7 +264,9 @@
 				box-shadow: 0px 4px 12px 0px rgba(15, 15, 15, 0.16);
 
 				.cover {
-					max-width: 100%;
+					width: 100%;
+          height: 100%;
+          object-fit: cover;
 					border-top-left-radius: 10px;
 					border-top-right-radius: 10px;
 				}

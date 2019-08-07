@@ -49,10 +49,10 @@
 			<div class="text_cnt">
 				{{content}}
 			</div>
-			<div class="trend_img" v-show="images.length>0">
+			<div class="trend_img" v-show="compressImages!=''">
 				<!-- <img :src="item" alt="" v-for="(item,index) in images" :key="index"> -->
 				<div class="imgs-container flex_r_f_s">
-					<div class="img-box" v-for="(img,index) in images" :key="img">
+					<div class="img-box" v-for="(img,index) in compressImages" :key="img">
 						<img :src="img" @click="handleImgsClick(index)">
 					</div>
 
@@ -134,6 +134,7 @@
 		data() {
 			return {
 				val: '',
+        compressImages:'',
 				isMask: false,
 				isReport: false,
 				reportData: ['垃圾营销', '有害信息', '违法信息', '诈骗信息', '不实信息'],
@@ -325,11 +326,14 @@
 					}
 				}).then((res) => {
 					if (res.data.code == 1) {
+            console.log(res.data.data)
 						self.userName = res.data.data.userName;
 						self.geoLocation = res.data.data.geoLocation;
+
 						if(res.data.data.images!=''){
 							self.images = res.data.data.images.split(',');
 						}
+            self.compressImages = res.data.data.compressImages.split(',');
 						self.time = res.data.data.createdTime.split(' ')[0];
 						self.userHeadImage = res.data.data.userHeadImage;
 						// self.content = res.data.data.content;

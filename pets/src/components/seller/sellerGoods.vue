@@ -173,6 +173,7 @@
           height: 180px;
           display: block;
           margin: 0 auto;
+          object-fit: cover;
         }
 
         .goods_info {

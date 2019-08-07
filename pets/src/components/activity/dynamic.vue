@@ -11,8 +11,8 @@
 								<div class="author-vip flex_r_s_c">V</div>
 							</div>
 							<div class="authorNameBox">
-								<div class="author-name">自由犬</div>
-								<div class="time">2018-08-20</div>
+								<div class="author-name">{{item.userName}}</div>
+								<div class="time">{{item.createdTime}}</div>
 							</div>
 						</div>
 						<div class="author-cnt">
@@ -21,8 +21,8 @@
 							</div>
 							<div class="trend_img" v-show="item.images!=''">
 
-								<div class="imgs-container flex_r_f_s">
-									<div class="img-box" v-for="(img,index) in item.images.split(',')" :key="img">
+								<div class="imgs-container flex_r_f_s" v-show="item.compressImages!=''">
+									<div class="img-box" v-for="(img,index) in item.compressImages.split(',')" :key="img">
 										<img :src="img"  @click="handleImgsClick(item.images,index)">
 									</div>
 
@@ -59,7 +59,7 @@
 	import Api from '../common/apj.js'
 	export default{
 		data(){
-			return{
+			return {
 				dynamicList:[],
 				geoLocation:'',
 				scroll:'',
@@ -83,8 +83,10 @@
 		mounted() {
 			if (JSON.parse(sessionStorage.getItem('user')) != null) {
 				this.userId = JSON.parse(sessionStorage.getItem('user')).userId;
+
 			}
 			this.getHeight();
+      this.getUrlData();
 			setTimeout(()=>{
 				this.getDynamic();
 			},100)
@@ -153,6 +155,25 @@
 				this.getDynamic();
 
 			},
+      getUrlData() { // 截取url中的数据
+
+      	let tempStr = window.location.href
+      	/**
+      	 * tempArr 是一个字符串数组 格式是["key=value", "key=value", ...]
+      	 */
+      	let tempArr = tempStr.split('?')[1] ? tempStr.split('?')[1].split('&') : []
+      	/**
+      	 * returnArr 是要返回出去的数据对象 格式是 { key: value, key: value, ... }
+      	 */
+      	let returnArr = {}
+      	tempArr.forEach(element => {
+      		returnArr[element.split('=')[0]] = element.split('=')[1]
+      	})
+      	/*输出日志*/
+      	if(returnArr.aId!=undefined){
+      		sessionStorage.setItem('Aid',JSON.stringify(returnArr.aId));
+      	}
+      },
 			onPullingUp() {
 			// 模拟更新数据
 
@@ -310,6 +331,7 @@
 								width: 60px;
 								height: 60px;
 								border-radius: 50%;
+                object-fit: cover;
 							}
 							.author-vip{
 								height: 20px;
@@ -352,15 +374,12 @@
 									position: relative;
 									overflow: hidden;
 									margin-bottom: 10px;
-
 									border-radius: 4px;
 									margin-right: 15px;
 									img {
 										width: 100%;
 										height: 100%;
-										position: absolute;
-										top: 0;
-										left: 0;
+										object-fit: cover;
 										// display: block;
 
 									}
