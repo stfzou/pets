@@ -25,7 +25,7 @@
 					</div>
 					<div class="v_code active_vcode" v-else>
 						<span>{{count}}</span>
-						
+
 					</div>
 				</li>
 			</ul>
@@ -59,7 +59,7 @@
 				setTimeout(() => {
 				  window.scrollTo(0,0);
 				},100);
-				
+
 			},
 			getCode() {
 				//获取验证码
@@ -69,7 +69,7 @@
 					if (!this.timer) {
 						this.count = TIME_COUNT;
 						this.show = false;
-						this.axios.get(Api.shopApi+'/shops_sms_register?phone=' + this.phone, {
+						this.axios.get(Api.shopApi+'/sms_register?phone=' + this.phone, {
 								headers: {
 									'Content-Type': 'application/x-www-form-urlencoded'
 								}
@@ -80,7 +80,7 @@
 							.catch(function(error) {
 								console.log(error);
 						});
-						
+
 						this.timer = setInterval(() => {
 							if (this.count > 0 && this.count <= TIME_COUNT) {
 								this.count--;
@@ -98,13 +98,13 @@
 					  })
 					toast.show()
 				}
-			
+
 			},
 			registerRuler() {
 				//注册
 				let self = this;
 				if (this.phone == '') {
-			
+
 					let toast = this.$createToast({
 						txt: '手机号不能为空',
 						type: 'error'
@@ -112,7 +112,7 @@
 					toast.show()
 					return false;
 				} else if (!this.reg.test(this.phone)) {
-			
+
 					let toast = this.$createToast({
 						txt: '手机号格式错误',
 						type: 'error'
@@ -120,7 +120,7 @@
 					toast.show()
 					return false;
 				} else if (this.pwd == '') {
-			
+
 					let toast = this.$createToast({
 						txt: '密码不能为空',
 						type: 'error'
@@ -128,7 +128,7 @@
 					toast.show()
 					return false;
 				} else if (this.pwd.length < 6) {
-			
+
 					let toast = this.$createToast({
 						txt: '密码不能小于6位数',
 						type: 'error'
@@ -136,7 +136,7 @@
 					toast.show()
 					return false;
 				} else if (this.vCode === '') {
-			
+
 					let toast = this.$createToast({
 						txt: '验证码不能为空',
 						type: 'error'
@@ -144,7 +144,7 @@
 					toast.show()
 					return false;
 				} else {
-					this.axios.post(Api.shopApi+'/shops_u_register', this.qs.stringify({
+					this.axios.post(Api.shopApi+'/user_register', this.qs.stringify({
 						phone: this.phone,
 						password: this.pwd,
 						v_code: this.vCode
@@ -153,9 +153,9 @@
 							'Content-Type': 'application/x-www-form-urlencoded'
 						}
 					}).then(function(res) {
-			
+
 						if (res.data.code === 1) {
-			
+
 							let toast = self.$createToast({
 								txt: '注册成功',
 								type: 'correct'
@@ -166,8 +166,8 @@
 									name:'login'
 								})
 							},500)
-							
-			
+
+
 						} else {
 							console.log(res)
 							let toast = self.$createToast({
@@ -176,12 +176,12 @@
 							  })
 							toast.show()
 						}
-			
+
 					}).catch(function(err) {
 						console.log(err)
 					})
-			
-			
+
+
 				}
 			},
 		},
@@ -248,10 +248,10 @@
 			         /* placeholder颜色  */
 						color: #fff;
 					}
-					
+
 				}
 				.vcode_box{
-					
+
 					.v_code{
 						margin-left: 30px;
 						span{
@@ -262,7 +262,7 @@
 							color: #FF523D;
 							font-size: 24px;
 						}
-						
+
 					}
 					.active_vcode{
 						span{

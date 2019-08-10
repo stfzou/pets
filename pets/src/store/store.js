@@ -10,6 +10,7 @@ export default new Vuex.Store({
 				productId:''
 			},
 			activityInfo:{
+        cAOrderId:'',
 				cAId:'',
 				userId:'',
 				ticketId:'',
@@ -24,10 +25,12 @@ export default new Vuex.Store({
 			//员工管理系统
 			staffNum:'',
 			customerNum:''
-			
+
   },
   mutations:{
-		
+    setCAorderId(state,CAorderId){
+      state.activityInfo.CAorderId = CAorderId;
+    },
 		setShopId(state,shopId){//保存商家id
 			state.loginInfo.shopId = shopId;
 		},
@@ -54,8 +57,7 @@ export default new Vuex.Store({
 		setStaffNum(state,num){
 			state.staffNum = num;
 		}
-		
+
   },
-  
+
 })
-	

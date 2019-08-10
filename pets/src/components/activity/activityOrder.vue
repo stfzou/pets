@@ -43,7 +43,7 @@
 		<div class="activityOderFoot flex_r_s_b">
 			<div class="payMoney">待支付:￥{{totalPrice}}</div>
 			<div class="payBtn flex_r_s_c" @click="popupShow">立即支付</div>
-			
+
 		</div>
 		<div class="popup" @click.stop="popuphide" v-if="isPopup">
 			<div class="payBox" @click.stop>
@@ -71,7 +71,7 @@
 				<div class="payBtn flex_r_s_c" @click="commit">确认支付</div>
 			</div>
 		</div>
-		
+
 	</div>
 </template>
 
@@ -80,7 +80,7 @@
 	import weixinPay from '../common/weixinPay.js'
 	export default {
 		data() {
-			
+
 			return {
 				val: '',
 				activityImg: '',
@@ -103,8 +103,9 @@
 		},
 		mounted() {
 
-			let arr = window.location.href.split("?")[1];
-			this.cAOrderId = arr.split("=")[1];
+			// let arr = window.location.href.split("?")[1];
+      console.log(this.$store.state.activityInfo.CAorderId)
+			this.cAOrderId = this.$store.state.activityInfo.CAorderId;
 			// alert(this.cAOrderId);
 			this.getEnvironment();
 		},
@@ -145,9 +146,9 @@
 					})
 				}
 			},
-		
+
 			getUrlData() {// 截取url中的数据
-			    
+
 				   let tempStr = window.location.href
 				   /**
 				   * tempArr 是一个字符串数组 格式是["key=value", "key=value", ...]
@@ -162,9 +163,6 @@
 				   })
 				  /*输出日志*/
 				   // console.log(returnArr)
-				  
-			    
-			  
 			},
 			getUrlPara(name) {
 				var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)","i");
@@ -178,9 +176,9 @@
 				const local = window.location.href;
 				if (this.code == null || this.code === '') {
 					window.location.href = 'https://open.weixin.qq.com/connect/oauth2/authorize?appid=wxdf1774932d9dd96e&redirect_uri='+encodeURIComponent(local)+'&response_type=code&scope=snsapi_base&state='+this.cAOrderId+'#wechat_redirect';
-					
+
 				}else{
-					
+
 						this.axios.post(Api.userApi + '/ca/selectSettlementCommunityActivityOrder', this.qs.stringify({
 							cAOrderId: self.getUrlPara('state')
 						}), {
@@ -206,10 +204,10 @@
 								alert(res.data.msg)
 							}
 						})
-						
+
 				}
-					
-				
+
+
 			},
 			clickWx(){
 				this.activeIndex = '2';
@@ -241,7 +239,7 @@
 				}
 			},
 			wxPay () { // 通过code获取 openId等用户信息，/api/user/wechat/login 为后台接口
-				
+
 				let self = this;
 				this.axios.post(Api.userApi + '/ca/wxPay/gzhh5/prepay', this.qs.stringify({
 					cAOrderId: self.getUrlPara('state'),
@@ -263,14 +261,14 @@
 							if (res.err_msg === 'get_brand_wcpay_request:ok') {
 								alert('支付成功，返回活动详情页！');
 								setTimeout(()=>{
-									window.location.href = 'http://192.168.0.119:8081/activity?id='+self.cAId;
+									window.location.href = 'http://app.gutouzu.com/index.html#/activity?id='+self.cAId;
 								},500)
 							} else if (res.err_msg === 'get_brand_wcpay_request:cancel') {
 								alert('取消支付！');
 							}else if(res.err_msg === 'get_brand_wcpay_request:fail'){
 								alert(JSON.stringify(res))
 							}
-						});	
+						});
 					} else {
 						alert(res.data.msg)
 					}
@@ -287,12 +285,12 @@
 					}
 				}).then((res) => {
 					if (res.data.code == 1) {
-// 						
+//
 						window.location.href=res.data.data
-						
+
 						console.log(res)
 
-						
+
 						 // weixinPay(wxData);
 
 					} else {
@@ -302,7 +300,7 @@
 				//
 			},
 			aliPay() {
-				
+
 				if(this.environment == '0'){
 					alert('请点击右上角用浏览器打开进行支付')
 				}else{
@@ -314,7 +312,7 @@
 							'Content-Type': 'application/x-www-form-urlencoded'
 						}
 					}).then((res) => {
-						
+
 						if(res.data.code == 1){
 							const div = document.createElement('div');
 							div.innerHTML = res.data.data;
@@ -324,10 +322,10 @@
 						}else{
 							alert(res.data.msg)
 						}
-						
+
 					})
 				}
-				
+
 			}
 		}
 	}

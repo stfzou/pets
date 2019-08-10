@@ -21,7 +21,7 @@
 					</div>
 					<div class="v_code active_vcode" v-else>
 						<span>{{count}}</span>
-						
+
 					</div>
 				</li>
 				<li class="flex_r_f_s" v-if="isPwd">
@@ -29,7 +29,7 @@
 					<input type="password" v-model="pwd" @blur.prevent="inputLoseFocus" placeholder="请输入您的密码" />
 				</li>
 			</ul>
-			
+
 			<div class="login_btn flex_r_s_c" v-if="!isPwd" @click="next">下一步</div>
 			<div class="login_btn flex_r_s_c" v-else @click="changePwd">完成</div>
 		</div>
@@ -70,7 +70,7 @@
 							.catch(function(error) {
 								console.log(error);
 						});
-						
+
 						this.timer = setInterval(() => {
 							if (this.count > 0 && this.count <= TIME_COUNT) {
 								this.count--;
@@ -88,7 +88,7 @@
 					  })
 					toast.show()
 				}
-			
+
 			},
 			next(){
 				if(this.vCode!=''&&this.phone!=''){
@@ -99,12 +99,12 @@
 				setTimeout(() => {
 				  window.scrollTo(0,0);
 				},100);
-				
+
 			},
 			changePwd(){
 				let self = this;
 				if (this.pwd == '') {
-							
+
 					let toast = this.$createToast({
 						txt: '密码不能为空',
 						type: 'error'
@@ -112,7 +112,7 @@
 					toast.show()
 					return false;
 				} else if (this.pwd.length < 6) {
-							
+
 					let toast = this.$createToast({
 						txt: '密码不能小于6位数',
 						type: 'error'
@@ -120,7 +120,7 @@
 					toast.show()
 					return false;
 				}else{
-					this.axios.post(Api.shopApi+'/updateGetPwd', this.qs.stringify({
+					this.axios.post(Api.shopApi+'/user/updatePwd', this.qs.stringify({
 						phone: this.phone,
 						password: this.pwd
 					}), {
@@ -128,9 +128,9 @@
 							'Content-Type': 'application/x-www-form-urlencoded'
 						}
 					}).then(function(res) {
-								
+
 						if (res.data.code === 1) {
-								
+
 							let toast = self.$createToast({
 								txt: '修改成功',
 								type: 'correct'
@@ -141,8 +141,8 @@
 									name:'login'
 								})
 							},500)
-							
-								
+
+
 						} else {
 							console.log(res)
 							let toast = self.$createToast({
@@ -151,7 +151,7 @@
 							  })
 							toast.show()
 						}
-								
+
 					}).catch(function(err) {
 						console.log(err)
 					})
@@ -224,10 +224,10 @@
 			         /* placeholder颜色  */
 						color: #fff;
 					}
-					
+
 				}
 				.vcode_box{
- 					
+
 					.v_code{
 						margin-left: 30px;
 						span{

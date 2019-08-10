@@ -51,7 +51,7 @@
 					<ul class="eval_list">
 						<li class="flex_r_s_b list_item" v-for="(item,index) in evalList" :key="index">
 							<div class="head_icon">
-								<img :src="item.userHeadImgAddr" alt="">
+								<img :src="item.userHeadImgAddr" alt="" @click="homeLink(item)">
 
 							</div>
 							<div class="right">
@@ -76,7 +76,7 @@
 			<div class="tx" v-else>暂无评论</div>
 		</div>
 		<div class="active_foot">
-			<div class="message_input flex_r_s_b">
+			<div class="message_input flex_r_s_b" v-show="isComment">
 				<input type="text" @blur.prevent="inputLoseFocus" v-model="msg" placeholder="留言">
 				<span class="send_msg" @click="commitComment">发送</span>
 			</div>
@@ -87,9 +87,9 @@
 						<img v-else src="../../assets/collection.png" alt="" @click="cancelCollection">
 						<p>收藏</p>
 					</div>
-					<div class="collection">
-						<img src="../../assets/icon_kefu.png" alt="">
-						<p>客服</p>
+					<div class="collection msg">
+						<img src="../../assets/icon_xiaox.png" alt="" @click="commentShow">
+						<p>留言</p>
 					</div>
 				</div>
 				<div class="bot_r flex_r_s_c" style="width: 50%;">
@@ -115,6 +115,7 @@
 				activityTitle:'',
 				browse:'',
 				commentNum:'',
+        isComment:false,
 				keep:'',
 				activityAddr:'',
 				endTime:'',
@@ -166,6 +167,22 @@
 
 		},
 		methods:{
+      commentShow(){
+        if(this.isComment){
+          this.isComment = false;
+        }else{
+          this.isComment = true;
+        }
+
+      },
+      homeLink(item){
+        this.$router.push({
+          name:'dynamic',
+          query:{
+            aId:item.userId
+          }
+        })
+      },
 			closeDown(){
 				this.isDown = false;
 			},
@@ -181,18 +198,22 @@
 			},
 			getUrlData() {// 截取url中的数据
 
-				   let tempStr = window.location.href
+				   let tempStr = window.location.href;
 				   /**
-				   * tempArr 是一个字符串数组 格式是["key=value", "key=value", ...]
-				   */
-				   let tempArr = tempStr.split('?')[1] ? tempStr.split('?')[1].split('&') : []
-				   /**
-				   * returnArr 是要返回出去的数据对象 格式是 { key: value, key: value, ... }
-				   */
-				   let returnArr = {}
-				   tempArr.forEach(element => {
-				   returnArr[element.split('=')[0]] = element.split('=')[1]
-				   })
+				    * tempArr 是一个字符串数组 格式是["key=value", "key=value", ...]
+				    */
+				   let returnArr = {};
+				   let urlArr = tempStr.split('?');
+				   if(urlArr){
+				     urlArr.forEach((e)=>{
+
+				         if(e.indexOf('=')>-1){
+
+				           returnArr[e.split('=')[0]] = e.split('=')[1];
+				         }
+
+				     })
+				   }
 				  /*输出日志*/
 
 				   sessionStorage.setItem('id',JSON.stringify(returnArr.id));
@@ -239,12 +260,12 @@
 								self.evalList.forEach((e)=>{
 									e.content = self.decodeUnicode(e.content);
 								})
+                console.log(self.evalList)
 								self.commentNum = res.data.data.commentNum;
                 self.$refs.scroll.forceUpdate();
-                setTimeout(()=>{
-                  self.$refs.scroll.refresh();
-                },100)
-							}, 500)
+                self.$refs.scroll.refresh();
+
+							}, 1000)
 
 
 						}
@@ -345,22 +366,22 @@
 						if(res.data.data.doList.length>0){
 
 							setTimeout(()=>{
-
 								res.data.data.doList.forEach((e)=>{
 									e.content = self.decodeUnicode(e.content);
-									self.evalList.push(e)
 								})
+                self.evalList.push(...res.data.data.doList)
                 self.$refs.scroll.forceUpdate();
                 setTimeout(()=>{
                   self.$refs.scroll.refresh()
-                },100)
-							},500)
+                },200)
+							},800)
 
 
 						}else{
 
 							setTimeout(()=>{
 								self.$refs.scroll.forceUpdate();
+                self.$refs.scroll.refresh();
 							},500)
 						}
 
@@ -446,30 +467,62 @@
 			},
 			collection(){
 				let self = this;
-				self.axios.post(Api.userApi+'/ca/updateCommunityActivityKeep',self.qs.stringify({
-					userId:JSON.parse(sessionStorage.getItem('user')).userId,
-					id:JSON.parse(sessionStorage.getItem('id')),
-					status:1
-				}), {
-					headers: {
-						'Content-Type': 'application/x-www-form-urlencoded'
-					}
-				}).then((res)=>{
-					if(res.data.code == 1){
-						self.isCollection = 1;
-						let toast = self.$createToast({
-							txt: '收藏成功',
-							type: 'correct'
-						  })
-						toast.show()
-					}else{
-						let toast = self.$createToast({
-							txt:res.data.msg,
-							type: 'error'
-						  })
-						toast.show()
-					}
-				})
+        if(JSON.parse(sessionStorage.getItem('user')) == null){
+        	let self = this;
+        	let url = window.location.href;
+        	this.$store.commit('setLoginUrl',url);
+        	this.$createDialog({
+        		type: 'confirm',
+        		icon: 'cubeic-warn',
+        		title: '需要登录后才进行收藏',
+        		confirmBtn: {
+        		  text: '去登录',
+        		  active: true,
+        		  disabled: false,
+        		  href: 'javascript:;'
+        		},
+        		cancelBtn: {
+        		  text: '取消',
+        		  active: false,
+        		  disabled: false,
+        		  href: 'javascript:;'
+        		},
+        		onConfirm: () => {
+        		  self.$router.push({
+        		  	name:'login'
+        		  })
+        		},
+
+        	 }).show()
+
+        }else{
+          self.axios.post(Api.userApi+'/ca/updateCommunityActivityKeep',self.qs.stringify({
+          	userId:JSON.parse(sessionStorage.getItem('user')).userId,
+          	id:JSON.parse(sessionStorage.getItem('id')),
+          	status:1
+          }), {
+          	headers: {
+          		'Content-Type': 'application/x-www-form-urlencoded'
+          	}
+          }).then((res)=>{
+          	if(res.data.code == 1){
+          		self.isCollection = 1;
+          		let toast = self.$createToast({
+          			txt: '收藏成功',
+          			type: 'correct'
+          		  })
+          		toast.show()
+          	}else{
+          		let toast = self.$createToast({
+          			txt:res.data.msg,
+          			type: 'error'
+          		  })
+          		toast.show()
+          	}
+          })
+        }
+
+
 			},
 			cancelCollection(){
 				let self = this;
@@ -552,7 +605,7 @@
 
 <style lang="scss">
 	.activity_warp{
-
+    background: #fff;
 		.line{
 			height: 10px;
 			background: #e8e8e8;
@@ -724,6 +777,7 @@
 							height: 90px;
 							width: 90px;
 							border-radius: 50%;
+              object-fit: cover;
 						}
 					}
 					.right{
@@ -797,7 +851,13 @@
 							color: #000;
 							text-align: center;
 						}
+
 					}
+          .msg{
+            img{
+              height: 50px;
+            }
+          }
 				}
 				.bot_r{
 					.partake{

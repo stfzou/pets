@@ -28,6 +28,7 @@ function detectVerticalSquash(img) {
     var canvas = document.createElement('canvas');
     canvas.width = 1;
     canvas.height = ih;
+
     var ctx = canvas.getContext('2d');
     ctx.drawImage(img, 0, 0);
     try {
@@ -146,7 +147,9 @@ function orientationHelper(canvas, ctx, orientation) {
  */
 function compress(file, options, callback) {
     const reader = new FileReader();
+
     reader.onload = function (evt) {
+
         if(options.compress === false){
             // 不启用压缩 & base64上传 的分支，不做任何处理，直接返回文件的base64编码
             file.base64 = evt.target.result;
@@ -158,6 +161,7 @@ function compress(file, options, callback) {
         const img = new Image();
         img.onload = function () {
             const ratio = detectVerticalSquash(img);
+
             const orientation = getOrientation(dataURItoBuffer(img.src));
             const canvas = document.createElement('canvas');
             const ctx = canvas.getContext('2d');
@@ -215,6 +219,7 @@ function compress(file, options, callback) {
             }
         };
         img.src = evt.target.result;
+
     };
     reader.readAsDataURL(file);
 }

@@ -1,6 +1,6 @@
 <template>
 	<div class="trend_warp">
-		<DownApp v-on:closeDown="closeDown" v-show="isDown"></DownApp>
+		<!-- <DownApp v-on:closeDown="closeDown" v-show="isDown"></DownApp> -->
 		<div class="top_nav flex_r_s_b">
 			<div class="back" @click="back"></div>
 			<div class="nav_title">动态正文</div>
@@ -37,7 +37,7 @@
 			</div>
 			<div class="userInfo flex_r_f_s">
 				<div class="headImg">
-					<img :src="userHeadImage" alt="">
+					<img :src="userHeadImage" alt="" @click="homeLink">
 				</div>
 				<div class="mid">
 					<div class="userName">{{userName}}</div>
@@ -49,11 +49,11 @@
 			<div class="text_cnt">
 				{{content}}
 			</div>
-			<div class="trend_img" v-show="compressImages!=''">
+			<div class="trend_img" v-show="images.length>0">
 				<!-- <img :src="item" alt="" v-for="(item,index) in images" :key="index"> -->
 				<div class="imgs-container flex_r_f_s">
-					<div class="img-box" v-for="(img,index) in compressImages" :key="img">
-						<img :src="img" @click="handleImgsClick(index)">
+					<div class="img-box" v-for="(img,index) in images" :key="img">
+						<img :src="img" @click="handleImgsClick(index)" :class="images.length>0&&images.length==1?classA:classB">
 					</div>
 
 				</div>
@@ -71,7 +71,7 @@
 				</div>
 				<div class="like_people flex_r_s_b">
 					<div class="likeHeadImg" v-for="(item,index) in likeUserHeadImages">
-						<img :src="item.userHeadImage" alt="">
+						<img :src="item.userHeadImage" alt="" @click="likeLink(item)">
 					</div>
 
 					<div class="likeHeadImg active flex_r_s_c" v-if="likeUserHeadImages.length>0">
@@ -102,7 +102,7 @@
 					<ul>
 						<li class="flex_r_s_b" v-for="(item,index) in dynamicComments">
 							<div class="list_l">
-								<img :src="item.userHeadImage" alt="">
+								<img width="720" :src="item.userHeadImage" alt="" @click="commentLink(item)">
 							</div>
 							<div class="list_mid">
 								<div class="userName">{{item.userName}}</div>
@@ -134,6 +134,9 @@
 		data() {
 			return {
 				val: '',
+        uId:'',
+        classA:'imgActive',
+        classB:'img',
         compressImages:'',
 				isMask: false,
 				isReport: false,
@@ -162,7 +165,7 @@
 							more: '加载更多',
 							noMore: '没有更多数据了',
 						},
-						threshold: 40,
+						threshold: 20,
 
 					}
 				},
@@ -198,6 +201,15 @@
 			DownApp
 		},
 		methods: {
+      homeLink(){
+        let self = this;
+        this.$router.push({
+          name:'dynamic',
+          query:{
+            aId:self.uId
+          }
+        })
+      },
 			handleImgsClick(index) {
 				this.initialIndex = index
 				const params = {
@@ -221,20 +233,28 @@
 			},
 			getUrlData() { // 截取url中的数据
 
-				let tempStr = window.location.href
+				let tempStr = window.location.href;
 				/**
 				 * tempArr 是一个字符串数组 格式是["key=value", "key=value", ...]
 				 */
-				let tempArr = tempStr.split('?')[1] ? tempStr.split('?')[1].split('&') : []
+        let returnArr = {};
+        let urlArr = tempStr.split('?');
+        if(urlArr){
+          urlArr.forEach((e)=>{
+
+              if(e.indexOf('=')>-1){
+
+                returnArr[e.split('=')[0]] = e.split('=')[1];
+              }
+
+          })
+        }
 				/**
 				 * returnArr 是要返回出去的数据对象 格式是 { key: value, key: value, ... }
 				 */
-				let returnArr = {}
-				tempArr.forEach(element => {
-					returnArr[element.split('=')[0]] = element.split('=')[1]
-				})
+
 				/*输出日志*/
-				console.log(returnArr)
+				//console.log(returnArr)
 				this.dynamicId = returnArr.dynamicId;
 
 			},
@@ -329,7 +349,7 @@
             console.log(res.data.data)
 						self.userName = res.data.data.userName;
 						self.geoLocation = res.data.data.geoLocation;
-
+            console.log(res)
 						if(res.data.data.images!=''){
 							self.images = res.data.data.images.split(',');
 						}
@@ -349,6 +369,9 @@
 
 						self.lookCount = res.data.data.lookCount;
 						self.commentCount = res.data.data.commentCount;
+            console.log(res.data.data)
+            self.uId = res.data.data.userId;
+
 						self.authorId = res.data.data.userId;
 						self.dynamicId = res.data.data.dynamicId;
 						self.isLike = res.data.data.isLike;
@@ -359,6 +382,14 @@
 					}
 				})
 			},
+      likeLink(item){
+        this.$router.push({
+          name:'dynamic',
+          query:{
+            aId:item.userId
+          }
+        })
+      },
 			getComment() {
 
 				let self = this;
@@ -377,11 +408,14 @@
 					if (res.data.code == 1) {
 
 						if (res.data.data.length > 0) {
+              console.log(res.data.data)
 							setTimeout(() => {
 								self.dynamicComments = res.data.data;
+                console.log(self.dynamicComments)
 								self.dynamicComments.forEach((e)=>{
 									e.userContent = self.decodeUnicode(e.userContent);
 								})
+
 								self.$refs.scroll.forceUpdate();
 								setTimeout(() => {
 									self.$refs.scroll.refresh();
@@ -398,6 +432,14 @@
 
 
 			},
+      commentLink(item){
+        this.$router.push({
+          name:'dynamic',
+          query:{
+            aId:item.userId
+          }
+        })
+      },
 			onPullingDown() {
 				// 模拟更新数据
 				this.page = 1;
@@ -425,8 +467,6 @@
 
 						// self.dynamicComments = res.data.data;
 						if (res.data.data.length > 0) {
-
-
 							setTimeout(() => {
 								res.data.data.forEach((e) => {
                   e.userContent = self.decodeUnicode(e.userContent);
@@ -635,6 +675,7 @@
 <style lang="scss">
 	.trend_warp {
 		padding-top: 88px;
+    background: #fff;
 		.tx {
 			font-size: 28px;
 			padding: 30px 20px;
@@ -784,6 +825,7 @@
 						display: block;
 						width: 100%;
 						height: 100%;
+            object-fit: cover;
 						border-radius: 50%;
 					}
 				}
@@ -816,9 +858,9 @@
 			}
 
 			.text_cnt {
-				font-size: 24px;
+				font-size: 28px;
 				color: #333;
-				line-height: 30px;
+				line-height: 36px;
 				margin-bottom: 10px;
 			}
 
@@ -826,21 +868,22 @@
 				.imgs-container{
 					flex-wrap: wrap;
 					.img-box{
-						width: 210px;
-						height: 210px;
 						position: relative;
 						overflow: hidden;
 						margin-bottom: 10px;
 						border-radius: 4px;
 						margin-right: 15px;
-						img {
-							width: 100%;
-							height: 100%;
+						.img {
+							width: 210px;
+							height: 210px;
 							display: block;
-
-							// display: block;
-
+              object-fit: cover;
+							display: block;
 						}
+            .imgActive{
+              max-height: 222px;
+              max-width:720px
+            }
 					}
 
 				}
@@ -849,7 +892,7 @@
 			}
 
 			.trend_label {
-				font-size: 22px;
+				font-size: 26px;
 				color: #666;
 				margin-top: 5px;
 
@@ -858,9 +901,9 @@
 				}
 
 				.addr {
-
+          font-size: 26px;
 					img {
-						width: 18px;
+						width: 22px;
 						margin-right: 10px;
 					}
 				}
@@ -870,7 +913,7 @@
 					margin: 15px 0;
 
 					img {
-						width: 22px;
+						width: 26px;
 						margin-right: 10px;
 					}
 				}
@@ -878,7 +921,7 @@
 
 			.like_box {
 				margin-top: 52px;
-
+        font-size: 26px;
 				.like {
 					i {
 						font-size: 28px;
@@ -892,7 +935,7 @@
 					}
 
 					span {
-						font-size: 22px;
+						font-size: 26px;
 						color: #666;
 					}
 				}
@@ -970,7 +1013,7 @@
 
 			.comment_list {
 				height: 300px;
-
+        box-sizing: border-box;
 				ul {
 					padding: 0 20px;
 
@@ -1014,7 +1057,7 @@
 						}
 
 						.list_r {
-							font-size: 22px;
+							font-size: 24px;
 							color: #999;
 							width: 130px;
 						}

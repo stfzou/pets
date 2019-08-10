@@ -11,7 +11,7 @@
 			<div class="userInfo">
 				<div class="headImg">
 					<img class="hPic" :src="userHeadImage" alt="">
-					<div class="rank flex_r_s_c">v</div>
+					<!-- <div class="rank flex_r_s_c">v</div> -->
 				</div>
 				<div class="userInfo-r">
 					<div class="userName flex_r_s_b">
@@ -231,7 +231,9 @@
 
 			img {
 				width: 100%;
+        height: 100%;
 				display: block;
+        object-fit: cover;
 			}
 		}
 

@@ -8,7 +8,7 @@
 						<div class="authorInfo flex_r_f_s">
 							<div class="author-img">
 								<img :src="item.userHeadImage" alt="">
-								<div class="author-vip flex_r_s_c">V</div>
+								<!-- <div class="author-vip flex_r_s_c">V</div> -->
 							</div>
 							<div class="authorNameBox">
 								<div class="author-name">{{item.userName}}</div>
@@ -23,7 +23,7 @@
 
 								<div class="imgs-container flex_r_f_s" v-show="item.compressImages!=''">
 									<div class="img-box" v-for="(img,index) in item.compressImages.split(',')" :key="img">
-										<img :src="img"  @click="handleImgsClick(item.images,index)">
+										<img :src="img"  @click="handleImgsClick(item.images,index)" :class="item.compressImages.split(',').length==1?classA:classB">
 									</div>
 
 								</div>
@@ -63,6 +63,8 @@
 				dynamicList:[],
 				geoLocation:'',
 				scroll:'',
+        classA:'imgActive',
+        classB:'img',
 				page:1,
 				options:{
 					pullDownRefresh:{
@@ -75,7 +77,8 @@
 						},
 						threshold:40,
 
-					}
+					},
+          bindToWrapper:true
 				},
 				userId:-1
 			}
@@ -119,6 +122,7 @@
 			},
 			getDynamic(){
 				let self = this;
+        this.page = 1;
 				self.axios.get(Api.trendApi + '/community/selectDynamicByUserId', {
 					params: {
 						beLookUserId: JSON.parse(sessionStorage.getItem('Aid')),
@@ -157,18 +161,22 @@
 			},
       getUrlData() { // 截取url中的数据
 
-      	let tempStr = window.location.href
+      	let tempStr = window.location.href;
       	/**
       	 * tempArr 是一个字符串数组 格式是["key=value", "key=value", ...]
       	 */
-      	let tempArr = tempStr.split('?')[1] ? tempStr.split('?')[1].split('&') : []
-      	/**
-      	 * returnArr 是要返回出去的数据对象 格式是 { key: value, key: value, ... }
-      	 */
-      	let returnArr = {}
-      	tempArr.forEach(element => {
-      		returnArr[element.split('=')[0]] = element.split('=')[1]
-      	})
+      	let returnArr = {};
+      	let urlArr = tempStr.split('?');
+      	if(urlArr){
+      	  urlArr.forEach((e)=>{
+
+      	      if(e.indexOf('=')>-1){
+
+      	        returnArr[e.split('=')[0]] = e.split('=')[1];
+      	      }
+
+      	  })
+      	}
       	/*输出日志*/
       	if(returnArr.aId!=undefined){
       		sessionStorage.setItem('Aid',JSON.stringify(returnArr.aId));
@@ -195,19 +203,20 @@
 						if(res.data.data.length>0){
 
 							setTimeout(()=>{
+                res.data.data.forEach((e)=>{
+                	e.content = self.decodeUnicode(e.content)
+                });
 								self.$refs.scroll.forceUpdate();
-								res.data.data.forEach((e)=>{
-									e.content = self.decodeUnicode(e.content)
-									self.dynamicList.push(e)
-								});
+                self.dynamicList.push(...res.data.data)
 								setTimeout(()=>{
 									self.$refs.scroll.refresh();
-								},100)
-							},500)
+								},200)
+							},1000)
 
 						}else{
 							setTimeout(()=>{
 								self.$refs.scroll.forceUpdate();
+                self.$refs.scroll.refresh();
 							},500)
 						}
 
@@ -315,6 +324,19 @@
 	// @import '../../style/common.scss';
 	.dynamic{
 		.dynamic-list{
+      .cube-index-list-nav{
+        padding: 20px 0;
+       }
+       .cube-pullup-wrapper{
+         padding-top: 20px;
+
+       }
+
+       .cube-pullup-wrapper .before-trigger{
+         padding: 0;
+         height: 50px;
+         line-height: 50px;
+       }
 			.dynamic-item{
 				.item-box{
 					padding: 0 20px;
@@ -361,28 +383,30 @@
 					.author-cnt{
 						.text_cnt{
 							margin-bottom: 20px;
-							font-size: 24px;
+							font-size: 28px;
 							color: #333;
-							line-height: 30px;
+							line-height: 36px;
 						}
 						.trend_img {
 							.imgs-container{
 								flex-wrap: wrap;
 								.img-box{
-									width: 210px;
-									height: 210px;
 									position: relative;
 									overflow: hidden;
 									margin-bottom: 10px;
 									border-radius: 4px;
 									margin-right: 15px;
-									img {
-										width: 100%;
-										height: 100%;
-										object-fit: cover;
-										// display: block;
-
-									}
+                  .img {
+                  	width: 210px;
+                  	height: 210px;
+                  	display: block;
+                    object-fit: cover;
+                  	display: block;
+                  }
+                  .imgActive{
+                    max-height: 360px;
+                    max-width: 100%;
+                  }
 								}
 
 
@@ -396,11 +420,11 @@
 						padding: 12px 0;
 						border-bottom: 1px solid #e8e8e8;
 						img{
-							width: 18px;
+							width: 20px;
 							margin-right: 10px;
 						}
 						span{
-							font-size: 22px;
+							font-size: 24px;
 							color: #666;
 
 						}
@@ -408,7 +432,7 @@
 					.item-foot{
 						padding: 18px 0;
 						span{
-							font-size: 22px;
+							font-size: 26px;
 							color: #666;
 							margin-left: 10px;
 						}

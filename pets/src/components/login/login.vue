@@ -47,14 +47,14 @@
 				setTimeout(() => {
 				  window.scrollTo(0,0);
 				},100);
-				
-			},  
+
+			},
 			login() {
 				//注册
 				let self = this;
-				
+
 				if (this.phone == '') {
-			
+
 					let toast = this.$createToast({
 						txt: '手机号不能为空',
 						type: 'error'
@@ -62,7 +62,7 @@
 					toast.show()
 					return false;
 				} else if (!this.reg.test(this.phone)) {
-			
+
 					let toast = this.$createToast({
 						txt: '手机号格式错误',
 						type: 'error'
@@ -70,7 +70,7 @@
 					toast.show()
 					return false;
 				} else if (this.pwd == '') {
-			
+
 					let toast = this.$createToast({
 						txt: '密码不能为空',
 						type: 'error'
@@ -78,7 +78,7 @@
 					toast.show()
 					return false;
 				} else if (this.pwd.length < 6) {
-			
+
 					let toast = this.$createToast({
 						txt: '密码不能小于6位数',
 						type: 'error'
@@ -87,7 +87,7 @@
 					return false;
 				}else {
 					self.loading = true;
-					this.axios.post(Api.shopApi+'/shops_u_login', this.qs.stringify({
+					this.axios.post(Api.shopApi+'/user_login', this.qs.stringify({
 						phone: this.phone,
 						password: this.pwd
 					}), {
@@ -97,34 +97,33 @@
 					}).then(function(res) {
 						console.log(res)
 						if (res.data.code === 1) {
-							
+
 							var userEntity = {
 								userName: res.data.user.userName,
 								userId: res.data.user.userId,
 								userPhone: res.data.user.phone,
-								token:res.data.token,
-								shopId:res.data.user.userShops.shopId
+								token:res.data.token
 							};
-							
+
 							sessionStorage.setItem('user', JSON.stringify(userEntity));
-							
+
 							if(self.$store.state.loginUrl!=''){
 								setTimeout(()=>{
 									self.loading = false;
 								    window.location.href = self.$store.state.loginUrl;
-									
+
 								},500)
 							}else{
 								self.$router.push({
 									name:'sellerGoods'
 								})
 							}
-							
-							
-			
+
+
+
 						} else {
 							console.log(res)
-							
+
 							setTimeout(()=>{
 								self.loading = false;
 							},500)
@@ -134,7 +133,7 @@
 							  })
 							toast.show();
 						}
-			
+
 					}).catch(function(err) {
 						let toast = self.$createToast({
 							txt:err,
@@ -144,8 +143,8 @@
 						self.loading = false;
 						// console.log(err)
 					})
-			
-			
+
+
 				}
 			},
 		},
@@ -208,7 +207,7 @@
 						color: #fff;
 						// background: #FF523D;
 					}
-					
+
 					input::-webkit-input-placeholder {
 			         /* placeholder颜色  */
 						color: #fff;

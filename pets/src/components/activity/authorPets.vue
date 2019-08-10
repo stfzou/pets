@@ -96,6 +96,7 @@
       },
 			getPets(){
 				let self = this;
+        self.page = 1;
 				self.axios.get(Api.trendApi + '/userPet/selectUserPet', {
 					params: {
 						userId: JSON.parse(sessionStorage.getItem('Aid')),
@@ -157,12 +158,13 @@
                 self.$refs.scroll.forceUpdate();
 								setTimeout(()=>{
 									self.$refs.scroll.refresh();
-								},100)
-							},500)
+								},500)
+							},800)
 
 						}else{
 							setTimeout(()=>{
 								self.$refs.scroll.forceUpdate();
+                self.$refs.scroll.refresh();
 							},500)
 						}
 					}else{
@@ -190,6 +192,14 @@
 	.authorPets{
 		.authorPetsList{
 			padding: 0 20px;
+      .cube-pullup-wrapper{
+        padding-top: 20px;
+      }
+      .cube-pullup-wrapper .before-trigger{
+        padding: 0;
+        height: 50px;
+        line-height: 50px;
+      }
 			.authorPetsItem{
 				padding: 30px 0;
 				align-items:flex-start;

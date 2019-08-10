@@ -43,7 +43,7 @@
 							<div v-if="item.isReceive==0||item.receiveNum==item.circulation" class="receiveBtn receivedBtn flex_r_s_c">立即领取</div>
 							<div @click="receive(item)" v-else class="receiveBtn flex_r_s_c">立即领取</div>
 						</div>
-						
+
 					</div>
 					<img v-show="item.isReceive==1" class="imprint" src="../../assets/received.png" alt="">
 					<img v-show="item.isReceive==0" class="imprint" src="../../assets/receiveEnd.png" alt="">
@@ -53,7 +53,7 @@
 		</div>
 		<div class="amap-page-container" v-show="false">
 			<el-amap ref="map" vid="amapDemo" :plugin="plugin" class="amap-demo"></el-amap>
-			
+
 		</div>
 	</div>
 </template>
@@ -82,11 +82,11 @@
 							more: '加载更多', noMore: '没有更多数据了',
 						},
 						threshold:40,
-						
+
 					}
 				},
 				plugin: [
-				
+
 					{
 						pName: 'Geolocation',
 						enableHighAccuracy: true, //是否使用高精度定位，默认:true
@@ -104,12 +104,12 @@
 							init(o) {
 								// o 是高德地图定位插件实例
 								o.getCurrentPosition((status, result) => {
-				
+
 									if (result && result.position) {
-				
+
 										self.lng = result.position.lng;
 										self.lat = result.position.lat;
-										
+
 									} else {
 										// self.getActivityListOne();
 										let toast = self.$createToast({
@@ -134,7 +134,7 @@
 			}
 			this.shopId = this.getUrlData().shopId;
 			this.getShopCouponList();
-			
+
 		},
 		methods:{
 			back() {
@@ -156,22 +156,26 @@
 				})
 			},
 			getUrlData() {// 截取url中的数据
-			    
-				   let tempStr = window.location.href
+
+				   	let tempStr = window.location.href;
 				   /**
-				   * tempArr 是一个字符串数组 格式是["key=value", "key=value", ...]
-				   */
-				   let tempArr = tempStr.split('?')[1] ? tempStr.split('?')[1].split('&') : []
-				   /**
-				   * returnArr 是要返回出去的数据对象 格式是 { key: value, key: value, ... }
-				   */
-				   let returnArr = {}
-				   tempArr.forEach(element => {
-				   returnArr[element.split('=')[0]] = element.split('=')[1]
-				   })
+				    * tempArr 是一个字符串数组 格式是["key=value", "key=value", ...]
+				    */
+				   let returnArr = {};
+				   let urlArr = tempStr.split('?');
+				   if(urlArr){
+				     urlArr.forEach((e)=>{
+
+				         if(e.indexOf('=')>-1){
+
+				           returnArr[e.split('=')[0]] = e.split('=')[1];
+				         }
+
+				     })
+				   }
 				  /*输出日志*/
 				   return returnArr;
-			  
+
 			},
 			getShopCouponList(){
 				let self = this;
@@ -200,7 +204,7 @@
 					}else{
 						alert(res.data.msg)
 					}
-					
+
 				})
 			},
 			onPullingDown(){
@@ -212,7 +216,7 @@
 			receive(item){
 				let self = this;
 				if(JSON.parse(sessionStorage.getItem('user')) == null){
-					
+
 					let url = window.location.href;
 					this.$store.commit('setLoginUrl',url);
 					this.$createDialog({
@@ -236,15 +240,15 @@
 						  	name:'login'
 						  })
 						},
-						
+
 					 }).show()
-					
+
 				}else{
-					
+
 					self.axios.post(Api.userApi + '/coupon/addUserCoupon', self.qs.stringify({
 						userId: self.uId,
 						couponId:item.couponId,
-						
+
 					}), {
 						headers: {
 							'Content-Type': 'application/x-www-form-urlencoded'
@@ -283,7 +287,7 @@
 				background: url(../../assets/icon/backColory.png) no-repeat center 0;
 				background-size: cover;
 			}
-		
+
 			.nav_title {
 				font-size: 30px;
 				color: #000;
@@ -366,7 +370,7 @@
 									color: #000;
 									line-height: 40px;
 								}
-								
+
 								.progressBox{
 									padding-top: 80px;
 									.progress{
@@ -391,7 +395,7 @@
 						}
 						.addr{
 							padding-top: 35px;
-							
+
 							img{
 								width: 18px;
 								margin-right: 12px;
@@ -430,14 +434,14 @@
 								width:120px;
 								height:40px;
 								background:#ff523d;
-								border-radius:6px; 
+								border-radius:6px;
 								color: #fff;
 								font-size: 26px;
 							}
 							.receivedBtn{
 								background:#B0B0B0;
 							}
-							
+
 						}
 						.saleNum{
 							font-size: 22px;

@@ -5,8 +5,8 @@
 			<div class="introduce flex_r_f_s">
 				<img src="../../assets/jd.png" alt="">
 				<div class="text">
-					<p>打开自由犬APP</p>
-					<p>购物更方便</p>
+					<p>打开骨米宠物APP</p>
+					<p>寻找更多养宠乐趣</p>
 				</div>
 			</div>
 		</div>

@@ -146,19 +146,22 @@
 				})
 			},
       getUrlData() { // 截取url中的数据
-
-      	let tempStr = window.location.href
+      	let tempStr = window.location.href;
       	/**
       	 * tempArr 是一个字符串数组 格式是["key=value", "key=value", ...]
       	 */
-      	let tempArr = tempStr.split('?')[1] ? tempStr.split('?')[1].split('&') : []
-      	/**
-      	 * returnArr 是要返回出去的数据对象 格式是 { key: value, key: value, ... }
-      	 */
-      	let returnArr = {}
-      	tempArr.forEach(element => {
-      		returnArr[element.split('=')[0]] = element.split('=')[1]
-      	})
+      	let returnArr = {};
+      	let urlArr = tempStr.split('?');
+      	if(urlArr){
+      	  urlArr.forEach((e)=>{
+
+      	      if(e.indexOf('=')>-1){
+
+      	        returnArr[e.split('=')[0]] = e.split('=')[1];
+      	      }
+
+      	  })
+      	}
       	/*输出日志*/
       	if(returnArr.aId!=undefined){
       		sessionStorage.setItem('Aid',JSON.stringify(returnArr.aId));
@@ -216,23 +219,24 @@
 						if(res.data.data.length>0){
 
 							setTimeout(()=>{
-
                 self.activityList.push(...res.data.data)
                 self.$refs.scroll.forceUpdate();
 								setTimeout(()=>{
 									self.$refs.scroll.refresh();
-								},100)
-							},500)
+								},500)
+							},800)
 
 						}else{
 							setTimeout(()=>{
 								self.$refs.scroll.forceUpdate();
+                self.$refs.scroll.refresh();
 							},500)
 						}
 
 					}else{
 						alert(res.data.msg);
 						self.$refs.scroll.forceUpdate();
+
 					}
 				})
 
@@ -247,7 +251,14 @@
 			overflow: initial;
 
 		}
-
+    .cube-pullup-wrapper{
+      padding-top: 20px;
+    }
+    .cube-pullup-wrapper .before-trigger{
+      padding: 0;
+      height: 50px;
+      line-height: 50px;
+    }
 		.cube-scroll-list-wrapper {
 			overflow: initial;
 		}
@@ -341,6 +352,9 @@
 					}
 				}
 			}
+      .activity-item:last-child{
+        margin: 0;
+      }
 		}
 	}
 </style>
