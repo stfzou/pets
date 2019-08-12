@@ -180,9 +180,9 @@
                 toast.show()
                 setTimeout(() => {
                   self.$store.commit('setCAorderId', res.data.data.cAOrderId)
-                  // self.$router.push({
-                  //   name: 'activityOrder'
-                  // })
+                  self.$router.push({
+                    name: 'activityOrder'
+                  })
 
                 }, 1000)
               }

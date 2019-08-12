@@ -237,6 +237,7 @@
 				}else if(this.activeIndex == '1'){
 					this.aliPay();
 				}
+
 			},
 			wxPay () { // 通过code获取 openId等用户信息，/api/user/wechat/login 为后台接口
 
@@ -261,7 +262,8 @@
 							if (res.err_msg === 'get_brand_wcpay_request:ok') {
 								alert('支付成功，返回活动详情页！');
 								setTimeout(()=>{
-									window.location.href = 'http://app.gutouzu.com/index.html#/activity?id='+self.cAId;
+									window.location.href = 'http://app.gutouzu.com/index.html#/activity?id='+self.$store.state.activityInfo.cAId;
+
 								},500)
 							} else if (res.err_msg === 'get_brand_wcpay_request:cancel') {
 								alert('取消支付！');
