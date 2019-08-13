@@ -30,6 +30,8 @@
 							</div>
 						</div>
 						<div class="addr flex_r_f_s"><img src="../../assets/icon/map@2x.png" alt=""><span>{{item.geoLocation}}</span></div>
+            <div class="itemTip" v-if="item.dynamicLabelNames.length>0"><span v-for="subItem in item.dynamicLabelNames">{{subItem}}</span></div>
+            <div class="petName" v-if="item.petName!=''"><span>#{{item.petName}}</span>+撸一次</div>
 						<div class="item-foot flex_r_f_e">
 							<div class="dynamic-pj flex_r_s_c" @click="dynamicXq(item)">
 								<img src="../../assets/icon_xiaox.png" alt="">
@@ -88,7 +90,7 @@
 				this.userId = JSON.parse(sessionStorage.getItem('user')).userId;
 
 			}
-			this.getHeight();
+			// this.getHeight();
       this.getUrlData();
 			setTimeout(()=>{
 				this.getDynamic();
@@ -113,12 +115,6 @@
 				}
 				this.$createImagePreview({ ...params
 				}).show()
-			},
-			getHeight(){
-				let elHeight = document.querySelector(".dynamicNav").offsetHeight;
-				let elTop = document.querySelector(".dynamicNav").offsetTop;
-				let h = document.documentElement.clientHeight - elTop;
-				document.querySelector(".dynamic-list").style.height = h+'px';
 			},
 			getDynamic(){
 				let self = this;
@@ -324,14 +320,13 @@
 	// @import '../../style/common.scss';
 	.dynamic{
 		.dynamic-list{
+      height: 800px;
       .cube-index-list-nav{
         padding: 20px 0;
        }
        .cube-pullup-wrapper{
          padding-top: 20px;
-
        }
-
        .cube-pullup-wrapper .before-trigger{
          padding: 0;
          height: 50px;
@@ -418,7 +413,6 @@
 					}
 					.addr{
 						padding: 12px 0;
-						border-bottom: 1px solid #e8e8e8;
 						img{
 							width: 20px;
 							margin-right: 10px;
@@ -429,7 +423,29 @@
 
 						}
 					}
+          .itemTip{
+            padding: 20px 0 30px 0;
+
+            span{
+              padding: 5px 10px;
+              border: 1px solid #e8e8e8;
+              color: #e8e8e8;
+              border-radius: 18px;
+              font-size: 26px;
+              margin-right: 10px;
+              margin-bottom: 10px;
+            }
+          }
+          .petName{
+            font-size: 26px;
+            color: #e8e8e8;
+            padding-bottom: 20px;
+            span{
+              margin-right: 20px;
+            }
+          }
 					.item-foot{
+            border-top: 1px solid #e8e8e8;
 						padding: 18px 0;
 						span{
 							font-size: 26px;

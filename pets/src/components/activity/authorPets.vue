@@ -79,15 +79,10 @@
 			}
 		},
 		mounted() {
-			let elHeight = document.querySelector(".dynamicNav").offsetHeight;
-			let elTop = document.querySelector(".dynamicNav").offsetTop;
-			let h = document.documentElement.clientHeight - elTop;
-			document.querySelector(".authorPetsList").style.height = h + 'px';
-
 			this.getPets();
 		},
 		methods:{
-       showToastType() {
+      showToastType() {
         const toast = this.$createToast({
           txt: 'TA还没有添加宠物',
           type: 'warn'
@@ -154,8 +149,8 @@
 						if(res.data.data.length>0){
 
 							setTimeout(()=>{
-                self.petList.push(...res.data.data)
                 self.$refs.scroll.forceUpdate();
+                self.petList.push(...res.data.data)
 								setTimeout(()=>{
 									self.$refs.scroll.refresh();
 								},500)
@@ -169,6 +164,7 @@
 						}
 					}else{
 						alert(res.data.msg);
+            self.$refs.scroll.forceUpdate();
 					}
 				})
 
@@ -192,6 +188,8 @@
 	.authorPets{
 		.authorPetsList{
 			padding: 0 20px;
+      height: 800px;
+      overflow: hidden;
       .cube-pullup-wrapper{
         padding-top: 20px;
       }

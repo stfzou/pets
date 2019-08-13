@@ -1,9 +1,13 @@
 <template>
 	<div class="authorActivity">
+
 		<div class="activityList">
 			<cube-scroll ref="scroll" :options="options" @pulling-up="onPullingUp" @pulling-down="onPullingDown">
 				<div class="activity-item" v-for="item in activityList">
-					<img class="cover" :src="item.activityCover" alt="">
+          <router-link class="flex_r_s_c" :to="{name:'activity',query:{id:item.id}}">
+            <img class="cover" :src="item.activityCover" alt="">
+          </router-link>
+
 					<div class="activeInfo">
 						<div class="activityName">{{item.activityTitel}}</div>
 						<div class="data flex_r_f_s">
@@ -20,17 +24,17 @@
 							</div>
 						</div>
 						<div class="cost flex_r_s_b">
-							<div class="price" v-if="item.minPrice == null">免费</div>
-							<div class="price" v-else>{{item.minPrice}}</div>
+							<div class="price" v-if="item.maxPrice == 0">免费</div>
+							<div class="price" v-if="item.maxPrice>0&&item.maxPrice!=item.minPrice">{{item.minPrice}} ~ {{item.maxPrice}}元</div>
+              <div class="price" v-if="item.maxPrice==item.minPrice&&item.maxPrice>0">{{item.maxPrice}}元</div>
 							<!-- <a href="###" class="flex_r_s_c">立即报名</a> -->
-							<router-link class="flex_r_s_c" :to="{name:'activity',query:{id:item.id}}">立即报名</router-link>
+							<router-link class="flex_r_s_c" v-if="item.isConduct===1" :to="{name:'activity',query:{id:item.id}}">立即报名</router-link>
+              <a class="flex_r_s_c grayBg" v-if="(new Date()).getTime()<(new Date(item.startTime)).getTime()">未开始</a>
+              <a class="flex_r_s_c grayBg" v-if="(new Date()).getTime()>=(new Date(item.endTime)).getTime()">已过期</a>
 						</div>
 					</div>
 				</div>
 			</cube-scroll>
-		</div>
-		<div class="activityList flex_r_s_c" v-if="isLoading">
-			<cube-loading :size="30"></cube-loading>
 		</div>
 		<div class="amap-page-container" v-show="false">
 			<el-amap ref="map" vid="amapDemo" :plugin="plugin" class="amap-demo"></el-amap>
@@ -40,11 +44,13 @@
 </template>
 
 <script>
+
 	import Api from '../common/apj.js'
 	export default {
 		data() {
 			let self = this;
 			return {
+
 				activityList: [],
         isLoading:true,
 				options: {
@@ -57,7 +63,7 @@
 							more: '加载更多',
 							noMore: '没有更多数据了',
 						},
-						threshold: 40,
+						threshold: 90,
 
 					}
 				},
@@ -102,14 +108,11 @@
 			}
 		},
 		mounted() {
-			let elHeight = document.querySelector(".dynamicNav").offsetHeight;
-			let elTop = document.querySelector(".dynamicNav").offsetTop;
-			let h = document.documentElement.clientHeight - elTop;
-			document.querySelector(".activityList").style.height = h + 'px';
       this.getUrlData();
       this.getActivityList();
 		},
 		methods: {
+
       showToastType() {
         const toast = this.$createToast({
           txt: 'TA还没有活动',
@@ -184,6 +187,7 @@
 
 						setTimeout(() => {
 							self.activityList = res.data.data;
+              console.log(self.activityList)
 							self.$refs.scroll.forceUpdate();
               setTimeout(()=>{
                 self.$refs.scroll.refresh();
@@ -219,11 +223,10 @@
 						if(res.data.data.length>0){
 
 							setTimeout(()=>{
-                self.activityList.push(...res.data.data)
                 self.$refs.scroll.forceUpdate();
-								setTimeout(()=>{
-									self.$refs.scroll.refresh();
-								},500)
+                self.activityList.push(...res.data.data)
+								self.$refs.scroll.refresh();
+
 							},800)
 
 						}else{
@@ -264,6 +267,8 @@
 		}
 
 		.activityList {
+      height: 800px;
+
 			overflow: hidden;
 			padding: 0 20px;
 			padding-bottom: 28px;
@@ -283,12 +288,13 @@
 				}
 
 				.activeInfo {
-					padding: 0 20px;
+					padding: 20px 20px 0 20px;
 
 					.activityName {
 						height: 48px;
 						line-height: 48px;
-						font-size: 30px;
+						font-size: 32px;
+            font-weight: bold;
 						color: #000;
 					}
 
@@ -296,11 +302,11 @@
 						height: 48px;
 
 						img {
-							width: 20px;
+							width: 26px;
 						}
 
 						span {
-							font-size: 24px;
+							font-size: 28px;
 							color: #666;
 							margin-left: 10px;
 						}
@@ -314,19 +320,19 @@
 							width: 500px;
 
 							img {
-								width: 20px;
+								width: 26px;
 							}
 
 							span {
-								font-size: 24px;
+								font-size: 26px;
 								color: #666;
 								margin-left: 10px;
 							}
 						}
 
 						.addr-r {
-							width: 160px;
-							font-size: 24px;
+							width: 180px;
+							font-size: 26px;
 							color: #666;
 							margin-left: 10px;
 							text-align: right;
@@ -349,6 +355,9 @@
 							color: #fff;
 							border-radius: 6px;
 						}
+            .grayBg{
+              background: #999;
+            }
 					}
 				}
 			}

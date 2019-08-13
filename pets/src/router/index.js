@@ -39,7 +39,7 @@ import GumiCard from '@/components/gumika/gumiCard'
 Vue.use(Router)
 export default new Router({
   //history
-	mode: 'hash',
+	mode: 'history',
     routes:[
 		{
 		  path:'',

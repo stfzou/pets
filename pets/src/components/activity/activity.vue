@@ -19,8 +19,15 @@
 				<span>收藏{{keep}}条</span>
 				<span>留言{{commentNum}}</span>
 			</div>
-			<div class="cost">{{activityPrice}}</div>
+			<div class="cost">
+        <span v-show="maxPrice>0&&maxPrice!=minPrice">{{minPrice}} ~ {{maxPrice}}元</span><span v-show="maxPrice===0">免费</span>
+        <span v-show="maxPrice>0&&maxPrice==minPrice">{{maxPrice}}元</span>
+       </div>
 			<ul class="info_list">
+        <li class="flex_r_f_s organizerName">
+        	<img class="info_l" src="../../assets/icon_she80@3x.png" alt="">
+        	<p><router-link :to="{name:'dynamic',query:{aId:userId}}">{{organizerName}}</router-link></p>
+        </li>
 				<li class="flex_r_f_s richeng">
 					<img class="info_l" src="../../assets/icon_time.png" alt="">
 					<p>{{startTime}}~{{endTime}}</p>
@@ -29,7 +36,7 @@
 					<img class="info_l" src="../../assets/icon/map@1x.png" alt="">
 					<p>{{activityAddr}}</p>
 				</li>
-				<li class="flex_r_f_s">
+				<li class="flex_r_f_s joinPerson">
 					<img class="info_l" src="../../assets/icon_renshu.png" alt="">
 					<p>已报名{{joinNum}}人/限{{limitNum}}人报名</p>
 				</li>
@@ -67,6 +74,10 @@
 								</div>
 
 								<div class="data">{{item.createTime}}</div>
+                <div class="replay" v-if="item.replyContent!=''">
+                  <div class="replayTitle">作者回复:</div>
+                  <p>{{item.replyContent}}</p>
+                </div>
 							</div>
 						</li>
 
@@ -77,7 +88,7 @@
 		</div>
 		<div class="active_foot">
 			<div class="message_input flex_r_s_b" v-show="isComment">
-				<input type="text" @blur.prevent="inputLoseFocus" v-model="msg" placeholder="留言">
+				<input type="text" @blur.prevent="inputLoseFocus" v-model="msg" maxlength="200" placeholder="留言">
 				<span class="send_msg" @click="commitComment">发送</span>
 			</div>
 			<div class="bottom flex_r_f_s">
@@ -88,12 +99,14 @@
 						<p>收藏</p>
 					</div>
 					<div class="collection msg">
-						<img src="../../assets/icon_xiaox.png" alt="" @click="commentShow">
+						<img src="../../assets/icon_she19@3x.png" alt="" @click="commentShow">
 						<p>留言</p>
 					</div>
 				</div>
 				<div class="bot_r flex_r_s_c" style="width: 50%;">
-					<div class="partake flex_r_s_c" @click="join">立即参加</div>
+					<div class="partake flex_r_s_c" v-if="isConduct==1" @click="join">立即参加</div>
+          <div class="partake flex_r_s_c grayBg" v-if="(new Date()).getTime()<(new Date(startTime)).getTime()">未开始</div>
+          <div class="partake flex_r_s_c grayBg" v-if="(new Date()).getTime()>=(new Date(endTime)).getTime()">已过期</div>
 				</div>
 			</div>
 		</div>
@@ -109,6 +122,9 @@
 			return {
 				evalList:[],
 				msg:'',
+        minPrice:0,
+        maxPrice:0,
+        organizerName:'',
 				mainImg:'',//活动主图
 				isActiveColor:false,
 				center:[],
@@ -124,6 +140,7 @@
 				joinNum:'',
 				limitNum:'',
 				isInnerHtml:true,
+        isConduct:'',
 				page:0,
 				options:{
 					pullDownRefresh:{
@@ -141,7 +158,8 @@
 				collectionImg:'',
 				isCollection:'',
 				uId:'-1',
-				isDown:true
+				isDown:true,
+        userId:''
 
 			}
 		},
@@ -243,6 +261,7 @@
 			},
 			getEval(){
 				let self = this;
+        self.page = 0;
 				self.axios.post(Api.userApi+'/ca/selectCommunityActivityComment',self.qs.stringify({
 					id:JSON.parse(sessionStorage.getItem('id')),
 					pageNo:self.page,
@@ -263,7 +282,10 @@
                 console.log(self.evalList)
 								self.commentNum = res.data.data.commentNum;
                 self.$refs.scroll.forceUpdate();
-                self.$refs.scroll.refresh();
+                setTimeout(()=>{
+                   self.$refs.scroll.refresh();
+                },200)
+
 
 							}, 1000)
 
@@ -311,11 +333,16 @@
 						self.activityAddr = res.data.data.activityAddr;
 						self.startTime = res.data.data.startTime;
 						self.endTime = res.data.data.endTime;
-						if(res.data.data.isToll == 0){
-							self.activityPrice = '免费'
-						}else{
-							self.activityPrice = '活动费用最少'+ res.data.data.minPrice+'元'
-						}
+            self.organizerName = res.data.data.organizerName;
+            self.userId = res.data.data.userId;
+            if(res.data.data.maxPrice!=0){
+              self.maxPrice = res.data.data.maxPrice;
+            }
+            if(res.data.data.minPrice==0){
+              self.minPrice = '免费'
+            }else{
+              self.minPrice = res.data.data.minPrice;
+            }
 						self.limitNum = res.data.data.limitNum;
 						self.joinNum = res.data.data.joinNum;
 						self.lat = res.data.data.latitude;
@@ -328,7 +355,8 @@
 							document.querySelector(".activity_cnt").innerHTML = res.data.data.description;
 							self.isInnerHtml = true;
 						}
-						console.log(res.data.data.description)
+            self.isConduct = res.data.data.isConduct;
+						console.log(res.data.data)
 						// console.log(res.data.data.description)
 						// self.evalList = res.data.data.commentVos;
 					}else{
@@ -342,7 +370,6 @@
 			},
 			onPullingDown() {
 			// 模拟更新数据
-				this.page = 0;
 				this.getEval();
 
 			},
@@ -366,14 +393,16 @@
 						if(res.data.data.doList.length>0){
 
 							setTimeout(()=>{
+                self.$refs.scroll.forceUpdate();
 								res.data.data.doList.forEach((e)=>{
 									e.content = self.decodeUnicode(e.content);
 								})
                 self.evalList.push(...res.data.data.doList)
-                self.$refs.scroll.forceUpdate();
                 setTimeout(()=>{
-                  self.$refs.scroll.refresh()
+                  self.$refs.scroll.refresh();
                 },200)
+
+
 							},800)
 
 
@@ -392,9 +421,8 @@
 
 			},
 			commitComment(){
-
+        let self = this;
 				if(JSON.parse(sessionStorage.getItem('user')) == null){
-					let self = this;
 					let url = window.location.href;
 					this.$store.commit('setLoginUrl',url);
 					this.$createDialog({
@@ -606,6 +634,7 @@
 <style lang="scss">
 	.activity_warp{
     background: #fff;
+    padding-bottom: 200px;
 		.line{
 			height: 10px;
 			background: #e8e8e8;
@@ -689,7 +718,7 @@
 			.footprint{
 				margin-top: 22px;
 				span{
-					font-size: 22px;
+					font-size: 26px;
 					color: #666;
 					margin-right: 30px;
 				}
@@ -702,6 +731,7 @@
 			}
 			.info_list{
 				li{
+          padding: 15px 0;
 					.info_l{
 						width: 20px;
 						margin-right: 8px;
@@ -709,28 +739,46 @@
 					p{
 						font-size: 26px;
 						color: #000;
-
+            a{
+              color: #000;
+            }
 					}
 
 				}
 
 				.richeng{
 					background: url("../../assets/icon/icon_she55@3x.png") no-repeat 100% center;
-					background-size: 22px;
+					background-size: 28px;
+          img{
+            width: 30px;
+          }
 				}
 				.right_sjx{
 
 					background: url("../../assets/icon/icon_she56@3x.png") no-repeat 100% center;
-					background-size: 24px;
-					margin: 35px 0;
+					background-size: 28px;
+          img{
+            width: 28px;
+          }
+
 				}
+        .organizerName{
+          img{
+            width: 24px;
+          }
+        }
+        .joinPerson{
+          img{
+            width: 28px;
+          }
+        }
 			}
 		}
 		.activity_cnt{
 			padding: 30px;
 			div{
-				font-size: 24px;
-				line-height: 34px;
+				font-size: 28px;
+				line-height: 40px;
 				color: #000;
 				margin-bottom: 10px;
 			}
@@ -786,14 +834,14 @@
 							align-items:flex-start;
 							.r_top_l{
 								.user_name{
-									font-size: 24px;
+									font-size: 30px;
 									color: #333;
 									height: 30px;
 								}
 								.text{
-									font-size: 26px;
+									font-size: 28px;
 									color: #000;
-									margin-top: 26px;
+									margin-top: 20px;
 								}
 
 							}
@@ -804,16 +852,39 @@
 							}
 						}
 						.data{
-							font-size: 20px;
+							font-size: 26px;
 							color: #999;
-							margin-top: 40px;
+							margin-top: 15px;
 						}
-
+            .replay{
+              background: #fcc9cf;
+              padding: 15px;
+              padding-top: 20px;
+              margin-top: 20px;
+              .replayTitle{
+                font-size: 26px;
+                color: #000;
+              }
+              p{
+                padding-top: 10px;
+                font-size: 26px;
+                color: #000;
+                line-height: 35px;
+              }
+            }
 					}
 				}
 			}
 		}
 		.active_foot{
+      // height: 110px;
+      width: 100%;
+      position: fixed;
+      left:0;
+      bottom: 0;
+      background: #fff;
+      z-index: 1000;
+
 			.message_input{
 				padding: 20px;
 				box-sizing: border-box;
@@ -855,7 +926,7 @@
 					}
           .msg{
             img{
-              height: 50px;
+              height: 56px;
             }
           }
 				}
@@ -868,6 +939,9 @@
 						border-radius: 10px;
 						width: 100%;
 					}
+          .grayBg{
+            background: #999;
+          }
 				}
 			}
 		}

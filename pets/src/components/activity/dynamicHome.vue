@@ -1,5 +1,6 @@
 <template>
 	<div class="dynamicHome">
+    <DownApp v-on:closeDown="closeDown" v-show="isDown"></DownApp>
 		<div class="top flex_r_s_b">
 			<img class="back" src="../../assets/icon/back@1x.png" alt="">
 			<img class="share" src="../../assets/icon/share@1x.png" alt="">
@@ -52,6 +53,7 @@
 
 <script>
 	import Api from '../common/apj.js'
+  import DownApp from '../common/downApp.vue'
 	export default {
 		data() {
 			return {
@@ -64,10 +66,13 @@
 				userNo: '',
 				styleImg: '',
 				userId: -1,
-				aId: ''
-
+				aId: '',
+        isDown:true,
 			}
 		},
+    components:{
+    	DownApp
+    },
 		mounted() {
 
 			if (JSON.parse(sessionStorage.getItem('user')) != null) {
@@ -79,6 +84,9 @@
 			// console.log(window.location.href)
 		},
 		methods: {
+      closeDown(){
+      	this.isDown = false;
+      },
 			getAuthorInfo() {
 				let self = this;
 				self.axios.get(Api.trendApi + '/userCenter/selectUserCenterByUserId', {

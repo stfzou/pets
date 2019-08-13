@@ -1,6 +1,6 @@
 <template>
 	<div class="trend_warp">
-		<!-- <DownApp v-on:closeDown="closeDown" v-show="isDown"></DownApp> -->
+		<DownApp v-on:closeDown="closeDown" v-show="isDown"></DownApp>
 		<div class="top_nav flex_r_s_b">
 			<div class="back" @click="back"></div>
 			<div class="nav_title">动态正文</div>
@@ -60,6 +60,8 @@
 			</div>
 			<div class="trend_label">
 				<div class="addr flex_r_f_s" v-if="geoLocation!=''"><img src="../../assets/icon/map@2x.png" alt=""><span>{{geoLocation}}</span></div>
+        <div class="itemTip" v-if="dynamicLabelNames.length>0"><span v-for="subItem in dynamicLabelNames">{{subItem}}</span></div>
+        <div class="petName" v-if="petName!=''"><span>#{{petName}}</span>+撸一次</div>
 				<!-- <div class="footprint flex_r_f_s"><img src="../../assets/footprint.png" alt=""><span>胖太</span></div>
 				<div class="explain">#异瞳#</div> -->
 			</div>
@@ -69,12 +71,11 @@
 					<i class="cubeic-like active" v-else @click="cancelLike"></i>
 					<span>{{likeCount}}人点赞</span>
 				</div>
-				<div class="like_people flex_r_s_b">
+				<div class="like_people flex_r_f_s">
 					<div class="likeHeadImg" v-for="(item,index) in likeUserHeadImages">
 						<img :src="item.userHeadImage" alt="" @click="likeLink(item)">
 					</div>
-
-					<div class="likeHeadImg active flex_r_s_c" v-if="likeUserHeadImages.length>0">
+					<div class="likeHeadImg active flex_r_s_c" v-show="likeLength>7">
 						<div class="flex_r_s_b" @click="praiseLink">
 							<span></span>
 							<span></span>
@@ -134,7 +135,10 @@
 		data() {
 			return {
 				val: '',
+        petName:'',
+        dynamicLabelNames:[],
         uId:'',
+        likeLength:'',
         classA:'imgActive',
         classB:'img',
         compressImages:'',
@@ -186,9 +190,9 @@
 		},
 		mounted() {
 
-			let h = document.documentElement.clientHeight - document.querySelector(".title").offsetTop;
-			let bottomH = document.querySelector(".send_comment").offsetHeight;
-			document.querySelector(".comment_list").style.height = (h-bottomH-100)+'px';
+			// let h = document.documentElement.clientHeight - document.querySelector(".title").offsetTop;
+			// let bottomH = document.querySelector(".send_comment").offsetHeight;
+			// document.querySelector(".comment_list").style.height = (h-bottomH-100)+'px';
 			if (JSON.parse(sessionStorage.getItem('user')) != null) {
 				this.userId = JSON.parse(sessionStorage.getItem('user')).userId;
 			}
@@ -349,6 +353,8 @@
             console.log(res.data.data)
 						self.userName = res.data.data.userName;
 						self.geoLocation = res.data.data.geoLocation;
+            self.dynamicLabelNames = res.data.data.dynamicLabelNames;
+            self.petName = res.data.data.petName;
             console.log(res)
 						if(res.data.data.images!=''){
 							self.images = res.data.data.images.split(',');
@@ -361,8 +367,9 @@
 						self.likeCount = res.data.data.likeCount;
 						self.likeData = res.data.data.likeUserHeadImages;
 						self.isFocus = res.data.data.isFocus;
-						if (res.data.data.likeUserHeadImages.length > 5) {
-							self.likeUserHeadImages = res.data.data.likeUserHeadImages.slice(0, 5);
+            self.likeLength = res.data.data.likeUserHeadImages.length;
+						if (res.data.data.likeUserHeadImages.length > 7) {
+							self.likeUserHeadImages = res.data.data.likeUserHeadImages.slice(-6);
 						} else {
 							self.likeUserHeadImages = res.data.data.likeUserHeadImages;
 						}
@@ -411,11 +418,10 @@
               console.log(res.data.data)
 							setTimeout(() => {
 								self.dynamicComments = res.data.data;
-                console.log(self.dynamicComments)
+                //console.log(self.dynamicComments)
 								self.dynamicComments.forEach((e)=>{
 									e.userContent = self.decodeUnicode(e.userContent);
 								})
-
 								self.$refs.scroll.forceUpdate();
 								setTimeout(() => {
 									self.$refs.scroll.refresh();
@@ -468,11 +474,12 @@
 						// self.dynamicComments = res.data.data;
 						if (res.data.data.length > 0) {
 							setTimeout(() => {
+                self.$refs.scroll.forceUpdate();
 								res.data.data.forEach((e) => {
                   e.userContent = self.decodeUnicode(e.userContent);
 								})
                 self.dynamicComments.push(...res.data.data)
-								self.$refs.scroll.forceUpdate();
+
 								setTimeout(() => {
 									self.$refs.scroll.refresh();
 								}, 100)
@@ -480,6 +487,7 @@
 						} else {
 							setTimeout(() => {
 								self.$refs.scroll.forceUpdate();
+                self.$refs.scroll.refresh();
 							}, 500)
 
 						}
@@ -487,6 +495,7 @@
 					} else {
 						setTimeout(() => {
 							self.$refs.scroll.forceUpdate();
+              self.$refs.scroll.refresh();
 						}, 500)
 						alert(res.data.msg)
 					}
@@ -675,7 +684,13 @@
 <style lang="scss">
 	.trend_warp {
 		padding-top: 88px;
+    padding-bottom: 88px;
     background: #fff;
+    .down-headr{
+      position: fixed;
+      left: 0;
+      top: 0;
+    }
 		.tx {
 			font-size: 28px;
 			padding: 30px 20px;
@@ -907,7 +922,26 @@
 						margin-right: 10px;
 					}
 				}
+        .itemTip{
+          padding: 20px 0 30px 0;
 
+          span{
+            padding: 5px 10px;
+            border: 1px solid #e8e8e8;
+            color: #e8e8e8;
+            border-radius: 18px;
+            font-size: 26px;
+            margin-right: 10px;
+            margin-bottom: 10px;
+          }
+        }
+        .petName{
+          font-size: 26px;
+          color: #e8e8e8;
+          span{
+            margin-right: 20px;
+          }
+        }
 				.footprint {
 
 					margin: 15px 0;
@@ -920,7 +954,7 @@
 			}
 
 			.like_box {
-				margin-top: 52px;
+				margin-top: 20px;
         font-size: 26px;
 				.like {
 					i {
@@ -948,14 +982,16 @@
 						height: 90px;
 						border-radius: 50%;
 						background: #ffdfdf;
-
+            margin-left: 8px;
 						img {
 							width: 100%;
 							height: 100%;
 							border-radius: 50%;
 						}
 					}
-
+          .likeHeadImg:first-child{
+            margin-left: 0;
+          }
 					.active {
 						background: #e8e8e8;
 
@@ -1012,7 +1048,7 @@
 			}
 
 			.comment_list {
-				height: 300px;
+				height: 350px;
         box-sizing: border-box;
 				ul {
 					padding: 0 20px;
