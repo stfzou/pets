@@ -29,8 +29,8 @@
               <div class="price" v-if="item.maxPrice==item.minPrice&&item.maxPrice>0">{{item.maxPrice}}元</div>
 							<!-- <a href="###" class="flex_r_s_c">立即报名</a> -->
 							<router-link class="flex_r_s_c" v-if="item.isConduct===1" :to="{name:'activity',query:{id:item.id}}">立即报名</router-link>
-              <a class="flex_r_s_c grayBg" v-if="(new Date()).getTime()<(new Date(item.startTime)).getTime()">未开始</a>
-              <a class="flex_r_s_c grayBg" v-if="(new Date()).getTime()>=(new Date(item.endTime)).getTime()">已过期</a>
+              <a class="flex_r_s_c grayBg" v-if="(new Date()).getTime()<(new Date(item.startTime)).getTime()&&item.isConduct!=1">未开始</a>
+              <a class="flex_r_s_c grayBg" v-if="(new Date()).getTime()>=(new Date(item.endTime)).getTime()&&item.isConduct!=1">已过期</a>
 						</div>
 					</div>
 				</div>
@@ -50,7 +50,7 @@
 		data() {
 			let self = this;
 			return {
-
+        aId:'',
 				activityList: [],
         isLoading:true,
 				options: {
@@ -123,7 +123,7 @@
 			getActivityListOne() {
 				let self = this;
 				self.axios.post(Api.userApi + '/ca/selectCommunityActivityListByUserId', self.qs.stringify({
-					userId: JSON.parse(sessionStorage.getItem('Aid')),
+					userId: self.aId,
 					pageNo: 0,
 					pageSize: 5,
 					latitude: self.lat,
@@ -167,13 +167,14 @@
       	}
       	/*输出日志*/
       	if(returnArr.aId!=undefined){
-      		sessionStorage.setItem('Aid',JSON.stringify(returnArr.aId));
+      		//sessionStorage.setItem('Aid',JSON.stringify(returnArr.aId));
+          this.aId = returnArr.aId;
       	}
       },
 			getActivityList() {
 				let self = this;
 				self.axios.post(Api.userApi + '/ca/selectCommunityActivityListByUserId', self.qs.stringify({
-					userId: JSON.parse(sessionStorage.getItem('Aid')),
+					userId: self.aId,
 					pageNo: 0,
 					pageSize: 5,
 					latitude: self.lat,
@@ -209,7 +210,7 @@
 				let self = this;
 				this.page++;
 				self.axios.post(Api.userApi + '/ca/selectCommunityActivityListByUserId', self.qs.stringify({
-					userId: JSON.parse(sessionStorage.getItem('Aid')),
+					userId: self.aId,
 					pageNo: self.page,
 					pageSize: 5,
 					latitude: self.lat,

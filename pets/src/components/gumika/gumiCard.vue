@@ -9,7 +9,7 @@
           </div>
           <div class="itemList flex_r_f_s vcode_box">
             <p>验证码</p>
-            <input type="password" v-model="vCode" @blur.prevent="inputLoseFocus" placeholder="请输入验证码" />
+            <input type="number" v-model="vCode" @blur.prevent="inputLoseFocus" placeholder="请输入验证码" />
             <div class="v_code" v-if="show">
               <span @click="getCode">获取验证码</span>
             </div>
@@ -27,7 +27,7 @@
         <div class="popupTitle flex_r_s_c">在线支付</div>
         <div class="payment flex_r_s_b">
           <span class="payment_l">需付款</span>
-          <span class="payment_r">￥{{totalPrice}}</span>
+          <span class="payment_r">￥299</span>
         </div>
         <div class="payStyle flex_r_f_e">
           <div class="flex_c_f_e">
@@ -57,18 +57,18 @@
     </div>
     <div class="cardCnt">
       <div class="vipCard">
-        <!-- <div class="open flex_r_s_c">立即开通</div> -->
-        <div class="barCode">
+        <div class="open flex_r_s_c" @click="dailongShow" v-if="!isCard">立即开通</div>
+        <div class="barCode" v-if="isCard">
           <img src="../../assets/barCode.png" alt="">
-          <div class="numCode">1234 1234 1234 1234</div>
+          <div class="numCode">{{number}}</div>
         </div>
-        <div class="validity">有效期至 2019/8/27</div>
+        <div class="validity" v-show="isCard">有效期至 {{endTime}}</div>
       </div>
     </div>
-    <div class="interestsInfoBox">
+    <div class="interestsInfoBox" v-if="isCard">
       <div class="interestsInfo flex_r_s_b">
-        <div class="cnt_l">已使用权益<b>2</b>次</div>
-        <div class="cnt_r">累计节省<b>￥18.60</b></div>
+        <div class="cnt_l">已使用权益<b>{{useNum}}</b>次</div>
+        <div class="cnt_r">累计节省<b>￥{{totalPrice}}元</b></div>
       </div>
     </div>
     <div class="navShow flex_r_s_b">
@@ -101,9 +101,14 @@
         <img src="../../assets/icon_gu07@3x.png" alt="">
       </div>
     </div>
-    <div class="gufoot" @click="dailongShow">
+    <div class="gufootActive flex_r_s_b" v-if="isCard">
+      <span>有效期至  {{endTime}}</span>
+      <img src="../../assets/xfBtn.png" alt="" @click="renew">
+    </div>
+    <div class="gufoot" @click="dailongShow" v-else>
       <img src="../../assets/pay.png" alt="">
     </div>
+
   </div>
 </template>
 
@@ -123,14 +128,69 @@
         activeIndex: '2',
         reg: /^1[3456789]\d{9}$/,
         userId: '',
-        code: ''
+        code: '',
+        number:'',
+        endTime:'',
+        useNum:'',
+        totalPrice:'',
+        isCard:false
       }
     },
     mounted() {
+      //console.log(sessionStorage.getItem('orderNum')!=null)
+      console.log(sessionStorage.getItem('orderNum'))
+      if(sessionStorage.getItem('orderNum')!=null&&sessionStorage.getItem('orderNum')!=undefined){
+        this.getOrderState();
+      }
       this.getEnvironment();
+      this.getCardInfo()
     },
     methods: {
-      share() {
+      share(){
+      	let toast = this.$createToast({
+      		txt: '点击顶部右上角进行分享',
+      		type: 'warn'
+      	  })
+      	toast.show()
+      },
+      getCardInfo(){
+        //console.log(JSON.parse(localStorage.getItem('user')))
+        if(JSON.parse(sessionStorage.getItem('user'))!= null){
+            let self = this;
+            this.axios.post(Api.userApi + '/boneMika/selectUserBoneMikaStatus', this.qs.stringify({
+              userId:JSON.parse(sessionStorage.getItem('user')).userId
+            }), {
+              headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+              }
+            }).then((res)=>{
+              if(res.data.code==1){
+                if(res.data.data==1){
+
+                  self.axios.post(Api.userApi + '/boneMika/selectBoneMikaVo', self.qs.stringify({
+                    userId:JSON.parse(sessionStorage.getItem('user')).userId
+                  }), {
+                    headers: {
+                      'Content-Type': 'application/x-www-form-urlencoded'
+                    }
+                  }).then((re)=>{
+                    if(re.data.code==1){
+                     self.number = (re.data.data.number+'').replace(/\s/g, '').replace(/(.{4})/g, "$1 ")
+                     self.endTime = re.data.data.endTime
+                     self.isCard = true
+                     self.useNum = re.data.data.useNum
+                     self.totalPrice = re.data.data.totalPrice
+                    }else{
+                      alert(re.data.msg)
+                    }
+                  })
+                }
+              }else{
+                alert(res.data.msg)
+              }
+            })
+
+        }
 
       },
       getUrlPara(name) {
@@ -161,6 +221,15 @@
       },
       getCode() {
         //获取验证码
+        if (this.phone == '') {
+
+          alert('请填写手机号码')
+          return false;
+        } else if (!this.reg.test(this.phone)) {
+
+          alert('手机号码格式错误')
+          return false;
+        }
         if (this.phone) {
           let _this = this;
           const TIME_COUNT = 60;
@@ -215,11 +284,60 @@
       dailongHide() {
         this.isDialong = false;
         this.isDialongCnt = true;
+
       },
       inputLoseFocus() {
         setTimeout(() => {
           window.scrollTo(0, 0);
         }, 100);
+
+      },
+      renew() {
+        let self = this;
+
+        if (this.phone == '') {
+
+          alert('请填写手机号码')
+          return false;
+        } else if (!this.reg.test(this.phone)) {
+
+          alert('手机号码格式错误')
+          return false;
+        } else if (this.vCode == '') {
+          alert('请填写验证码')
+          return false;
+        } else {
+          this.axios.post(Api.userApi + '/user_sms_login', this.qs.stringify({
+            phone: this.phone,
+            vcode: this.vCode
+          }), {
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded'
+            }
+          }).then(function(res) {
+
+            if (res.data.code === 1) {
+              var userEntity = {
+                userName: res.data.user.userName,
+                userId: res.data.user.userId,
+                userPhone: res.data.user.phone,
+                token: res.data.token
+              };
+              self.userId = res.data.user.userId;
+              sessionStorage.setItem('user', JSON.stringify(userEntity));
+              self.isDialong = true;
+              self.isDialongCnt = false;
+
+            }else {
+              console.log(res)
+              alert(res.data.msg)
+            }
+
+          }).catch(function(err) {
+            console.log(err)
+            alert(err)
+          })
+        }
 
       },
       vCodeLogin() {
@@ -266,19 +384,13 @@
               }).then((re) => {
                 if(re.data.code ===1 ){
                   if(re.data.data==0){
+                    self.isDialong = true;
                     self.isDialongCnt = false;
                   }else{
-                    self.axios.post(Api.userApi + '/boneMika/selectBoneMikaVo', self.qs.stringify({//查询骨米卡详情
-                      userId: self.userId
-                    }), {
-                      headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded'
-                      }
-                    }).then((cb) => {
-                      if(cb.data.code===1){
-                         alert(1)
-                      }
-                    })
+                    // alert(1)
+                    setTimeout(() => {
+                      window.location.href = 'http://app.gutouzu.com/index.html#/gumiCardt='+ new Date().getTime();
+                    }, 500)
                   }
                 }else{
                   alert(re.data.msg)
@@ -296,10 +408,38 @@
         }
 
       },
+      getOrderState(){
+        let self = this;
+        this.axios.post(Api.userApi + '/boneMika/selectBoneMikaOrderStatus', this.qs.stringify({
+          out_trade_no: sessionStorage.getItem('orderNum')
+        }), {
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+          }
+        }).then((res) => {
+          if (res.data.code == 1) {
+              if(res.data.data===1){
+                alert('开通成功')
+                sessionStorage.removeItem("orderNum");
+                setTimeout(() => {
+                  window.location.href = 'http://app.gutouzu.com/index.html#/gumiCardt?t='+ new Date().getTime();
+                }, 500)
+              }else{
+                alert(res.data.msg)
+                 setTimeout(() => {
+                  window.location.href = 'http://app.gutouzu.com/index.html#/gumiCardt?t='+ new Date().getTime();
+                }, 500)
+              }
+
+          } else {
+            alert(res.data.msg)
+          }
+        })
+      },
       wxH5Pay() {
 
         let self = this;
-        this.axios.post(Api.userApi + '/boneMika/wxPay/gzhh5/prepay', this.qs.stringify({
+        this.axios.post(Api.userApi + '/boneMika/boneMikaByWXHwPay', this.qs.stringify({
           userId: self.userId
         }), {
           headers: {
@@ -308,7 +448,8 @@
         }).then((res) => {
           if (res.data.code == 1) {
             //
-            window.location.href = res.data.data
+            sessionStorage.setItem('orderNum',res.data.data.out_trade_no);
+            window.location.href = res.data.data.mweb_url
 
             console.log(res)
 
@@ -344,10 +485,13 @@
               if (res.err_msg === 'get_brand_wcpay_request:ok') {
                 alert('支付成功，返回活动详情页！');
                 setTimeout(() => {
-                  window.location.href = 'http://app.gutouzu.com/index.html#/gumiCard';
+                  window.location.href = 'http://app.gutouzu.com/index.html#/gumiCardt?t='+ new Date().getTime();
                 }, 500)
               } else if (res.err_msg === 'get_brand_wcpay_request:cancel') {
                 alert('取消支付！');
+                setTimeout(() => {
+                  window.location.href = 'http://app.gutouzu.com/index.html#/gumiCardt?t='+ new Date().getTime();
+                }, 500)
               } else if (res.err_msg === 'get_brand_wcpay_request:fail') {
                 alert(JSON.stringify(res))
               }
@@ -394,6 +538,7 @@
 
       },
       commit() {
+        sessionStorage.removeItem("orderNum");
         if (this.activeIndex == '2' && this.environment == '0') {
           this.wxPay();
         } else if (this.activeIndex == '2' && this.environment == '1') {
@@ -409,14 +554,14 @@
 <style lang="scss">
   .guimiCard {
     background: #f5f5f5;
-
+    padding-bottom: 96px;
     .guDialog {
       position: fixed;
       height: 100%;
       width: 100%;
       left: 0;
       top: 0;
-      z-index: 1000;
+      z-index: 10000;
       background: rgba(0, 0, 0, 0.6);
 
       .dialongCnt {
@@ -662,7 +807,7 @@
         background: #fff;
         border-radius: 35px;
         color: #ff523d;
-        font-size: 26px;
+        font-size: 28px;
         position: absolute;
         left: 60px;
         bottom: 58px;
@@ -677,7 +822,7 @@
 
         .numCode {
           text-align: center;
-          font-size: 26px;
+          font-size: 28px;
           color: #fff;
           padding-top: 10px;
         }
@@ -724,12 +869,34 @@
     .gufoot {
       width: 100%;
       height: 96px;
-
+      position: fixed;
+      left: 0;
+      bottom: 0;
+      z-index: 1000;
       img {
         width: 100%;
         height: 96px;
         display: block;
       }
     }
+    .gufootActive{
+      box-sizing: border-box;
+      padding-left: 26px;
+      height: 96px;
+      background: #6b6a6a;
+      position: fixed;
+      left: 0;
+      bottom: 0;
+      z-index: 10;
+      img{
+        width: 260px;
+        height: 96px;
+      }
+      span{
+        color: #fff;
+        font-size: 26px;
+      }
+    }
+
   }
 </style>

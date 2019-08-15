@@ -35,6 +35,7 @@ import CouponList from '@/components/shareCoupon/couponList'
 import ShopCoupon from '@/components/shareCoupon/shopCoupon'
 import CouponXq from '@/components/shareCoupon/couponXq'
 import GumiCard from '@/components/gumika/gumiCard'
+import PayRes from '@/components/common/payRes'
 
 Vue.use(Router)
 export default new Router({
@@ -50,6 +51,11 @@ export default new Router({
 			name:'vLogin',
 			component:vLogin,
 		},
+    {
+      path:'/payRes',
+      name:'payRes',
+      component:PayRes,
+    },
     {
       path:'/gumiCard',
       name:'gumiCard',

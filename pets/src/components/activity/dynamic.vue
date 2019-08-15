@@ -68,6 +68,7 @@
         classA:'imgActive',
         classB:'img',
 				page:1,
+        aId:'',
 				options:{
 					pullDownRefresh:{
 						txt:'更新成功',
@@ -121,7 +122,7 @@
         this.page = 1;
 				self.axios.get(Api.trendApi + '/community/selectDynamicByUserId', {
 					params: {
-						beLookUserId: JSON.parse(sessionStorage.getItem('Aid')),
+						beLookUserId:self.aId,
 						lookUserId:self.userId,
 						page:1,
 						rows:5
@@ -175,7 +176,8 @@
       	}
       	/*输出日志*/
       	if(returnArr.aId!=undefined){
-      		sessionStorage.setItem('Aid',JSON.stringify(returnArr.aId));
+      		//sessionStorage.setItem('Aid',JSON.stringify(returnArr.aId));
+          this.aId = returnArr.aId;
       	}
       },
 			onPullingUp() {
@@ -185,7 +187,7 @@
 				this.page++;
 				self.axios.get(Api.trendApi + '/community/selectDynamicByUserId', {
 					params: {
-						beLookUserId: JSON.parse(sessionStorage.getItem('Aid')),
+						beLookUserId:self.aId,
 						lookUserId:self.userId,
 						page:self.page,
 						rows:5

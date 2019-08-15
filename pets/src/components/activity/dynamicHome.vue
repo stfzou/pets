@@ -32,15 +32,15 @@
 		</div>
 		<div class="dynamicNav flex_r_f_e">
 
-			<router-link :to="{name:'dynamic'}" class="flex_r_s_c">
+			<router-link :to="{name:'dynamic',query:{aId:aId}}" class="flex_r_s_c">
 				<span>TA的动态</span>
 				<div class="hx"></div>
 			</router-link>
-			<router-link :to="{name:'authorActivity'}" class="flex_r_s_c">
+			<router-link :to="{name:'authorActivity',query:{aId:aId}}" class="flex_r_s_c">
 				<span>TA的活动</span>
 				<div class="hx"></div>
 			</router-link>
-			<router-link :to="{name:'authorPets'}" class="flex_r_s_c">
+			<router-link :to="{name:'authorPets',query:{aId:aId}}" class="flex_r_s_c">
 				<span>TA的宠物</span>
 				<div class="hx"></div>
 			</router-link>
@@ -78,7 +78,7 @@
 			if (JSON.parse(sessionStorage.getItem('user')) != null) {
 				this.userId = JSON.parse(sessionStorage.getItem('user')).userId;
 			}
-
+      this.getUrlData();
 			this.getAuthorInfo();
 
 			// console.log(window.location.href)
@@ -86,6 +86,30 @@
 		methods: {
       closeDown(){
       	this.isDown = false;
+      },
+      getUrlData() { // 截取url中的数据
+
+      	let tempStr = window.location.href;
+      	/**
+      	 * tempArr 是一个字符串数组 格式是["key=value", "key=value", ...]
+      	 */
+      	let returnArr = {};
+      	let urlArr = tempStr.split('?');
+      	if(urlArr){
+      	  urlArr.forEach((e)=>{
+
+      	      if(e.indexOf('=')>-1){
+
+      	        returnArr[e.split('=')[0]] = e.split('=')[1];
+      	      }
+
+      	  })
+      	}
+      	/*输出日志*/
+      	if(returnArr.aId!=undefined){
+      		sessionStorage.setItem('Aid',JSON.stringify(returnArr.aId));
+          this.aId = returnArr.aId;
+      	}
       },
 			getAuthorInfo() {
 				let self = this;

@@ -60,6 +60,7 @@
 			return{
 				arr:[1,2,3,4,5],
         isLoading:true,
+        aId:'',
 				options: {
 					pullDownRefresh: {
 						txt: '更新成功',
@@ -79,6 +80,7 @@
 			}
 		},
 		mounted() {
+      this.getUrlData();
 			this.getPets();
 		},
 		methods:{
@@ -89,12 +91,35 @@
         })
         toast.show()
       },
+      getUrlData() { // 截取url中的数据
+      	let tempStr = window.location.href;
+      	/**
+      	 * tempArr 是一个字符串数组 格式是["key=value", "key=value", ...]
+      	 */
+      	let returnArr = {};
+      	let urlArr = tempStr.split('?');
+      	if(urlArr){
+      	  urlArr.forEach((e)=>{
+
+      	      if(e.indexOf('=')>-1){
+
+      	        returnArr[e.split('=')[0]] = e.split('=')[1];
+      	      }
+
+      	  })
+      	}
+      	/*输出日志*/
+      	if(returnArr.aId!=undefined){
+      		//sessionStorage.setItem('Aid',JSON.stringify(returnArr.aId));
+          this.aId = returnArr.aId;
+      	}
+      },
 			getPets(){
 				let self = this;
         self.page = 1;
 				self.axios.get(Api.trendApi + '/userPet/selectUserPet', {
 					params: {
-						userId: JSON.parse(sessionStorage.getItem('Aid')),
+						userId: self.aId,
 						page:1,
 						rows:5
 					}
@@ -135,7 +160,7 @@
 				this.page++;
 				self.axios.get(Api.trendApi + '/userPet/selectUserPet', {
 					params: {
-						userId: JSON.parse(sessionStorage.getItem('Aid')),
+						userId: self.aId,
 						page:self.page,
 						rows:5
 					}

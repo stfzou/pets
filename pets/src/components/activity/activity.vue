@@ -105,8 +105,8 @@
 				</div>
 				<div class="bot_r flex_r_s_c" style="width: 50%;">
 					<div class="partake flex_r_s_c" v-if="isConduct==1" @click="join">立即参加</div>
-          <div class="partake flex_r_s_c grayBg" v-if="(new Date()).getTime()<(new Date(startTime)).getTime()">未开始</div>
-          <div class="partake flex_r_s_c grayBg" v-if="(new Date()).getTime()>=(new Date(endTime)).getTime()">已过期</div>
+          <div class="partake flex_r_s_c grayBg" v-if="(new Date()).getTime()<(new Date(startTime)).getTime()&&isConduct!=1">未开始</div>
+          <div class="partake flex_r_s_c grayBg" v-if="(new Date()).getTime()>=(new Date(endTime)).getTime()&&isConduct!=1">已过期</div>
 				</div>
 			</div>
 		</div>
@@ -884,7 +884,7 @@
       bottom: 0;
       background: #fff;
       z-index: 1000;
-
+      border-top: 1px solid #ff523d;
 			.message_input{
 				padding: 20px;
 				box-sizing: border-box;
