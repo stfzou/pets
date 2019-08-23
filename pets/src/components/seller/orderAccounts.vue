@@ -11,17 +11,17 @@
 					 <div class="addr_name">
 						<span>{{addr.receiveName}}</span>
 						<span class="phone">{{addr.receivePhone.replace(/^(\d{3})\d{4}(\d+)/,"$1****$2")}}</span>
-					</div> 
+					</div>
 					 <div class="addr_text flex_r_f_s">
 						<img src="../../assets/icon/map@2x.png" alt="">
 						<span class="addr_cnt">{{addr.addrProvince}}{{addr.addrCity}}{{addr.addrArea}}{{addr.addressTitle}}</span>
 						<div class="mr flex_r_s_c">默认</div>
 					</div>
 				</div>
-				
+
 				<div class="noAddr" v-else>您还没有设置地址，点击设置地址</div>
 			</div>
-			
+
 			<div class="addr_line"></div>
 		</div>
 		<div class="orderList_box">
@@ -65,7 +65,7 @@
 				<div class="integral flex_r_s_b">
 					<span class="">使用100积分，抵用1.00元</span>
 					<cube-switch v-model="val">
-					
+
 					</cube-switch>
 				</div>
 				<div class="integral flex_r_s_b">
@@ -124,7 +124,7 @@
 		methods: {
 			back() {
 				this.$router.go(-1); //返回上一层
-			
+
 			},
 			showTimePicker() {
 				this.$createTimePicker({
@@ -151,7 +151,7 @@
 			getOrder(){
 				let self = this;
 				self.axios.post(Api.userApi+'/order/orderSettlement',self.qs.stringify({
-					userId:JSON.parse(sessionStorage.getItem('user')).userId
+					userId:JSON.parse(localStorage.getItem('user')).userId
 				}), {
 					headers: {
 						'Content-Type': 'application/x-www-form-urlencoded'
@@ -174,7 +174,7 @@
 				})
 			},
 			addrUrl(){
-				let self = this; 
+				let self = this;
 				self.$router.push({
 					name:'userAddr'
 				});
@@ -183,15 +183,15 @@
 			getAddr(){
 				let self = this;
 				self.axios.post(Api.userApi+'/user/selectUserAddr',self.qs.stringify({
-					userId:JSON.parse(sessionStorage.getItem('user')).userId,
+					userId:JSON.parse(localStorage.getItem('user')).userId,
 				}), {
 					headers: {
 						'Content-Type': 'application/x-www-form-urlencoded',
-						"token":JSON.parse(sessionStorage.getItem('user')).token
+						"token":JSON.parse(localStorage.getItem('user')).token
 					}
 				}).then((res)=>{
 					if(res.data.code == 1){
-						
+
 						// self.addrData = ;
 						res.data.data.forEach((e)=>{
 							if(e.isDefault == 1){
@@ -212,7 +212,7 @@
 
 	.orderAccounts {
 		padding-bottom: 126px;
-		padding-top:88px; 
+		padding-top:88px;
 		.top_nav {
 			padding: 0 20px;
 			height: 88px;
@@ -337,7 +337,7 @@
 						margin-bottom: 20px;
 						.goods_img {
 							width: 100px;
-							
+
 						}
 
 						.goodsInfo_r {
@@ -347,7 +347,7 @@
 								color: #000;
 								font-size: 26px;
 							}
-							
+
 							.attr{
 								margin-top: 10px;
 								font-size: 24px;
@@ -437,7 +437,7 @@
 				margin-top: 30px;
 				.cube-switch .cube-switch-ui{
 					height: 30px;
-					
+
 				}
 				.pt_integral{
 					margin-bottom: 30px;

@@ -49,7 +49,7 @@
       </div>
     </div>
     <div class="headPost">
-      <div class="top_nav flex_r_s_b">
+      <div class="top_nav flex_r_s_b" :class="{active_nav:isActiveColor}">
         <div class="back" @click="back"></div>
         <div class="nav_title">骨米卡特权权益</div>
         <div class="share" @click="share"></div>
@@ -118,6 +118,7 @@
     data() {
       return {
         phone: '',
+        isActiveColor:false,
         vCode: '',
         show: true,
         totalPrice: 198,
@@ -137,11 +138,11 @@
       }
     },
     mounted() {
-      //console.log(sessionStorage.getItem('orderNum')!=null)
-      console.log(sessionStorage.getItem('orderNum'))
-      if(sessionStorage.getItem('orderNum')!=null&&sessionStorage.getItem('orderNum')!=undefined){
-        this.getOrderState();
-      }
+      //localStorage.removeItem('user')
+      //console.log(localStorage.getItem('orderNum')!=null)
+      let self = this;
+      window.addEventListener('scroll', self.handleScroll)
+      //console.log(localStorage.getItem('orderNum'))
       this.getEnvironment();
       this.getCardInfo()
     },
@@ -153,12 +154,32 @@
       	  })
       	toast.show()
       },
+      handleScroll () {
+
+      	setTimeout(()=>{
+      		var scrollTop = window.scrollY;
+      		let elHeight = document.querySelector(".cardCnt").offsetHeight;
+      		if(scrollTop>elHeight){
+
+      			this.isActiveColor = true;
+      		}else{
+      			this.isActiveColor = false;
+
+      		}
+      		if(scrollTop>0){
+      			this.isDown = false;
+      		}else{
+      			this.isDown = true;
+      		}
+      	},200)
+
+      },
       getCardInfo(){
         //console.log(JSON.parse(localStorage.getItem('user')))
-        if(JSON.parse(sessionStorage.getItem('user'))!= null){
+        if(JSON.parse(localStorage.getItem('user'))!= null){
             let self = this;
             this.axios.post(Api.userApi + '/boneMika/selectUserBoneMikaStatus', this.qs.stringify({
-              userId:JSON.parse(sessionStorage.getItem('user')).userId
+              userId:JSON.parse(localStorage.getItem('user')).userId
             }), {
               headers: {
                 'Content-Type': 'application/x-www-form-urlencoded'
@@ -168,7 +189,7 @@
                 if(res.data.data==1){
 
                   self.axios.post(Api.userApi + '/boneMika/selectBoneMikaVo', self.qs.stringify({
-                    userId:JSON.parse(sessionStorage.getItem('user')).userId
+                    userId:JSON.parse(localStorage.getItem('user')).userId
                   }), {
                     headers: {
                       'Content-Type': 'application/x-www-form-urlencoded'
@@ -294,50 +315,10 @@
       },
       renew() {
         let self = this;
-
-        if (this.phone == '') {
-
-          alert('请填写手机号码')
-          return false;
-        } else if (!this.reg.test(this.phone)) {
-
-          alert('手机号码格式错误')
-          return false;
-        } else if (this.vCode == '') {
-          alert('请填写验证码')
-          return false;
-        } else {
-          this.axios.post(Api.userApi + '/user_sms_login', this.qs.stringify({
-            phone: this.phone,
-            vcode: this.vCode
-          }), {
-            headers: {
-              'Content-Type': 'application/x-www-form-urlencoded'
-            }
-          }).then(function(res) {
-
-            if (res.data.code === 1) {
-              var userEntity = {
-                userName: res.data.user.userName,
-                userId: res.data.user.userId,
-                userPhone: res.data.user.phone,
-                token: res.data.token
-              };
-              self.userId = res.data.user.userId;
-              sessionStorage.setItem('user', JSON.stringify(userEntity));
-              self.isDialong = true;
-              self.isDialongCnt = false;
-
-            }else {
-              console.log(res)
-              alert(res.data.msg)
-            }
-
-          }).catch(function(err) {
-            console.log(err)
-            alert(err)
-          })
-        }
+        self.userId = JSON.parse(localStorage.getItem('user')).userId;
+        //localStorage.setItem('user', JSON.stringify(userEntity));
+        self.isDialong = true;
+        self.isDialongCnt = false;
 
       },
       vCodeLogin() {
@@ -374,7 +355,7 @@
               };
               self.userId = res.data.user.userId;
 
-              sessionStorage.setItem('user', JSON.stringify(userEntity));
+              localStorage.setItem('user', JSON.stringify(userEntity));
               self.axios.post(Api.userApi + '/boneMika/selectUserBoneMikaStatus', self.qs.stringify({//查询骨米卡状态
                 userId: self.userId
               }), {
@@ -382,15 +363,19 @@
                   'Content-Type': 'application/x-www-form-urlencoded'
                 }
               }).then((re) => {
-                if(re.data.code ===1 ){
-                  if(re.data.data==0){
+
+                if(re.data.code===1){
+
+                  if(re.data.data===1){
+
+                    setTimeout(() => {
+                      window.location.href = "http://192.168.0.127:8081/gumiCard?sj="+10000*Math.random();
+                    }, 500)
+                  }else{
+
                     self.isDialong = true;
                     self.isDialongCnt = false;
-                  }else{
-                    // alert(1)
-                    setTimeout(() => {
-                      window.location.href = 'http://app.gutouzu.com/index.html#/gumiCardt='+ new Date().getTime();
-                    }, 500)
+
                   }
                 }else{
                   alert(re.data.msg)
@@ -408,34 +393,7 @@
         }
 
       },
-      getOrderState(){
-        let self = this;
-        this.axios.post(Api.userApi + '/boneMika/selectBoneMikaOrderStatus', this.qs.stringify({
-          out_trade_no: sessionStorage.getItem('orderNum')
-        }), {
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded'
-          }
-        }).then((res) => {
-          if (res.data.code == 1) {
-              if(res.data.data===1){
-                alert('开通成功')
-                sessionStorage.removeItem("orderNum");
-                setTimeout(() => {
-                  window.location.href = 'http://app.gutouzu.com/index.html#/gumiCardt?t='+ new Date().getTime();
-                }, 500)
-              }else{
-                alert(res.data.msg)
-                 setTimeout(() => {
-                  window.location.href = 'http://app.gutouzu.com/index.html#/gumiCardt?t='+ new Date().getTime();
-                }, 500)
-              }
 
-          } else {
-            alert(res.data.msg)
-          }
-        })
-      },
       wxH5Pay() {
 
         let self = this;
@@ -448,9 +406,23 @@
         }).then((res) => {
           if (res.data.code == 1) {
             //
-            sessionStorage.setItem('orderNum',res.data.data.out_trade_no);
-            window.location.href = res.data.data.mweb_url
-
+            //localStorage.setItem('orderNum',res.data.data.out_trade_no);
+            //window.location.href = res.data.data.mweb_url
+            let orderInfo = {
+              payUrl:res.data.data.mweb_url,
+              backUrl:window.location.href,
+              out_trade_no:res.data.data.out_trade_no,
+              payStyle:'wx'
+            }
+            self.$store.commit('setOrderInfo',orderInfo)
+            self.$router.push({
+              name:'payRes',
+              query:{
+                out_trade_no:res.data.data.out_trade_no,
+                backUrl:'http://app.gutouzu.com/index.html#/gumiCard',
+                orderApi:'/boneMika/selectBoneMikaOrderStatus'
+              }
+            })
             console.log(res)
 
 
@@ -485,12 +457,12 @@
               if (res.err_msg === 'get_brand_wcpay_request:ok') {
                 alert('支付成功，返回活动详情页！');
                 setTimeout(() => {
-                  window.location.href = 'http://app.gutouzu.com/index.html#/gumiCardt?t='+ new Date().getTime();
+                  window.location.href = 'http://app.gutouzu.com/index.html#/gumiCard?sj='+10000*Math.random();
                 }, 500)
               } else if (res.err_msg === 'get_brand_wcpay_request:cancel') {
                 alert('取消支付！');
                 setTimeout(() => {
-                  window.location.href = 'http://app.gutouzu.com/index.html#/gumiCardt?t='+ new Date().getTime();
+                  window.location.href = 'http://app.gutouzu.com/index.html#/gumiCard?sj='+10000*Math.random();
                 }, 500)
               } else if (res.err_msg === 'get_brand_wcpay_request:fail') {
                 alert(JSON.stringify(res))
@@ -516,10 +488,22 @@
           }).then((res) => {
 
             if (res.data.code == 1) {
-              const div = document.createElement('div');
-              div.innerHTML = res.data.data;
-              document.body.appendChild(div);
-              document.forms.punchout_form.submit();
+              //localStorage.setItem('orderNum',res.data.data.out_trade_no);
+              let orderInfo = {
+                payUrl:res.data.data.from,
+                out_trade_no:res.data.data.out_trade_no,
+                payStyle:'ali'
+              }
+              self.$store.commit('setOrderInfo',orderInfo)
+              self.$router.push({
+                name:'payRes',
+                query:{
+                  out_trade_no:res.data.data.out_trade_no,
+                  backUrl:'http://app.gutouzu.com/index.html#/gumiCard',
+                  orderApi:'/boneMika/selectBoneMikaOrderStatus'
+                }
+              })
+
               self.isPopup = false;
             } else {
               alert(res.data.msg)
@@ -538,7 +522,7 @@
 
       },
       commit() {
-        sessionStorage.removeItem("orderNum");
+
         if (this.activeIndex == '2' && this.environment == '0') {
           this.wxPay();
         } else if (this.activeIndex == '2' && this.environment == '1') {
@@ -752,6 +736,21 @@
           background: url('../../assets/icon/share@2x.png') no-repeat center 0;
           background-size: 100%;
         }
+
+      }
+      .active_nav{
+      	background: #fff;
+      	.back{
+      		background: url(../../assets/icon/backColory.png) no-repeat center 0;
+      		background-size: cover;
+      	}
+      	.share{
+      		background: url('../../assets/icon/active_share.png') no-repeat center 0;
+      		background-size: 100%;
+      	}
+      	.nav_title{
+      		color: #ff523d;
+      	}
       }
     }
 

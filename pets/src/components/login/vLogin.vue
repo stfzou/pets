@@ -25,7 +25,7 @@
 				</li>
 			</ul>
 			<div class="link_login">
-				
+
 				<a>未注册的手机号将自动为您创建账号</a>
 			</div>
 			<div class="login_btn flex_r_s_c" @click="vCodeLogin">登录</div>
@@ -79,7 +79,7 @@
 									console.log(error);
 								});
 						}
-						
+
 						this.timer = setInterval(() => {
 							if (this.count > 0 && this.count <= TIME_COUNT) {
 								this.count--;
@@ -91,7 +91,7 @@
 						}, 1000)
 					}
 				}
-			
+
 			},
 			back() {
 				this.$router.go(-1);//返回上一层
@@ -100,7 +100,7 @@
 				setTimeout(() => {
 				  window.scrollTo(0,0);
 				},100);
-				
+
 			},
 			vCodeLogin(){
 				let self = this;
@@ -127,7 +127,7 @@
 							'Content-Type': 'application/x-www-form-urlencoded'
 						}
 					}).then(function(res) {
-								
+
 						if (res.data.code === 1) {
 							console.log(res)
 							var userEntity = {
@@ -135,11 +135,11 @@
 								userId: res.data.user.userId,
 								userPhone: res.data.user.phone,
 								token:res.data.token
-								
+
 							};
 							// self.$store.commit('setUserInfo',userEntity);
-							sessionStorage.setItem('user', JSON.stringify(userEntity));
-							
+							localStorage.setItem('user', JSON.stringify(userEntity));
+
 							let toast = self.$createToast({
 								txt: '登录成功',
 								type: 'correct'
@@ -155,8 +155,8 @@
 									name:'sellerGoods'
 								})
 							}
-							
-								
+
+
 						} else {
 							console.log(res)
 							let toast = self.$createToast({
@@ -165,12 +165,12 @@
 							  })
 							toast.show()
 						}
-								
+
 					}).catch(function(err) {
 						console.log(err)
 					})
 				}
-				
+
 			}
 		}
 	}
@@ -236,10 +236,10 @@
 			         /* placeholder颜色  */
 						color: #fff;
 					}
-					
+
 				}
 				.vcode_box{
- 					
+
 					.v_code{
 						margin-left: 30px;
 						span{

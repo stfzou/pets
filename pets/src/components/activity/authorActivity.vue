@@ -167,7 +167,7 @@
       	}
       	/*输出日志*/
       	if(returnArr.aId!=undefined){
-      		//sessionStorage.setItem('Aid',JSON.stringify(returnArr.aId));
+      		//localStorage.setItem('Aid',JSON.stringify(returnArr.aId));
           this.aId = returnArr.aId;
       	}
       },

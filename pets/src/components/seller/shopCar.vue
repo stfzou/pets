@@ -35,14 +35,14 @@
 							<div class="goods_r">
 								<div class="goods_name">{{subItem.productName}}</div>
 								<div class="parameter" v-if="subItem.anvs.length>0">
-									
+
 									<span v-for="(s,index) in subItem.anvs">{{s.avName|pNameFilter(index,subItem.anvs.length-1)}}</span>
 								</div>
 								<div class="activity">
 									<div>
 										<span>限时</span>
 									</div>
-									
+
 								</div>
 								<div class="price_box flex_r_s_b">
 									<div class="price_l">
@@ -60,13 +60,13 @@
 										</div>
 									</div>
 								</div>
-								
+
 							</div>
 						</div>
-						
+
 					</div>
 				</li>
-				
+
 			</ul>
 		</div>
 		<div class="shopCart_foot flex_r_s_b">
@@ -109,16 +109,16 @@
 				text:'编辑',
 				allSelect:false,
 				price:''
-				
+
 			}
 		},
 		mounted() {
-			
+
 			this.getShopCar();
 		},
 		filters:{
 			pNameFilter(val,index,arrl){
-				
+
 				if(arrl == index){
 					return val;
 				}else{
@@ -158,10 +158,10 @@
 					}), {
 						headers: {
 							'Content-Type': 'application/x-www-form-urlencoded'
-							
+
 						}
 					}).then((res)=>{
-						
+
 						if(res.data.code == 1){
 							subItem.productNum++
 							subItem.skuImgId = subItem.productNum;
@@ -176,14 +176,14 @@
 						}
 					})
 				}
-				
-				
+
+
 			},
 			reduce(subItem){
 				if(subItem.productNum<=1){
 					console.log('不能再减了哦')
 				}else{
-					
+
 					let self = this;
 					self.axios.post(Api.userApi+'/car/shopCarOperate',self.qs.stringify({
 						shopId:subItem.shopId,
@@ -196,7 +196,7 @@
 							'Content-Type': 'application/x-www-form-urlencoded'
 						}
 					}).then((res)=>{
-						
+
 						if(res.data.code == 1){
 							subItem.productNum = subItem.productNum-1;
 							subItem.skuImgId = subItem.productNum;
@@ -216,13 +216,13 @@
 			getShopCar(){
 				let self = this;
 				self.axios.post(Api.userApi+'/car/selectShopCar',self.qs.stringify({
-					userId:JSON.parse(sessionStorage.getItem('user')).userId,
+					userId:JSON.parse(localStorage.getItem('user')).userId,
 				}), {
 					headers: {
 						'Content-Type': 'application/x-www-form-urlencoded'
 					}
 				}).then((res)=>{
-					
+
 					if(res.data.code == 1){
 						// self.shopCarData = res.data.data.carShops;
 						console.log(res)
@@ -247,7 +247,7 @@
 							})
 						})
 						self.price = Math.floor(res.data.data.selectPrice * 100) / 100;
-						
+
 					}else{
 						console.log(res.data.msg)
 					}
@@ -262,9 +262,9 @@
 						'Content-Type': 'application/x-www-form-urlencoded'
 					}
 				}).then((res)=>{
-					
+
 					if(res.data.code == 1){
-					
+
 						self.price = res.data.data.selectPrice;
 						console.log(res)
 					}
@@ -297,7 +297,7 @@
 							'Content-Type': 'application/x-www-form-urlencoded'
 						}
 					}).then((res)=>{
-						
+
 						if(res.data.code == 1){
 							// subItem.productNum = subItem.productNum-1;
 							subItem.skuImgId = subItem.productNum;
@@ -329,7 +329,7 @@
 						item.select = true;
 						self.allSelect = true;
 						item.carPs.forEach((e)=>{
-							
+
 							if(e.isSelect == 0){
 								item.select = false;
 								return false;
@@ -343,10 +343,10 @@
 								}
 							})
 						})
-						
+
 					}
 				})
-				
+
 			},
 			cancel(subItem,item){
 				let self = this;
@@ -365,10 +365,10 @@
 						self.allSelect = false;
 					}
 				})
-				
+
 			},
 			shopSelect(item){
-				
+
 				let self = this;
 				self.axios.post(Api.userApi+'/car/updateShopSelectAll',self.qs.stringify({
 					shopId:item.carPs[0].shopId,
@@ -396,12 +396,12 @@
 						})
 					}
 				})
-				
-				
+
+
 			},
 			shopCancel(item){
 				let self = this;
-				
+
 				self.axios.post(Api.userApi+'/car/updateShopSelectAll',self.qs.stringify({
 					shopId:item.carPs[0].shopId,
 					select:0,
@@ -418,11 +418,11 @@
 						item.carPs.forEach((e)=>{
 							e.isSelect = 0;
 						})
-						
+
 					}
 				})
-				
-				
+
+
 			},
 			selectAll(){
 				let self = this;
@@ -444,17 +444,17 @@
 								j.isSelect = 1;
 							})
 						})
-						
+
 					}
 				})
-				
+
 			},
 			cancelSelectAll(){
 				let self = this;
 				self.axios.post(Api.userApi+'/car/updateShopSelectAll',self.qs.stringify({
 					shopId:-1,
 					select:0,
-					userId:JSON.parse(sessionStorage.getItem('user')).userId
+					userId:JSON.parse(localStorage.getItem('user')).userId
 				}), {
 					headers: {
 						'Content-Type': 'application/x-www-form-urlencoded'
@@ -469,7 +469,7 @@
 								j.isSelect = 0;
 							})
 						})
-						
+
 					}
 				})
 			},
@@ -478,7 +478,7 @@
 				let self = this;
 				if(this.allSelect){
 					self.axios.post(Api.userApi+'/car/deleteShopCar',self.qs.stringify({
-						userId:JSON.parse(sessionStorage.getItem('user')).userId
+						userId:JSON.parse(localStorage.getItem('user')).userId
 					}), {
 						headers: {
 							'Content-Type': 'application/x-www-form-urlencoded'
@@ -492,7 +492,7 @@
 					})
 				}else{
 					this.shopCarData.forEach((e)=>{
-						
+
 						e.carPs.forEach((j)=>{
 							if(j.isSelect == 1){
 								clearCarData.push(j.carId)
@@ -513,7 +513,7 @@
 						}
 					})
 				}
-				
+
 			},
 			settlement(){
 				let self = this;
@@ -528,9 +528,9 @@
 				})
 				if(isHttp){
 					self.axios.post(Api.userApi+'/order/orderSettlement',self.qs.stringify({
-					
-						userId:JSON.parse(sessionStorage.getItem('user')).userId
-						
+
+						userId:JSON.parse(localStorage.getItem('user')).userId
+
 					}), {
 						headers: {
 							'Content-Type': 'application/x-www-form-urlencoded'
@@ -557,7 +557,7 @@
 						icon: 'cubeic-warn'
 					}).show()
 				}
-				
+
 			}
 		},
 	}
@@ -568,7 +568,7 @@
 	@import '../../style/mixin.scss';
 	.shopcar_warp{
 		padding: 88px 0 86px 0;
-		
+
 		.top_nav {
 			padding: 0 20px;
 			height: 88px;
@@ -586,7 +586,7 @@
 				background: url(../../assets/icon/backColory.png) no-repeat center 0;
 				background-size: cover;
 			}
-		
+
 			.nav_title {
 				font-size: 30px;
 				color: #000;
@@ -594,9 +594,9 @@
 				left: 50%;
 				top: 50%;
 				transform: translate(-50%, -50%);
-		
+
 			}
-		
+
 			.text {
 				font-size: 26px;
 				color: #FF523D;
@@ -616,7 +616,7 @@
 			ul{
 				li{
 					border-bottom: 10px solid #e8e8e8;
-					
+
 					.shopName_box{
 						padding: 0 20px;
 						height: 86px;
@@ -639,7 +639,7 @@
 							}
 						}
 					}
-					
+
 					.discount{
 						height: 60px;
 						background: #ffefed;
@@ -663,7 +663,7 @@
 						.goods_item{
 							padding: 30px 0;
 							border-top: 1px solid #e8e8e8;/*no*/
-							
+
 							.mid{
 								img{
 									width: 104px;
@@ -721,7 +721,7 @@
 											color: #FF523D;
 											font-size: 24px;
 											outline: none;
-											
+
 										}
 										.add{
 											height: 40px;
@@ -734,8 +734,8 @@
 							border: none;
 						}
 					}
-					
-						
+
+
 				}
 			}
 		}
@@ -771,7 +771,7 @@
 					background:linear-gradient(90deg, #fe8071, #ffb160, #ffaf60, #ff7660);
 					border-radius:7px;
 				}
-				
+
 			}
 			.delete_btn{
 				width: 180px;
@@ -780,7 +780,7 @@
 				border-radius:7px;
 				color: #FF523D;
 				font-size: 28px;
-				
+
 			}
 		}
 	}

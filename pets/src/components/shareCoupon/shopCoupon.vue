@@ -1,22 +1,65 @@
 <template>
 	<div class="shopCoupon">
+    <div class="couponListDialog flex_r_s_c" @click.stop="dailongHide" v-show="isDialong">
+      <div class="dialongCnt" @click.stop v-show="!isDialongCnt">
+        <div class="dialongCntTop">
+          <div class="title">
+            您咱不能使用此项权益
+          </div>
+          <p>仅限骨米卡特权会员预定，开通骨米卡优选俱乐部会员即可享受特权优惠权益</p>
+        </div>
+        <div class="btnBox flex_r_s_b">
+          <div class="cancelBtn flex_r_s_c" @click="dailongHide">取消</div>
+          <div class="okBtn flex_r_s_c" @click="guCardLink">确定</div>
+        </div>
+      </div>
+      <div class="payBox" @click.stop v-show="isDialongCnt">
+        <div class="popupTitle flex_r_s_c">在线支付</div>
+        <div class="payment flex_r_s_b">
+          <span class="payment_l">需付款</span>
+          <span class="payment_r">￥{{payPrice}}</span>
+        </div>
+        <div class="payStyle flex_r_f_e">
+          <div class="flex_c_f_e">
+            <div class="payImg" @click="clickAli">
+              <img src="../../assets/zfb.png" alt="">
+              <div class="select" v-show="activeIndex == '1'"></div>
+            </div>
+            <p>支付宝支付</p>
+          </div>
+          <div class="flex_c_f_e">
+            <div class="payImg" @click="clickWx">
+              <img src="../../assets/weixin.png" alt="">
+              <div class="select" v-show="activeIndex == '2'"></div>
+            </div>
+            <p>微信支付</p>
+          </div>
+        </div>
+        <div class="payBtn flex_r_s_c" @click="commit">确认支付</div>
+      </div>
+    </div>
 		<div class="top_nav flex_r_s_b">
 			<div class="back" @click="back"></div>
-			<div class="nav_title">店铺优惠券</div>
+			<div class="nav_title">{{shopName}}</div>
 			<div class="share" @click="share"></div>
 		</div>
 		<div class="shopBox flex_c_f_e">
-			<img class="shopImg" :src="shopImgAddr" alt="">
-			<div class="shopName">{{shopName}}</div>
-			<a href="###" class="addr flex_r_f_s">
-				<img src="../../assets/icon/map@2x.png" alt="">
-				<p>{{shopAddress}}</p>
+			<img class="shopImg" v-if="false" :src="shopImgAddr" alt="">
+      <img class="shopImg" v-else src="../../assets/head_icon.png" alt="">
+      <div class="operateTypes">主营品类:<span v-for="item in operateTypes">{{item.typeName}}、</span></div>
+      <div class="shopDesc">店铺简介:{{shopDesc}}</div>
+			<a :href="navUrl" class="addr flex_r_s_b">
+        <p>地址:{{shopAddress}}</p>
+				<img src="../../assets/icon/icon_she56@3x.png" alt="">
 			</a>
+      <div class="distance">{{distance}}</div>
 		</div>
+    <div class="shopCouponTitle">店铺优惠券</div>
 		<div class="couponListBox">
 			<cube-scroll ref="scroll">
 			<ul>
 				<li class="flex_r_s_b" v-for="item in couponList">
+          <img v-if="item.couponType===3" class="privilege" src="../../assets/icon_gu30@3x.png" alt="">
 					<div class="list_l">
 						<div class="listLeftTop flex_r_s_b">
 							<img @click="couponXqLink(item)" :src="item.couponIcan" alt="">
@@ -33,20 +76,28 @@
 						</div>
 					</div>
 					<div class="list_r">
-						<div class="sale" :class="{activeColor:item.receiveNum==item.circulation}">￥{{item.couponPrice}}</div>
+						<div class="sale" :class="{activeColor:item.receiveNum==item.circulation}">
+              <span v-if="item.conditionPrice===0">￥{{item.couponPrice}}</span>
+              <span v-if="item.conditionPrice!==0">￥{{item.conditionPrice}}</span>
+            </div>
 						<div class="condition">
-							<span :class="{activeColor:item.receiveNum==item.circulation}" v-if="item.conditionPrice!=0">满{{item.conditionPrice}}元可用</span>
-							<span :class="{activeColor:item.receiveNum==item.circulation}" v-else>无门槛</span>
+							<span v-if="item.conditionPrice!==0" :class="{activeColor:item.receiveNum==item.circulation}">票价:<span class="through">{{item.couponPrice}}</span></span>
+							<span v-if="item.conditionPrice==0">无门槛</span>
 						</div>
 						<div class="makeTime">{{item.couponEndTime}}前有效</div>
 						<div class="receiveBtnBox">
-							<div v-if="item.isReceive==0||item.receiveNum==item.circulation" class="receiveBtn receivedBtn flex_r_s_c">立即领取</div>
-							<div @click="receive(item)" v-else class="receiveBtn flex_r_s_c">立即领取</div>
+							<!-- <div v-if="item.isReceive===0" class="receiveBtn receivedBtn flex_r_s_c">立即领取</div>
+							<div @click="receive(item)" v-else class="receiveBtn flex_r_s_c">立即领取</div> -->
+
+              <div v-if="item.isReceive===0&&item.conditionPrice==0" class="receiveBtn receivedBtn flex_r_s_c">已领完</div>
+              <div v-if="item.isReceive===0&&item.conditionPrice!=0" class="receiveBtn receivedBtn flex_r_s_c">已购买</div>
+              <div @click="receive(item)" v-if="item.isReceive!=0" class="receiveBtn flex_r_s_c">立即领取</div>
 						</div>
 
 					</div>
-					<img v-show="item.isReceive==1" class="imprint" src="../../assets/received.png" alt="">
-					<img v-show="item.isReceive==0" class="imprint" src="../../assets/receiveEnd.png" alt="">
+					<img v-if="item.isReceive===0&&item.conditionPrice==0" class="imprint" src="../../assets/receiveEnd.png" alt="">
+					<img v-if="item.isReceive===1" class="imprint" src="../../assets/received.png" alt="">
+					<img v-if="item.isReceive===0&&item.conditionPrice!=0" class="imprint" src="../../assets/buyEnd.png" alt="">
 				</li>
 			</ul>
 			</cube-scroll>
@@ -66,8 +117,17 @@
 			return{
 				lng:0,
 				lat:0,
-				uId:'31',
+        environment:'',
+				uId:'',
+        navUrl:'',
 				shopId:'',
+        distance:'',
+        operateTypes:[],
+        activeIndex:'2',
+        shopDesc:'',
+        isDialongCnt:true,
+        isDialong:false,
+        payPrice:'',
 				couponList:[],
 				shopName:'',
 				shopImgAddr:'',
@@ -126,11 +186,12 @@
 			}
 		},
 		mounted() {
-			if(JSON.parse(sessionStorage.getItem('user')) == null){
+      this.getEnvironment();
+			if(JSON.parse(localStorage.getItem('user')) == null){
 				// this.$store.commit('setRouterName','activity');
 				this.uId = '';
 			}else{
-				this.uId = JSON.parse(sessionStorage.getItem('user')).userId;
+				this.uId = JSON.parse(localStorage.getItem('user')).userId;
 			}
 			this.shopId = this.getUrlData().shopId;
 			this.getShopCouponList();
@@ -147,6 +208,73 @@
 				  })
 				toast.show()
 			},
+      dailongShow() {
+        this.isDialong = true;
+      },
+      dailongHide() {
+        this.isDialong = false;
+
+      },
+      clickWx() {
+        this.activeIndex = '2';
+
+      },
+      clickAli() {
+        this.activeIndex = '1';
+
+      },
+      getEnvironment() { //静默授权初始化
+        var ua = window.navigator.userAgent.toLowerCase();
+        if (ua.match(/MicroMessenger/i) == 'micromessenger') {
+          this.environment = '0';
+          this.getCode();
+        } else {
+          this.environment = '1';
+        }
+      },
+      getUrlPara(name) {
+        var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i");
+        var r = window.location.search.substr(1).match(reg);
+        if (r != null) return (r[2]);
+        return null;
+      },
+      getCode () { //静默授权
+      	let self = this;
+      	const local = window.location.href;
+      	this.code = this.getUrlPara('code');
+      	if (this.code == null || this.code === '') {
+      	  window.location.href = 'https://open.weixin.qq.com/connect/oauth2/authorize?appid=wxdf1774932d9dd96e&redirect_uri=' +
+      	    encodeURIComponent(local) + '&response_type=code&scope=snsapi_base&state=' + '38' + '#wechat_redirect';
+      	}
+      },
+      getCardState(item){
+        let self = this;
+        self.axios.post(Api.userApi + '/boneMika/selectUserBoneMikaStatus', self.qs.stringify({//查询骨米卡状态
+          userId: self.uId
+        }), {
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+          }
+        }).then((re) => {
+          if(re.data.code ===1){
+            if(re.data.data===1&&item.conditionPrice!=0){
+              self.isDialong = true;
+              self.isDialongCnt = true;
+              self.couponId = item.couponId;
+              self.payPrice = item.conditionPrice;
+            }else if(item.conditionPrice==0&&re.data.data==1){
+              self.receiveCoupon(item)
+            } else{
+              // alert(1)
+              self.isDialong = true;
+              self.isDialongCnt = false;
+            }
+          }else{
+            alert(re.data.msg)
+          }
+
+        })
+      },
 			couponXqLink(item){
 				this.$router.push({
 					name:'couponXq',
@@ -190,13 +318,18 @@
 					}
 				}).then((res)=>{
 					if(res.data.code == 1){
+            console.log(res.data.data)
 						self.shopName = res.data.data.shopName;
 						self.shopImgAddr = res.data.data.shopImgAddr;
 						self.shopAddress = res.data.data.shopAddress;
 						self.couponList = res.data.data.shopCoupons;
+            self.shopDesc = res.data.data.shopDesc;
+            self.operateTypes = res.data.data.operateTypes;
+            self.distance = res.data.data.distance;
+            self.navUrl = 'https://uri.amap.com/marker?position='+res.data.data.longitude+','+res.data.data.latitude+'&name='+res.data.data.shopAddress;;
 						self.couponList.forEach((e)=>{
 							e.styleObj = {
-								width:Math.round((e.receiveNum/e.circulation * 10000)/100).toFixed(4) + '%'
+								width:(100-Math.round((e.receiveNum/e.circulation * 10000)/100).toFixed(4))+'%'
 							}
 							e.sx = (100-Math.round((e.receiveNum/e.circulation * 10000)/100).toFixed(4))+'%'
 						})
@@ -213,16 +346,185 @@
 			onPullingUp(){
 				//加载
 			},
+      receiveCoupon(item){
+        let self = this;
+        self.axios.post(Api.userApi + '/coupon/addUserCoupon', self.qs.stringify({
+        	userId: self.uId,
+        	couponId:item.couponId,
+        }), {
+        	headers: {
+        		'Content-Type': 'application/x-www-form-urlencoded'
+        	}
+        }).then((res)=>{
+        	if(res.data.code == 1){
+        		let toast = self.$createToast({
+        			txt: '领取成功',
+        			type: 'correct'
+        		  })
+        		toast.show();
+        		setTimeout(()=>{
+        			self.page = 0;
+        			self.getShopCouponList();
+        		},500)
+        	}else{
+        		alert(res.data.msg)
+        	}
+        })
+      },
+      wxH5Pay() {
+
+        let self = this;
+        this.axios.post(Api.userApi + '/couponOrder/couponOrderByWXHwPay', this.qs.stringify({
+          userId: self.uId,
+          couponId:self.couponId
+        }), {
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+          }
+        }).then((res) => {
+          if (res.data.code == 1) {
+
+            let orderInfo = {
+              payUrl:res.data.data.mweb_url,
+              backUrl:window.location.href,
+              out_trade_no:res.data.data.out_trade_no,
+              payStyle:'wx'
+            }
+            self.$store.commit('setOrderInfo',orderInfo)
+            self.$router.push({
+              name:'payRes',
+              query:{
+                out_trade_no:res.data.data.out_trade_no,
+                backUrl:window.location.href,
+                orderApi:'/couponOrder/selectCouponOrderStatus'
+              }
+            })
+            console.log(res)
+
+          } else {
+            alert(res.data.msg)
+          }
+        })
+        //
+      },
+      wxPay() { // 通过code获取 openId等用户信息，/api/user/wechat/login 为后台接口
+
+        let self = this;
+        this.axios.post(Api.userApi + '/couponOrder/wxPay/gzhh5/prepay', this.qs.stringify({
+          userId: self.uId,
+          couponId:self.couponId,
+          code: self.getUrlPara('code')
+        }), {
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+          }
+        }).then((res) => {
+          if (res.data.code == 1) {
+            WeixinJSBridge.invoke('getBrandWCPayRequest', {
+              'appId': res.data.data.appId,
+              'timeStamp': res.data.data.timeStamp,
+              'nonceStr': res.data.data.nonceStr,
+              'package': res.data.data.package,
+              'signType': 'MD5',
+              'paySign': res.data.data.paySign
+            }, function(res) {
+              if (res.err_msg === 'get_brand_wcpay_request:ok') {
+                alert('支付成功！');
+                setTimeout(() => {
+                  self.$router.push({
+                    name:'wxWhitePage',
+                    query:{
+                      wxPayBackUrl:window.location.href
+                    }
+                  })
+                }, 500)
+
+              } else if (res.err_msg === 'get_brand_wcpay_request:cancel') {
+                alert('取消支付！');
+                setTimeout(() => {
+                  self.$router.push({
+                    name:'wxWhitePage',
+                    query:{
+                      wxPayBackUrl:window.location.href
+                    }
+                  })
+                }, 500)
+
+              } else if (res.err_msg === 'get_brand_wcpay_request:fail') {
+                alert(JSON.stringify(res))
+              }
+            });
+          } else {
+            alert(res.data.msg)
+          }
+        })
+      },
+      aliPay() { //支付宝支付
+
+        if (this.environment == '0') {
+          alert('请点击右上角用浏览器打开进行支付')
+        } else {
+          let self = this;
+          this.axios.post(Api.userApi + '/couponOrder/ali/webpay', this.qs.stringify({
+            userId: self.uId,
+            couponId:self.couponId
+          }), {
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded'
+            }
+          }).then((res) => {
+
+            if (res.data.code == 1) {
+              //localStorage.setItem('orderNum',res.data.data.out_trade_no);
+              let orderInfo = {
+                payUrl:res.data.data.from,
+                out_trade_no:res.data.data.out_trade_no,
+                payStyle:'ali'
+              }
+              self.$store.commit('setOrderInfo',orderInfo)
+              self.$router.push({
+                name:'payRes',
+                query:{
+                  out_trade_no:res.data.data.out_trade_no,
+                  backUrl:window.location.href,
+                  orderApi:'/couponOrder/selectCouponOrderStatus'
+                }
+              })
+
+              // self.isPopup = false;
+            } else {
+              alert(res.data.msg)
+            }
+
+          })
+        }
+
+      },
+      commit() {
+
+        if (this.activeIndex == '2' && this.environment == '0') {
+          this.wxPay();
+        } else if (this.activeIndex == '2' && this.environment == '1') {
+          this.wxH5Pay();
+        } else if (this.activeIndex == '1') {
+          this.aliPay();
+        }
+      },
+      guCardLink(){
+        this.$router.push({
+          name:'gumiCard'
+        })
+      },
 			receive(item){
 				let self = this;
-				if(JSON.parse(sessionStorage.getItem('user')) == null){
+				if(JSON.parse(localStorage.getItem('user')) == null){
 
 					let url = window.location.href;
 					this.$store.commit('setLoginUrl',url);
 					this.$createDialog({
 						type: 'confirm',
 						icon: 'cubeic-warn',
-						title: '需要登录后才能评论',
+						title: '需要登录后才参加活动',
 						confirmBtn: {
 						  text: '去登录',
 						  active: true,
@@ -241,40 +543,147 @@
 						  })
 						},
 
-					 }).show()
+					}).show()
 
-				}else{
+				}else if(item.couponType==2&&item.conditionPrice!=0){
+			    this.payPrice = item.conditionPrice;
+			    this.isDialong = true;
+			    this.couponId = item.couponId;
+			  }else if(item.couponType==3){
+			    this.getCardState(item)
 
-					self.axios.post(Api.userApi + '/coupon/addUserCoupon', self.qs.stringify({
-						userId: self.uId,
-						couponId:item.couponId,
+			    // this.payPrice = item.conditionPrice;
+			    // this.isDialong = true;
+			  }else{
+			    this.receiveCoupon(item)
 
-					}), {
-						headers: {
-							'Content-Type': 'application/x-www-form-urlencoded'
-						}
-					}).then((res)=>{
-						if(res.data.code == 1){
-							let toast = self.$createToast({
-								txt: '领取成功',
-								type: 'correct'
-							  })
-							toast.show();
-							setTimeout(()=>{
-								self.getShopCouponList();
-							},500)
-						}else{
-							alert(res.data.msg)
-						}
-					})
 				}
-			}
+			},
 		}
 	}
 </script>
 
 <style lang="scss">
 	.shopCoupon{
+    .couponListDialog {
+      position: fixed;
+      height: 100%;
+      width: 100%;
+      left: 0;
+      top: 0;
+      z-index: 10000;
+      background: rgba(0, 0, 0, 0.6);
+      .dialongCnt{
+        width: 600px;
+        background: #fff;
+        padding-top: 50px;
+        border-radius: 10px;
+        .dialongCntTop{
+          .title{
+            font-size: 30px;
+            color: #000;
+            font-weight:bold;
+            text-align: center;
+          }
+          p{
+            color: #666;
+            font-size: 28px;
+            font-weight: bold;
+            padding: 50px 30px 0 30px;
+            text-align: center;
+            line-height: 34px;
+          }
+        }
+        .btnBox {
+          box-sizing: border-box;
+          padding: 30px 0;
+          div {
+            width: 50%;
+            height: 70px;
+            font-size: 30px;
+            box-sizing: border-box;
+            color: #ff523d;
+          }
+          .cancelBtn {
+            color: #333;
+          }
+        }
+      }
+      .payBox {
+        position: absolute;
+        left: 0;
+        bottom: 0;
+        background: #fff;
+        width: 100%;
+
+        .payBtn {
+          height: 96px;
+          background: #FF523D;
+          color: #fff;
+          font-size: 28px;
+        }
+
+        .payStyle {
+          height: 286px;
+
+          &>div {
+            position: relative;
+
+            .payImg {
+              position: relative;
+
+              img {
+                width: 80px;
+              }
+
+              .select {
+                width: 38px;
+                height: 38px;
+                background: url('../../assets/select.png') no-repeat center 0;
+                background-size: cover;
+                position: absolute;
+                right: -10px;
+                top: -10px;
+              }
+            }
+
+            p {
+              margin-top: 10px;
+              font-size: 28px;
+              color: #000;
+            }
+
+          }
+        }
+
+        .popupTitle {
+          height: 72px;
+          border-bottom: 1px solid #FF523D;
+          /*no*/
+          font-size: 28px;
+          color: #000;
+        }
+
+        .payment {
+          height: 68px;
+          padding: 0 20px;
+          box-sizing: border-box;
+
+          .payment_l {
+            font-size: 28px;
+            color: #000;
+          }
+
+          .payment_r {
+            font-size: 28px;
+            color: #FF523D;
+          }
+        }
+      }
+    }
+    .through{
+      text-decoration:line-through;
+    }
 		.top_nav {
 			padding: 0 20px;
 			height: 88px;
@@ -305,7 +714,7 @@
 			}
 		}
 		.shopBox{
-			height: 400px;
+			height: 430px;
 			align-content:space-between;
 			justify-content:center;
 			// background: red;
@@ -313,31 +722,63 @@
 				width: 120px;
 				height: 120px;
 				border-radius: 50%;
+        object-fit: cover;
+        margin: 30px 0;
+        border: 1px solid #e8e8e8;
 			}
 			.shopName{
 				color: #000;
 				font-size: 30px;
 				padding-top: 30px;
 			}
+      .operateTypes{
+        color: #000;
+        font-size: 28px;
+        font-weight: bold;
+        padding-bottom: 20px;
+        span{
+          color: #000;
+          font-size: 28px;
+          font-weight: bold;
+        }
+      }
+      .shopDesc{
+        padding: 0 20px 0 20px;
+        line-height: 34px;
+        font-size: 26px;
+        color: #666;
+      }
 			.addr{
-				padding-top: 20px;
-				width: 445px;
-				// display: block;
-				// align-items: flex-start;
+        box-sizing: border-box;
+				padding:20px 20px 0 20px;
+
 				img{
-					width: 18px;
-					margin-right: 14px;
+					width:30px;
 				}
 				p{
-					font-size: 24px;
+					font-size: 26px;
 					color: #666;
 					line-height: 44px;
 				}
 			}
+      .distance{
+        padding: 20px 20px 0 20px;
+        font-size: 26px;
+        color: #666;
+        text-align: left;
+        width: 100%;
+        box-sizing: border-box;
+      }
 		}
-		.couponListBox{
+		.shopCouponTitle{
+      font-size: 26px;
+      color: #000;
+      text-align: center;
+      padding: 30px 0;
+    }
+    .couponListBox{
 			position:absolute;
-			top: 489px;
+			top: 620px;
 			bottom: 0;
 			left: 0;
 			right: 0;
@@ -354,6 +795,13 @@
 					box-shadow:0px 4px 12px 0px rgba(15,15,15,0.16);
 					border-radius:10px;
 					box-sizing: border-box;
+          .privilege{
+            position: absolute;
+            left: 0;
+            top: 20px;
+            width: 200px;
+            z-index: 100;
+          }
 					.list_l{
 						width: 430px;
 						.listLeftTop{

@@ -49,11 +49,11 @@
 			<div class="text_cnt">
 				{{content}}
 			</div>
-			<div class="trend_img" v-show="images.length>0">
+			<div class="trend_img" v-show="compressImages!=''">
 				<!-- <img :src="item" alt="" v-for="(item,index) in images" :key="index"> -->
 				<div class="imgs-container flex_r_f_s">
-					<div class="img-box" v-for="(img,index) in images" :key="img">
-						<img :src="img" @click="handleImgsClick(index)" :class="images.length>0&&images.length==1?classA:classB">
+					<div class="img-box" v-for="(img,index) in compressImages.split(',')" :key="img">
+						<img :src="img" @click="handleImgsClick(index)" :class="compressImages.split(',').length>0&&compressImages.split(',').length==1?classA:classB">
 					</div>
 
 				</div>
@@ -148,7 +148,7 @@
 				activeIndex: 0,
 				userName: '',
 				time: '',
-				images: [],
+				images:'',
 				geoLocation: '',
 				userHeadImage: '',
 				content: '',
@@ -193,8 +193,8 @@
 			// let h = document.documentElement.clientHeight - document.querySelector(".title").offsetTop;
 			// let bottomH = document.querySelector(".send_comment").offsetHeight;
 			// document.querySelector(".comment_list").style.height = (h-bottomH-100)+'px';
-			if (JSON.parse(sessionStorage.getItem('user')) != null) {
-				this.userId = JSON.parse(sessionStorage.getItem('user')).userId;
+			if (JSON.parse(localStorage.getItem('user')) != null) {
+				this.userId = JSON.parse(localStorage.getItem('user')).userId;
 			}
 			this.getUrlData();
 			this.getTrend();
@@ -215,22 +215,32 @@
         })
       },
 			handleImgsClick(index) {
-				this.initialIndex = index
-				const params = {
-					$props: {
-						imgs: this.images,
-						initialIndex: 'initialIndex', // 响应式数据的key名
-						loop: false
-					},
-					$events: {
-						change: (i) => {
-							// 必须更新 initialIndex
-							this.initialIndex = i
-						}
-					}
-				}
-				this.$createImagePreview({ ...params
-				}).show()
+				let self = this;
+				this.axios.get(Api.userApi + '/image/getImageUrlArrays?keys=' + self.images, {
+				    headers: {
+				      'Content-Type': 'application/x-www-form-urlencoded'
+				    }
+				}).then((res)=>{
+				    if(res.data.code==1){
+				      self.initialIndex = index
+				      const params = {
+				      	$props: {
+				      		imgs:res.data.data,
+				      		initialIndex: 'initialIndex', // 响应式数据的key名
+				      		loop: false
+				      	},
+				      	$events: {
+				      		change: (i) => {
+				      			// 必须更新 initialIndex
+				      			self.initialIndex = i
+				      		}
+				      	}
+				      }
+				      self.$createImagePreview({ ...params
+				      }).show()
+				    }
+
+				})
 			},
 			closeDown() {
 				this.isDown = false;
@@ -357,9 +367,9 @@
             self.petName = res.data.data.petName;
             console.log(res)
 						if(res.data.data.images!=''){
-							self.images = res.data.data.images.split(',');
+							self.images = res.data.data.images;
 						}
-            self.compressImages = res.data.data.compressImages.split(',');
+            self.compressImages = res.data.data.compressImages;
 						self.time = res.data.data.createdTime.split(' ')[0];
 						self.userHeadImage = res.data.data.userHeadImage;
 						// self.content = res.data.data.content;
@@ -987,6 +997,7 @@
 							width: 100%;
 							height: 100%;
 							border-radius: 50%;
+              object-fit: cover;
 						}
 					}
           .likeHeadImg:first-child{
@@ -1038,6 +1049,7 @@
 					img {
 						width: 40px;
 						margin-right: 10px;
+
 					}
 
 					span {
@@ -1073,6 +1085,7 @@
 								width: 100%;
 								height: 100%;
 								border-radius: 50%;
+                object-fit: cover;
 							}
 						}
 

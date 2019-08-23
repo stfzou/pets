@@ -168,17 +168,16 @@
 		},
 		mounted() {
 			let self = this;
+      localStorage.removeItem("activeOrderNum");
 			window.addEventListener('scroll', self.handleScroll)
-
 			this.getUrlData();
-			if(JSON.parse(sessionStorage.getItem('user')) == null){
+			if(JSON.parse(localStorage.getItem('user')) == null){
 				// this.$store.commit('setRouterName','activity');
 				this.uId = '-1';
 			}else{
-				this.uId = JSON.parse(sessionStorage.getItem('user')).userId;
+				this.uId = JSON.parse(localStorage.getItem('user')).userId;
 			}
-
-			// console.log(JSON.parse(sessionStorage.getItem('user')))
+			// console.log(JSON.parse(localStorage.getItem('user')))
 			this.getActivity();
 			this.getEval();
 
@@ -234,7 +233,7 @@
 				   }
 				  /*输出日志*/
 
-				   sessionStorage.setItem('id',JSON.stringify(returnArr.id));
+				   localStorage.setItem('id',JSON.stringify(returnArr.id));
 
 
 			 },
@@ -263,7 +262,7 @@
 				let self = this;
         self.page = 0;
 				self.axios.post(Api.userApi+'/ca/selectCommunityActivityComment',self.qs.stringify({
-					id:JSON.parse(sessionStorage.getItem('id')),
+					id:JSON.parse(localStorage.getItem('id')),
 					pageNo:self.page,
 					pageSize:5
 				}), {
@@ -315,7 +314,7 @@
 			getActivity(){
 				let self = this;
 				self.axios.post(Api.userApi+'/ca/selectCommunityActivityDetails',self.qs.stringify({
-					id:JSON.parse(sessionStorage.getItem('id')),
+					id:JSON.parse(localStorage.getItem('id')),
 					userId:self.uId,
 					latitude:0,
 					longitude:0
@@ -379,7 +378,7 @@
 				let self = this;
 				this.page++;
 				self.axios.post(Api.userApi+'/ca/selectCommunityActivityComment',self.qs.stringify({
-					id:JSON.parse(sessionStorage.getItem('id')),
+					id:JSON.parse(localStorage.getItem('id')),
 					pageNo:self.page,
 					pageSize:5
 				}), {
@@ -422,7 +421,7 @@
 			},
 			commitComment(){
         let self = this;
-				if(JSON.parse(sessionStorage.getItem('user')) == null){
+				if(JSON.parse(localStorage.getItem('user')) == null){
 					let url = window.location.href;
 					this.$store.commit('setLoginUrl',url);
 					this.$createDialog({
@@ -458,8 +457,8 @@
 				}else{
 					let self = this;
 					self.axios.post(Api.userApi+'/ca/addCommunityActivityComment',self.qs.stringify({
-						userId:JSON.parse(sessionStorage.getItem('user')).userId,
-						communityActivityId:JSON.parse(sessionStorage.getItem('id')),
+						userId:JSON.parse(localStorage.getItem('user')).userId,
+						communityActivityId:JSON.parse(localStorage.getItem('id')),
 						content:self.msg
 					}), {
 						headers: {
@@ -495,7 +494,7 @@
 			},
 			collection(){
 				let self = this;
-        if(JSON.parse(sessionStorage.getItem('user')) == null){
+        if(JSON.parse(localStorage.getItem('user')) == null){
         	let self = this;
         	let url = window.location.href;
         	this.$store.commit('setLoginUrl',url);
@@ -525,8 +524,8 @@
 
         }else{
           self.axios.post(Api.userApi+'/ca/updateCommunityActivityKeep',self.qs.stringify({
-          	userId:JSON.parse(sessionStorage.getItem('user')).userId,
-          	id:JSON.parse(sessionStorage.getItem('id')),
+          	userId:JSON.parse(localStorage.getItem('user')).userId,
+          	id:JSON.parse(localStorage.getItem('id')),
           	status:1
           }), {
           	headers: {
@@ -555,8 +554,8 @@
 			cancelCollection(){
 				let self = this;
 				self.axios.post(Api.userApi+'/ca/updateCommunityActivityKeep',self.qs.stringify({
-					userId:JSON.parse(sessionStorage.getItem('user')).userId,
-					id:JSON.parse(sessionStorage.getItem('id')),
+					userId:JSON.parse(localStorage.getItem('user')).userId,
+					id:JSON.parse(localStorage.getItem('id')),
 					status:0
 				}), {
 					headers: {
@@ -581,7 +580,7 @@
 			},
 			join(){
 				let self = this;
-				if(JSON.parse(sessionStorage.getItem('user')) == null){
+				if(JSON.parse(localStorage.getItem('user')) == null){
 					let url = window.location.href;
 					this.$store.commit('setLoginUrl',url);
 					this.$createDialog({

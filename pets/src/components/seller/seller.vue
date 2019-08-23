@@ -6,7 +6,7 @@
 		<div class="seller_nav_warp">
 			<div class="intd_box">
 				<div class="intd" :class="{active_intd:coupon}">
-					
+
 					<div class="retract" v-show="coupon" @click="close"></div>
 					<div class="flex_r_f_s intd_top">
 						<img class="head_icon" src="../../assets/icon/head_icon.png" alt="">
@@ -49,10 +49,10 @@
 						</ul>
 						<div class="tejia">折扣商品7折起</div>
 						<div class="tejia tejia2">特价商品59元起</div>
-						
+
 					</div>
 				</div>
-				
+
 			</div>
 			<div class="seller_nav_box">
 				<div class="seller_nav flex_r_f_e">
@@ -62,12 +62,12 @@
 					</router-link>
 				</div>
 			</div>
-			
+
 			<!-- <transition name="fade"> -->
 				<router-view></router-view>
 			<!-- </transition> -->
 		</div>
-		
+
 	</div>
 </template>
 
@@ -87,7 +87,7 @@
 				],
 				goodsName:'',
 				distance:''
-				
+
 			}
 		},
 		components:{
@@ -109,7 +109,7 @@
 				pic.style.left = currentLeft+'px';
 			},
 			loadState(){
-				
+
 				this.loading = true;
 				setTimeout(()=>{
 					this.loading = false;
@@ -118,7 +118,7 @@
 			getStoreInfo(){
 				let self = this;
 				self.axios.post(Api.shopApi+'/webShop/selectShopsInfoById',self.qs.stringify({
-					shopId:JSON.parse(sessionStorage.getItem('user')).shopId,
+					shopId:JSON.parse(localStorage.getItem('user')).shopId,
 					lat:0,
 					lng:0
 				}), {
@@ -132,7 +132,7 @@
 					}else{
 						// self.$message.error(res.data.msg);
 					}
-					
+
 				})
 			}
 		},
@@ -150,7 +150,7 @@
 		watch:{
 			'$route':'loadState'
 		}
-	
+
 	}
 </script>
 
@@ -161,7 +161,7 @@
 		transition: all ease-in-out 0.5s;
 	}
 	.seller_warp{
-		
+
 		.post {
 			height: 208px;
 			background:url(../../assets/icon/icon-bg1.png) no-repeat center 0;
@@ -229,7 +229,7 @@
 										font-size:24px;
 										b{
 											font-size:34px;
-											
+
 										}
 									}
 									.span2{
@@ -253,7 +253,7 @@
 									}
 								}
 							}
-							
+
 						}
 					}
 					.head_icon{
@@ -282,9 +282,9 @@
 							}
 						}
 						.btom{
-							
+
 							span{
-								
+
 								border-radius:6px;
 								color: #FF523D;
 								@include font-dpr(20px);
@@ -305,8 +305,8 @@
 						}
 					}
 				}
-				
-				
+
+
 			}
 			.seller_nav_box .seller_nav{
 				position: relative;
@@ -327,7 +327,7 @@
 					line-height: 0;
 					position: absolute;
 					bottom: -1px;/*no*/
-					  
+
 				}
 			}
 			.load-warp{

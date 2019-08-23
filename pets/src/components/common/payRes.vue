@@ -2,7 +2,8 @@
   <div class="payResWarp">
       <div class="payCnt flex_r_s_c">
            <img src="../../assets/payLoad.gif" alt="">
-           <p>正在等待支付结果，请稍后</p>
+           <p>点击下方按钮，查询订单状态</p>
+           <div class="queryOrder" @click="getOrderState">确定</div>
       </div>
   </div>
 </template>
@@ -13,10 +14,69 @@
     data(){
       return{
         userId:'',
+        payUrl:'',
+        backUrl:'',
+        out_trade_no:'',
+        payStyle:''
       }
     },
-    methods:{
+    mounted() {
+      this.userId = JSON.parse(localStorage.getItem('user')).userId;
 
+      if(this.$store.state.orderInfo!=null){
+        this.payUrl = this.$store.state.orderInfo.payUrl;
+      }
+      if(this.$store.state.orderInfo!=null){
+        this.payStyle = this.$store.state.orderInfo.payStyle;
+      }
+
+      this.backUrl = this.$route.query.backUrl;
+      this.out_trade_no = this.$route.query.out_trade_no;
+
+      this.$store.commit('setOrderInfo','')
+
+      // this.getOrderState();
+      if(this.payStyle==='wx'){
+
+        this.wxPayWeb();
+      }else if(this.payStyle==='ali'){
+        // alert(this.payStyle)
+        this.aliPayWeb()
+      }
+
+
+    },
+    methods:{
+      wxPayWeb(){
+        window.location.href = this.payUrl
+      },
+      aliPayWeb(){
+
+        const div = document.createElement('div');
+        div.innerHTML = this.payUrl;
+        document.body.appendChild(div);
+        document.forms.punchout_form.submit();
+      },
+      getOrderState(){
+        let self = this;
+
+        this.axios.post(Api.userApi + self.$route.query.orderApi, this.qs.stringify({
+          out_trade_no: self.$route.query.out_trade_no
+        }), {
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+          }
+        }).then((res) => {
+          if (res.data.code == 1) {
+              alert('订单支付成功')
+              setTimeout(() => {
+                window.location.href = self.$route.query.backUrl
+              }, 500)
+          }else{
+            alert(res.data.msg)
+          }
+        })
+      },
     }
   }
 </script>
@@ -33,6 +93,16 @@
           padding-top: 50px;
           color: #333;
           font-size: 30px;
+        }
+        .queryOrder{
+          width: 200px;
+          background: #ff523d;
+          color: #fff;
+          font-size: 26px;
+          text-align: center;
+          line-height: 50px;
+          margin-top: 50px;
+          border-radius: 8px;
         }
       }
     }

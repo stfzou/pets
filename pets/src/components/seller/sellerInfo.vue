@@ -5,7 +5,7 @@
 			<div class="seller_pic">
 				<img v-show="shopImgFacade" :src="item.imgAddr" alt="" v-for="(item,index) in shopImgFacade">
 				<img v-show="shopImgInStore" :src="item.imgAddr" alt="" v-for="(item,index) in shopImgInStore">
-				
+
 			</div>
 			<div class="text">
 				商家简介：{{desc}}。
@@ -36,7 +36,7 @@
 				<span>经营资质</span>
 				<i class="cubeic-arrow"></i>
 			</div>
-			
+
 		</div>
 	</div>
 </template>
@@ -62,7 +62,7 @@
 			getInfo(){
 				let self = this;
 				self.axios.post(Api.shopApi+'/webShop/getShopsWholeById',self.qs.stringify({
-					shopId:JSON.parse(sessionStorage.getItem('user')).shopId
+					shopId:JSON.parse(localStorage.getItem('user')).shopId
 				}), {
 					headers: {
 						'Content-Type': 'application/x-www-form-urlencoded'
@@ -105,7 +105,7 @@
 					margin-right: 16px;
 					margin-top: 10px;
 				}
-				
+
 			}
 			.text{
 				color: #000;
@@ -135,7 +135,7 @@
 			box-sizing: border-box;
 			padding: 0 20px;
 			div{
-				
+
 				height: 66px;
 				border-bottom: 1px solid #e8e8e8;/*no*/
 				span{
@@ -147,7 +147,7 @@
 					color: #000;
 				}
 			}
-			
+
 		}
 	}
 </style>

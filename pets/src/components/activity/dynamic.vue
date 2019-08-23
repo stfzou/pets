@@ -17,7 +17,10 @@
 						</div>
 						<div class="author-cnt">
 							<div class="text_cnt">
-								{{item.content}}
+                <router-link :to="{name:'trend',query:{dynamicId:item.dynamicId}}">
+                  {{item.content}}
+                </router-link>
+
 							</div>
 							<div class="trend_img" v-show="item.images!=''">
 
@@ -87,10 +90,11 @@
 			}
 		},
 		mounted() {
-			if (JSON.parse(sessionStorage.getItem('user')) != null) {
-				this.userId = JSON.parse(sessionStorage.getItem('user')).userId;
+			if (JSON.parse(localStorage.getItem('user')) != null) {
+				this.userId = JSON.parse(localStorage.getItem('user')).userId;
 
 			}
+
 			// this.getHeight();
       this.getUrlData();
 			setTimeout(()=>{
@@ -100,22 +104,34 @@
 		},
 		methods:{
 			handleImgsClick(imges,index) {
-				this.initialIndex = index
-				const params = {
-					$props: {
-						imgs: imges.split(','),
-						initialIndex: 'initialIndex', // 响应式数据的key名
-						loop: false
-					},
-					$events: {
-						change: (i) => {
-							// 必须更新 initialIndex
-							this.initialIndex = i
-						}
-					}
-				}
-				this.$createImagePreview({ ...params
-				}).show()
+        let self = this;
+        this.axios.get(Api.userApi + '/image/getImageUrlArrays?keys=' + imges, {
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded'
+            }
+        }).then((res)=>{
+            if(res.data.code==1){
+              self.initialIndex = index
+              const params = {
+              	$props: {
+              		imgs:res.data.data,
+              		initialIndex: 'initialIndex', // 响应式数据的key名
+              		loop: false
+              	},
+              	$events: {
+              		change: (i) => {
+              			// 必须更新 initialIndex
+              			self.initialIndex = i
+              		}
+              	}
+              }
+              self.$createImagePreview({ ...params
+              }).show()
+            }
+
+        })
+
+
 			},
 			getDynamic(){
 				let self = this;
@@ -135,15 +151,14 @@
 					if(res.data.code == 1){
 						console.log(res)
 						setTimeout(()=>{
-
+              self.$refs.scroll.forceUpdate();
 							res.data.data.forEach((e)=>{
 								e.content = self.decodeUnicode(e.content)
 							})
               self.dynamicList = res.data.data;
-							self.$refs.scroll.forceUpdate();
               setTimeout(()=>{
                 self.$refs.scroll.refresh();
-              },100)
+              },500)
 
 						},500)
 					}else{
@@ -176,7 +191,7 @@
       	}
       	/*输出日志*/
       	if(returnArr.aId!=undefined){
-      		//sessionStorage.setItem('Aid',JSON.stringify(returnArr.aId));
+      		//localStorage.setItem('Aid',JSON.stringify(returnArr.aId));
           this.aId = returnArr.aId;
       	}
       },
@@ -381,8 +396,10 @@
 						.text_cnt{
 							margin-bottom: 20px;
 							font-size: 28px;
-							color: #333;
 							line-height: 36px;
+              a{
+                color: #333;
+              }
 						}
 						.trend_img {
 							.imgs-container{

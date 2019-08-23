@@ -49,7 +49,7 @@
       };
     },
     mounted() {
-      if (JSON.parse(sessionStorage.getItem('user')) == null) {
+      if (JSON.parse(localStorage.getItem('user')) == null) {
 
         this.$router.push({
           name: 'login'
@@ -59,7 +59,7 @@
       let h = document.documentElement.clientHeight - document.querySelector(".sellerGoods_warp").offsetTop;
       document.querySelector(".sellerGoods_warp").style.height = h + 'px';
 
-      console.log(sessionStorage.getItem('user'))
+      console.log(localStorage.getItem('user'))
       this.getGoods()
     },
     methods: {
@@ -76,7 +76,7 @@
         let self = this;
         this.page++;
         self.axios.post(Api.shopApi + '/webShop/selectProductBasicByShopId', self.qs.stringify({
-          shopId: JSON.parse(sessionStorage.getItem('user')).shopId,
+          shopId: JSON.parse(localStorage.getItem('user')).shopId,
           pageNo: self.page,
           pageSize: 8
         }), {
@@ -113,7 +113,7 @@
       getGoods() {
         let self = this;
         self.axios.post(Api.shopApi + '/webShop/selectProductBasicByShopId', self.qs.stringify({
-          shopId: JSON.parse(sessionStorage.getItem('user')).shopId,
+          shopId: JSON.parse(localStorage.getItem('user')).shopId,
           pageNo: self.page,
           pageSize: 8
         }), {

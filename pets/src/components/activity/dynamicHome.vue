@@ -75,8 +75,8 @@
     },
 		mounted() {
 
-			if (JSON.parse(sessionStorage.getItem('user')) != null) {
-				this.userId = JSON.parse(sessionStorage.getItem('user')).userId;
+			if (JSON.parse(localStorage.getItem('user')) != null) {
+				this.userId = JSON.parse(localStorage.getItem('user')).userId;
 			}
       this.getUrlData();
 			this.getAuthorInfo();
@@ -107,7 +107,7 @@
       	}
       	/*输出日志*/
       	if(returnArr.aId!=undefined){
-      		sessionStorage.setItem('Aid',JSON.stringify(returnArr.aId));
+      		localStorage.setItem('Aid',JSON.stringify(returnArr.aId));
           this.aId = returnArr.aId;
       	}
       },
@@ -115,7 +115,7 @@
 				let self = this;
 				self.axios.get(Api.trendApi + '/userCenter/selectUserCenterByUserId', {
 					params: {
-						beLookUserId: JSON.parse(sessionStorage.getItem('Aid')),
+						beLookUserId: JSON.parse(localStorage.getItem('Aid')),
 						lookUserId: self.userId
 					}
 				}, {
@@ -151,7 +151,7 @@
 					let self = this;
 
 					this.axios.post(Api.trendApi + '/community/focusUser', this.qs.stringify({
-						targetUserId: JSON.parse(sessionStorage.getItem('Aid')),
+						targetUserId: JSON.parse(localStorage.getItem('Aid')),
 						userId: self.userId
 					}), {
 						headers: {
@@ -175,7 +175,7 @@
 			cancelFollow() {
 				let self = this;
 				this.axios.post(Api.trendApi + '/community/cancelFocusUser', this.qs.stringify({
-					targetUserId:  JSON.parse(sessionStorage.getItem('Aid')),
+					targetUserId:  JSON.parse(localStorage.getItem('Aid')),
 					userId: self.userId
 				}), {
 					headers: {
@@ -281,8 +281,8 @@
 
 				.headImg {
 					position: absolute;
-					left: 0;
-					top: 0;
+					left: -14px;
+					top: -10px;
 					height: 140px;
 					width: 140px;
 					border-radius: 50%;
@@ -292,6 +292,7 @@
 						width: 100%;
 						height: 100%;
 						border-radius: 50%;
+            object-fit: cover;
 					}
 
 					.rank {

@@ -54,6 +54,7 @@
         nickName: '',
         phone: '',
         eMail: '',
+        userId:'',
         fileUrl:[],
         imgArr:[],
         initialIndex:0,
@@ -61,6 +62,10 @@
           target: '//jsonplaceholder.typicode.com/photos/'
         }
       }
+    },
+    mounted() {
+      this.userId = JSON.parse(localStorage.getItem('user')).userId;
+      this.queryOrderPayState();
     },
     methods: {
       back() {
@@ -73,13 +78,44 @@
         }, 100);
 
       },
+      goLogin(msg) {
+      	let self = this;
+      	let url = window.location.href;
+      	this.$store.commit('setLoginUrl', url);
+      	this.$createDialog({
+      		type: 'confirm',
+      		icon: 'cubeic-warn',
+      		title:msg,
+      		confirmBtn: {
+      			text: '去登录',
+      			active: true,
+      			disabled: false,
+      			href: 'javascript:;'
+      		},
+      		cancelBtn: {
+      			text: '取消',
+      			active: false,
+      			disabled: false,
+      			href: 'javascript:;'
+      		},
+      		onConfirm: () => {
+      			self.$router.push({
+      				name: 'login'
+      			})
+
+      		},
+
+      	}).show()
+
+      },
       FreeJoin(cAOrderId) {
 
         let self = this;
         this.axios.post(Api.userApi + '/ca/freeJoinCommunityActivity', this.qs.stringify({
           cAOrderId: cAOrderId,
-          cAId: JSON.parse(sessionStorage.getItem('id')),
-          userId: JSON.parse(sessionStorage.getItem('user')).userId
+          cAId: JSON.parse(localStorage.getItem('id')),
+          userId: JSON.parse(localStorage.getItem('user')).userId,
+          payFrom:0
         }), {
           headers: {
             'Content-Type': 'application/x-www-form-urlencoded'
@@ -91,15 +127,17 @@
               type: 'cubeic-right'
             })
             toast.show();
+            //alert()
 
-            setTimeout(() => {
+            setTimeout(()=>{
               self.$router.push({
-                name: 'activity',
-                parmas: {
-                  id: JSON.parse(sessionStorage.getItem('id')),
+                name:'activity',
+                query:{
+                  id:JSON.parse(localStorage.getItem('id'))
+
                 }
               })
-            }, 500)
+            },500)
 
           } else {
             alert(res.data.msg)
@@ -107,38 +145,122 @@
         })
 
       },
+      queryOrderPayState(){
+         let self = this;
+        this.axios.get(Api.userApi + '/ca/selectUserIsNoPayCommunityActivityOrder?userId='+self.userId, {
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded'
+            }
+          }).then(function(response) {
+            if(response.data.code==1){
+              if(response.data.data==1){
+                self.axios.get(Api.userApi + '/ca/selectUserNoPaySettlementCommunityActivityOrder?userId='+self.userId, {
+                    headers: {
+                      'Content-Type': 'application/x-www-form-urlencoded'
+                    }
+                  }).then(function(noPayres) {
+                    if(noPayres.data.code==1){
+                      self.$createDialog({
+                      	type: 'confirm',
+                      	icon: 'cubeic-alert',
+                      	title: '您有未支付订单',
+                      	content: '继续支付或者取消订单',
+                      	confirmBtn: {
+                      		text: '继续支付',
+                      		active: true,
+                      		disabled: false,
+                      		href: 'javascript:;'
+                      	},
+                      	cancelBtn: {
+                      		text: '取消订单',
+                      		active: false,
+                      		disabled: false,
+                      		href: 'javascript:;'
+                      	},
+                      	onConfirm: () => {
+                      		setTimeout(() => {
+                      		  self.$store.commit('setCAorderId', noPayres.data.data.cAOrderId)
+                      		  self.$router.push({
+                      		    name: 'activityOrder'
+                      		  })
+                      		},500)
+                      	},
+                      	onCancel: () => {
+                            self.axios.post(Api.userApi + '/ca/cancelActivityOrderByUserId', self.qs.stringify({
+                              userId: JSON.parse(localStorage.getItem('user')).userId
+                            }), {
+                              headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded'
+                              }
+                            }).then((res) => {
+                              if (res.data.code == 1) {
+                                let toast = self.$createToast({
+                                  txt: '取消订单',
+                                  type: 'cubeic-right'
+                                })
+                                toast.show();
+                                self.$store.commit('setCAorderId',null)
+                                setTimeout(()=>{
+                                  self.$router.push({
+                                    name:'activity',
+                                    query:{
+                                      id:JSON.parse(localStorage.getItem('id'))
+                                    }
+                                  })
+                                },200)
+
+                              }else {
+                                alert(res.data.msg)
+                              }
+                            })
+                      	}
+                      }).show()
+
+
+                    }
+                  }).catch(function(error) {
+                    console.log(error);
+                });
+
+              }
+            }
+          }).catch(function(error) {
+            console.log(error);
+        });
+      },
       joinActivity() {
+        let self = this;
         let reg = /^1[3456789]\d{9}$/;
         let regEmail = new RegExp("^[a-z0-9]+([._\\-]*[a-z0-9])*@([a-z0-9]+[-a-z0-9]*[a-z0-9]+.){1,63}[a-z0-9]+$");
-        if (this.userName == '') {
+        if (self.userName == '') {
           let toast = this.$createToast({
             txt: '姓名不能为空',
             type: 'error'
           })
           toast.show()
           return false;
-        } else if (this.phone == '') {
-          let toast = this.$createToast({
+        } else if (self.phone == '') {
+          let toast = self.$createToast({
             txt: '电话号码不能为空',
             type: 'error'
           })
           toast.show()
           return false;
-        } else if (!reg.test(this.phone)) {
-          let toast = this.$createToast({
+        } else if (!reg.test(self.phone)) {
+          let toast = self.$createToast({
             txt: '手机号码格式错误',
             type: 'error'
           })
           toast.show()
           return false;
-        } else if (this.eMail == '') {
-          let toast = this.$createToast({
+        } else if (self.eMail == '') {
+          let toast = self.$createToast({
             txt: '邮箱不能为空',
             type: 'error'
           })
           toast.show()
           return false;
-        } else if (!regEmail.test(this.eMail)) {
+        } else if (!regEmail.test(self.eMail)) {
           let toast = this.$createToast({
             txt: '邮箱格式错误',
             type: 'error'
@@ -147,11 +269,9 @@
           return false;
         } else {
           // alert(1)
-
-          let self = this;
           let formData = new FormData();
-          formData.append("cAId",JSON.parse(sessionStorage.getItem('id')))
-          formData.append("userId",JSON.parse(sessionStorage.getItem('user')).userId)
+          formData.append("cAId",JSON.parse(localStorage.getItem('id')))
+          formData.append("userId",JSON.parse(localStorage.getItem('user')).userId)
           formData.append("ticketId",self.$store.state.activityInfo.ticketId)
           formData.append("ticketNum",self.$store.state.activityInfo.ticketNum)
           formData.append("name",self.userName)

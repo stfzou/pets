@@ -98,25 +98,50 @@
 				code:'',
 				environment:'',
 				activeIndex:'2',
-				cAId:''
+				cAId:'',
+        userId:''
 			}
 		},
 		mounted() {
-
-			// let arr = window.location.href.split("?")[1];
-      console.log(this.$store.state.activityInfo.CAorderId)
-			this.cAOrderId = this.$store.state.activityInfo.CAorderId;
-			// alert(this.cAOrderId);
-			this.getEnvironment();
+     this.userId=JSON.parse(localStorage.getItem('user')).userId;
+     this.cAOrderId = this.$store.state.activityInfo.CAorderId;
+     this.getEnvironment();
 		},
+
 		methods: {
+
+      getOrderState(){
+        let self = this;
+        this.axios.post(Api.userApi + '/ca/selectCommunityActivityOrderStatus', this.qs.stringify({
+          out_trade_no: localStorage.getItem('activeOrderNum')
+        }), {
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+          }
+        }).then((res) => {
+          if (res.data.code == 1) {
+            alert('参加活动成功')
+            localStorage.removeItem("activeOrderNum");
+            setTimeout(() => {
+              self.$router.push({
+                name:'activity',
+                query:{
+                  id:JSON.parse(localStorage.getItem('id'))
+                }
+              })
+            }, 500)
+
+          }
+        })
+      },
 			getEnvironment(){
+        let self = this;
+        console.log(this.$store.state.activityInfo.CAorderId)
 				var ua = window.navigator.userAgent.toLowerCase();
 				if (ua.match(/MicroMessenger/i) == 'micromessenger') {
 					this.environment = '0';
 					this.getCode();
-				} else {
-					let self = this;
+				}else {
 					this.environment = '1';
 					this.axios.post(Api.userApi + '/ca/selectSettlementCommunityActivityOrder', this.qs.stringify({
 						cAOrderId: self.cAOrderId
@@ -262,8 +287,7 @@
 							if (res.err_msg === 'get_brand_wcpay_request:ok') {
 								alert('支付成功，返回活动详情页！');
 								setTimeout(()=>{
-									window.location.href = 'http://app.gutouzu.com/index.html#/activity?id='+self.$store.state.activityInfo.cAId;
-
+									window.location.href = 'http://app.gutouzu.com/index.html#/activity?id='+JSON.parse(localStorage.getItem('id'));
 								},500)
 							} else if (res.err_msg === 'get_brand_wcpay_request:cancel') {
 								alert('取消支付！');
@@ -288,8 +312,23 @@
 				}).then((res) => {
 					if (res.data.code == 1) {
 //
-						window.location.href=res.data.data
-
+            //localStorage.setItem('orderNum',res.data.data.out_trade_no);
+						//window.location.href=res.data.data.mweb_url
+            let orderInfo = {
+              payUrl:res.data.data.mweb_url,
+              backUrl:window.location.href,
+              out_trade_no:res.data.data.out_trade_no,
+              payStyle:'wx'
+            }
+            self.$store.commit('setOrderInfo',orderInfo)
+            self.$router.push({
+              name:'payRes',
+              query:{
+                out_trade_no:res.data.data.out_trade_no,
+                backUrl:'http://app.gutouzu.com/index.html#/activity?id='+JSON.parse(localStorage.getItem('id')),
+                orderApi:'/ca/selectCommunityActivityOrderStatus'
+              }
+            })
 						console.log(res)
 
 
@@ -316,10 +355,23 @@
 					}).then((res) => {
 
 						if(res.data.code == 1){
-							const div = document.createElement('div');
-							div.innerHTML = res.data.data;
-							document.body.appendChild(div);
-							document.forms.punchout_form.submit();
+              //console.log(res.data.data.out_trade_no)
+              alert(res.data.data.out_trade_no)
+              let orderInfo = {
+                payUrl:res.data.data.from,
+                out_trade_no:res.data.data.out_trade_no,
+                payStyle:'ali'
+              }
+
+              self.$store.commit('setOrderInfo',orderInfo)
+              self.$router.push({
+                name:'payRes',
+                query:{
+                  out_trade_no:res.data.data.out_trade_no,
+                  backUrl:'http://app.gutouzu.com/index.html#/activity?id='+JSON.parse(localStorage.getItem('id')),
+                  orderApi:'/ca/selectCommunityActivityOrderStatus'
+                }
+              })
 							self.isPopup = false;
 						}else{
 							alert(res.data.msg)

@@ -36,6 +36,7 @@ import ShopCoupon from '@/components/shareCoupon/shopCoupon'
 import CouponXq from '@/components/shareCoupon/couponXq'
 import GumiCard from '@/components/gumika/gumiCard'
 import PayRes from '@/components/common/payRes'
+import WxWhitePage from '@/components/common/wxWhitePage'
 
 Vue.use(Router)
 export default new Router({
@@ -51,6 +52,11 @@ export default new Router({
 			name:'vLogin',
 			component:vLogin,
 		},
+    {
+    	path:'/wxWhitePage',
+    	name:'wxWhitePage',
+    	component:WxWhitePage,
+    },
     {
       path:'/payRes',
       name:'payRes',
@@ -234,5 +240,7 @@ export default new Router({
 				}
 			]
 		}
-	]
+	],
+
+
 })

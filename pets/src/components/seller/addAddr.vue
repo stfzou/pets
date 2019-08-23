@@ -5,7 +5,7 @@
 			<div class="nav_title">新增收货地址</div>
 			<div class="text" @click="modify" v-if="isEdit">修改</div>
 			<div class="text" @click="newAddr" v-else>完成</div>
-			
+
 		</div>
 		<ul class="addAddr_list">
 			<li class="flex_r_f_s">
@@ -40,13 +40,13 @@
 				reg: /^1[3456789]\d{9}$/,
 				txt:'新增收获地址',
 				isEdit:false
-				
+
 			}
 		},
 		methods: {
 			back() {
 				this.$router.go(-1); //返回上一层
-			
+
 			},
 			addrMap() {
 				let self = this;
@@ -58,13 +58,13 @@
 						houseNumber:self.houseNumber,
 						userName:self.userName
 					}
-					
+
 				})
 			},
 			newAddr(){
 				let self = this;
 				console.log(self.$route.params)
-				
+
 				if(self.userName == ''){
 					self.$createDialog({
 						type: 'alert',
@@ -107,7 +107,7 @@
 					return false;
 				}else{
 					self.axios.post(Api.userApi+'/user/addUserAddr',self.qs.stringify({
-						userId:JSON.parse(sessionStorage.getItem('user')).userId,
+						userId:JSON.parse(localStorage.getItem('user')).userId,
 						addressTitle:self.addr,
 						addrProvince:self.$route.params.province,
 						addrCity:self.$route.params.city,
@@ -132,17 +132,17 @@
 								content:'添加成功',
 								icon: 'cubeic-right',
 								onConfirm: () => {
-								 
+
 								  	self.$router.push({
 								  		name:'userAddr'
 								  	})
-								  
+
 								},
 							}).show()
-							
-							
-							
-							
+
+
+
+
 						}else{
 							self.$createDialog({
 								type: 'alert',
@@ -150,18 +150,18 @@
 								content:res.data.msg,
 								icon: 'cubeic-warn'
 							}).show()
-							
+
 						}
 					})
-					
+
 				}
-				
-				
+
+
 			},
 			modify(){
 				let self = this;
 				self.axios.post(Api.userApi+'/user/updateAddr',self.qs.stringify({
-					userId:JSON.parse(sessionStorage.getItem('user')).userId,
+					userId:JSON.parse(localStorage.getItem('user')).userId,
 					addressTitle:self.addr,
 					addrProvince:self.$route.params.province,
 					addrCity:self.$route.params.city,
@@ -186,11 +186,11 @@
 							content:'修改成功',
 							icon: 'cubeic-right',
 							onConfirm: () => {
-							 
+
 							  	self.$router.push({
 							  		name:'userAddr'
 							  	})
-							  
+
 							},
 						}).show()
 					}else{
@@ -219,7 +219,7 @@
 				this.isEdit = true;
 			}
 		}
-		
+
 	}
 </script>
 
@@ -233,14 +233,14 @@
 			box-sizing: border-box;
 			position: relative;
 			border-bottom: 1px solid #FF523D;
-		
+
 			.back {
 				width: 26px;
 				height: 42px;
 				background: url(../../assets/icon/backColory.png) no-repeat center 0;
 				background-size: cover;
 			}
-		
+
 			.nav_title {
 				font-size: 30px;
 				color: #000;
@@ -248,13 +248,13 @@
 				left: 50%;
 				top: 50%;
 				transform: translate(-50%, -50%);
-		
+
 			}
 			.text {
 				font-size: 26px;
 				color: #FF523D;
 			}
-			
+
 		}
 		.addAddr_list{
 			padding: 0 20px;
@@ -273,8 +273,8 @@
 					font-size: 28px;
 					color: #999;
 				}
-				input:focus{ 
-					outline:none; 
+				input:focus{
+					outline:none;
 				}
 				.mid{
 					font-size: 28px;

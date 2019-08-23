@@ -105,7 +105,7 @@
 								token:res.data.token
 							};
 
-							sessionStorage.setItem('user', JSON.stringify(userEntity));
+							localStorage.setItem('user', JSON.stringify(userEntity));
 
 							if(self.$store.state.loginUrl!=''){
 								setTimeout(()=>{

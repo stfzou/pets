@@ -62,7 +62,7 @@
 		<div class="amap-page-container" v-show="false">
 			<el-amap ref="map" vid="amapDemo" :plugin="plugin" class="amap-demo">
 			</el-amap>
-		
+
 		</div>
 		<div class="couponBtn flex_r_s_c" @click="commit">下一步</div>
 	</div>
@@ -88,7 +88,7 @@
 				lng:0,
 				lat:0,
 				plugin: [
-				
+
 					{
 						pName: 'Geolocation',
 						enableHighAccuracy: true,//是否使用高精度定位，默认:true
@@ -106,13 +106,13 @@
 							init(o) {
 								// o 是高德地图定位插件实例
 								o.getCurrentPosition((status, result) => {
-									
+
 									if (result && result.position) {
-										
+
  										self.lng = result.position.lng;
  										self.lat = result.position.lat;
 										self.getTicket();
-										
+
 									}else{
 										self.getTicket();
 									}
@@ -125,8 +125,8 @@
 		},
 		mounted() {
 			// this.format("2019-03-14 11:56:00",'123')
-			
-			
+
+
 		},
 		filters:{
 			isBearRefund(val){
@@ -150,7 +150,7 @@
 				  const scrollHeight = document.documentElement.scrollTop || document.body.scrollTop || 0;
 					window.scrollTo(0, Math.max(scrollHeight - 1, 0));
 				},100);
-				
+
 			},
 			back() {
 				this.$router.go(-1); //返回上一层
@@ -178,7 +178,7 @@
 					if(item.isUse<=1){
 						item.isUse = 1;
 						this.ticketInfo.ticketNum = item.isUse;
-						
+
 					}else{
 						item.isUse--;
 						this.ticketInfo.ticketNum = item.isUse;
@@ -188,7 +188,7 @@
 						item.isUse = 1;
 					}else{
 						item.isUse--;
-						
+
 					}
 				}
 			},
@@ -211,7 +211,7 @@
 			getTicket(){
 				let self = this;
 				self.axios.post(Api.userApi+'/ca/selectCommunityActivityJoinVo',self.qs.stringify({
-					id:JSON.parse(sessionStorage.getItem('id')),
+					id:JSON.parse(localStorage.getItem('id')),
 					latitude:self.lat,
 					longitude:self.lng
 				}), {
@@ -233,8 +233,8 @@
 							e.isUse = 1;
 						})
 						self.ticketInfo = {
-							cAId:JSON.parse(sessionStorage.getItem('id')),
-							userId:JSON.parse(sessionStorage.getItem('user')).userId,
+							cAId:JSON.parse(localStorage.getItem('id')),
+							userId:JSON.parse(localStorage.getItem('user')).userId,
 							ticketId:self.ticketList[0].ticketId,
 							ticketNum:self.ticketList[0].isUse,
 							ticketType:self.ticketList[0].ticketType,
@@ -252,8 +252,8 @@
 			selectTicket(item,index){
 				this.activeIndex = index;
 				this.ticketInfo = {
-					cAId:JSON.parse(sessionStorage.getItem('id')),
-					userId:JSON.parse(sessionStorage.getItem('user')).userId,
+					cAId:JSON.parse(localStorage.getItem('id')),
+					userId:JSON.parse(localStorage.getItem('user')).userId,
 					ticketId:item.ticketId,
 					ticketNum:item.isUse,
 					ticketType:item.ticketType,
@@ -275,9 +275,9 @@
 						name:'activityEnter'
 					})
 				}
-				
+
 			}
-		
+
 		}
 	}
 </script>

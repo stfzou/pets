@@ -25,7 +25,7 @@
 					</div>
 				</div>
 			</li>
-			
+
 		</ul>
 		<div class="mask flex_r_s_c" v-if="isMask" @click.stop = "maskHide">
 			<div class="mask_cnt" @click.stop>
@@ -54,7 +54,7 @@
 		mounted(){
 			this.getAddr();
 			// console.log(this.$router.query.id)
-			
+
 		},
 		methods: {
 			maskHide() {
@@ -93,7 +93,7 @@
 			getAddr(){
 				let self = this;
 				self.axios.post(Api.userApi+'/user/selectUserAddr',self.qs.stringify({
-					userId:JSON.parse(sessionStorage.getItem('user')).userId,
+					userId:JSON.parse(localStorage.getItem('user')).userId,
 				}), {
 					headers: {
 						'Content-Type': 'application/x-www-form-urlencoded',
@@ -123,7 +123,7 @@
 					toast.show()
 				}else{
 					self.axios.post(Api.userApi+'/user/updateAddrDefault',self.qs.stringify({
-						userId:JSON.parse(sessionStorage.getItem('user')).userId,
+						userId:JSON.parse(localStorage.getItem('user')).userId,
 						userAddrId:item.userAddrId
 					}), {
 						headers: {
@@ -140,11 +140,11 @@
 						}
 					})
 				}
-				
+
 			},
 			edit(item){
 // 				let selectData = item;
-// 				sessionStorage.setItem('editAddr', JSON.stringify(selectData));
+// 				localStorage.setItem('editAddr', JSON.stringify(selectData));
 				let self = this;
 				self.$router.push({
 					name:'addAddr',
@@ -190,7 +190,7 @@
 				background: url(../../assets/icon/backColory.png) no-repeat center 0;
 				background-size: cover;
 			}
-		
+
 			.nav_title {
 				font-size: 30px;
 				color: #000;
@@ -198,9 +198,9 @@
 				left: 50%;
 				top: 50%;
 				transform: translate(-50%, -50%);
-		
+
 			}
-		
+
 			.text {
 				font-size: 26px;
 				color: #FF523D;
@@ -307,10 +307,10 @@
 							}
 						}
 					}
-					
+
 				}
 			}
-			
+
 		}
 	}
 </style>

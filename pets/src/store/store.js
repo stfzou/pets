@@ -22,6 +22,8 @@ export default new Vuex.Store({
 			addrInfo:{
 				name:''
 			},
+      orderInfo:null,
+
 			//员工管理系统
 			staffNum:'',
 			customerNum:''
@@ -50,6 +52,9 @@ export default new Vuex.Store({
 		setLoginUrl(state,url){//设置登录后需要跳转的页面
 			state.loginUrl = url;
 		},
+    setOrderInfo(state,orderInfo){//设置支付订单信息
+      state.orderInfo = orderInfo;
+    },
 		//员工管理系统
 		setCustomerNum(state,num){
 			state.customerNum = num

@@ -136,7 +136,7 @@
       getEval(isImg, isPraise) {
         let self = this;
         self.axios.post(Api.shopApi + '/webShop/selectShopAssessPage', self.qs.stringify({
-          shopId: JSON.parse(sessionStorage.getItem('user')).shopId,
+          shopId: JSON.parse(localStorage.getItem('user')).shopId,
           isImg: isImg,
           isPraise: isPraise,
           pageNo: 0,
@@ -171,7 +171,7 @@
         let self = this;
         this.page++;
         self.axios.post(Api.shopApi + '/webShop/selectShopAssessPage', self.qs.stringify({
-          shopId: JSON.parse(sessionStorage.getItem('user')).shopId,
+          shopId: JSON.parse(localStorage.getItem('user')).shopId,
           isImg: self.isImgCode,
           isPraise: self.isPraiseCode,
           pageNo: self.page,
