@@ -79,7 +79,9 @@
 			<cube-scroll ref="scroll" @pulling-up="onPullingUp" @pulling-down="onPullingDown" :options="options">
 			<ul>
 				<li class="flex_r_s_b" v-for="item in couponList">
-          <img v-if="item.couponType===3" class="privilege" src="../../assets/icon_gu30@3x.png" alt="">
+           <img v-if="item.couponType===3" class="privilege" src="../../assets/icon_gu30@3x.png" alt="">
+          <img v-if="item.couponType===2" class="privilege" src="../../assets/icon_gu32@3x.png" alt="">
+          <img v-if="item.couponType===1" class="privilege" src="../../assets/icon_gu33@3x.png" alt="">
 					<div class="list_l">
 						<div class="listLeftTop flex_r_s_b">
 							<img @click="couponXqLink(item)" :src="item.couponIcan" alt="">
@@ -101,13 +103,13 @@
 						</div>
 					</div>
 					<div class="list_r">
-						<div class="sale" :class="{activeColor:item.receiveNum==item.circulation}">
+						<div class="sale">
               <span v-if="item.conditionPrice===0">￥{{item.couponPrice}}</span>
               <span v-if="item.conditionPrice!==0">￥{{item.conditionPrice}}</span>
              </div>
 						<div class="condition">
-							<span v-if="item.conditionPrice!==0" :class="{activeColor:item.receiveNum==item.circulation}">票价:<span class="through">{{item.couponPrice}}</span></span>
-							<span v-if="item.conditionPrice==0">无门槛</span>
+							<span v-if="item.conditionPrice!==0">原价:<span class="through">{{item.couponPrice}}</span></span>
+							<span v-if="item.conditionPrice==0" class="activeColor">无门槛</span>
 						</div>
 						<div class="makeTime">{{item.couponEndTime}}前有效</div>
 						<div class="receiveBtnBox">
@@ -526,7 +528,7 @@
 					this.$createDialog({
 						type: 'confirm',
 						icon: 'cubeic-warn',
-						title: '需要登录后才参加活动',
+						title: '需要登录后才能领取',
 						confirmBtn: {
 						  text: '去登录',
 						  active: true,
@@ -700,6 +702,9 @@
 	.couponList{
 		position: relative;
 		height: 100%;
+    .activeColor{
+      color: #ff523d;
+    }
     .couponListDialog {
       position: fixed;
       height: 100%;
@@ -917,7 +922,7 @@
             position: absolute;
             left: 0;
             top: 20px;
-            width: 200px;
+            width: 150px;
             z-index: 100;
           }
 					.list_l{
@@ -991,17 +996,14 @@
 							text-align: center;
 						}
 						.condition{
-							color: #ff523d;
 							text-align: center;
 							font-size: 22px;
 							padding-top: 18px;
+              color: #999;
 						}
             .through{
               text-decoration:line-through;
             }
-						.activeColor{
-							color: #999;
-						}
 						.makeTime{
 							font-size: 22px;
 							color: #999;

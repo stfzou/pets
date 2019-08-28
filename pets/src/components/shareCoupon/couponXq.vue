@@ -45,15 +45,30 @@
     </div>
 		<div class="couponInfoBox flex_r_s_c">
 			<div class="couponInfo">
+        <img v-if="couponType===3" class="privilege" src="../../assets/icon_gu30@3x.png" alt="">
+        <img v-if="couponType===2" class="privilege" src="../../assets/icon_gu32@3x.png" alt="">
+        <img v-if="couponType===1" class="privilege" src="../../assets/icon_gu33@3x.png" alt="">
+
 				<img v-show="isReceive===0&&conditionPrice===0" class="sign" src="../../assets/receiveEnd.png" alt="">
 				<img v-show="isReceive===1" class="sign" src="../../assets/received.png" alt="">
 				<img v-show="isReceive===0&&conditionPrice!==0" class="sign" src="../../assets/buyEnd.png" alt="">
 				<div class="couponTop">
-					<img class="couponImg" :src="couponIcan" alt="">
-					<div class="couponName">{{couponName}}</div>
+					<!-- <img class="couponImg" :src="couponIcan" alt=""> -->
+          <div class="couponImgBox">
+            <cube-slide ref="slide" :data="couponIcan">
+              <cube-slide-item v-for="(item, index) in couponIcan" :key="index">
+                <div class="imgBox" @click="handleImgsClick(index)">
+                  <img class="couponImg" :src="item" alt="">
+                </div>
+              </cube-slide-item>
+            </cube-slide>
+          </div>
+					<div class="couponName">
+            {{couponName}}
+          </div>
 					<p>{{couponDesc}}</p>
 					<div class="sale"><span v-if="conditionPrice===0">￥{{couponPrice}}</span><span v-else>￥{{conditionPrice}}</span></div>
-					<div class="condition"><span v-if="conditionPrice===0">无门槛</span><span v-else class="through">票价:{{couponPrice}}</span></div>
+					<div class="condition"><span class="activeColor" v-if="conditionPrice===0">无门槛</span><span v-else class="through">原价:{{couponPrice}}</span></div>
 					<div class="receiveBtnBox">
 						<!-- <div v-show="isReceive===2||isReceive===1" @click="receiveBtn" class="receiveBtn flex_r_s_c">立即领取</div>
 						<div v-show="isReceive===1" class="receiveBtn receivedBtn flex_r_s_c">已领取</div>
@@ -73,7 +88,10 @@
 								商户
 							</div>
 							<div class="listRight">
-								{{shopName}}
+                <router-link class="shopName flex_r_s_b" :to="{name:'shopCoupon',query:{shopId:shopId}}">
+                  <span>{{shopName}}</span>
+                  <img src="../../assets/icon_gu31@3x.png" alt="">
+                </router-link>
 							</div>
 						</li>
 						<li class="flex_r_f_s">
@@ -116,6 +134,8 @@
 			<ul>
 				<li class="flex_r_s_b" v-for="item in couponList">
           <img v-if="item.couponType===3" class="privilege" src="../../assets/icon_gu30@3x.png" alt="">
+          <img v-if="item.couponType===2" class="privilege" src="../../assets/icon_gu32@3x.png" alt="">
+          <img v-if="item.couponType===1" class="privilege" src="../../assets/icon_gu33@3x.png" alt="">
 					<div class="list_l">
 						<div class="listLeftTop flex_r_s_b">
 							<img @click="couponXqLink(item)" :src="item.couponIcan" alt="">
@@ -135,15 +155,15 @@
 						</div>
 					</div>
 					<div class="list_r">
-						<div class="sale" :class="{activeColor:item.receiveNum==item.circulation}">
+						<div class="sale">
 
               <span v-if="item.conditionPrice===0">￥{{item.couponPrice}}</span>
               <span v-if="item.conditionPrice!==0">￥{{item.conditionPrice}}</span>
 
             </div>
 						<div class="condition">
-							<span v-if="item.conditionPrice!==0" :class="{activeColor:item.receiveNum==item.circulation}">票价:<span class="through">{{item.couponPrice}}</span></span>
-              <span v-if="item.conditionPrice==0">无门槛</span>
+							<span v-if="item.conditionPrice!==0">原价:<span class="through">{{item.couponPrice}}</span></span>
+              <span class="activeColor" v-if="item.conditionPrice==0">无门槛</span>
 						</div>
 						<div class="makeTime">{{item.couponEndTime}}前有效</div>
 						<div class="receiveBtnBox">
@@ -179,6 +199,7 @@
 				lng:0,
 				lat:0,
 				uId:'',
+        shopId:'',
         isDialong:false,
         isDialongCnt:true,
         payPrice:'',
@@ -188,7 +209,7 @@
         tempCouponId:'',
 				couponList:[],
 				couponName:'',
-				couponIcan:'',
+				couponIcan:[],
 				shopAddress:'',
 				couponDesc:'',
 				couponPrice:'',
@@ -201,6 +222,7 @@
 				distance:'',
 				couponEndTime:'',
 				isReceive:'',
+        initialIndex:'',
 				options:{
 					pullDownRefresh:{
 						txt:'更新成功',
@@ -254,14 +276,6 @@
 				]
 			}
 		},
-    watch :{
-      　'$route': function (to, from) {
-           //执行数据更新查询
-    　　    this.getUrlData();
-            this.getShopCouponList();
-            document.documentElement.scrollTop=0;
-    　　}
-    },
 		mounted() {
       this.getEnvironment();
 			if(JSON.parse(localStorage.getItem('user')) == null){
@@ -274,6 +288,25 @@
 			this.getShopCouponList();
 		},
 		methods:{
+      handleImgsClick(index) {
+      	let self = this;
+        self.initialIndex = index
+        const params = {
+          $props: {
+            imgs:self.couponIcan,
+            initialIndex: 'initialIndex', // 响应式数据的key名
+            loop: false
+          },
+          $events: {
+            change: (i) => {
+              // 必须更新 initialIndex
+              self.initialIndex = i
+            }
+          }
+        }
+        self.$createImagePreview({ ...params
+        }).show()
+      },
 			back() {
 				this.$router.go(-1); //返回上一层
 			},
@@ -281,9 +314,11 @@
         var ua = window.navigator.userAgent.toLowerCase();
         if (ua.match(/MicroMessenger/i) == 'micromessenger') {
           this.environment = '0';
+
           this.getCode();
         } else {
           this.environment = '1';
+
         }
       },
       dailongShow() {
@@ -334,9 +369,7 @@
       	const local = window.location.href;
       	this.code = this.getUrlPara('code');
       	if (this.code == null || this.code === '') {
-      	  window.location.href =
-      	    'https://open.weixin.qq.com/connect/oauth2/authorize?appid=wxdf1774932d9dd96e&redirect_uri=' +
-      	    encodeURIComponent(local) + '&response_type=code&scope=snsapi_base&state=' + '38' + '#wechat_redirect';
+      	  window.location.href ='https://open.weixin.qq.com/connect/oauth2/authorize?appid=wxdf1774932d9dd96e&redirect_uri='+encodeURIComponent(local) + '&response_type=code&scope=snsapi_base&state=' + '38' + '#wechat_redirect';
       	}
       },
       getCardState(item){
@@ -405,10 +438,9 @@
         //
       },
       wxPay() { // 通过code获取 openId等用户信息，/api/user/wechat/login 为后台接口
-
         let self = this;
         this.axios.post(Api.userApi + '/couponOrder/wxPay/gzhh5/prepay', this.qs.stringify({
-          userId: self.userId,
+          userId: self.uId,
           couponId:self.couponId,
           code: self.getUrlPara('code')
         }), {
@@ -416,7 +448,9 @@
             'Content-Type': 'application/x-www-form-urlencoded'
           }
         }).then((res) => {
+
           if (res.data.code == 1) {
+
             WeixinJSBridge.invoke('getBrandWCPayRequest', {
               'appId': res.data.data.appId,
               'timeStamp': res.data.data.timeStamp,
@@ -430,7 +464,7 @@
                 setTimeout(() => {
                   self.$router.push({
                     name:'wxWhitePage',
-                    query:{
+                    params:{
                       wxPayBackUrl:window.location.href
                     }
                   })
@@ -498,10 +532,13 @@
       commit() {
 
         if (this.activeIndex == '2' && this.environment == '0') {
+
           this.wxPay();
         } else if (this.activeIndex == '2' && this.environment == '1') {
+
           this.wxH5Pay();
         } else if (this.activeIndex == '1') {
+
           this.aliPay();
         }
       },
@@ -518,9 +555,9 @@
 			},
       couponXqLink(item){
       	this.$router.push({
-      		name:'couponXq',
-      		query:{
-      			couponId:item.couponId
+      		name:'wxWhitePage',
+      		params:{
+      			wxPayBackUrl:'http://192.168.0.140:8081/couponXq?couponId='+item.couponId
       		}
       	})
       },
@@ -567,7 +604,7 @@
 					this.$createDialog({
 						type: 'confirm',
 						icon: 'cubeic-warn',
-						title: '需要登录后才能评论',
+						title: '需要登录后才能领取',
 						confirmBtn: {
 						  text: '去登录',
 						  active: true,
@@ -618,7 +655,14 @@
 					if(res.data.code == 1){
             console.log(res.data.data)
 						self.couponName = res.data.data.couponName;
-						self.couponIcan = res.data.data.couponIcan;
+            self.shopId = res.data.data.shopId;
+            self.couponIcan.push(res.data.data.couponIcan)
+            if(res.data.data.couponIcanA!=''){
+              self.couponIcan.push(res.data.data.couponIcanA)
+            }
+            if(res.data.data.couponIcanB!=''){
+              self.couponIcan.push(res.data.data.couponIcanB)
+            }
 						self.shopAddress = res.data.data.shopAddress;
 						self.couponDesc = res.data.data.couponDesc;
 						self.couponList = res.data.data.shopCoupons;
@@ -653,7 +697,7 @@
 					this.$createDialog({
 						type: 'confirm',
 						icon: 'cubeic-warn',
-						title: '需要登录后才能评论',
+						title: '需要登录后才能领取',
 						confirmBtn: {
 						  text: '去登录',
 						  active: true,
@@ -721,6 +765,9 @@
     padding-top: 88px;
     .through{
       text-decoration:line-through;
+    }
+    .activeColor{
+      color: #ff523d;
     }
     .couponListDialog {
       position: fixed;
@@ -877,6 +924,13 @@
 				border-radius: 10px;
 				overflow: hidden;
 				position: relative;
+        .privilege{
+          position: absolute;
+          left: 0;
+          top: 20px;
+          width: 150px;
+          z-index: 8;
+        }
 				.sign{
 					position: absolute;
 					width: 130px;
@@ -886,13 +940,31 @@
 				}
 				.couponTop{
 					padding: 40px 20px 50px 20px;
-
+          .couponImgBox{
+            width: 178px;
+            height: 178px;
+            margin: 0 auto;
+            .cube-slide-dots>span{
+              width: 10px;
+              height: 10px;
+              border-radius: 50%;
+              // background: #ccc;
+            }
+            // .cube-slide-dots>span.active{
+            //   color: #ff523d;
+            // }
+          }
+          .imgBox{
+            width: 178px;
+            height: 178px;
+            border-radius: 10px;
+          }
 					img{
 						width: 178px;
 						height: 178px;
 						display: block;
 						margin: 0 auto;
-						border-radius: 10px;
+
 					}
 					.couponName{
 						text-align: center;
@@ -904,11 +976,9 @@
 					p{
 						font-size: 24px;
 						color: #666;
-						padding-top: 20px;
 						text-align: center;
             line-height: 30px;
-            width: 400px;
-            margin: 0 auto;
+            padding: 20px 20px 0 20px;
 					}
 					.sale{
 						font-size: 60px;
@@ -918,7 +988,7 @@
 					}
 					.condition{
 						font-size: 24px;
-						color: #ff523d;
+						color: #999;
 						padding-top: 15px;
 						text-align: center;
 					}
@@ -976,9 +1046,18 @@
 
 								width: 460px;
                 .addr{
-                  color: #000;
+                  color: #333;
                   height: 52px;
                   line-height: 52px;
+                }
+                .shopName{
+                  color: #333;
+                  height: 52px;
+                  line-height: 52px;
+                  img{
+                    width: 22px;
+
+                  }
                 }
 							}
 							span{
@@ -1021,7 +1100,7 @@
             position: absolute;
             left: 0;
             top: 20px;
-            width: 200px;
+            width: 150px;
             z-index: 100;
           }
 					.list_l{
@@ -1097,11 +1176,15 @@
 							text-align: center;
 						}
 						.condition{
-							color: #ff523d;
+							// color: #ff523d;
+              color: #999;
 							text-align: center;
 							font-size: 22px;
 							padding-top: 15px;
 						}
+            .activeColor{
+              color: #ff523d;
+            }
 						.makeTime{
 							font-size: 22px;
 							color: #999;

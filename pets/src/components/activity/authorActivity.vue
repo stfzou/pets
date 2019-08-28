@@ -292,7 +292,7 @@
 					padding: 20px 20px 0 20px;
 
 					.activityName {
-						height: 48px;
+
 						line-height: 48px;
 						font-size: 32px;
             font-weight: bold;

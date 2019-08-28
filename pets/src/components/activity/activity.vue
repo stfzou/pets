@@ -47,6 +47,9 @@
 			<!-- <img src="../../assets/active_bg.png" alt=""> -->
 
 		</div>
+    <div class="activity_cnt_img" v-if="isCntImg">
+
+    </div>
 		<div class="line"></div>
 		<div class="message_cnt">
 			<div class="title">
@@ -121,6 +124,7 @@
 			let self = this;
 			return {
 				evalList:[],
+        isCntImg:true,
 				msg:'',
         minPrice:0,
         maxPrice:0,
@@ -347,13 +351,21 @@
 						self.lat = res.data.data.latitude;
 						self.lng = res.data.data.longitude;
 						self.isCollection = res.data.data.isKeep;
-
+             //isCntImg
 						if(res.data.data.description==''){
 							self.isInnerHtml = false;
 						}else{
-							document.querySelector(".activity_cnt").innerHTML = res.data.data.description;
+              var re=/([\n\r])(\s)*(\<\/div\>?(\s)*\<div)+/g;
+              document.querySelector(".activity_cnt").innerHTML=res.data.data.description.replace(/[\n\r]/g,'<br>');
 							self.isInnerHtml = true;
 						}
+            if(res.data.data.imgs==''){
+
+              self.isCntImg = false;
+            }else{
+              document.querySelector(".activity_cnt_img").innerHTML = res.data.data.imgs;
+              self.isCntImg = true;
+            }
             self.isConduct = res.data.data.isConduct;
 						console.log(res.data.data)
 						// console.log(res.data.data.description)
@@ -710,9 +722,10 @@
 		.activity_info{
 			padding: 30px;
 			.activity_name{
-				font-size: 36px;
+				font-size: 32px;
+        line-height: 40px;
 				color: #000;
-				// font-weight: bold;
+				font-weight: bold;
 			}
 			.footprint{
 				margin-top: 22px;
@@ -762,6 +775,11 @@
 
 				}
         .organizerName{
+          p{
+            a{
+              font-weight: bold;
+            }
+          }
           img{
             width: 24px;
           }
@@ -775,17 +793,17 @@
 		}
 		.activity_cnt{
 			padding: 30px;
-			div{
-				font-size: 28px;
-				line-height: 40px;
-				color: #000;
-				margin-bottom: 10px;
-			}
-			img{
-				width: 100%;
-				display: block;
-			}
+      font-size: 28px;
+      line-height: 40px;
+
 		}
+    .activity_cnt_img{
+      padding: 0 15px;
+      img{
+      	width: 100%;
+      	display: block;
+      }
+    }
 		.message_cnt{
 			.title{
 				padding: 20px;

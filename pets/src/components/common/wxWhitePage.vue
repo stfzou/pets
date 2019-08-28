@@ -10,8 +10,8 @@
       }
     },
     mounted() {
-      window.location.href = this.$router.query.wxPayBackUrl
-
+      window.location.href = this.$route.params.wxPayBackUrl
+      console.log(this.$route.params.wxPayBackUrl)
     },
   }
 </script>

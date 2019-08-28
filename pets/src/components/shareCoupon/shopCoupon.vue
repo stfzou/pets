@@ -59,7 +59,10 @@
 			<cube-scroll ref="scroll">
 			<ul>
 				<li class="flex_r_s_b" v-for="item in couponList">
+
           <img v-if="item.couponType===3" class="privilege" src="../../assets/icon_gu30@3x.png" alt="">
+          <img v-if="item.couponType===2" class="privilege" src="../../assets/icon_gu32@3x.png" alt="">
+          <img v-if="item.couponType===1" class="privilege" src="../../assets/icon_gu33@3x.png" alt="">
 					<div class="list_l">
 						<div class="listLeftTop flex_r_s_b">
 							<img @click="couponXqLink(item)" :src="item.couponIcan" alt="">
@@ -76,13 +79,13 @@
 						</div>
 					</div>
 					<div class="list_r">
-						<div class="sale" :class="{activeColor:item.receiveNum==item.circulation}">
+						<div class="sale">
               <span v-if="item.conditionPrice===0">￥{{item.couponPrice}}</span>
               <span v-if="item.conditionPrice!==0">￥{{item.conditionPrice}}</span>
             </div>
 						<div class="condition">
-							<span v-if="item.conditionPrice!==0" :class="{activeColor:item.receiveNum==item.circulation}">票价:<span class="through">{{item.couponPrice}}</span></span>
-							<span v-if="item.conditionPrice==0">无门槛</span>
+							<span v-if="item.conditionPrice!==0">原价:<span class="through">{{item.couponPrice}}</span></span>
+							<span class="activeColor" v-if="item.conditionPrice==0">无门槛</span>
 						</div>
 						<div class="makeTime">{{item.couponEndTime}}前有效</div>
 						<div class="receiveBtnBox">
@@ -433,7 +436,7 @@
                 setTimeout(() => {
                   self.$router.push({
                     name:'wxWhitePage',
-                    query:{
+                    params:{
                       wxPayBackUrl:window.location.href
                     }
                   })
@@ -444,7 +447,7 @@
                 setTimeout(() => {
                   self.$router.push({
                     name:'wxWhitePage',
-                    query:{
+                    params:{
                       wxPayBackUrl:window.location.href
                     }
                   })
@@ -565,6 +568,7 @@
 
 <style lang="scss">
 	.shopCoupon{
+
     .couponListDialog {
       position: fixed;
       height: 100%;
@@ -684,6 +688,9 @@
     .through{
       text-decoration:line-through;
     }
+    .activeColor{
+      color: #ff523d;
+    }
 		.top_nav {
 			padding: 0 20px;
 			height: 88px;
@@ -799,7 +806,7 @@
             position: absolute;
             left: 0;
             top: 20px;
-            width: 200px;
+            width: 150px;
             z-index: 100;
           }
 					.list_l{
@@ -865,7 +872,7 @@
 							text-align: center;
 						}
 						.condition{
-							color: #ff523d;
+							color: #999;
 							text-align: center;
 							font-size: 22px;
 							padding-top: 15px;
