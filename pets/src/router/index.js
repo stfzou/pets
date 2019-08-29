@@ -37,6 +37,11 @@ import CouponXq from '@/components/shareCoupon/couponXq'
 import GumiCard from '@/components/gumika/gumiCard'
 import PayRes from '@/components/common/payRes'
 import WxWhitePage from '@/components/common/wxWhitePage'
+import QuestionOne from '@/components/answer/questionOne'
+import QuestionTwo from '@/components/answer/questionTwo'
+import AnswerOne from '@/components/answer/answerOne'
+import AnswerTwo from '@/components/answer/answerTwo'
+import AnswerWhite from '@/components/answer/answerWhite'
 
 Vue.use(Router)
 export default new Router({
@@ -56,6 +61,31 @@ export default new Router({
     	path:'/wxWhitePage',
     	name:'wxWhitePage',
     	component:WxWhitePage,
+    },
+    {
+    	path:'/answerOne',
+    	name:'answerOne',
+    	component:AnswerOne,
+    },
+    {
+    	path:'/answerTwo',
+    	name:'answerTwo',
+    	component:AnswerTwo,
+    },
+    {
+      path:'/questionOne',
+      name:'questionOne',
+      component:QuestionOne,
+    },
+    {
+      path:'/questionTwo',
+      name:'questionTwo',
+      component:QuestionTwo,
+    },
+    {
+      path:'/answerWhite',
+      name:'answerWhite',
+      component:AnswerWhite,
     },
     {
       path:'/payRes',

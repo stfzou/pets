@@ -369,7 +369,7 @@
                   if(re.data.data===1){
 
                     setTimeout(() => {
-                      window.location.href = "http://192.168.0.127:8081/gumiCard?sj="+10000*Math.random();
+                      window.location.href = "http://app.gutouzu.com/index.html#/gumiCard?sj="+10000*Math.random();
                     }, 500)
                   }else{
 

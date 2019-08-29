@@ -79,7 +79,7 @@
 			<cube-scroll ref="scroll" @pulling-up="onPullingUp" @pulling-down="onPullingDown" :options="options">
 			<ul>
 				<li class="flex_r_s_b" v-for="item in couponList">
-           <img v-if="item.couponType===3" class="privilege" src="../../assets/icon_gu30@3x.png" alt="">
+          <img v-if="item.couponType===3" class="privilege" src="../../assets/icon_gu30@3x.png" alt="">
           <img v-if="item.couponType===2" class="privilege" src="../../assets/icon_gu32@3x.png" alt="">
           <img v-if="item.couponType===1" class="privilege" src="../../assets/icon_gu33@3x.png" alt="">
 					<div class="list_l">
@@ -87,7 +87,7 @@
 							<img @click="couponXqLink(item)" :src="item.couponIcan" alt="">
               <!-- <img src="" alt=""> -->
 							<div class="couponNameBox">
-								<div class="couponName">{{item.couponName}}</div>
+								<div class="couponName">{{item.couponName | descFilter}}</div>
 								<div class="distance">{{item.distance}}</div>
 								<div class="progressBox flex_r_s_b">
 									<div class="progress">
@@ -113,15 +113,18 @@
 						</div>
 						<div class="makeTime">{{item.couponEndTime}}前有效</div>
 						<div class="receiveBtnBox">
-							<div v-if="item.isReceive===0&&item.conditionPrice==0" class="receiveBtn receivedBtn flex_r_s_c">已领完</div>
-              <div v-if="item.isReceive===0&&item.conditionPrice!=0" class="receiveBtn receivedBtn flex_r_s_c">已购买</div>
-							<div @click="receive(item)" v-if="item.isReceive!=0" class="receiveBtn flex_r_s_c">立即领取</div>
+							<div v-if="item.isReceive==0&&item.conditionPrice==0&&item.circulation>item.receiveNum" class="receiveBtn receivedBtn flex_r_s_c">已领取</div>
+              <div v-if="item.isReceive==0&&item.conditionPrice!=0&&item.circulation>item.receiveNum" class="receiveBtn receivedBtn flex_r_s_c">已购买</div>
+              <div v-if="item.circulation==item.receiveNum" class="receiveBtn receivedBtn flex_r_s_c">已领完</div>
+							<div @click="receive(item)" v-if="item.isReceive!=0&&item.conditionPrice==0" class="receiveBtn flex_r_s_c">立即领取</div>
+              <div @click="receive(item)" v-if="item.isReceive!=0&&item.conditionPrice!=0" class="receiveBtn flex_r_s_c">立即购买</div>
 						</div>
 						<div class="saleNum">商家共{{item.shopTotalNum}}种优惠券</div>
+           <!-- <div v-if="item.isReceive!==0&&(item.shopTotalNum!=item.receiveNum)">123</div> -->
 					</div>
-          <img v-if="item.isReceive===0&&item.conditionPrice==0" class="imprint" src="../../assets/receiveEnd.png" alt="">
-					<img v-if="item.isReceive===1" class="imprint" src="../../assets/received.png" alt="">
-          <img v-if="item.isReceive===0&&item.conditionPrice!=0" class="imprint" src="../../assets/buyEnd.png" alt="">
+          <img v-if="item.circulation==item.receiveNum" class="imprint" src="../../assets/receiveEnd.png" alt="">
+					<img v-if="(item.isReceive===0&&item.conditionPrice==0)&&item.circulation>item.receiveNum" class="imprint" src="../../assets/received.png" alt="">
+          <img v-if="item.conditionPrice!=0&&item.circulation>item.receiveNum" class="imprint" src="../../assets/buyEnd.png" alt="">
 				</li>
 			</ul>
 			</cube-scroll>
@@ -241,6 +244,15 @@
       this.getCouponType();
 			this.getCouponList();
 		},
+    filters:{
+      descFilter(val){
+        if(val.length>12){
+          return val.substr(0,12)+'...'
+        }else{
+          return val
+        }
+      }
+    },
 		methods:{
 			getCouponList(){
 				let self = this;
@@ -937,9 +949,9 @@
 							.couponNameBox{
 								width: 220px;
 								.couponName{
-									font-size: 26px;
+									font-size: 28px;
 									color: #000;
-									line-height: 40px;
+									line-height: 34px;
 								}
 								.distance{
 									font-size: 22px;

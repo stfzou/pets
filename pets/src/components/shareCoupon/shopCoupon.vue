@@ -49,10 +49,10 @@
       <div class="operateTypes">主营品类:<span v-for="item in operateTypes">{{item.typeName}}、</span></div>
       <div class="shopDesc">店铺简介:{{shopDesc}}</div>
 			<a :href="navUrl" class="addr flex_r_s_b">
-        <p>地址:{{shopAddress}}</p>
+        <p>地址:<span>{{shopAddress}}</span></p>
 				<img src="../../assets/icon/icon_she56@3x.png" alt="">
 			</a>
-      <div class="distance">{{distance}}</div>
+      <div class="distance">距离:<span>{{distance | distanceFilter}}公里</span></div>
 		</div>
     <div class="shopCouponTitle">店铺优惠券</div>
 		<div class="couponListBox">
@@ -67,8 +67,8 @@
 						<div class="listLeftTop flex_r_s_b">
 							<img @click="couponXqLink(item)" :src="item.couponIcan" alt="">
 							<div class="couponNameBox">
-								<div class="couponName">{{item.couponName}}</div>
-								<div class="distance">{{item.distance}}</div>
+								<div class="couponName">{{item.couponName | descFilter}}</div>
+								<div class="distance">{{item.couponDesc | descFilter}}</div>
 								<div class="progressBox flex_r_s_b">
 									<div class="progress">
 										<div :style="item.styleObj"></div>
@@ -92,16 +92,18 @@
 							<!-- <div v-if="item.isReceive===0" class="receiveBtn receivedBtn flex_r_s_c">立即领取</div>
 							<div @click="receive(item)" v-else class="receiveBtn flex_r_s_c">立即领取</div> -->
 
-              <div v-if="item.isReceive===0&&item.conditionPrice==0" class="receiveBtn receivedBtn flex_r_s_c">已领完</div>
-              <div v-if="item.isReceive===0&&item.conditionPrice!=0" class="receiveBtn receivedBtn flex_r_s_c">已购买</div>
-              <div @click="receive(item)" v-if="item.isReceive!=0" class="receiveBtn flex_r_s_c">立即领取</div>
+             <div v-if="item.isReceive==0&&item.conditionPrice==0&&item.circulation>item.receiveNum" class="receiveBtn receivedBtn flex_r_s_c">已领取</div>
+             <div v-if="item.isReceive==0&&item.conditionPrice!=0&&item.circulation>item.receiveNum" class="receiveBtn receivedBtn flex_r_s_c">已购买</div>
+             <div v-if="item.circulation==item.receiveNum" class="receiveBtn receivedBtn flex_r_s_c">已领完</div>
+             <div @click="receive(item)" v-if="item.isReceive!=0&&item.conditionPrice==0" class="receiveBtn flex_r_s_c">立即领取</div>
+             <div @click="receive(item)" v-if="item.isReceive!=0&&item.conditionPrice!=0" class="receiveBtn flex_r_s_c">立即购买</div>
 						</div>
-
+            <div v-if="item.isReceive!=0&&item.conditionPrice!=0&&item.shopTotalNum>item.receiveNum">123</div>
 					</div>
-					<img v-if="item.isReceive===0&&item.conditionPrice==0" class="imprint" src="../../assets/receiveEnd.png" alt="">
-					<img v-if="item.isReceive===1" class="imprint" src="../../assets/received.png" alt="">
-					<img v-if="item.isReceive===0&&item.conditionPrice!=0" class="imprint" src="../../assets/buyEnd.png" alt="">
-				</li>
+					<img v-if="item.circulation==item.receiveNum" class="imprint" src="../../assets/receiveEnd.png" alt="">
+					<img v-if="(item.isReceive===0&&item.conditionPrice==0)&&item.circulation>item.receiveNum" class="imprint" src="../../assets/received.png" alt="">
+					<img v-if="item.conditionPrice!=0&&item.circulation>item.receiveNum" class="imprint" src="../../assets/buyEnd.png" alt="">
+        </li>
 			</ul>
 			</cube-scroll>
 		</div>
@@ -188,6 +190,18 @@
 				]
 			}
 		},
+    filters:{
+      descFilter(val){
+        if(val.length>12){
+          return val.substr(0,12)+'...'
+        }else{
+          return val
+        }
+      },
+      distanceFilter(val){
+        return parseFloat(val.substring(2))
+      }
+    },
 		mounted() {
       this.getEnvironment();
 			if(JSON.parse(localStorage.getItem('user')) == null){
@@ -757,7 +771,7 @@
       }
 			.addr{
         box-sizing: border-box;
-				padding:20px 20px 0 20px;
+				padding:40px 20px 0 20px;
 
 				img{
 					width:30px;
@@ -766,6 +780,9 @@
 					font-size: 26px;
 					color: #666;
 					line-height: 44px;
+          span{
+            margin-left:20px;
+          }
 				}
 			}
       .distance{
@@ -775,6 +792,9 @@
         text-align: left;
         width: 100%;
         box-sizing: border-box;
+        span{
+          margin-left:20px;
+        }
       }
 		}
 		.shopCouponTitle{
@@ -821,13 +841,18 @@
 							.couponNameBox{
 								width: 220px;
 								.couponName{
-									font-size: 26px;
+									font-size: 28px;
 									color: #000;
-									line-height: 40px;
+									line-height: 34px;
 								}
-
+                .distance{
+                  font-size:24px;
+                  color:#666;
+                  padding-top:10px;
+                  line-height:34px;
+                }
 								.progressBox{
-									padding-top: 80px;
+									padding-top: 20px;
 									.progress{
 										position: relative;
 										width:100px;

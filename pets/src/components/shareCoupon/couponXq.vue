@@ -14,7 +14,7 @@
           <p>仅限骨米卡特权会员预定，开通骨米卡优选俱乐部会员即可享受特权优惠权益</p>
         </div>
         <div class="btnBox flex_r_s_b">
-          <div class="cancelBtn flex_r_s_c" @click="dailongHide">取消</div>
+          <div class="cancelBtn flex_r_s_c" @click="guCardLink">¥{{payPrice}}单价购买</div>
           <div class="okBtn flex_r_s_c" @click="guCardLink">确定</div>
         </div>
       </div>
@@ -49,9 +49,9 @@
         <img v-if="couponType===2" class="privilege" src="../../assets/icon_gu32@3x.png" alt="">
         <img v-if="couponType===1" class="privilege" src="../../assets/icon_gu33@3x.png" alt="">
 
-				<img v-show="isReceive===0&&conditionPrice===0" class="sign" src="../../assets/receiveEnd.png" alt="">
-				<img v-show="isReceive===1" class="sign" src="../../assets/received.png" alt="">
-				<img v-show="isReceive===0&&conditionPrice!==0" class="sign" src="../../assets/buyEnd.png" alt="">
+        <img v-if="circulation==receiveNum" class="sign" src="../../assets/receiveEnd.png" alt="">
+        <img v-if="(isReceive===0&&conditionPrice==0)&&circulation>receiveNum" class="sign" src="../../assets/received.png" alt="">
+        <img v-if="conditionPrice!=0&&circulation>receiveNum" class="sign" src="../../assets/buyEnd.png" alt="">
 				<div class="couponTop">
 					<!-- <img class="couponImg" :src="couponIcan" alt=""> -->
           <div class="couponImgBox">
@@ -67,16 +67,19 @@
             {{couponName}}
           </div>
 					<p>{{couponDesc}}</p>
-					<div class="sale"><span v-if="conditionPrice===0">￥{{couponPrice}}</span><span v-else>￥{{conditionPrice}}</span></div>
-					<div class="condition"><span class="activeColor" v-if="conditionPrice===0">无门槛</span><span v-else class="through">原价:{{couponPrice}}</span></div>
-					<div class="receiveBtnBox">
-						<!-- <div v-show="isReceive===2||isReceive===1" @click="receiveBtn" class="receiveBtn flex_r_s_c">立即领取</div>
-						<div v-show="isReceive===1" class="receiveBtn receivedBtn flex_r_s_c">已领取</div>
-						<div v-show="isReceive===0" class="receiveBtn receivedBtn flex_r_s_c">已领完</div> -->
+          <div class="saleBox">
+            <div class="sale"><span v-if="conditionPrice===0">￥{{couponPrice}}</span><span v-else>￥{{conditionPrice}}</span></div>
+            <div class="condition"><span class="activeColor" v-if="conditionPrice===0">无门槛</span><span v-else>原价:<span class="through activeColor">{{couponPrice}}</span></span></div>
 
-            <div v-show="isReceive===0&&couponType!=3" class="receiveBtn receivedBtn flex_r_s_c">立即领取</div>
-            <div v-show="isReceive===0&&couponType===3" class="receiveBtn receivedBtn flex_r_s_c">已购买</div>
-            <div @click="receiveBtn" v-show="isReceive!=0" class="receiveBtn flex_r_s_c">立即领取</div>
+          </div>
+
+          <div class="receiveBtnBox">
+
+            <div v-if="isReceive==0&&conditionPrice==0&&circulation>receiveNum" class="receiveBtn receivedBtn flex_r_s_c">已领取</div>
+            <div v-if="isReceive==0&&conditionPrice!=0&&circulation>receiveNum" class="receiveBtn receivedBtn flex_r_s_c">已购买</div>
+            <div v-if="circulation==receiveNum" class="receiveBtn receivedBtn flex_r_s_c">已领完</div>
+            <div @click="receiveBtn" v-if="isReceive!=0&&conditionPrice==0" class="receiveBtn flex_r_s_c">立即领取</div>
+            <div @click="receiveBtn" v-if="isReceive!=0&&conditionPrice!=0" class="receiveBtn flex_r_s_c">立即购买</div>
 					</div>
 				</div>
 				<div class="couponBottom">
@@ -140,7 +143,7 @@
 						<div class="listLeftTop flex_r_s_b">
 							<img @click="couponXqLink(item)" :src="item.couponIcan" alt="">
 							<div class="couponNameBox">
-								<div class="couponName">{{item.couponName}}</div>
+								<div class="couponName">{{item.couponName | descFilter}}</div>
 								<!-- <div class="distance">{{item.distance}}</div> -->
                 <div class="couponDesc" >
                   {{item.couponDesc}}
@@ -168,16 +171,17 @@
 						<div class="makeTime">{{item.couponEndTime}}前有效</div>
 						<div class="receiveBtnBox">
 
-              <div v-if="item.isReceive===0&&item.conditionPrice==0" class="receiveBtn receivedBtn flex_r_s_c">已领完</div>
-              <div v-if="item.isReceive===0&&item.conditionPrice!==0" class="receiveBtn receivedBtn flex_r_s_c">已购买</div>
-              <div @click="receive(item)" v-if="item.isReceive!=0" class="receiveBtn flex_r_s_c">立即领取</div>
+             <div v-if="item.isReceive==0&&item.conditionPrice==0&&item.circulation>item.receiveNum" class="receiveBtn receivedBtn flex_r_s_c">已领取</div>
+             <div v-if="item.isReceive==0&&item.conditionPrice!=0&&item.circulation>item.receiveNum" class="receiveBtn receivedBtn flex_r_s_c">已购买</div>
+             <div v-if="item.circulation==item.receiveNum" class="receiveBtn receivedBtn flex_r_s_c">已领完</div>
+             <div @click="receive(item)" v-if="item.isReceive!=0&&item.conditionPrice==0" class="receiveBtn flex_r_s_c">立即领取</div>
+             <div @click="receive(item)" v-if="item.isReceive!=0&&item.conditionPrice!=0" class="receiveBtn flex_r_s_c">立即购买</div>
 						</div>
 
 					</div>
-					<img v-if="item.isReceive===0&&item.conditionPrice==0" class="imprint" src="../../assets/receiveEnd.png" alt="">
-					<img v-if="item.isReceive===1" class="imprint" src="../../assets/received.png" alt="">
-					<img v-if="item.isReceive===0&&item.conditionPrice!=0" class="imprint" src="../../assets/buyEnd.png" alt="">
-
+					<img v-if="item.circulation==item.receiveNum" class="imprint" src="../../assets/receiveEnd.png" alt="">
+					<img v-if="(item.isReceive===0&&item.conditionPrice==0)&&item.circulation>item.receiveNum" class="imprint" src="../../assets/received.png" alt="">
+					<img v-if="item.conditionPrice!=0&&item.circulation>item.receiveNum" class="imprint" src="../../assets/buyEnd.png" alt="">
 
 				</li>
 			</ul>
@@ -200,9 +204,11 @@
 				lat:0,
 				uId:'',
         shopId:'',
+        receiveNum:'',
         isDialong:false,
         isDialongCnt:true,
         payPrice:'',
+        circulation:'',
         code:'',
         activeIndex:'2',
 				couponId:'',
@@ -287,6 +293,15 @@
       this.getUrlData();
 			this.getShopCouponList();
 		},
+    filters:{
+      descFilter(val){
+        if(val.length>12){
+          return val.substr(0,15)+'...'
+        }else{
+          return val
+        }
+      }
+    },
 		methods:{
       handleImgsClick(index) {
       	let self = this;
@@ -557,7 +572,7 @@
       	this.$router.push({
       		name:'wxWhitePage',
       		params:{
-      			wxPayBackUrl:'http://192.168.0.140:8081/couponXq?couponId='+item.couponId
+      			wxPayBackUrl:'http://192.168.0.143:8081/couponXq?couponId='+item.couponId
       		}
       	})
       },
@@ -596,6 +611,7 @@
 			receiveBtn(){
 
 				let self = this;
+        this.payPrice = this.conditionPrice;
         this.couponId = this.tempCouponId;
 				if(JSON.parse(localStorage.getItem('user')) == null){
 
@@ -655,6 +671,8 @@
 					if(res.data.code == 1){
             console.log(res.data.data)
 						self.couponName = res.data.data.couponName;
+            self.receiveNum = res.data.data.receiveNum;
+            self.circulation = res.data.data.circulation;
             self.shopId = res.data.data.shopId;
             self.couponIcan.push(res.data.data.couponIcan)
             if(res.data.data.couponIcanA!=''){
@@ -690,6 +708,7 @@
 			},
 			receive(item){
 				let self = this;
+        this.payPrice = item.conditionPrice;
 				if(JSON.parse(localStorage.getItem('user')) == null){
 
 					let url = window.location.href;
@@ -967,30 +986,35 @@
 
 					}
 					.couponName{
-						text-align: center;
+						text-align: left;
 						color: #000;
 						font-size: 28px;
+            font-weight:800;
 						padding-top: 40px;
             line-height: 36px;
 					}
 					p{
 						font-size: 24px;
 						color: #666;
-						text-align: center;
+						text-align: left;
             line-height: 30px;
-            padding: 20px 20px 0 20px;
+            padding:20px 0;
 					}
+          .saleBox{
+            position:relative;
+          }
 					.sale{
 						font-size: 60px;
 						color: #ff523d;
-						padding-top: 60px;
-						text-align: center;
+            text-align:center;
 					}
 					.condition{
 						font-size: 24px;
 						color: #999;
-						padding-top: 15px;
-						text-align: center;
+            position:absolute;
+            right:60px;
+            top:50%;
+            transform:translate(0,-50%);
 					}
 					.receiveBtnBox{
 						padding-top: 40px;
@@ -1115,9 +1139,9 @@
 							.couponNameBox{
 								width: 220px;
 								.couponName{
-									font-size: 26px;
+									font-size: 28px;
 									color: #000;
-									line-height: 40px;
+									line-height: 34px;
 								}
 
 								.progressBox{
