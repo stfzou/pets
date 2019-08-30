@@ -24,14 +24,14 @@
               if(res.data.code==1){
                 if(res.data.data.type==2){
                   self.$router.push({
-                    name:'questionOne',
+                    name:'questionTwo',
                     query:{
                       qId:res.data.data.questionId
                     }
                   })
                 }else{
                   self.$router.push({
-                    name:'questionTwo',
+                    name:'questionOne',
                     query:{
                       qId:res.data.data.questionId
                     }

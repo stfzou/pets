@@ -188,6 +188,7 @@
 
 		},
 		methods:{
+      
       commentShow(){
         if(this.isComment){
           this.isComment = false;

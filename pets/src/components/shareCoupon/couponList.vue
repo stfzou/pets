@@ -124,7 +124,7 @@
 					</div>
           <img v-if="item.circulation==item.receiveNum" class="imprint" src="../../assets/receiveEnd.png" alt="">
 					<img v-if="(item.isReceive===0&&item.conditionPrice==0)&&item.circulation>item.receiveNum" class="imprint" src="../../assets/received.png" alt="">
-          <img v-if="item.conditionPrice!=0&&item.circulation>item.receiveNum" class="imprint" src="../../assets/buyEnd.png" alt="">
+          <img v-if="item.isReceive!=2&&item.conditionPrice!=0&&item.circulation>item.receiveNum" class="imprint" src="../../assets/buyEnd.png" alt="">
 				</li>
 			</ul>
 			</cube-scroll>

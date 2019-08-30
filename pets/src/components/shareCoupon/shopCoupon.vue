@@ -46,7 +46,7 @@
 		<div class="shopBox flex_c_f_e">
 			<img class="shopImg" v-if="false" :src="shopImgAddr" alt="">
       <img class="shopImg" v-else src="../../assets/head_icon.png" alt="">
-      <div class="operateTypes">主营品类:<span v-for="item in operateTypes">{{item.typeName}}、</span></div>
+      <div class="operateTypes">主营:<span v-for="item in operateTypes">{{item.typeName}}</span></div>
       <div class="shopDesc">店铺简介:{{shopDesc}}</div>
 			<a :href="navUrl" class="addr flex_r_s_b">
         <p>地址:<span>{{shopAddress}}</span></p>
@@ -54,9 +54,9 @@
 			</a>
       <div class="distance">距离:<span>{{distance | distanceFilter}}公里</span></div>
 		</div>
-    <div class="shopCouponTitle">店铺优惠券</div>
+
 		<div class="couponListBox">
-			<cube-scroll ref="scroll">
+
 			<ul>
 				<li class="flex_r_s_b" v-for="item in couponList">
 
@@ -67,7 +67,7 @@
 						<div class="listLeftTop flex_r_s_b">
 							<img @click="couponXqLink(item)" :src="item.couponIcan" alt="">
 							<div class="couponNameBox">
-								<div class="couponName">{{item.couponName | descFilter}}</div>
+								<div class="couponName" @click="couponXqLink(item)">{{item.couponName | descFilter}}</div>
 								<div class="distance">{{item.couponDesc | descFilter}}</div>
 								<div class="progressBox flex_r_s_b">
 									<div class="progress">
@@ -102,10 +102,10 @@
 					</div>
 					<img v-if="item.circulation==item.receiveNum" class="imprint" src="../../assets/receiveEnd.png" alt="">
 					<img v-if="(item.isReceive===0&&item.conditionPrice==0)&&item.circulation>item.receiveNum" class="imprint" src="../../assets/received.png" alt="">
-					<img v-if="item.conditionPrice!=0&&item.circulation>item.receiveNum" class="imprint" src="../../assets/buyEnd.png" alt="">
+					<img v-if="item.isReceive!=2&&item.conditionPrice!=0&&item.circulation>item.receiveNum" class="imprint" src="../../assets/buyEnd.png" alt="">
         </li>
 			</ul>
-			</cube-scroll>
+
 		</div>
 		<div class="amap-page-container" v-show="false">
 			<el-amap ref="map" vid="amapDemo" :plugin="plugin" class="amap-demo"></el-amap>
@@ -115,6 +115,7 @@
 </template>
 
 <script>
+  import wxapi from '../common/wxapi.js'
 	import Api from '../common/apj.js'
 	export default{
 		data(){
@@ -192,17 +193,19 @@
 		},
     filters:{
       descFilter(val){
-        if(val.length>12){
-          return val.substr(0,12)+'...'
+        if(val.length>14){
+          return val.substr(0,16)+'...'
         }else{
           return val
         }
       },
       distanceFilter(val){
-        return parseFloat(val.substring(2))
+        return parseFloat(val.substring(3))
       }
+
     },
 		mounted() {
+      wxapi.wxRegister(this.wxRegCallback)
       this.getEnvironment();
 			if(JSON.parse(localStorage.getItem('user')) == null){
 				// this.$store.commit('setRouterName','activity');
@@ -215,6 +218,63 @@
 
 		},
 		methods:{
+      wxRegCallback () {
+        // 用于微信JS-SDK回调
+        this.wxShareTimeline()
+        this.wxShareAppMessage()
+      },
+      wxShareTimeline () {
+        // 微信自定义分享到朋友圈
+
+        let option = {
+          title: '限时团购周 挑战最低价', // 分享标题, 请自行替换
+          link: window.location.href.split('#')[0], // 分享链接，根据自身项目决定是否需要split
+          //imgUrl: 'logo.png', // 分享图标, 请自行替换，需要绝对路径
+          success: () => {
+            alert('分享成功')
+          },
+          error: () => {
+            alert('已取消分享')
+          }
+        }
+        // 将配置注入通用方法
+        wxapi.ShareTimeline(option)
+      },
+      wxShareAppMessage () {
+        // 微信自定义分享给朋友
+        let option = {
+          title: '限时团购周 挑战最低价', // 分享标题, 请自行替换
+          desc: '限时团购周 挑战最低价', // 分享描述, 请自行替换
+          link:window.location.href.split('#')[0], // 分享链接，根据自身项目决定是否需要split
+          //imgUrl: 'logo.png', // 分享图标, 请自行替换，需要绝对路径
+          success: () => {
+            alert('分享成功')
+          },
+          error: () => {
+            alert('已取消分享')
+          }
+        }
+        // 将配置注入通用方法
+        wxapi.ShareAppMessage(option)
+      },
+      qqShareMsg(){
+        //分享给QQ好友
+        let option = {
+          title: '限时团购周 挑战最低价', // 分享标题, 请自行替换
+          desc: '限时团购周 挑战最低价', // 分享描述, 请自行替换
+          link:window.location.href.split('#')[0], // 分享链接，根据自身项目决定是否需要split
+          //imgUrl: 'logo.png', // 分享图标, 请自行替换，需要绝对路径
+          success: () => {
+            alert('分享成功')
+          },
+          error: () => {
+            alert('已取消分享')
+          }
+        }
+        // 将配置注入通用方法
+        wxapi.ShareQQMessage(option)
+
+      },
 			back() {
 				this.$router.go(-1); //返回上一层
 			},
@@ -341,7 +401,15 @@
 						self.shopAddress = res.data.data.shopAddress;
 						self.couponList = res.data.data.shopCoupons;
             self.shopDesc = res.data.data.shopDesc;
+
             self.operateTypes = res.data.data.operateTypes;
+            self.operateTypes.forEach((e,index,arr)=>{
+
+              if(index!=self.operateTypes.length-1){
+                e.typeName = e.typeName+'、'
+              }
+            })
+
             self.distance = res.data.data.distance;
             self.navUrl = 'https://uri.amap.com/marker?position='+res.data.data.longitude+','+res.data.data.latitude+'&name='+res.data.data.shopAddress;;
 						self.couponList.forEach((e)=>{
@@ -735,7 +803,6 @@
 			}
 		}
 		.shopBox{
-			height: 430px;
 			align-content:space-between;
 			justify-content:center;
 			// background: red;
@@ -797,18 +864,9 @@
         }
       }
 		}
-		.shopCouponTitle{
-      font-size: 26px;
-      color: #000;
-      text-align: center;
-      padding: 30px 0;
-    }
+
     .couponListBox{
-			position:absolute;
-			top: 620px;
-			bottom: 0;
-			left: 0;
-			right: 0;
+
 			ul{
 				padding:0 20px 10px 20px;
 				overflow: hidden;
@@ -892,7 +950,7 @@
 					}
 					.list_r{
 						.sale{
-							font-size: 60px;
+							font-size: 50px;
 							color: #ff523d;
 							text-align: center;
 						}

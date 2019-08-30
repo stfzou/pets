@@ -51,7 +51,7 @@
 
         <img v-if="circulation==receiveNum" class="sign" src="../../assets/receiveEnd.png" alt="">
         <img v-if="(isReceive===0&&conditionPrice==0)&&circulation>receiveNum" class="sign" src="../../assets/received.png" alt="">
-        <img v-if="conditionPrice!=0&&circulation>receiveNum" class="sign" src="../../assets/buyEnd.png" alt="">
+        <img v-if="isReceive!=2&&conditionPrice!=0&&circulation>receiveNum" class="sign" src="../../assets/buyEnd.png" alt="">
 				<div class="couponTop">
 					<!-- <img class="couponImg" :src="couponIcan" alt=""> -->
           <div class="couponImgBox">
@@ -81,6 +81,7 @@
             <div @click="receiveBtn" v-if="isReceive!=0&&conditionPrice==0" class="receiveBtn flex_r_s_c">立即领取</div>
             <div @click="receiveBtn" v-if="isReceive!=0&&conditionPrice!=0" class="receiveBtn flex_r_s_c">立即购买</div>
 					</div>
+          <div class="receiveNum">已领取{{receiveNum}}张</div>
 				</div>
 				<div class="couponBottom">
 					<div class="posL"></div>
@@ -143,7 +144,7 @@
 						<div class="listLeftTop flex_r_s_b">
 							<img @click="couponXqLink(item)" :src="item.couponIcan" alt="">
 							<div class="couponNameBox">
-								<div class="couponName">{{item.couponName | descFilter}}</div>
+								<div class="couponName"  @click="couponXqLink(item)">{{item.couponName | descFilter}}</div>
 								<!-- <div class="distance">{{item.distance}}</div> -->
                 <div class="couponDesc" >
                   {{item.couponDesc}}
@@ -181,7 +182,7 @@
 					</div>
 					<img v-if="item.circulation==item.receiveNum" class="imprint" src="../../assets/receiveEnd.png" alt="">
 					<img v-if="(item.isReceive===0&&item.conditionPrice==0)&&item.circulation>item.receiveNum" class="imprint" src="../../assets/received.png" alt="">
-					<img v-if="item.conditionPrice!=0&&item.circulation>item.receiveNum" class="imprint" src="../../assets/buyEnd.png" alt="">
+					<img v-if="item.isReceive!=2&&item.conditionPrice!=0&&item.circulation>item.receiveNum" class="imprint" src="../../assets/buyEnd.png" alt="">
 
 				</li>
 			</ul>
@@ -1004,7 +1005,7 @@
             position:relative;
           }
 					.sale{
-						font-size: 60px;
+						font-size: 50px;
 						color: #ff523d;
             text-align:center;
 					}
@@ -1012,7 +1013,7 @@
 						font-size: 24px;
 						color: #999;
             position:absolute;
-            right:60px;
+            right:90px;
             top:50%;
             transform:translate(0,-50%);
 					}
@@ -1032,6 +1033,12 @@
 						}
 
 					}
+          .receiveNum{
+            font-size: 26px;
+            color: #999;
+            text-align:center;
+            padding-top:30px;
+          }
 				}
 				.couponBottom{
 					position: relative;
@@ -1195,7 +1202,7 @@
 					}
 					.list_r{
 						.sale{
-							font-size: 60px;
+							font-size: 50px;
 							color: #ff523d;
 							text-align: center;
 						}

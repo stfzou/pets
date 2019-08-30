@@ -11,18 +11,19 @@
         </div>
 
         <div class="res">
-            你是一个意志坚强的人，不喜欢依靠别人，喜欢独来独往。在生活中，你有一颗旺盛的好奇心，对很多事情都有强烈的兴趣，喜欢钻研琢磨。你的生活态度很理性，很少会看到你冲动做出不合理的举动。初次和你相处，可能会觉得你这个人不是很好打交道，但是深入了解后会发现你并不是表面上看得那样，高冷的外表下，你其实也很关心他人，为人亲切体贴。
+            {{result}}
         </div>
-        <img class="shareBg" src="../../assets/shareImg.png" alt="">
+        <img @click="share" class="shareBg" src="../../assets/shareImg.png" alt="">
+        <img @click="share" class="shareBg" src="../../assets/shareImg2.png" alt="">
       </div>
 
     </div>
-    <div class="bannerPost">
-        <div class="tip flex_r_f_e"><span>广告</span><i class="cubeic-close"></i></div>
-        <cube-slide ref="slide" :data="items">
-          <cube-slide-item v-for="(item, index) in items" :key="index">
-            <a href="###">
-              <img src="../../assets/as_post.jpg">
+    <div class="bannerPost" v-if="isPost">
+        <div class="tip flex_r_f_e" @click="closePost"><span>广告</span><i class="cubeic-close"></i></div>
+        <cube-slide ref="slide" :data="postArr">
+          <cube-slide-item v-for="(item, index) in postArr" :key="index">
+            <a :href="item.link">
+              <img :src="item.imgAddr">
             </a>
           </cube-slide-item>
         </cube-slide>
@@ -31,17 +32,141 @@
 </template>
 
 <script>
+  import wxapi from '../common/wxapi.js'
   import Api from '../common/apj.js'
   export default{
     data(){
       return{
-        items:[1,2,3]
+        qId:'',
+        option:'',
+        result:'',
+        postArr:[],
+        isPost:true,
       }
+    },
+
+    mounted() {
+      wxapi.wxRegister(this.wxRegCallback)
+      this.qId = this.getUrlData().qId;
+      this.option = this.getUrlData().option;
+      this.getAnswer();
     },
     methods:{
       back(){
 
-      }
+      },
+      wxRegCallback () {
+        // 用于微信JS-SDK回调
+        this.wxShareTimeline()
+        this.wxShareAppMessage()
+      },
+      wxShareTimeline () {
+        // 微信自定义分享到朋友圈
+
+        let option = {
+          title: '限时团购周 挑战最低价', // 分享标题, 请自行替换
+          link: window.location.href.split('#')[0], // 分享链接，根据自身项目决定是否需要split
+          //imgUrl: 'logo.png', // 分享图标, 请自行替换，需要绝对路径
+          success: () => {
+            alert('分享成功')
+          },
+          error: () => {
+            alert('已取消分享')
+          }
+        }
+        // 将配置注入通用方法
+        wxapi.ShareTimeline(option)
+      },
+      wxShareAppMessage () {
+        // 微信自定义分享给朋友
+        let option = {
+          title: '限时团购周 挑战最低价', // 分享标题, 请自行替换
+          desc: '限时团购周 挑战最低价', // 分享描述, 请自行替换
+          link:window.location.href.split('#')[0], // 分享链接，根据自身项目决定是否需要split
+          //imgUrl: 'logo.png', // 分享图标, 请自行替换，需要绝对路径
+          success: () => {
+            alert('分享成功')
+          },
+          error: () => {
+            alert('已取消分享')
+          }
+        }
+        // 将配置注入通用方法
+        wxapi.ShareAppMessage(option)
+      },
+      qqShareMsg(){
+        //分享给QQ好友
+        let option = {
+          title: '限时团购周 挑战最低价', // 分享标题, 请自行替换
+          desc: '限时团购周 挑战最低价', // 分享描述, 请自行替换
+          link:window.location.href.split('#')[0], // 分享链接，根据自身项目决定是否需要split
+          //imgUrl: 'logo.png', // 分享图标, 请自行替换，需要绝对路径
+          success: () => {
+            alert('分享成功')
+          },
+          error: () => {
+            alert('已取消分享')
+          }
+        }
+        // 将配置注入通用方法
+        wxapi.ShareQQMessage(option)
+        
+      },
+      share(){
+      	let toast = this.$createToast({
+      		txt: '点击顶部右上角进行分享',
+      		type: 'warn'
+      	  })
+      	toast.show()
+      },
+      closePost(){
+        this.isPost = false;
+      },
+      getAnswer(){
+        let self = this;
+        this.axios.get(Api.userApi + '/tasteTest/selectTestResult?questionId='+this.qId+'&option='+this.option, {
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded'
+            }
+          }).then(function(res) {
+            if(res.data.code==1){
+
+              self.postArr = res.data.data.adDos;
+              self.result = res.data.data.result;
+            }
+          }).catch(function(error) {
+            console.log(error);
+          });
+      },
+      getUrlData() {// 截取url中的数据
+
+        let tempStr = window.location.href;
+         /**
+          * tempArr 是一个字符串数组 格式是["key=value", "key=value", ...]
+          */
+         let returnArr = {};
+         let urlArr = tempStr.split('?');
+         if(urlArr){
+           urlArr.forEach((e)=>{
+
+               if(e.indexOf('&')>-1){
+
+                 e.split('&').forEach((j)=>{
+                    if(j.split('=')){
+                      returnArr[j.split('=')[0]] = j.split('=')[1];
+                    }
+
+                 })
+
+               }
+
+           })
+         }
+         return returnArr
+        /*输出日志*/
+
+        console.log(returnArr)
+       },
     }
   }
 </script>
@@ -116,8 +241,8 @@
       position:fixed;
       left:50%;
       bottom:30px;
-      width:616px;
-      height:310px;
+      width:630px;
+      height:230px;
       transform:translateX(-50%);
       .tip{
         position:absolute;
@@ -126,15 +251,13 @@
         width:100px;
         height:40px;
         background:rgba(0,0,0,0.6);
-        border-radius:20px;
         z-index:100;
         font-size:24px;
         color:#fff;
       }
       img{
         width:100%;
-        height:310px;
-        border-radius:20px;
+        height:100%;
         object-fit: cover;
       }
     }

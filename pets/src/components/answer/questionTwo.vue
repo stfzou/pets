@@ -6,36 +6,26 @@
     </div>
     <div class="questionBox">
       <div class="questionCnt">
-        <div class="titile">测对于他人的挑衅你会隐忍吗</div>
+        <div class="titile">{{title}}</div>
         <div class="q_text">
-          生活中遇到跟自己意见相左的人，你便会把对方列为敌人的行列吗？
+          <cube-scroll ref="scroll">
+            <p>{{question}}</p>
+          </cube-scroll>
         </div>
       </div>
       <ul class="questionList">
-        <li class="flex_r_f_s">
-          <div class="select">A</div>
-          <div class="selectText">是的</div>
-        </li>
-        <li class="flex_r_f_s">
-          <div class="select">A</div>
-          <div class="selectText">是的</div>
-        </li>
-        <li class="flex_r_f_s">
-          <div class="select">A</div>
-          <div class="selectText">是的</div>
-        </li>
-        <li class="flex_r_f_s">
-          <div class="select">A</div>
-          <div class="selectText">是的</div>
+        <li class="flex_r_f_s" v-for="item in options" @click="selectOpt(item)">
+          <div class="select">{{item.label}}</div>
+          <div class="selectText">{{item.name}}</div>
         </li>
       </ul>
     </div>
-    <div class="bannerPost">
-        <div class="tip flex_r_f_e"><span>广告</span><i class="cubeic-close"></i></div>
-        <cube-slide ref="slide" :data="items">
-          <cube-slide-item v-for="(item, index) in items" :key="index">
-            <a href="###">
-              <img src="../../assets/as_post.jpg">
+    <div class="bannerPost" v-if="isPost">
+        <div class="tip flex_r_f_e" @click="closePost"><span>广告</span><i class="cubeic-close"></i></div>
+        <cube-slide ref="slide" :data="postArr">
+          <cube-slide-item v-for="(item, index) in postArr" :key="index">
+            <a :href="item.link">
+              <img :src="item.imgAddr">
             </a>
           </cube-slide-item>
         </cube-slide>
@@ -48,13 +38,119 @@
   export default{
     data(){
       return{
-        items:[1,2,3]
+        qId:'',
+        question:'',
+        title:'',
+        letterArr:['A','B','C','D','E','F','G','H','Y'],
+        options:[],
+        postArr:[],
+        image:'',
+        isPost:true
       }
     },
+    mounted() {
+      this.getUrlData();
+      this.getQuesInfo();
+    },
+
     methods:{
       back(){
 
-      }
+      },
+      closePost(){
+        this.isPost = false;
+      },
+      link(){
+        this.$router.push({name:'answerTwo',query:{
+          a:'123',
+          b:'456'
+        }})
+      },
+      selectOpt(item){
+        let self = this;
+
+        if(item.opTnum==='1'){
+          this.$router.push({
+            name:'answerTwo',
+            query:{
+              qId:self.qId,
+              option:item.res
+            }
+          })
+        }else{
+          this.axios.get(Api.userApi + '/tasteTest/selectNextQuestion?nextQuestionId=' + item.res, {
+              headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+              }
+            }).then(function(resp) {
+              if(resp.data.code==1){
+                console.log(resp)
+                self.question = resp.data.data.question
+                self.options = [];
+                resp.data.data.options.forEach((e,index)=>{
+                  self.options.push({
+                    label:self.letterArr[index],
+                    name:e.split('_')[0],
+                    opTnum:e.split('_')[1],
+                    res:e.split('_')[2]
+                  })
+                })
+
+              }else{
+                alert(resp.data.msg)
+              }
+            }).catch(function(error) {
+              console.log(error);
+            });
+
+        }
+      },
+      getQuesInfo(){
+        let self = this;
+        this.axios.get(Api.userApi + '/tasteTest/selectQuestionById?questionId=' + this.qId, {
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded'
+            }
+          }).then(function(res) {
+            if(res.data.code==1){
+              self.question = res.data.data.question
+              self.title = res.data.data.title
+              res.data.data.options.forEach((e,index)=>{
+                self.options.push({
+                  label:self.letterArr[index],
+                  name:e.split('_')[0],
+                  opTnum:e.split('_')[1],
+                  res:e.split('_')[2]
+                })
+              })
+              self.postArr = res.data.data.ads;
+            }
+          }).catch(function(error) {
+            console.log(error);
+          });
+      },
+      getUrlData() {// 截取url中的数据
+
+        let tempStr = window.location.href;
+         /**
+          * tempArr 是一个字符串数组 格式是["key=value", "key=value", ...]
+          */
+         let returnArr = {};
+         let urlArr = tempStr.split('?');
+         if(urlArr){
+           urlArr.forEach((e)=>{
+
+               if(e.indexOf('=')>-1){
+
+                 returnArr[e.split('=')[0]] = e.split('=')[1];
+               }
+
+           })
+         }
+        /*输出日志*/
+        this.qId = returnArr.qId;
+        console.log(this.qId)
+       },
     }
   }
 </script>
@@ -105,30 +201,36 @@
         background:url('../../assets/question_02.png') no-repeat 0 center;
         background-size:100%;
         .titile{
-          padding:150px 50px 0 50px;
-          text-align:center;
+          padding:120px 50px 0 80px;
+          line-height:40px;
           font-weight:bold;
           font-size:30px;
           color:#333;
         }
         .q_text{
           text-align:left;
-          padding:50px 50px 0 50px;
+          height:210px;
           font-size:26px;
           color:#333;
-          line-height:48px;
+          p{
+            padding:20px 50px 0 80px;
+            line-height:34px;
+          }
         }
 
       }
       .questionList{
         padding:60px 34px 0 44px;
+        box-sizing:border-box;
+        flex-wrap:wrap;
         li{
-          background:url('../../assets/select_bg_02.png') no-repeat 0 center;
-          background-size:cover;
-          height:160px;
-          padding-left:66px;
+          // background:url('../../assets/select_bg_02.png') no-repeat 0 center;
+          background:#fff;
+          background-size:100%;
+          height:80px;
+          padding-left:10px;
           box-sizing:border-box;
-          border-radius:10px;
+          border-radius:30px;
           margin-bottom:40px;
           overflow:hidden;
           .select{
@@ -140,6 +242,7 @@
             margin-left:40px;
             font-size:26px;
             color:#000;
+            line-height:34px;
           }
         }
       }
@@ -148,8 +251,8 @@
       position:fixed;
       left:50%;
       bottom:30px;
-      width:616px;
-      height:310px;
+      width:630px;
+      height:230px;
       transform:translateX(-50%);
       .tip{
         position:absolute;
@@ -158,15 +261,14 @@
         width:100px;
         height:40px;
         background:rgba(0,0,0,0.6);
-        border-radius:20px;
+
         z-index:100;
         font-size:24px;
         color:#fff;
       }
       img{
         width:100%;
-        height:310px;
-        border-radius:20px;
+        height:230px;
         object-fit: cover;
       }
     }

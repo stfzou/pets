@@ -9,15 +9,15 @@
         <div class="titile">{{question}}</div>
         <img class="questionImg" :src="image" alt="">
         <div class="questionListBox">
-          <cube-scroll ref="scroll">
-            <ul class="questionList">
-              <li class="flex_r_s_b" v-for="item in options">
+
+            <ul class="questionList flex_r_s_b">
+              <li class="flex_r_s_b" v-for="item in options" @click="selectOpt(item)">
                 <div class="select">{{item.label}}</div>
                 <div class="selectText">{{item.name}}</div>
               </li>
 
             </ul>
-          </cube-scroll>
+
         </div>
 
       </div>
@@ -40,7 +40,6 @@
   export default{
     data(){
       return{
-        items:[1,2,3],
         qId:'',
         question:'',
         letterArr:['A','B','C','D','E','F','G','H','Y'],
@@ -61,6 +60,44 @@
       closePost(){
         this.isPost = false;
       },
+      selectOpt(item){
+        let self = this;
+        if(item.opTnum==='1'){
+          this.$router.push({
+            name:'answerOne',
+            query:{
+              qId:self.qId,
+              option:item.res
+            }
+          })
+        }else{
+          this.axios.get(Api.userApi + '/tasteTest/selectNextQuestion?nextQuestionId=' + item.res, {
+              headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+              }
+            }).then(function(resp) {
+              if(resp.data.code==1){
+                console.log(resp)
+                self.question = resp.data.data.question
+                self.options = [];
+                resp.data.data.options.forEach((e,index)=>{
+                  self.options.push({
+                    label:self.letterArr[index],
+                    name:e.split('_')[0],
+                    opTnum:e.split('_')[1],
+                    res:e.split('_')[2]
+                  })
+                })
+
+              }else{
+                alert(resp.data.msg)
+              }
+            }).catch(function(error) {
+              console.log(error);
+            });
+
+        }
+      },
       getQuesInfo(){
         let self = this;
         this.axios.get(Api.userApi + '/tasteTest/selectQuestionById?questionId=' + this.qId, {
@@ -73,7 +110,9 @@
               res.data.data.options.forEach((e,index)=>{
                 self.options.push({
                   label:self.letterArr[index],
-                  name:e.split('_')[0]
+                  name:e.split('_')[0],
+                  opTnum:e.split('_')[1],
+                  res:e.split('_')[2]
                 })
               })
               self.postArr = res.data.data.ads;
@@ -162,25 +201,28 @@
           color:#333;
         }
         .questionImg{
-          width:400px;
+          max-width:400px;
+          max-height:200px;
           display:block;
           margin:60px auto 0 auto;
         }
         .questionListBox{
 
-          height:420px;
+          height:500px;
         }
         .questionList{
           padding:50px 72px 0 72px;
-
+          flex-wrap:wrap;
+          box-sizing:border-box;
           li{
             background:#ffb80f;
             height:60px;
             border-radius:10px;
             margin-bottom:40px;
             overflow:hidden;
+            width:35%;
             .select{
-              width:10%;
+              width:30%;
               height:60px;
               line-height:60px;
               padding-left:20px;
@@ -189,7 +231,7 @@
               color:#000;
             }
             .selectText{
-              width:90%;
+              width:70%;
               height:60px;
               line-height:60px;
               background:#fff5dd;
@@ -207,9 +249,9 @@
       position:fixed;
       z-index:100;
       left:50%;
-      bottom:30px;
-      width:616px;
-      height:310px;
+      bottom:10px;
+      width:630px;
+      height:230px;
       transform:translateX(-50%);
       .tip{
         position:absolute;
@@ -218,15 +260,14 @@
         width:100px;
         height:40px;
         background:rgba(0,0,0,0.6);
-        border-radius:20px;
         z-index:100;
         font-size:24px;
         color:#fff;
       }
       img{
         width:100%;
-        height:310px;
-        border-radius:20px;
+        height:100%;
+
         object-fit: cover;
       }
     }
