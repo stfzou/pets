@@ -1,6 +1,21 @@
 <template>
 	<div class="activity_warp">
 		<DownApp v-on:closeDown="closeDown" v-show="isDown"></DownApp>
+    <div class="couponListDialog flex_r_s_c" @click.stop="dailongHide" v-show="isDialong">
+      <div class="dialongCnt" @click.stop>
+        <div class="dialongCntTop">
+          <div class="title">
+            您暂不能参加此次活动
+          </div>
+          <p>仅限骨米卡特权会员预定，开通骨米卡优选俱乐部会员即可享受特权优惠权益</p>
+        </div>
+        <div class="btnBox flex_r_s_b">
+          <div class="cancelBtn flex_r_s_c" @click="dailongHide">取消</div>
+          <div class="okBtn flex_r_s_c" @click="guCardLink">查看权益</div>
+        </div>
+      </div>
+
+    </div>
 		<div class="top_nav flex_r_s_b" :class="{active_nav:isActiveColor}">
 			<div class="back" @click="back"></div>
 			<div class="nav_title">{{activityTitle}}</div>
@@ -14,6 +29,7 @@
 		</div>
 		<div class="activity_info">
 			<div class="activity_name">{{activityTitle}}</div>
+      <div class="gumi" v-if="isPrivilege===1">骨米卡专享</div>
 			<div class="footprint">
 				<span>浏览{{browse}}条</span>
 				<span>收藏{{keep}}条</span>
@@ -124,6 +140,7 @@
 			let self = this;
 			return {
 				evalList:[],
+        isDialong:false,
         isCntImg:true,
 				msg:'',
         minPrice:0,
@@ -137,6 +154,7 @@
 				commentNum:'',
         isComment:false,
 				keep:'',
+        isPrivilege:'',
 				activityAddr:'',
 				endTime:'',
 				startTime:'',
@@ -188,7 +206,44 @@
 
 		},
 		methods:{
-      
+      guCardLink(){
+        this.$router.push({
+          name:'gumiCard'
+        })
+      },
+      dailongShow() {
+        this.isDialong = true;
+      },
+      dailongHide() {
+        this.isDialong = false;
+
+      },
+      getCardState(){
+        let self = this;
+        self.axios.post(Api.userApi + '/boneMika/selectUserBoneMikaStatus', self.qs.stringify({//查询骨米卡状态
+          userId: self.uId
+        }), {
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+          }
+        }).then((re) => {
+
+          if(re.data.code ===1){
+            if(re.data.data===1){
+              self.$router.push({
+              	name:'selectCoupon'
+              })
+            }else{
+              self.isDialong = true;
+            }
+
+
+          }else{
+            alert(re.data.msg)
+          }
+
+        })
+      },
       commentShow(){
         if(this.isComment){
           this.isComment = false;
@@ -330,6 +385,7 @@
 				}).then((res)=>{
 					if(res.data.code == 1){
 						console.log(res)
+            self.isPrivilege = res.data.data.isPrivilege;
 						self.mainImg = res.data.data.activityCover;
 						self.activityTitle = res.data.data.activityTitel;
 						self.browse = res.data.data.browse;
@@ -621,9 +677,7 @@
 					 }).show()
 
 				}else{
-					this.$router.push({
-						name:'selectCoupon'
-					})
+					this.getCardState();
 				}
 
 			},
@@ -647,6 +701,52 @@
 	.activity_warp{
     background: #fff;
     padding-bottom: 200px;
+    .couponListDialog {
+      position: fixed;
+      height: 100%;
+      width: 100%;
+      left: 0;
+      top: 0;
+      z-index: 10000;
+      background: rgba(0, 0, 0, 0.6);
+      .dialongCnt{
+        width: 600px;
+        background: #fff;
+        padding-top: 50px;
+        border-radius: 10px;
+        .dialongCntTop{
+          .title{
+            font-size: 30px;
+            color: #000;
+            font-weight:bold;
+            text-align: center;
+          }
+          p{
+            color: #666;
+            font-size: 28px;
+            font-weight: bold;
+            padding: 50px 30px 0 30px;
+            text-align: center;
+            line-height: 34px;
+          }
+        }
+        .btnBox {
+          box-sizing: border-box;
+          padding: 30px 0;
+          div {
+            width: 50%;
+            height: 70px;
+            font-size: 30px;
+            box-sizing: border-box;
+            color: #ff523d;
+          }
+          .cancelBtn {
+            color: #333;
+          }
+        }
+      }
+
+    }
 		.line{
 			height: 10px;
 			background: #e8e8e8;
@@ -722,6 +822,17 @@
 		}
 		.activity_info{
 			padding: 30px;
+      .gumi{
+        width:180px;
+        height:30px;
+        border-radius:30px;
+        background:#ff523d;
+        color:#fff;
+        font-size:24px;
+        line-height:30px;
+        text-align:center;
+        margin:10px 0;
+      }
 			.activity_name{
 				font-size: 32px;
         line-height: 40px;

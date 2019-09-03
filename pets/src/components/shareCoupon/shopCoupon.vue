@@ -10,7 +10,7 @@
         </div>
         <div class="btnBox flex_r_s_b">
           <div class="cancelBtn flex_r_s_c" @click="dailongHide">取消</div>
-          <div class="okBtn flex_r_s_c" @click="guCardLink">确定</div>
+          <div class="okBtn flex_r_s_c" @click="guCardLink">查看权益</div>
         </div>
       </div>
       <div class="payBox" @click.stop v-show="isDialongCnt">
@@ -58,7 +58,7 @@
 		<div class="couponListBox">
 
 			<ul>
-				<li class="flex_r_s_b" v-for="item in couponList">
+				<li class="flex_r_s_b" v-for="(item,index) in couponList" :key="index">
 
           <img v-if="item.couponType===3" class="privilege" src="../../assets/icon_gu30@3x.png" alt="">
           <img v-if="item.couponType===2" class="privilege" src="../../assets/icon_gu32@3x.png" alt="">
@@ -80,12 +80,15 @@
 					</div>
 					<div class="list_r">
 						<div class="sale">
-              <span v-if="item.conditionPrice===0">￥{{item.couponPrice}}</span>
-              <span v-if="item.conditionPrice!==0">￥{{item.conditionPrice}}</span>
+              <span v-if="item.conditionPrice!==0&&item.couponType===1">￥{{item.couponPrice|keepFloat}}</span>
+              <span v-if="item.conditionPrice!==0&&item.couponType!==1">￥{{item.conditionPrice|keepFloat}}</span>
+              <span  v-if="item.conditionPrice==0">￥{{item.couponPrice|keepFloat}}</span>
             </div>
 						<div class="condition">
-							<span v-if="item.conditionPrice!==0">原价:<span class="through">{{item.couponPrice}}</span></span>
-							<span class="activeColor" v-if="item.conditionPrice==0">无门槛</span>
+
+              <span v-if="item.conditionPrice!==0&&item.couponType===1">满<span>{{item.couponPrice|keepFloat}}</span>元使用</span>
+              <span v-if="item.conditionPrice!==0&&item.couponType!=1">原价:<span class="through">{{item.couponPrice|keepFloat}}</span></span>
+							<span v-if="item.conditionPrice==0">无门槛使用</span>
 						</div>
 						<div class="makeTime">{{item.couponEndTime}}前有效</div>
 						<div class="receiveBtnBox">
@@ -95,9 +98,11 @@
              <div v-if="item.isReceive==0&&item.conditionPrice==0&&item.circulation>item.receiveNum" class="receiveBtn receivedBtn flex_r_s_c">已领取</div>
              <div v-if="item.isReceive==0&&item.conditionPrice!=0&&item.circulation>item.receiveNum" class="receiveBtn receivedBtn flex_r_s_c">已购买</div>
              <div v-if="item.circulation==item.receiveNum" class="receiveBtn receivedBtn flex_r_s_c">已领完</div>
-             <div @click="receive(item)" v-if="item.isReceive!=0&&item.conditionPrice==0" class="receiveBtn flex_r_s_c">立即领取</div>
-             <div @click="receive(item)" v-if="item.isReceive!=0&&item.conditionPrice!=0" class="receiveBtn flex_r_s_c">立即购买</div>
-						</div>
+             <div @click="receive(item)" v-if="item.isReceive!=0&&item.conditionPrice==0&&item.couponType!=1" class="receiveBtn flex_r_s_c">立即领取</div>
+             <div @click="receive(item)" v-if="item.isReceive!=0&&item.conditionPrice==0&&item.couponType==1" class="receiveBtn flex_r_s_c">立即领取</div>
+             <div @click="receive(item)" v-if="item.isReceive!=0&&item.conditionPrice!=0&&item.couponType!=1" class="receiveBtn flex_r_s_c">立即购买</div>
+
+            </div>
             <div v-if="item.isReceive!=0&&item.conditionPrice!=0&&item.shopTotalNum>item.receiveNum">123</div>
 					</div>
 					<img v-if="item.circulation==item.receiveNum" class="imprint" src="../../assets/receiveEnd.png" alt="">
@@ -193,20 +198,22 @@
 		},
     filters:{
       descFilter(val){
-        if(val.length>14){
-          return val.substr(0,16)+'...'
+        if(val.length>15){
+          return val.substr(0,15)+'...'
         }else{
           return val
         }
       },
       distanceFilter(val){
         return parseFloat(val.substring(3))
+      },
+      keepFloat(val){
+        return parseFloat(val).toFixed(1);
       }
 
     },
 		mounted() {
-      wxapi.wxRegister(this.wxRegCallback)
-      this.getEnvironment();
+      //this.getEnvironment();
 			if(JSON.parse(localStorage.getItem('user')) == null){
 				// this.$store.commit('setRouterName','activity');
 				this.uId = '';
@@ -218,63 +225,7 @@
 
 		},
 		methods:{
-      wxRegCallback () {
-        // 用于微信JS-SDK回调
-        this.wxShareTimeline()
-        this.wxShareAppMessage()
-      },
-      wxShareTimeline () {
-        // 微信自定义分享到朋友圈
 
-        let option = {
-          title: '限时团购周 挑战最低价', // 分享标题, 请自行替换
-          link: window.location.href.split('#')[0], // 分享链接，根据自身项目决定是否需要split
-          //imgUrl: 'logo.png', // 分享图标, 请自行替换，需要绝对路径
-          success: () => {
-            alert('分享成功')
-          },
-          error: () => {
-            alert('已取消分享')
-          }
-        }
-        // 将配置注入通用方法
-        wxapi.ShareTimeline(option)
-      },
-      wxShareAppMessage () {
-        // 微信自定义分享给朋友
-        let option = {
-          title: '限时团购周 挑战最低价', // 分享标题, 请自行替换
-          desc: '限时团购周 挑战最低价', // 分享描述, 请自行替换
-          link:window.location.href.split('#')[0], // 分享链接，根据自身项目决定是否需要split
-          //imgUrl: 'logo.png', // 分享图标, 请自行替换，需要绝对路径
-          success: () => {
-            alert('分享成功')
-          },
-          error: () => {
-            alert('已取消分享')
-          }
-        }
-        // 将配置注入通用方法
-        wxapi.ShareAppMessage(option)
-      },
-      qqShareMsg(){
-        //分享给QQ好友
-        let option = {
-          title: '限时团购周 挑战最低价', // 分享标题, 请自行替换
-          desc: '限时团购周 挑战最低价', // 分享描述, 请自行替换
-          link:window.location.href.split('#')[0], // 分享链接，根据自身项目决定是否需要split
-          //imgUrl: 'logo.png', // 分享图标, 请自行替换，需要绝对路径
-          success: () => {
-            alert('分享成功')
-          },
-          error: () => {
-            alert('已取消分享')
-          }
-        }
-        // 将配置注入通用方法
-        wxapi.ShareQQMessage(option)
-
-      },
 			back() {
 				this.$router.go(-1); //返回上一层
 			},
@@ -333,6 +284,7 @@
             'Content-Type': 'application/x-www-form-urlencoded'
           }
         }).then((re) => {
+
           if(re.data.code ===1){
             if(re.data.data===1&&item.conditionPrice!=0){
               self.isDialong = true;
@@ -396,6 +348,19 @@
 				}).then((res)=>{
 					if(res.data.code == 1){
             console.log(res.data.data)
+            let option = {
+              title: res.data.data.shopName+'的优惠券来袭啦', // 分享标题, 请自行替换
+              desc:'你附近的'+res.data.data.shopName+'发布了一大波优惠信息,快来看看吧~',
+              link: window.location.href, // 分享链接，根据自身项目决定是否需要split
+              imgUrl:res.data.data.shopCoupons[0].couponIcan, // 分享图标, 请自行替换，需要绝对路径
+              success: () => {
+                alert('分享成功')
+              },
+              error: () => {
+                alert('已取消分享')
+              }
+            }
+            wxapi.wxRegister(option)
 						self.shopName = res.data.data.shopName;
 						self.shopImgAddr = res.data.data.shopImgAddr;
 						self.shopAddress = res.data.data.shopAddress;
@@ -519,7 +484,7 @@
                   self.$router.push({
                     name:'wxWhitePage',
                     params:{
-                      wxPayBackUrl:window.location.href
+                      wxPayBackUrl:'http://app.gutouzu.com/index.html#/shopCoupon?shopId='+self.shopId
                     }
                   })
                 }, 500)
@@ -530,7 +495,7 @@
                   self.$router.push({
                     name:'wxWhitePage',
                     params:{
-                      wxPayBackUrl:window.location.href
+                      wxPayBackUrl:'http://app.gutouzu.com/index.html#/shopCoupon?shopId='+self.shopId
                     }
                   })
                 }, 500)
@@ -571,7 +536,7 @@
                 name:'payRes',
                 query:{
                   out_trade_no:res.data.data.out_trade_no,
-                  backUrl:window.location.href,
+                  backUrl:'http://app.gutouzu.com/index.html#/shopCoupon?shopId='+self.shopId,
                   orderApi:'/couponOrder/selectCouponOrderStatus'
                 }
               })
@@ -631,15 +596,19 @@
 					}).show()
 
 				}else if(item.couponType==2&&item.conditionPrice!=0){
+
 			    this.payPrice = item.conditionPrice;
 			    this.isDialong = true;
+          this.isDialongCnt = true;
 			    this.couponId = item.couponId;
 			  }else if(item.couponType==3){
+
 			    this.getCardState(item)
 
 			    // this.payPrice = item.conditionPrice;
 			    // this.isDialong = true;
 			  }else{
+
 			    this.receiveCoupon(item)
 
 				}
@@ -888,7 +857,7 @@
             z-index: 100;
           }
 					.list_l{
-						width: 430px;
+						width: 450px;
 						.listLeftTop{
 							align-items:flex-start;
 							img{
@@ -897,7 +866,8 @@
 								border-radius: 10px;
 							}
 							.couponNameBox{
-								width: 220px;
+								width: 240px;
+                margin-left:10px;
 								.couponName{
 									font-size: 28px;
 									color: #000;
@@ -949,8 +919,10 @@
 						}
 					}
 					.list_r{
+            width: 200px;
+
 						.sale{
-							font-size: 50px;
+							font-size: 38px;
 							color: #ff523d;
 							text-align: center;
 						}
@@ -964,6 +936,7 @@
 							font-size: 22px;
 							color: #999;
 							padding-top: 20px;
+              text-align:center;
 						}
 						.receiveBtnBox{
 							padding-top: 12px;

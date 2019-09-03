@@ -14,8 +14,8 @@
           <p>仅限骨米卡特权会员预定，开通骨米卡优选俱乐部会员即可享受特权优惠权益</p>
         </div>
         <div class="btnBox flex_r_s_b">
-          <div class="cancelBtn flex_r_s_c" @click="guCardLink">¥{{payPrice}}单价购买</div>
-          <div class="okBtn flex_r_s_c" @click="guCardLink">确定</div>
+          <div class="cancelBtn flex_r_s_c" @click="dailongHide">取消</div>
+          <div class="okBtn flex_r_s_c" @click="guCardLink">查看权益</div>
         </div>
       </div>
       <div class="payBox" @click.stop v-show="isDialongCnt">
@@ -68,8 +68,18 @@
           </div>
 					<p>{{couponDesc}}</p>
           <div class="saleBox">
-            <div class="sale"><span v-if="conditionPrice===0">￥{{couponPrice}}</span><span v-else>￥{{conditionPrice}}</span></div>
-            <div class="condition"><span class="activeColor" v-if="conditionPrice===0">无门槛</span><span v-else>原价:<span class="through activeColor">{{couponPrice}}</span></span></div>
+            <div class="sale">
+              <span v-if="conditionPrice!==0&&couponType===1">￥{{couponPrice|keepFloat}}</span>
+              <span v-if="conditionPrice!==0&&couponType!==1">￥{{conditionPrice|keepFloat}}</span>
+              <span  v-if="conditionPrice==0">￥{{couponPrice|keepFloat}}</span>
+
+
+            </div>
+            <div class="condition">
+              <span v-if="conditionPrice===0">无门槛使用</span>
+              <span v-if="couponType!==1&&conditionPrice!==0">原价:<span class="through">{{couponPrice|keepFloat}}</span></span>
+              <span v-if="couponType===1&&conditionPrice!==0">满{{conditionPrice|keepFloat}}元使用</span>
+            </div>
 
           </div>
 
@@ -78,8 +88,9 @@
             <div v-if="isReceive==0&&conditionPrice==0&&circulation>receiveNum" class="receiveBtn receivedBtn flex_r_s_c">已领取</div>
             <div v-if="isReceive==0&&conditionPrice!=0&&circulation>receiveNum" class="receiveBtn receivedBtn flex_r_s_c">已购买</div>
             <div v-if="circulation==receiveNum" class="receiveBtn receivedBtn flex_r_s_c">已领完</div>
-            <div @click="receiveBtn" v-if="isReceive!=0&&conditionPrice==0" class="receiveBtn flex_r_s_c">立即领取</div>
-            <div @click="receiveBtn" v-if="isReceive!=0&&conditionPrice!=0" class="receiveBtn flex_r_s_c">立即购买</div>
+            <div @click="receiveBtn" v-if="isReceive!=0&&conditionPrice==0&&couponType===1" class="receiveBtn flex_r_s_c">立即领取</div>
+            <div @click="receiveBtn" v-if="isReceive!=0&&conditionPrice==0&&couponType!==1" class="receiveBtn flex_r_s_c">立即领取</div>
+            <div @click="receiveBtn" v-if="isReceive!=0&&conditionPrice!=0&&couponType!==1" class="receiveBtn flex_r_s_c">立即购买</div>
 					</div>
           <div class="receiveNum">已领取{{receiveNum}}张</div>
 				</div>
@@ -160,14 +171,15 @@
 					</div>
 					<div class="list_r">
 						<div class="sale">
-
-              <span v-if="item.conditionPrice===0">￥{{item.couponPrice}}</span>
-              <span v-if="item.conditionPrice!==0">￥{{item.conditionPrice}}</span>
-
+              <span v-if="item.conditionPrice!==0&&item.couponType===1">￥{{item.couponPrice|keepFloat}}</span>
+              <span v-if="item.conditionPrice!==0&&item.couponType!==1">￥{{item.conditionPrice|keepFloat}}</span>
+              <span  v-if="item.conditionPrice==0">￥{{item.couponPrice|keepFloat}}</span>
             </div>
 						<div class="condition">
-							<span v-if="item.conditionPrice!==0">原价:<span class="through">{{item.couponPrice}}</span></span>
-              <span class="activeColor" v-if="item.conditionPrice==0">无门槛</span>
+              <span v-if="item.conditionPrice!==0&&item.couponType===1">满<span>{{item.conditionPrice|keepFloat}}</span>元使用</span>
+              <span v-if="item.conditionPrice!==0&&item.couponType!=1">原价:<span class="through">{{item.couponPrice|keepFloat}}</span></span>
+
+              <span  v-if="item.conditionPrice==0">无门槛使用</span>
 						</div>
 						<div class="makeTime">{{item.couponEndTime}}前有效</div>
 						<div class="receiveBtnBox">
@@ -175,9 +187,11 @@
              <div v-if="item.isReceive==0&&item.conditionPrice==0&&item.circulation>item.receiveNum" class="receiveBtn receivedBtn flex_r_s_c">已领取</div>
              <div v-if="item.isReceive==0&&item.conditionPrice!=0&&item.circulation>item.receiveNum" class="receiveBtn receivedBtn flex_r_s_c">已购买</div>
              <div v-if="item.circulation==item.receiveNum" class="receiveBtn receivedBtn flex_r_s_c">已领完</div>
-             <div @click="receive(item)" v-if="item.isReceive!=0&&item.conditionPrice==0" class="receiveBtn flex_r_s_c">立即领取</div>
-             <div @click="receive(item)" v-if="item.isReceive!=0&&item.conditionPrice!=0" class="receiveBtn flex_r_s_c">立即购买</div>
-						</div>
+             <div @click="receive(item)" v-if="item.isReceive!=0&&item.conditionPrice==0&&item.couponType!=1" class="receiveBtn flex_r_s_c">立即领取</div>
+             <div @click="receive(item)" v-if="item.isReceive!=0&&item.conditionPrice==0&&item.couponType==1" class="receiveBtn flex_r_s_c">立即领取</div>
+             <div @click="receive(item)" v-if="item.isReceive!=0&&item.conditionPrice!=0&&item.couponType!=1" class="receiveBtn flex_r_s_c">立即购买</div>
+
+            </div>
 
 					</div>
 					<img v-if="item.circulation==item.receiveNum" class="imprint" src="../../assets/receiveEnd.png" alt="">
@@ -196,6 +210,7 @@
 </template>
 
 <script>
+  import wxapi from '../common/wxapi.js'
 	import Api from '../common/apj.js'
 	export default{
 		data(){
@@ -204,6 +219,7 @@
 				lng:0,
 				lat:0,
 				uId:'',
+        couponType:'',
         shopId:'',
         receiveNum:'',
         isDialong:false,
@@ -301,6 +317,9 @@
         }else{
           return val
         }
+      },
+      keepFloat(val){
+        return parseFloat(val).toFixed(1);
       }
     },
 		methods:{
@@ -481,7 +500,7 @@
                   self.$router.push({
                     name:'wxWhitePage',
                     params:{
-                      wxPayBackUrl:window.location.href
+                      wxPayBackUrl:'http://app.gutouzu.com/index.html#/couponXq?couponId='+item.couponId
                     }
                   })
                 }, 500)
@@ -491,7 +510,7 @@
                   self.$router.push({
                     name:'wxWhitePage',
                     query:{
-                      wxPayBackUrl:window.location.href
+                      wxPayBackUrl:'http://app.gutouzu.com/index.html#/couponXq?couponId='+item.couponId
                     }
                   })
                 }, 500)
@@ -570,12 +589,7 @@
 
 			},
       couponXqLink(item){
-      	this.$router.push({
-      		name:'wxWhitePage',
-      		params:{
-      			wxPayBackUrl:'http://192.168.0.143:8081/couponXq?couponId='+item.couponId
-      		}
-      	})
+        window.location.href = 'http://app.gutouzu.com/index.html#/couponXq?couponId='+item.couponId
       },
 			onPullingUp(){
 				//加载
@@ -674,7 +688,21 @@
 						self.couponName = res.data.data.couponName;
             self.receiveNum = res.data.data.receiveNum;
             self.circulation = res.data.data.circulation;
+            self.couponType = res.data.data.couponType;
             self.shopId = res.data.data.shopId;
+            let option = {
+              title: res.data.data.shopName+'分享的优惠券', // 分享标题, 请自行替换
+              desc:'附近的'+res.data.data.shopName+'给您分享了一张'+res.data.data.couponName+'优惠券信息，快来领取吧',
+              link: window.location.href, // 分享链接，根据自身项目决定是否需要split
+              imgUrl:res.data.data.couponIcan, // 分享图标, 请自行替换，需要绝对路径
+              success: () => {
+                alert('分享成功')
+              },
+              error: () => {
+                alert('已取消分享')
+              }
+            }
+            wxapi.wxRegister(option)
             self.couponIcan.push(res.data.data.couponIcan)
             if(res.data.data.couponIcanA!=''){
               self.couponIcan.push(res.data.data.couponIcanA)
@@ -741,6 +769,7 @@
 				}else if(item.couponType==2&&item.conditionPrice!=0){
           this.payPrice = item.conditionPrice;
           this.isDialong = true;
+          this.isDialongCnt = true;
           this.couponId = item.couponId;
         }else if(item.couponType==3){
           this.getCardState(item)
@@ -786,9 +815,7 @@
     .through{
       text-decoration:line-through;
     }
-    .activeColor{
-      color: #ff523d;
-    }
+
     .couponListDialog {
       position: fixed;
       height: 100%;
@@ -974,6 +1001,7 @@
             //   color: #ff523d;
             // }
           }
+
           .imgBox{
             width: 178px;
             height: 178px;
@@ -987,7 +1015,7 @@
 
 					}
 					.couponName{
-						text-align: left;
+						text-align:center;
 						color: #000;
 						font-size: 28px;
             font-weight:800;
@@ -1005,7 +1033,7 @@
             position:relative;
           }
 					.sale{
-						font-size: 50px;
+						font-size: 38px;
 						color: #ff523d;
             text-align:center;
 					}
@@ -1013,10 +1041,13 @@
 						font-size: 24px;
 						color: #999;
             position:absolute;
-            right:90px;
+            right:60px;
             top:50%;
             transform:translate(0,-50%);
 					}
+          .activeColor{
+            color:#ff523d;
+          }
 					.receiveBtnBox{
 						padding-top: 40px;
 						.receiveBtn{
@@ -1135,7 +1166,7 @@
             z-index: 100;
           }
 					.list_l{
-						width: 430px;
+						width: 450px;
 						.listLeftTop{
 							align-items:flex-start;
 							img{
@@ -1144,7 +1175,7 @@
 								border-radius: 10px;
 							}
 							.couponNameBox{
-								width: 220px;
+								width: 240px;
 								.couponName{
 									font-size: 28px;
 									color: #000;
@@ -1201,10 +1232,11 @@
 						}
 					}
 					.list_r{
+            width:200px;
 						.sale{
-							font-size: 50px;
-							color: #ff523d;
+							font-size: 38px;
 							text-align: center;
+              color:#ff523d;
 						}
 						.condition{
 							// color: #ff523d;

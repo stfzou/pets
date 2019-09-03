@@ -290,6 +290,9 @@
 		padding-bottom:116px;
 		background: #f5f5f5;
 		box-sizing: border-box;
+    height:100%;
+    box-sizing:border-box;
+    overflow:auto;
 		.top_nav {
 			padding: 0 20px;
 			height: 88px;

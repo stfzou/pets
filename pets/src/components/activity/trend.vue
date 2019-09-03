@@ -46,8 +46,8 @@
 				<div class="follow flex_r_s_c" @click="follow" v-if="isFocus == 0">+关注</div>
 				<div class="follow flex_r_s_c" @click="cancelFollow" v-else>取消关注</div>
 			</div>
-			<div class="text_cnt">
-				{{content}}
+			<div class="text_cnt" v-html="content">
+				
 			</div>
 			<div class="trend_img" v-show="compressImages!=''">
 				<!-- <img :src="item" alt="" v-for="(item,index) in images" :key="index"> -->
@@ -374,6 +374,7 @@
 						self.userHeadImage = res.data.data.userHeadImage;
 						// self.content = res.data.data.content;
 						self.content = self.decodeUnicode(res.data.data.content);
+            self.content = self.content.replace(/[\n\r]/g,'<br>')
 						self.likeCount = res.data.data.likeCount;
 						self.likeData = res.data.data.likeUserHeadImages;
 						self.isFocus = res.data.data.isFocus;

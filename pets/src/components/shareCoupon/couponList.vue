@@ -104,21 +104,25 @@
 					</div>
 					<div class="list_r">
 						<div class="sale">
-              <span v-if="item.conditionPrice===0">￥{{item.couponPrice}}</span>
-              <span v-if="item.conditionPrice!==0">￥{{item.conditionPrice}}</span>
+              <span v-if="item.conditionPrice!==0&&item.couponType===1">￥{{item.couponPrice|keepFloat}}</span>
+              <span v-if="item.conditionPrice!==0&&item.couponType!==1">￥{{item.conditionPrice|keepFloat}}</span>
+              <span  v-if="item.conditionPrice==0">￥{{item.couponPrice|keepFloat}}</span>
              </div>
 						<div class="condition">
-							<span v-if="item.conditionPrice!==0">原价:<span class="through">{{item.couponPrice}}</span></span>
-							<span v-if="item.conditionPrice==0" class="activeColor">无门槛</span>
+              <span v-if="item.conditionPrice!==0&&item.couponType===1">满<span>{{item.couponPrice|keepFloat}}</span>元使用</span>
+							<span v-if="item.conditionPrice!==0&&item.couponType!=1">原价:<span class="through">{{item.couponPrice|keepFloat}}</span></span>
+							<span v-if="item.conditionPrice==0">无门槛</span>
 						</div>
 						<div class="makeTime">{{item.couponEndTime}}前有效</div>
 						<div class="receiveBtnBox">
 							<div v-if="item.isReceive==0&&item.conditionPrice==0&&item.circulation>item.receiveNum" class="receiveBtn receivedBtn flex_r_s_c">已领取</div>
               <div v-if="item.isReceive==0&&item.conditionPrice!=0&&item.circulation>item.receiveNum" class="receiveBtn receivedBtn flex_r_s_c">已购买</div>
               <div v-if="item.circulation==item.receiveNum" class="receiveBtn receivedBtn flex_r_s_c">已领完</div>
-							<div @click="receive(item)" v-if="item.isReceive!=0&&item.conditionPrice==0" class="receiveBtn flex_r_s_c">立即领取</div>
-              <div @click="receive(item)" v-if="item.isReceive!=0&&item.conditionPrice!=0" class="receiveBtn flex_r_s_c">立即购买</div>
-						</div>
+							<div @click="receive(item)" v-if="item.isReceive!=0&&item.conditionPrice==0&&item.couponType!=1" class="receiveBtn flex_r_s_c">立即领取</div>
+							<div @click="receive(item)" v-if="item.isReceive!=0&&item.conditionPrice==0&&item.couponType==1" class="receiveBtn flex_r_s_c">立即领取</div>
+							<div @click="receive(item)" v-if="item.isReceive!=0&&item.conditionPrice!=0&&item.couponType!=1" class="receiveBtn flex_r_s_c">立即购买</div>
+
+            </div>
 						<div class="saleNum">商家共{{item.shopTotalNum}}种优惠券</div>
            <!-- <div v-if="item.isReceive!==0&&(item.shopTotalNum!=item.receiveNum)">123</div> -->
 					</div>
@@ -137,6 +141,7 @@
 </template>
 
 <script>
+  import wxapi from '../common/wxapi.js'
 	import Api from '../common/apj.js'
 	export default{
 		data(){
@@ -233,6 +238,7 @@
 			}
 		},
 		mounted() {
+
       this.getEnvironment();
 			if(JSON.parse(localStorage.getItem('user')) == null){
 				// this.$store.commit('setRouterName','activity');
@@ -240,7 +246,7 @@
 			}else{
 				this.uId = JSON.parse(localStorage.getItem('user')).userId;
 			}
-      this.getEnvironment();
+
       this.getCouponType();
 			this.getCouponList();
 		},
@@ -251,6 +257,9 @@
         }else{
           return val
         }
+      },
+      keepFloat(val){
+        return parseFloat(val).toFixed(1);
       }
     },
 		methods:{
@@ -276,6 +285,19 @@
 					if(res.data.code == 1){
 						setTimeout(()=>{
               self.couponList = res.data.data;
+              let option = {
+                title:'一大波宠物商家的优惠活动来袭啦!!', // 分享标题, 请自行替换
+                desc:'您附近的宠物商家刚刚发布了优惠活动，快来看看吧~',
+                link: window.location.href, // 分享链接，根据自身项目决定是否需要split
+                imgUrl:res.data.data[0].couponIcan, // 分享图标, 请自行替换，需要绝对路径
+                success: () => {
+                  alert('分享成功')
+                },
+                error: () => {
+                  alert('已取消分享')
+                }
+              }
+              wxapi.wxRegister(option)
               console.log(self.couponList)
               self.couponList.forEach((e)=>{
               	e.styleObj = {
@@ -564,6 +586,7 @@
 				}else if(item.couponType==2&&item.conditionPrice!=0){
           this.payPrice = item.conditionPrice;
           this.isDialong = true;
+          this.isDialongCnt = true;
           this.couponId = item.couponId;
         }else if(item.couponType==3){
           this.getCardState(item)
@@ -623,6 +646,7 @@
           }
         }).then((res) => {
           if (res.data.code == 1) {
+
             WeixinJSBridge.invoke('getBrandWCPayRequest', {
               'appId': res.data.data.appId,
               'timeStamp': res.data.data.timeStamp,
@@ -938,7 +962,7 @@
             z-index: 100;
           }
 					.list_l{
-						width: 430px;
+						width: 450px;
 						.listLeftTop{
 							align-items:flex-start;
 							img{
@@ -947,7 +971,7 @@
 								border-radius: 10px;
 							}
 							.couponNameBox{
-								width: 220px;
+								width: 240px;
 								.couponName{
 									font-size: 28px;
 									color: #000;
@@ -1002,8 +1026,9 @@
 						}
 					}
 					.list_r{
+            width:200px;
 						.sale{
-							font-size: 60px;
+							font-size: 38px;
 							color: #ff523d;
 							text-align: center;
 						}

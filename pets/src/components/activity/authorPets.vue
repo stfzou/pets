@@ -214,6 +214,7 @@
 		.authorPetsList{
 			padding: 0 20px;
       height: 800px;
+      background:#fff;
       overflow: hidden;
       .cube-pullup-wrapper{
         padding-top: 20px;

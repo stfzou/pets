@@ -7,7 +7,7 @@
           <router-link class="flex_r_s_c" :to="{name:'activity',query:{id:item.id}}">
             <img class="cover" :src="item.activityCover" alt="">
           </router-link>
-
+          <img class="tipImg" v-if="item.isPrivilege===1" src="../../assets/icon_gu37@2x.png" alt="">
 					<div class="activeInfo">
 						<div class="activityName">{{item.activityTitel}}</div>
 						<div class="data flex_r_f_s">
@@ -94,10 +94,7 @@
 
 										self.lng = result.position.lng;
 										self.lat = result.position.lat;
-										self.getActivityListOne();
 
-									} else {
-										self.getActivityListOne();
 
 									}
 								});
@@ -112,7 +109,7 @@
       this.getActivityList();
 		},
 		methods: {
-
+      
       showToastType() {
         const toast = this.$createToast({
           txt: 'TA还没有活动',
@@ -120,34 +117,6 @@
         })
         toast.show()
       },
-			getActivityListOne() {
-				let self = this;
-				self.axios.post(Api.userApi + '/ca/selectCommunityActivityListByUserId', self.qs.stringify({
-					userId: self.aId,
-					pageNo: 0,
-					pageSize: 5,
-					latitude: self.lat,
-					longitude: self.lng
-				}), {
-					headers: {
-						'Content-Type': 'application/x-www-form-urlencoded'
-					}
-				}).then((res) => {
-					if (res.data.code == 1) {
-						self.activityList = res.data.data;
-            if(res.data.data.length<1){
-              self.showToastType();
-              self.isLoading=false;
-            }
-						setTimeout(() => {
-							self.$refs.scroll.refresh();
-						}, 500)
-					}else{
-						alert(res.data.msg)
-
-					}
-				})
-			},
       getUrlData() { // 截取url中的数据
       	let tempStr = window.location.href;
       	/**
@@ -269,7 +238,7 @@
 
 		.activityList {
       height: 800px;
-
+      background:#fff;
 			overflow: hidden;
 			padding: 0 20px;
 			padding-bottom: 28px;
@@ -279,7 +248,13 @@
 				margin-bottom: 28px;
 				border-radius: 10px;
 				box-shadow: 0px 4px 12px 0px rgba(15, 15, 15, 0.16);
-
+        position:relative;
+        .tipImg{
+          width:180px;
+          position:absolute;
+          left:-8px;
+          top:20px;
+        }
 				.cover {
 					width: 100%;
           height: 100%;

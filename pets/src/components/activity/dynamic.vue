@@ -17,8 +17,8 @@
 						</div>
 						<div class="author-cnt">
 							<div class="text_cnt">
-                <router-link :to="{name:'trend',query:{dynamicId:item.dynamicId}}">
-                  {{item.content}}
+                <router-link v-html="item.content" :to="{name:'trend',query:{dynamicId:item.dynamicId}}">
+
                 </router-link>
 
 							</div>
@@ -153,7 +153,10 @@
 						setTimeout(()=>{
               self.$refs.scroll.forceUpdate();
 							res.data.data.forEach((e)=>{
+
+
 								e.content = self.decodeUnicode(e.content)
+                e.content = e.content.replace(/[\n\r]/g,'<br>')
 							})
               self.dynamicList = res.data.data;
               setTimeout(()=>{
@@ -214,10 +217,12 @@
 				}).then((res)=>{
 					if(res.data.code == 1){
 						if(res.data.data.length>0){
-
+              console.log(res.data.data)
 							setTimeout(()=>{
                 res.data.data.forEach((e)=>{
-                	e.content = self.decodeUnicode(e.content)
+                
+                  e.content = self.decodeUnicode(e.content)
+                  e.content = e.content.replace(/[\n\r]/g,'<br>')
                 });
 								self.$refs.scroll.forceUpdate();
                 self.dynamicList.push(...res.data.data)
@@ -338,6 +343,7 @@
 	.dynamic{
 		.dynamic-list{
       height: 800px;
+      background:#fff;
       .cube-index-list-nav{
         padding: 20px 0;
        }
