@@ -9,14 +9,14 @@ const wxApi = {
   wxRegister (option) {
     // 这边的接口请换成你们自己的
 
-    Axios.post('http://app.gutouzu.com/getfour.action',Qs.stringify({url:encodeURIComponent(window.location.href.split('#')[0])}),{
+    Axios.post('http://app.gutouzu.com/getfour.action',Qs.stringify({url:window.location.href.split('#')[0]}),{
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded'
         }
       }).then(function(res) {
 
           wx.config({
-            debug: false, // 开启调试模式
+            debug:false, // 开启调试模式
             appId: res.data.appid, // 必填，公众号的唯一标识
             timestamp: res.data.timestamp, // 必填，生成签名的时间戳
             nonceStr: res.data.noncestr, // 必填，生成签名的随机串

@@ -739,18 +739,7 @@
 
       }
       .active_nav{
-      	background: #fff;
-      	.back{
-      		background: url(../../assets/icon/backColory.png) no-repeat center 0;
-      		background-size: cover;
-      	}
-      	.share{
-      		background: url('../../assets/icon/active_share.png') no-repeat center 0;
-      		background-size: 100%;
-      	}
-      	.nav_title{
-      		color: #ff523d;
-      	}
+      	background: #ff523d;
       }
     }
 

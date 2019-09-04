@@ -205,6 +205,13 @@
 
 
 		},
+    descFilter(val){
+      if(val.length>15){
+        return val.substr(0,15)+'...'
+      }else{
+        return val
+      }
+    },
 		methods:{
       guCardLink(){
         this.$router.push({
@@ -773,7 +780,10 @@
 				left: 50%;
 				top: 50%;
 				transform: translate(-50%, -50%);
-
+        width:500px;
+        overflow: hidden;/*超出部分隐藏*/
+        text-overflow:ellipsis;/* 超出部分显示省略号 */
+        white-space: nowrap;/*规定段落中的文本不进行换行 */
 			}
 			.share{
 				width: 50px;
@@ -783,18 +793,8 @@
 			}
 		}
 		.active_nav{
-			background: #fff;
-			.back{
-				background: url(../../assets/icon/backColory.png) no-repeat center 0;
-				background-size: cover;
-			}
-			.share{
-				background: url('../../assets/icon/active_share.png') no-repeat center 0;
-				background-size: 100%;
-			}
-			.nav_title{
-				color: #ff523d;
-			}
+			background: #ff523d;
+
 		}
 		.activity_filter{
 			height: 430px;

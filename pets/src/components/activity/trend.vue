@@ -40,7 +40,7 @@
 					<img :src="userHeadImage" alt="" @click="homeLink">
 				</div>
 				<div class="mid">
-					<div class="userName">{{userName}}</div>
+					<div class="userName" @click="homeLink">{{userName}}</div>
 					<div class="time">{{time}}</div>
 				</div>
 				<div class="follow flex_r_s_c" @click="follow" v-if="isFocus == 0">+关注</div>
@@ -205,6 +205,7 @@
 			DownApp
 		},
 		methods: {
+      
       homeLink(){
         let self = this;
         this.$router.push({
