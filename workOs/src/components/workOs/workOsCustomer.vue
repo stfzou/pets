@@ -12,9 +12,9 @@
 				<div class="region flex_r_f_s">
 					<div class="sheng flex_r_s_b" @click="showAddressPicker" v-for="item in cityData">
 						<span>{{item}}</span>
-
 						<i class="cube-select-icon"></i>
 					</div>
+          <router-link v-if="parentId==0" :to="{name:'workOsPcMap'}">PC端链接</router-link>
 				</div>
 				<div class="customerType flex_r_f_s">
 					<cube-select v-model="environmenVal" :options="storeEnvironmen" placeholder="店铺环境" @change="getCustomer"></cube-select>
@@ -24,7 +24,12 @@
 				</div>
 				<div class="customerTypeBox flex_r_f_s">
 					<cube-select v-model="staffVal" :options="staffData" placeholder="员工" @change="listChange"></cube-select>
-					<router-link v-if="parentId==0" :to="{name:'workOsPcMap'}">PC端链接</router-link>
+          <div class="flex_r_s_b timeBox">
+            <cube-button class="cube-select" @click="showDatePicker">{{time1}}</cube-button>
+            <span>-</span>
+            <cube-button class="cube-select" @click="showDatePicker2">{{time2}}</cube-button>
+          </div>
+
 				</div>
 				<div class="search_box">
 					<div class="search flex_r_s_b">
@@ -136,6 +141,8 @@
 	export default {
 		data() {
 			return {
+        time1:'',//时间文本值
+        time2:'',//时间文本值
 				storeEnvironmen: [{value:'',text:'店铺星级'}],
 				customerType: [{value:'',text:'客户类型'}],
 				staffData:[],
@@ -169,6 +176,7 @@
 
 					}
 				},
+        staffId:'',
 				parentId:'1',
         businessId:'',
 
@@ -228,6 +236,89 @@
 					name:'workOsInfoList'
 				});
 			},
+      selectDataHandle(date, selectedVal, selectedText) {
+        let self = this;
+        this.time1 = selectedText.join('-');
+        if(this.time2!=''&& new Date(selectedText.join('-')).getTime()>new Date(self.time2).getTime()){
+          let temp = this.time2;
+          this.time2 = this.time1;
+          this.time1 = temp;
+          this.getCustomer();
+        }else if(this.time2!=''&& new Date(selectedText.join('-')).getTime()==new Date(self.time2).getTime()){
+          alert('不能选相同的时间');
+          this.time1 = '';
+        }else{
+          this.getCustomer();
+        }
+      },
+      showDatePicker() {
+         if (!this.datePicker) {
+           this.datePicker = this.$createDatePicker({
+             title: '时间选择',
+             min: new Date(2008, 7, 8),
+             max: new Date(),
+             value: new Date(),
+             onSelect: this.selectDataHandle,
+             onCancel: function(){}
+           })
+         }
+
+         this.datePicker.show()
+       },
+       selectDataHandle(date, selectedVal, selectedText) {
+         let self = this;
+         this.time1 = selectedText.join('-');
+         if(this.time2!=''&& new Date(selectedText.join('-')).getTime()>new Date(self.time2).getTime()){
+           let temp = this.time2;
+           this.time2 = this.time1;
+           this.time1 = temp;
+
+           this.getCustomer();
+         }else if(this.time2!=''&& new Date(selectedText.join('-')).getTime()==new Date(self.time2).getTime()){
+           alert('不能选相同的时间');
+           this.time1 = '';
+         }else{
+
+           this.getCustomer();
+         }
+       },
+       cancelHandle() {
+
+       },
+      showDatePicker2() {
+         if (!this.datePicker2) {
+           this.datePicker2 = this.$createDatePicker({
+             title: '时间选择',
+             min: new Date(2008, 7, 8),
+             max: new Date(),
+             value: new Date(),
+             onSelect: this.selectDataHandle2,
+             onCancel: function(){}
+           })
+         }
+
+         this.datePicker2.show()
+       },
+      selectDataHandle2(date, selectedVal, selectedText) {
+        //this.time2 = selectedVal.join('/')
+         let self = this;
+         if(this.time1==''){
+           alert('请选择开始时间');
+           return false;
+         }
+         this.time2 = selectedText.join('-');
+         if(this.time1!=''&& new Date(selectedText.join('-')).getTime()<new Date(self.time1).getTime()){
+           let temp = this.time2;
+           this.time2 = this.time1;
+           this.time1 = temp;
+           this.getCustomer();
+         }else if(this.time1!=''&& new Date(selectedText.join('-')).getTime()==new Date(self.time1).getTime()){
+           alert('不能选相同的时间');
+           this.time2 = '';
+         }else{
+           this.getCustomer();
+         }
+      },
       deletCustomer(item,index){
       	let self = this;
       	this.$createDialog({
@@ -431,6 +522,8 @@
 					pageNo:0,
 					pageSize:10,
 					shopName:self.shopName,
+          startTime:self.time1,
+          endTime:self.time2,
 					productTypeId:self.projectTypeVal
 				}), {
 					headers: {
@@ -501,6 +594,8 @@
 					conditionId:self.environmenVal,
 					typeId:self.typeVal,
 					pageNo:self.page,
+          startTime:self.time1,
+          endTime:self.time2,
 					productTypeId:self.projectTypeVal,
 					pageSize:10
 				}), {
@@ -618,7 +713,10 @@
 							width: 30px;
 						}
 					}
-
+          a{
+            font-size:28px;
+            color:#666
+          }
 				}
 
 				.customerType {
@@ -645,6 +743,17 @@
 						// color: #ff523d;
 						margin-left: 20px;
 					}
+          .timeBox{
+            width: 330px;
+            margin-left:10px;
+            height:40px;
+            span{
+              margin: 0 10px;
+            }
+            button{
+              height:40px;
+            }
+          }
 				}
 				.search_box {
 					padding-top: 10px;

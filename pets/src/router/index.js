@@ -42,6 +42,7 @@ import QuestionTwo from '@/components/answer/questionTwo'
 import AnswerOne from '@/components/answer/answerOne'
 import AnswerTwo from '@/components/answer/answerTwo'
 import AnswerWhite from '@/components/answer/answerWhite'
+import PrizeHistory from '@/components/prizeHistory/prizeHistory'
 
 Vue.use(Router)
 export default new Router({
@@ -57,6 +58,11 @@ export default new Router({
 			name:'vLogin',
 			component:vLogin,
 		},
+    {
+      path:'/prizeHistory',
+      name:'prizeHistory',
+      component:PrizeHistory,
+    },
     {
     	path:'/wxWhitePage',
     	name:'wxWhitePage',
