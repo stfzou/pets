@@ -1,0 +1,377 @@
+﻿body,
+ul,
+ol,
+li,
+p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+form,
+fieldset,
+table,
+td,
+img,
+div {
+	margin: 0;
+	padding: 0;
+	border: 0;
+}
+
+html,body{
+	height: 100%;
+	overflow: hidden;
+	box-sizing: border-box;
+}
+.flex_r_s_c,.flex_r_s_b,.flex_r_f_s,.flex_r_f_e,.flex_c_f_s,.flex_c_f_e,.flex_c_s_b{
+  width: 100%;
+  // overflow: hidden;
+  display: -webkit-box;      /* OLD - iOS 6-, Safari 3.1-6 */
+  display: -moz-box;         /* OLD - Firefox 19- (buggy but mostly works) */
+  display: -ms-flexbox;      /* TWEENER - IE 10 */
+  display: -webkit-flex;     /* NEW - Chrome */
+  display: flex;             /* NEW, Spec - Opera 12.1, Firefox 20+ */
+  flex-direction: column;
+  flex-wrap: nowrap;
+  justify-content: flex-start;
+  align-items:center;
+  position: relative;
+}
+.flex_r_s_b{
+  flex-direction: row;
+  justify-content: space-between;
+}
+.flex_r_s_c{
+	flex-direction: row;
+	align-items:center;
+	justify-content:center;
+}
+.flex_r_f_s{
+  flex-direction: row;
+  justify-content: flex-start;
+}
+.flex_r_f_e{
+  flex-direction: row;
+  justify-content: space-around;
+}
+.flex_c_f_s{
+  align-items:flex-start;
+}
+.flex_c_f_e{
+  justify-content: flex-end;
+}
+.flex_c_s_b{
+  justify-content: space-between;
+  align-items:flex-start;
+}
+/*body{color:#333; font-size:12px;font-family:"Microsoft YaHei"}*/
+
+ul,
+ol {
+	list-style-type: none;
+}
+
+select,
+input,
+img,
+select {
+	vertical-align: middle;
+}
+
+input {
+	font-size: 12px;
+}
+
+.clear {
+	clear: both;
+}
+
+
+/* 大转盘样式 */
+
+.banner {
+	display: block;
+	width: 6rem;
+	height: 6rem;
+	margin-left: auto;
+	margin-right: auto;
+	margin-bottom: 20px;
+}
+
+.banner .turnplate {
+	display: block;
+	width: 4.8rem;
+	height: 4.8rem;
+	position: absolute;
+	left: 50%;
+	top: 50%;
+	transform: translate(-50%,-50%);
+}
+
+.banner .turnplate canvas.item {
+	width: 100%;
+}
+
+.banner .turnplate img.pointer {
+	position: absolute;
+	width: 31.5%;
+	height: 42.5%;
+	left: 34.1%;
+	top: 23%;
+}
+
+#sbtn {
+	position: absolute;
+	bottom: 0.2rem;
+	text-align: center;
+	width: 100%;
+}
+
+#sbtn img {
+	width: 35%;
+	margin: 0 20px;
+}
+.dzp-wrap{
+	height: 100%;
+	width: 100%;
+	background: url(../images/game-bg.png) no-repeat 0 center;
+	background-size:cover;
+	position: relative;
+	overflow: hidden;
+}
+.dzp-wrap .pz{
+	width: 1.4rem;
+	height: 0.4rem;
+	background: #fff;
+	position: absolute;
+	right: 0;
+	font-size: 0.24rem;
+	color: #333;
+	text-align: center;
+	line-height: 0.4rem;
+	border-bottom-left-radius: 0.3rem;
+	border-top-left-radius: 0.3rem;
+}
+.dzp-wrap .hdgz{
+	top:3.2rem;
+}
+.dzp-wrap .zjcx{
+	top:4rem;
+}
+.container{
+	margin: 0 auto;
+}
+.content{
+	
+	width: 100%;
+	height: auto;
+	margin: 0px auto;
+	
+}
+.banner{
+	position: absolute;
+	left: 50%;
+	top: 35%;
+	transform: translate(-50%,0);
+}
+.gd-num{
+	font-size: 0.32rem;
+	color: #fff;
+	text-align: center;
+	padding-top: 0.2rem;
+	position: absolute;
+	bottom: 0.4rem;
+	left: 0;
+	width: 100%;
+}
+.diglog-box{
+	height: 100%;
+	display: none;
+	width: 100%;
+	position: fixed;
+	background: rgba(0,0,0,0.6);
+	z-index: 100000;
+	top: 0;
+	left: 0;
+}
+
+.diglog-box .diglog-cnt{
+	width: 5.68rem;
+	height: 6.05rem;
+	background: url(../images/dialogBg.png) no-repeat;
+	background-size: 100%;
+	position: absolute;
+	left: 50%;
+	top: 50%;
+	transform: translate(-50%,-50%);
+}
+.diglog-box .diglog-cnt .close{
+	position: absolute;
+	width: 0.45rem;
+	right: 0.15rem;
+	top: -0.05rem;
+	
+}
+.diglog-box .diglog-cnt .gdcj-cnt{
+	display: none;
+}
+.diglog-box .diglog-cnt .gdcj-show{
+	display: block;
+}
+.diglog-box .diglog-cnt .gdcj-cnt img{
+	width: 2.8rem;
+	display: block;
+	margin: 1rem auto 0 auto;
+}
+.diglog-box .diglog-cnt .gdcj-cnt .tip{
+	font-size: 0.32rem;
+	text-align: center;
+	color: #fff;
+	padding-top: 0.5rem;
+}
+.diglog-box .diglog-cnt .gdcj-cnt .sygd{
+	color: #ffcd1b;
+	font-size: 0.22rem;
+	text-align: center;
+}
+.diglog-box .diglog-cnt .gdcj-cnt .btn-box{
+	padding: 0 0.6rem;
+	box-sizing: border-box;
+	padding-top: 0.2rem;
+}
+.diglog-box .diglog-cnt .gdcj-cnt .gdcj-btom{
+	padding-top: 1.1rem;
+}
+
+.diglog-box .diglog-cnt .gdcj-cnt .btn-box div{
+	width: 2rem;
+	height: 0.78rem;
+	background: url(../images/btnBg.png) no-repeat;
+	background-size: cover;
+	text-align: center;
+	line-height: 0.78rem;
+	color: #fff;
+	font-size: 0.3rem;
+}
+
+.login-dialog{
+	position: fixed;
+	left: 0;
+	top: 0;
+	background:rgba(0,0,0,0.6);
+	width: 100%;
+	height: 100%;
+	z-index: 1000;
+	display: none;
+}
+.login-dialog .dialongCnt{
+	width: 6rem;
+    background: #fff;
+    padding-top:0.2rem;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%,-50%);
+}
+.login-dialog .dialongCnt .itemList{
+	padding: 0.3rem 0.2rem;
+    box-sizing: border-box;
+}
+.login-dialog .dialongCnt .itemList input{
+	background: none;
+    outline: none;
+    border-radius: 4px;
+    font-size: 0.26rem;
+    color: #333;
+    text-align: center;
+    height: 0.5rem;
+    line-height: 0.5rem;
+    width: 3rem;
+    margin-left: 0.3rem;
+    border: 1px solid #e8e8e8;
+}
+.login-dialog .dialongCnt .itemList p {
+    width: 1.1rem;
+    text-align: justify;
+    text-align-last: justify;
+    font-size: 0.26rem;
+}
+
+.login-dialog .dialongCnt .itemList .vInput{
+    width: 1.8rem;
+ }
+ 
+.login-dialog .dialongCnt .itemList  .v_code {
+    margin-left:0.3rem;
+    
+}
+.login-dialog .dialongCnt .itemList .active_vcode{
+	display: none;
+}
+.login-dialog .dialongCnt .itemList .v_code{
+    
+    width: 1.5rem;
+    height: 0.5rem;
+    border-radius:0.1rem;
+    background: #ff523d;
+    color: #fff;
+    text-align: center;
+    line-height: 0.5rem;
+    font-size: 0.24rem;
+}
+.login-dialog .dialongCnt .itemList .codeShow{
+	display: block;
+}
+.login-dialog .dialongCnt .itemList .codeHide{
+	display: none;
+}
+.login-dialog .dialongCnt .btnBox{
+	border-top: 1px solid #e8e8e8;
+	box-sizing: border-box;
+	margin-top: 0.2rem;
+}
+
+.login-dialog .dialongCnt .btnBox div{
+	width: 50%;
+    height: 0.7rem;
+    font-size: 0.3rem;
+    box-sizing: border-box;
+}
+.login-dialog .dialongCnt .btnBox .cancelBtn{
+    border-right: 1px solid #e8e8e8;
+}
+.login-dialog .dialongCnt .title{
+	font-size: 0.32rem;
+	text-align: center;
+	font-weight: bold;
+}
+
+
+#container{
+    margin-top: 0.2rem;    
+    position: relative;
+    height: 0.35rem;	
+    overflow: hidden;
+    font-size: 0.26rem;
+}
+#list-wrapper{
+    position: relative;
+    top: 0.2rem;
+}
+ul {
+    list-style: none;
+    text-align: center;
+    padding: 0 0.2rem;
+}
+li{
+    height: 0.35rem;
+    line-height: 0.35rem;
+    color: #fff;
+}
+
+
+.show{
+	display: block;
+}

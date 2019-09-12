@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans" style="font-size: 16.15px;">
+
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no" />
+		<title>Document</title>
+		<script src="//res.wx.qq.com/open/js/jweixin-1.2.0.js" type="text/javascript" charset="utf-8"></script>
+		<script>
+			(function(doc, win) {
+				var docEl = doc.documentElement,
+					resizeEvt = 'orientationchange' in window ? 'orientationchange' : 'resize',
+					recalc = function() {
+						var clientWidth = docEl.clientWidth;
+						if(!clientWidth) return;
+						docEl.style.fontSize = 5 * (clientWidth / 100) + 'px';
+					};
+
+				if(!doc.addEventListener) return;
+				win.addEventListener(resizeEvt, recalc, false);
+				doc.addEventListener('DOMContentLoaded', recalc, false);
+			})(document, window);
+		</script>
+		<style>
+			.portrait body div.landscape {
+				display: none !important;
+			}
+			
+			.landscape body div.landscape {
+				display: block !important;
+			}
+			
+			.loading {
+				position: fixed;
+				z-index: 999;
+				top: 0;
+				left: 0;
+				display: table;
+				width: 100%;
+				height: 100%;
+				background: #93167b;
+				color: #cbe8b2;
+				text-align: center
+			}
+			
+			.loading .loader {
+				display: table-cell;
+				vertical-align: middle
+			}
+			
+			.loading .loader span {
+				position: relative;
+				display: inline-block;
+				margin-bottom: .5rem;
+				border-top: .3rem solid hsla(0, 0%, 100%, .2);
+				border-right: .3rem solid hsla(0, 0%, 100%, .2);
+				border-bottom: .3rem solid hsla(0, 0%, 100%, .2);
+				border-left: .3rem solid #fff;
+				-webkit-animation: load 1s infinite linear;
+				animation: load 1s infinite linear
+			}
+			
+			.loading .loader span,
+			.loading .loader span:after {
+				width: 2.8rem;
+				height: 2.8rem;
+				border-radius: 50%
+			}
+			
+			@-webkit-keyframes load {
+				0% {
+					-webkit-transform: rotate(0);
+					transform: rotate(0)
+				}
+				to {
+					-webkit-transform: rotate(360deg);
+					transform: rotate(360deg)
+				}
+			}
+			
+			@keyframes load {
+				0% {
+					-webkit-transform: rotate(0);
+					transform: rotate(0)
+				}
+				to {
+					-webkit-transform: rotate(360deg);
+					transform: rotate(360deg)
+				}
+			}
+		</style>
+		<link rel="stylesheet" type="text/css" href="css/style2.css">
+	</head>
+
+	<body onload="init();">
+
+		<!--loading-->
+		<div id="loading" class="loading">
+			<div class="loader">
+				<span></span>
+				<p id="loadtext">Loading...</p>
+			</div>
+		</div>
+		<!--//loading-->
+
+		<div class="gamebox">
+			<div class="dialong">
+				<div class="dialongCnt zj-dia">
+					<img class="close-dia" src="images/close.png" alt="" />
+					<img class="title-img" src="images/gongxi.png" alt="" />
+					<div class="tip">好运气！<br /><span class="zjtx"></span> </div>
+					<div class="dia-btn flex_r_s_b">
+						<div>去查看</div>
+						<div class="shareBtn">分享给好友</div>
+					</div>
+				</div>
+				<div class="dialongCnt wzj-dia">
+					<img class="close-dia" src="images/close.png" alt="" />
+					<img class="title-img" src="images/yihan.png" alt="" />
+					<div class="tip">很遗憾！<span class="zjtx">您暂未获得任何奖励 <br />分享好友后可获得一次砸蛋机会</span> </div>
+					<div class="dia-btn flex_r_s_c">
+						<div class="shareBtn">分享给好友</div>
+					</div>
+				</div>
+				<div class="dialongCnt shareBox">
+					<img class="close-dia" src="images/close.png" alt="" />
+					<img class="title-img" src="images/yihan.png" alt="" />
+					<div class="tip">砸蛋次数已用尽<br /><span>分享好友后可获得一次砸蛋机会</span> </div>
+					<div class="dia-btn flex_r_s_c">
+						<div class="shareBtn">分享给好友</div>
+					</div>
+				</div>
+				<div class="login-dialog">
+					<div class="title">手机登录即可参与</div>
+					<div class="inputBox">
+						<div class="itemList flex_r_f_s">
+							<p>手机号码</p>
+							<input class="phoneInput" type="number" placeholder="请输入手机号码" />
+						</div>
+						<div class="itemList flex_r_f_s vcode_box">
+							<p>验证码</p>
+							<input class="vInput" type="number" placeholder="请输入验证码" />
+							<div class="v_code getCode">
+								获取验证码
+							</div>
+							<div class="v_code active_vcode">
+
+							</div>
+						</div>
+					</div>
+					<div class="btnBox flex_r_s_b">
+						<div class="cancelBtn flex_r_s_c">取消</div>
+						<div class="okBtn flex_r_s_c">确定</div>
+					</div>
+				</div>
+			</div>
+			<div class="stage">
+				<img src="images/stage1.png" style="display: block;">
+				<div class="lanren">
+					<div class="agg"></div>
+					<div class="agg"></div>
+					<div class="agg"></div>
+				</div>
+
+				<!--中奖-->
+				<div class="winBox" style="display: none;">
+					<img src="">
+				</div>
+
+			</div>
+
+			<div class="footer">
+				<p>您今天还有 <span id="chance">0</span> 次抽奖机会</p>
+			</div>
+
+			<div class="bottom-btn flex_r_s_b">
+				<div>
+					<a href="###">中奖规则</a>
+				</div>
+				<div>
+					<a href="###">中奖查询</a>
+				</div>
+			</div>
+		</div>
+
+		<!--活动说明-->
+
+		<script type="text/javascript" src="js/jquery.min.js"></script>
+		<script src="js/preloadjs-NEXT.min.js"></script>
+		<script src="js/soundjs-NEXT.min.js"></script>
+		<script>
+			let chance = 0; //砸蛋次数
+			let apiUrl = 'http://app.gutouzu.com';
+			let userId = '-1';
+			console.log(JSON.parse(localStorage.getItem('userId')))
+			if(JSON.parse(localStorage.getItem('userId')) != undefined || JSON.parse(localStorage.getItem('userId')) != null) {
+				userId = JSON.parse(localStorage.getItem('userId'));
+			}
+			let opt = {
+				title: '砸金蛋',
+				desc: '这是一个砸金蛋活动',
+				link: window.location.href,
+				imgUrl: '',
+				success: function() {
+					$.ajax({
+						url: apiUrl + '/prize/goldenEggShare',
+						type: "POST",
+						data: {
+							"userId": userId
+						},
+						success: function(res) {
+							
+							if(res.code == 1) {
+								alert('分享成功,获得今日免费砸金蛋一次')
+								chance+=1;
+							} else {
+								alert(res.msg)
+							}
+						}
+					})
+				}
+			}
+
+			
+
+			function init() {
+
+				var assetsPath = "images/";
+				manifest = [
+
+					{
+						id: "img01",
+						src: "agg.png"
+					},
+					{
+						id: "img02",
+						src: "agg-puo.png"
+					},
+					{
+						id: "img03",
+						src: "bg.png"
+					},
+					{
+						id: "img04",
+						src: "hammer.png"
+					},
+					{
+						id: "img08",
+						src: "stage1.png"
+					},
+
+				];
+
+				createjs.Sound.alternateExtensions = ["mp3"];
+				preload = new createjs.LoadQueue(true, assetsPath);
+				preload.installPlugin(createjs.Sound);
+				preload.addEventListener("complete", doneLoading);
+				preload.addEventListener("progress", updateLoading);
+				preload.loadManifest(manifest);
+
+				function updateLoading() {
+					$("#loadtext").text("Loading " + (preload.progress * 100 | 0) + "%");
+				}
+
+				//loading完毕
+				function doneLoading(event) {
+					//createjs.Sound.play("laser");
+					$("#loading").hide();
+					// start 播放背景音乐
+					//          createjs.Sound.play("bgMusic", {interrupt: createjs.Sound.INTERRUPT_NONE, loop: -1, volume: 0.4});
+				}
+
+				var winH = $(window).innerHeight();
+				var winW = $(window).innerWidth();
+				$("body,.gamebox,.jn-box").css({
+					height: winH,
+					width: winW
+				});
+
+				$("#chance").text(chance);
+
+				var YesorNo = true;
+
+				function aClick() {
+
+					if(userId == '-1') { //如果没有登录，就弹出弹窗去登录
+						$(".dialong").addClass("diaShow")
+						$(".login-dialog").addClass("diaCntShow")
+					} else {
+						$(".agg").off("click", aClick);
+						//	            chance-=1;
+						//	            $("#chance").text(chance);
+						
+							var _this = $(this);
+							_this.parents(".lanren").addClass("paused");
+							_this.html('<img src="images/hammer.png" class="hammer"><img src="images/agg-puo.png" class="agg-puo">');
+							setTimeout(function() {
+								_this.css({
+									background: "none"
+								}).find(".agg-puo").show();
+
+								$.ajax({ //请求砸蛋数据
+									url: apiUrl + '/prize/goldenEggStart',
+									type: "POST",
+									data: {
+										"userId": userId
+									},
+									success: function(res) {
+										console.log(res)
+										if(res.code == 1) {
+											chance -= 1;
+											$("#chance").text(chance);
+											if(res.data.indexOf('谢谢参与') > -1) {
+												$(".dialong").addClass('diaShow');
+												$(".wzj-dia").addClass('diaCntShow');
+											} else if(res.data.indexOf('骨豆') > -1) {
+												$(".dialong").addClass('diaShow');
+												$(".zj-dia").addClass('diaCntShow');
+												$(".zj-dia .zjtx").text('您获得' + res.data);
+											}
+
+										} else if(res.code == 1102) {
+											$(".dialong").addClass('diaShow');
+											$(".shareBox").addClass('diaCntShow');
+
+										} else {
+											alert(res.msg)
+										}
+									}
+								})
+
+							}, 250);
+						
+
+					}
+
+				}
+
+				$(".agg").on("click", aClick);
+
+				//重新开始
+				$(".close-dia").on('click', function() {
+					
+					$("#sorryBox").hide();
+					$(".lanren").removeClass("paused");
+					$(".agg").on("click", aClick).html("").attr("style", "");
+					$(".dialong").removeClass('diaShow');
+					$(".dialongCnt").removeClass('diaCntShow');
+					
+				});
+
+				//分享提示
+				$(".shareBtn").click(function() {
+					alert('点击右上角，进行分享')
+					$(".dialong").removeClass('diaShow');
+				})
+
+			}
+
+			(function() {
+				var init = function() {
+					var updateOrientation = function() {
+						var orientation = window.orientation;
+						switch(orientation) {
+							case 90:
+							case -90:
+								orientation = 'landscape'; //这里是横屏
+								break;
+							default:
+								orientation = 'portrait'; //这里是竖屏
+								break;
+						}
+						document.body.parentNode.setAttribute('class', orientation);
+					};
+					window.addEventListener('orientationchange', updateOrientation, false);
+					updateOrientation();
+				};
+				window.addEventListener('DOMContentLoaded', init, false);
+			})();
+
+			//微信API初始化
+			function wxInit(option) {
+				$.ajax({
+					url: 'http://app.gutouzu.com/getfour.action',
+					type: "POST",
+					data: {
+						"url": window.location.href
+					},
+					success: function(res) {
+						
+						res = JSON.parse(res)
+						
+						wx.config({
+							debug: false, // 开启调试模式
+							appId: res.appid, // 必填，公众号的唯一标识
+							timestamp: res.timestamp, // 必填，生成签名的时间戳
+							nonceStr: res.noncestr, // 必填，生成签名的随机串
+							signature: res.sgture, // 必填，签名，见附录1
+							jsApiList: [
+								'checkJsApi',
+								'onMenuShareTimeline', //-----------------我们这里用了分享朋友圈
+								'onMenuShareAppMessage', //----------------好友
+								'onMenuShareQQ',
+								'onMenuShareQZone'
+
+							] // 必填，需要使用的JS接口列表，所有JS接口列表见附录2
+						})
+						wx.ready(() => {
+							// 如果需要定制ready回调方法
+							// alert(1)
+							wx.onMenuShareQQ({
+								title: opt.title, // 分享标题
+								desc: opt.desc, // 分享描述
+								link: opt.link, // 分享链接
+								imgUrl: opt.imgUrl, // 分享图标
+								success() {
+									// 用户成功分享后执行的回调函数
+									option.success()
+								},
+								cancel() {
+									// 用户取消分享后执行的回调函数
+
+								}
+
+							});
+
+							wx.onMenuShareAppMessage({ //分享微信好友
+								title: opt.title, // 分享标题
+								desc: opt.desc, // 分享描述
+								link: opt.link, // 分享链接
+								imgUrl: opt.imgUrl, // 分享图标
+								success() {
+									// 用户成功分享后执行的回调函数
+									option.success()
+								},
+								cancel() {
+									// 用户取消分享后执行的回调函数
+
+								}
+							})
+
+							wx.onMenuShareTimeline({ //微信朋友圈分享
+								title: opt.title, // 分享标题
+								link: opt.link, // 分享链接
+								imgUrl: opt.imgUrl, // 分享图标
+								success() {
+									// 用户成功分享后执行的回调函数
+
+									option.success()
+								},
+								cancel() {
+									// 用户取消分享后执行的回调函数
+
+								}
+							})
+						});
+					}
+				})
+
+			}
+
+			//初始获取数据
+			function getData() {
+				$.ajax({
+					url: apiUrl + '/prize/selectGoldenEggCount',
+					type: "GET",
+					data: {
+						"userId": userId
+					},
+					success: function(res) {
+						
+						if(res.code == 1) {
+							chance = res.data
+							$("#chance").text(res.data)
+
+						} else {
+							alert(res.msg)
+						}
+					}
+				})
+			}
+
+			let count = '';
+			let codeTimer = null;
+			let reg = /^1[3456789]\d{9}$/;
+			//获取验证码
+			function getCode() {
+				//获取验证码
+				let phone = $(".phoneInput").val();
+
+				if(phone == '') {
+					alert('请填写手机号码')
+					return false;
+				} else if(!reg.test(phone)) {
+					alert('手机号码格式错误')
+					return false;
+				}
+				if(phone) {
+
+					const TIME_COUNT = 60;
+					if(!codeTimer) {
+						count = TIME_COUNT;
+						$.ajax({
+							url: 'http://app.gutouzu.com/sms_login_code',
+							type: "GET",
+							data: {
+								"phone": phone
+							},
+							success: function(res) {
+
+								if(res.code != 1) {
+									alert(res.msg)
+								}
+							}
+						})
+						codeTimer = setInterval(() => {
+							if(count > 0 && count <= TIME_COUNT) {
+								count--;
+								$(".getCode").addClass('codeHide')
+								$(".active_vcode").addClass('codeShow');
+								$(".active_vcode").text(count)
+							} else {
+								clearInterval(codeTimer);
+								codeTimer = null;
+								$(".getCode").removeClass('codeHide')
+								$(".active_vcode").removeClass('codeShow');
+								$(".active_vcode").text(0)
+							}
+						}, 1000)
+					}
+				}
+
+			}
+
+			//登录
+			function login() {
+
+				let phone = $(".phoneInput").val();
+				let vCode = $(".vInput").val();
+				if(phone == '') {
+					alert('请输入手机号码')
+				} else if(!reg.test(phone)) {
+					alert('手机号码格式错误')
+				} else if(vCode == '') {
+					alert('请输入验证码')
+				} else {
+					$.ajax({
+						url: 'http://app.gutouzu.com/user_sms_login',
+						type: "POST",
+						data: {
+							"phone": phone,
+							"vcode": vCode
+						},
+						success: function(res) {
+
+							if(res.code == 1) {
+								getData();
+								localStorage.setItem('userId', res.user.userId);
+								userId = res.user.userId;
+								$(".login-dialog").removeClass('diaCntShow');
+								$(".dialong").removeClass('diaShow');
+
+							} else {
+								alert(res.msg)
+							}
+						}
+					})
+				}
+
+			}
+
+			$(document).ready(function() {
+				wxInit();
+				getData();
+
+				$(".getCode").click(function() {
+
+					getCode();
+				});
+
+				$(".okBtn").click(function() {
+
+					login();
+				})
+			})
+		</script>
+	</body>
+
+</html>

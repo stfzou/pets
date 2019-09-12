@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"> 
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>幸运抽奖盘</title>
+<script type="text/javascript" src="js/rem.js"></script>
+<link href="css/style.css" rel="stylesheet" type="text/css">
+
+</head>
+
+<body>
+<div class="dzp-wrap">
+	<!--<img src="images/game-bg.png" alt="" style="position: absolute;width: 100%;height: 100%;">-->
+	<div class="hdgz pz">活动规则</div>
+	<div class="zjcx pz">中奖查询</div>
+	<div id="wrap">
+	    <div id="container">
+		    <div id="list-wrapper">
+		        <ul class="notice-list" id="notice-list">
+		            
+		        </ul>
+		        <ul class="notice-list" id="notice-list-2">
+		        </ul>
+		    </div>
+		</div>
+	</div>
+	<div class="login-dialog">
+		<div class="dialongCnt">
+			<div class="title">手机登录即可参与</div>
+	        <div class="inputBox">
+	          <div class="itemList flex_r_f_s">
+	            <p>手机号码</p>
+	            <input class="phoneInput" type="number" placeholder="请输入手机号码" />
+	          </div>
+	          <div class="itemList flex_r_f_s vcode_box">
+	            <p>验证码</p>
+	            <input class="vInput" type="number" placeholder="请输入验证码" />
+	            <div class="v_code getCode">
+	             	 获取验证码
+	            </div>
+	            <div class="v_code active_vcode">
+	              
+	            </div>
+	          </div>
+	        </div>
+	        <div class="btnBox flex_r_s_b">
+	          <div class="cancelBtn flex_r_s_c">取消</div>
+	          <div class="okBtn flex_r_s_c">确定</div>
+	        </div>
+      </div>
+	</div>
+	<div class="diglog-box">
+		<div class="diglog-cnt">
+			<img class="close" src="images/close.png" alt="" />
+			<div class="gdcj-cnt kouchu">
+				<img src="images/gdcj.png" alt="" />
+				<div class="tip">确认扣除10粒骨豆参与抽奖</div>
+				<div class="gdcj-btom">
+					<div class="sygd"></div>
+					<div class="btn-box flex_r_s_b">
+						<div class="qx quxiao">取消</div>
+						<div class="qr cj">确认</div>
+					</div>
+				</div>
+			</div>
+			<div class="gdcj-cnt zhongjiang">
+				<img src="images/gongxi.png" alt="" />
+				<div class="tip">好运气 <br /><span class="zj-cnt">获得99元大礼包</span></div>
+				<div class="gdcj-btom">
+					<div class="sygd"></div>
+					<div class="btn-box flex_r_s_b">
+						<div class="qx ck">去查看</div>
+						<div class="qr">继续抽奖</div>
+					</div>
+				</div>
+			</div>
+			<div class="gdcj-cnt xiexie">
+				<img src="images/xxcy.png" alt="" />
+				<div class="tip">很遗憾<br /><span class="zj-cnt">您本次抽奖未获得任何奖品</span></div>
+				<div class="gdcj-btom">
+					<div class="sygd"></div>
+					<div class="btn-box flex_r_s_b">
+						<div class="qx quxiao">取消</div>
+						<div class="qr">继续抽奖</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="gd-num"></div>
+	<div class="content">
+		<img src="images/icon_jpxx.png" id="xxcy" style="display:none;" />
+		<img src="images/icon_jpgd.png" id="jpgd" style="display:none;" />
+		<img src="images/icon_jp99.png" id="jp99" style="display:none;" />
+		<img src="images/icon_jp39.png" id="jp39" style="display:none;" />
+		<!--<img src="images/7.png" id="ganlan-img" style="display:none;" />
+		<img src="images/4.png" id="yusan-img" style="display:none;" />-->
+		<div class="banner" style="background-image:url(images/routaBg.png);background-size:100% 100%;">
+			<div class="turnplate">
+				<canvas class="item" id="wheelcanvas" width="422px" height="422px"></canvas>
+				<img class="pointer" src="images/turnplate-pointer.png"/>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+<!--<div id="sbtn">
+	<a href="#"><img src="images/kscj.png" alt=""></a>
+	
+</div>-->
+	
+<script type="text/javascript" src="js/jquery.min.js"></script>
+<script type="text/javascript" src="js/awardRotate.js"></script>
+<script type="text/javascript">
+
+let apiUrl = 'http://app.gutouzu.com';
+let userId = '-1';
+let gudoNum = null;
+let zpData = [];
+console.log(JSON.parse(localStorage.getItem('userId')))
+if(JSON.parse(localStorage.getItem('userId'))!=undefined||JSON.parse(localStorage.getItem('userId'))!=null){
+	
+	userId = JSON.parse(localStorage.getItem('userId'));
+}
+
+
+
+var turnplate={
+		restaraunts:[],				//大转盘奖品名称
+		colors:[],					//大转盘奖品区块对应背景颜色
+		outsideRadius:192,			//大转盘外圆的半径
+		textRadius:155,				//大转盘奖品位置距离圆心的距离
+		insideRadius:68,			//大转盘内圆的半径
+		startAngle:0,				//开始角度
+		bRotate:false				//false:停止;ture:旋转
+};
+
+$(document).ready(function(){
+	
+	//动态添加大转盘的奖品与奖品区域背景颜色
+	turnplate.restaraunts = ["99元大礼包","10粒骨豆","30粒骨豆", "39元大礼包", "谢谢参与"];
+	turnplate.colors = ["#ffa5e1 ", "#aba5ff", "#ffa5a5", "#ffd1a5","#a5dcff"];
+	var rotateTimeOut = function (){
+		$('#wheelcanvas').rotate({
+			angle:0,
+			animateTo:2160,
+			duration:8000,
+			callback:function (){
+				alert('网络超时，请检查您的网络设置！');
+			}
+		});
+	};
+
+
+	//旋转转盘 item:奖品位置; txt：提示语;
+	var rotateFn = function (item, txt){
+		var angles = item * (360 / turnplate.restaraunts.length) - (360 / (turnplate.restaraunts.length*2));
+		if(angles<270){
+			angles = 270 - angles; 
+		}else{
+			angles = 360 - angles + 270;
+		}
+		$('#wheelcanvas').stopRotate();
+		$('#wheelcanvas').rotate({
+			angle:0,
+			animateTo:angles+1800,
+			duration:8000,
+			callback:function (){
+				//中奖提示
+//				alert(txt);
+				console.log(txt)
+				console.log(zpData)
+				if(txt=='谢谢参与'){
+					
+					$(".gdcj-cnt").removeClass('gdcj-show')
+					$(".xiexie").addClass('gdcj-show')
+					diaShow();
+					
+				}else{
+					
+					if(txt.indexOf('粒')>-1){
+						let num = null;
+						zpData.forEach(function(e){
+							if(txt==e.name){
+								num = e.num;
+								return;
+							}
+						})
+						
+						$.ajax({
+						        url:apiUrl+'/prize/addWinPrizeByType',
+						        type: "POST",
+						        data:{"userId":userId,"prizeName":txt,"type":1,"properties":1,"num":num,"giftBagId":''},
+						        success: function (res) {
+						            if(res.code==1){
+						            	$(".gdcj-cnt").removeClass('gdcj-show')
+										$(".zhongjiang").addClass('gdcj-show')
+										$(".zhongjiang .zj-cnt").text('获得'+txt)
+										diaShow();
+						            	
+						            }else{
+						            	alert(res.msg)
+						            }
+						        }
+    					})
+						
+					}else if(txt.indexOf('礼包')>-1){
+						
+						let giftBagId = null;
+						zpData.forEach(function(e){
+							if(txt==e.name){
+								giftBagId = e.giftBagId;
+								return;
+							}
+						})
+						
+						$.ajax({
+						        url:apiUrl+'/prize/addWinPrizeByType',
+						        type: "POST",
+						        data:{"userId":userId,"prizeName":txt,"type":1,"properties":2,"num":0,"giftBagId":giftBagId},
+						        success: function (res) {
+						            if(res.code==1){
+						            	$(".gdcj-cnt").removeClass('gdcj-show')
+										$(".zhongjiang").addClass('gdcj-show')
+										$(".zhongjiang .zj-cnt").text('获得'+txt)
+										diaShow();
+						            	
+						            }else{
+						            	alert(res.msg)
+						            }
+						        }
+    					})
+					}
+					
+				}
+				
+				turnplate.bRotate = !turnplate.bRotate;
+			}
+		});
+	};
+
+	$('.pointer').click(function (){
+		
+		console.log(userId)
+		if(userId=='-1'){
+			$(".login-dialog").addClass("show")
+		}else{
+			$(".gdcj-cnt").removeClass('gdcj-show')
+			$(".kouchu").addClass('gdcj-show')
+			diaShow();
+		}
+		
+	});
+	
+	$(".cancelBtn").click(function(){
+		$(".login-dialog").removeClass("show")
+	})
+	
+	$(".btn-box .quxiao").click(function(){
+		diaHide()
+		$(".gdcj-cnt").removeClass('gdcj-show')
+	})
+	
+	$(".diglog-cnt .close").click(function(){
+		diaHide()
+		$(".gdcj-cnt").removeClass('gdcj-show')
+	})
+	
+	$(".btn-box .qr").click(function(){
+		
+		$.ajax({
+	        url:apiUrl+'/prize/dialStart',
+	        type: "POST",
+	        data:{"userId":userId},
+	        success: function (res) {
+	        	
+	            if(res.code==1){
+	            	if(turnplate.bRotate)return;
+					gudoNum = gudoNum-10;
+					$(".sygd").text('剩余'+gudoNum+'粒骨豆');
+					$(".gd-num").text('您当前剩余'+gudoNum+'粒骨豆');
+					diaHide();
+					turnplate.bRotate = !turnplate.bRotate;
+					//获取随机数(奖品个数范围内)
+					var item = rnd(1,turnplate.restaraunts.length);
+					//奖品数量等于10,指针落在对应奖品区域的中心角度[252, 216, 180, 144, 108, 72, 36, 360, 324, 288]
+					rotateFn(item, turnplate.restaraunts[item-1]);
+	            }else{
+	            	alert(res.msg)
+	            }
+	        }
+    	})
+		
+		
+	})
+	
+	$(".getCode").click(function(){
+		
+		getCode();
+	});
+	
+	$(".okBtn").click(function(){
+		
+		login();
+	})
+	
+});
+
+
+
+let count = '';
+let codeTimer = null;
+let reg = /^1[3456789]\d{9}$/;
+//获取验证码
+function getCode() {
+        //获取验证码
+        let phone = $(".phoneInput").val();
+        
+        if (phone == '') {
+          alert('请填写手机号码')
+          return false;
+        } else if (!reg.test(phone)) {
+          alert('手机号码格式错误')
+          return false;
+        }
+        if (phone) {
+          
+          const TIME_COUNT = 60;
+          if (!codeTimer) {
+            count = TIME_COUNT;
+			$.ajax({
+		        url:'http://app.gutouzu.com/sms_login_code',
+		        type: "GET",
+		        data:{"phone":phone},
+		        success: function (res) {
+		        	
+		            if(res.code!=1){
+		            	alert(res.msg)
+		            }
+		        }
+    		})
+            codeTimer = setInterval(() => {
+              if (count > 0 && count <= TIME_COUNT) {
+                count--;
+                $(".getCode").addClass('codeHide')
+                $(".active_vcode").addClass('codeShow');
+                $(".active_vcode").text(count)
+              } else {
+                clearInterval(codeTimer);
+                codeTimer = null;
+                $(".getCode").removeClass('codeHide')
+                $(".active_vcode").removeClass('codeShow');
+                $(".active_vcode").text(0)
+              }
+            }, 1000)
+          }
+        }
+
+}
+
+
+//登录
+function login(){
+	
+	let phone = $(".phoneInput").val();
+	let vCode = $(".vInput").val();
+	if(phone==''){
+		alert('请输入手机号码')
+	}else if(!reg.test(phone)){
+		alert('手机号码格式错误')
+	}else if(vCode==''){
+		alert('请输入验证码')
+	}else{
+		$.ajax({
+        url:'http://app.gutouzu.com/user_sms_login',
+        type: "POST",
+        data:{"phone":phone,"vcode":vCode},
+        success: function (res) {
+        	
+            if(res.code==1){
+            	$.ajax({
+			        url:apiUrl+'/prize/selectPrizeByType',
+			        type: "GET",
+			        data:{"userId":userId,"type":1,rows:10},
+			        success: function (arg) {
+			        	
+			            if(arg.code==1){
+			            	gudoNum = arg.data.boneBean;
+			            	$(".sygd").text('剩余'+gudoNum+'粒骨豆');
+							$(".gd-num").text('您当前剩余'+gudoNum+'粒骨豆');
+			            }else{
+			            	alert(arg.msg)
+			            }
+			        }
+    			})
+            	localStorage.setItem('userId',res.user.userId);
+            	userId = res.user.userId;
+            	$(".login-dialog").removeClass('show')
+            }else{
+            	alert(res.msg)
+            }
+        }
+    })
+	}
+	
+}
+
+//跑马灯
+function zmd(){
+	var ROLL_SPEED = 100
+    var noticeList1 = $('#notice-list');
+    var noticeList2 = $('#notice-list-2');
+    var listWrapper = $('#list-wrapper');
+    noticeList2.html(noticeList1.html())
+    listWrapper.css('top', 0)
+    var timer = setInterval(rollStart, ROLL_SPEED);
+
+    function rollStart() {
+        if (Math.abs(_subStr(listWrapper.css('top'))) >= noticeList1.height()) {
+            listWrapper.css('top', 0)
+        } else {
+            var top = listWrapper.css('top');
+            listWrapper.css('top', _subStr(top) - 1)
+        }
+    }
+
+    // 截取px前数值
+    function _subStr(str) {
+        var index = str.indexOf('px');
+        if (index > -1) {
+            return parseFloat(str.substr(0, index + 1))
+        }
+    }
+}
+
+
+
+
+//初始化大转盘数据
+function getData(){
+	
+	$.ajax({
+        url:apiUrl+'/prize/selectPrizeByType',
+        type: "GET",
+        data:{"userId":userId,"type":1,rows:10},
+        success: function (res) {
+        	console.log(res)
+        	
+            if(res.code==1){
+            	zpData = res.data.prizeDos;
+            	rnd(1,100);
+				drawRouletteWheel();
+            	gudoNum = res.data.boneBean;
+            	
+            	$(".sygd").text('剩余'+gudoNum+'粒骨豆');
+				$(".gd-num").text('您当前剩余'+gudoNum+'粒骨豆');
+            	let pmdHtml = '';
+            	res.data.winPrizeRecordDos.forEach(function(e){
+            		pmdHtml+='<li>'+e.userName+'获得'+e.prizeName+'</li>'
+            		
+            	})
+            	
+            	$("#notice-list").append(pmdHtml)
+            }else{
+            	alert(res.msg)
+            }
+        }
+    })
+	
+}
+
+
+
+//弹框显示
+function diaShow(){
+	$(".diglog-box").addClass('show')
+}
+
+//弹窗消失
+function diaHide(){
+	$(".diglog-box").removeClass('show')
+}
+
+function rnd(n, m){
+	
+	n=1;//最小随机数
+	m=100;//最大随机数（概率范围最大值）
+	var ransluck = [];//概率为比自己小的第一个数之间的差
+	//最大数数不超过最大随机数
+	
+	zpData.forEach(function(e){
+		if(e.name == turnplate.restaraunts[0]){
+			ransluck[0] = e.probability
+		}else if(e.name == turnplate.restaraunts[1]){
+			ransluck[1] = e.probability
+		}else if(e.name == turnplate.restaraunts[2]){
+			ransluck[2] = e.probability
+		}else if(e.name == turnplate.restaraunts[3]){
+			ransluck[3] = e.probability
+		}else if(e.name == turnplate.restaraunts[4]){
+			ransluck[4] = e.probability
+		}
+		
+	})
+	
+	var randoms = Math.floor(Math.random()*(m-n+1)+n);
+	
+	if(randoms>=100-ransluck[0])
+	{
+		var random = 1;
+	}
+	else if(randoms>=100-ransluck[1])
+	{
+		var random = 2;
+	}
+	else if(randoms>=100-ransluck[2])
+	{
+		var random = 3;
+	}
+	else if(randoms>=100-ransluck[3])
+	{
+		var random = 4;
+	}
+	else if(randoms>=100-ransluck[4])
+	{
+		var random = 5;
+	}else{
+		var random = 5;
+	}
+	//alert(randoms);
+	//alert(random);
+	return random;
+	
+}
+
+
+//页面所有元素加载完毕后执行drawRouletteWheel()方法对转盘进行渲染
+window.onload=function(){
+	
+	getData();
+	zmd();
+};
+
+function drawRouletteWheel() {    
+  var canvas = document.getElementById("wheelcanvas");    
+  if (canvas.getContext) {
+	  //根据奖品个数计算圆周角度
+	  var arc = Math.PI / (turnplate.restaraunts.length/2);
+	  var ctx = canvas.getContext("2d");
+	  //在给定矩形内清空一个矩形
+	  ctx.clearRect(0,0,422,422);
+	  //strokeStyle 属性设置或返回用于笔触的颜色、渐变或模式  
+	  ctx.strokeStyle = "#FFBE04";
+	  //font 属性设置或返回画布上文本内容的当前字体属性
+	  ctx.font = '20px Microsoft YaHei';      
+	  for(var i = 0; i < turnplate.restaraunts.length; i++) {       
+		  var angle = turnplate.startAngle + i * arc;
+		  ctx.fillStyle = turnplate.colors[i];
+		  ctx.beginPath();
+		  //arc(x,y,r,起始角,结束角,绘制方向) 方法创建弧/曲线（用于创建圆或部分圆）    
+		  ctx.arc(211, 211, turnplate.outsideRadius, angle, angle + arc, false);    
+		  ctx.arc(211, 211, turnplate.insideRadius, angle + arc, angle, true);
+		  ctx.stroke();  
+		  ctx.fill();
+		  //锁画布(为了保存之前的画布状态)
+		  ctx.save();   
+		  
+		  //----绘制奖品开始----
+		  ctx.fillStyle = "#E5302F";
+		  var text = turnplate.restaraunts[i];
+		  var line_height = 17;
+		  //translate方法重新映射画布上的 (0,0) 位置
+		  ctx.translate(211 + Math.cos(angle + arc / 2) * turnplate.textRadius, 211 + Math.sin(angle + arc / 2) * turnplate.textRadius);
+		  
+		  //rotate方法旋转当前的绘图
+		  ctx.rotate(angle + arc / 2 + Math.PI / 2);
+		  
+		  /** 下面代码根据奖品类型、奖品名称长度渲染不同效果，如字体、颜色、图片效果。(具体根据实际情况改变) **/
+		  if(text.indexOf("M")>0){//流量包
+			  var texts = text.split("M");
+			  for(var j = 0; j<texts.length; j++){
+				  ctx.font = j == 0?'bold 26px Microsoft YaHei':'18px Microsoft YaHei';
+				  if(j == 0){
+					  ctx.fillText(texts[j]+"M", -ctx.measureText(texts[j]+"M").width / 2, j * line_height);
+				  }else{
+					  ctx.fillText(texts[j], -ctx.measureText(texts[j]).width / 2, j * line_height);
+				  }
+			  }
+		  }else if(text.indexOf("M") == -1 && text.length>6){//奖品名称长度超过一定范围 
+			  text = text.substring(0,6)+"||"+text.substring(6);
+			  var texts = text.split("||");
+			  for(var j = 0; j<texts.length; j++){
+				  ctx.fillText(texts[j], -ctx.measureText(texts[j]).width / 2, j * line_height);
+			  }
+		  }else{
+			  //在画布上绘制填色的文本。文本的默认颜色是黑色
+			  //measureText()方法返回包含一个对象，该对象包含以像素计的指定字体宽度
+			  ctx.fillText(text, -ctx.measureText(text).width / 2, 0);
+		  }
+		  
+		  //添加对应图标
+		 
+		  if(text.indexOf("99")>=0){
+		  		
+			  var img= document.getElementById("jp99");
+			  img.onload=function(){  
+				  ctx.drawImage(img,-15,10);      
+			  }; 
+			  ctx.drawImage(img,-15,10);  
+		  }else if(text.indexOf("10")>=0){
+		  	
+			  var img= document.getElementById("jpgd");
+			  img.onload=function(){
+				  ctx.drawImage(img,-15,10);
+			  };
+			  ctx.drawImage(img,-15,10);
+		  }
+		  else if(text.indexOf("30")>=0){
+			  var img= document.getElementById("jpgd");
+			  img.onload=function(){
+				  ctx.drawImage(img,-15,10);
+			  };
+			  ctx.drawImage(img,-15,10);
+		  }
+		  else if(text.indexOf("39")>=0){
+			  var img= document.getElementById("jp39");
+			  img.onload=function(){
+				  ctx.drawImage(img,-15,10);
+			  };
+			  ctx.drawImage(img,-15,10);
+		  }
+		  else if(text.indexOf("谢谢")>=0){
+			  var img= document.getElementById("xxcy");
+			  img.onload=function(){
+				  ctx.drawImage(img,-15,10);
+			  };
+			  ctx.drawImage(img,-15,10);
+		  }
+
+		  //把当前画布返回（调整）到上一个save()状态之前 
+		  ctx.restore();
+		  //----绘制奖品结束----
+	  }     
+  } 
+}
+
+</script>
+
+</body>
+</html>
