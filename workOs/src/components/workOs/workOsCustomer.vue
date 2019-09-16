@@ -17,9 +17,9 @@
           <router-link v-if="parentId==0" :to="{name:'workOsPcMap'}">PC端链接</router-link>
 				</div>
 				<div class="customerType flex_r_f_s">
-					<cube-select v-model="environmenVal" :options="storeEnvironmen" placeholder="店铺环境" @change="getCustomer"></cube-select>
-					<cube-select v-model="typeVal" :options="customerType" placeholder="客户类型" @change="getCustomer"></cube-select>
-					<cube-select v-model="projectTypeVal" :options="projectData" placeholder="产品类型" @change="getCustomer"></cube-select>
+					<cube-select v-model="environmenVal" :options="storeEnvironmen" placeholder="店铺环境" @change="getChangeData"></cube-select>
+					<cube-select v-model="typeVal" :options="customerType" placeholder="客户类型" @change="getChangeData"></cube-select>
+					<cube-select v-model="projectTypeVal" :options="projectData" placeholder="产品类型" @change="getChangeData"></cube-select>
 
 				</div>
 				<div class="customerTypeBox flex_r_f_s">
@@ -34,7 +34,7 @@
 				<div class="search_box">
 					<div class="search flex_r_s_b">
 						<input type="text" placeholder="输入你要查询的店铺名字" v-model="shopName">
-						<div class="sIcon flex_r_s_c" @click="getCustomer">
+						<div class="sIcon flex_r_s_c" @click="getChangeData">
 							<img src="../../assets/ali-sousuo.png" alt="">
 						</div>
 					</div>
@@ -44,6 +44,7 @@
 			<div class="workOsCustomer_nav">
 				<router-link class="active" :to="{name:'workOsCustomer'}">信息列表</router-link>
 				<router-link :to="{name:'workOsMap'}">地图详情</router-link>
+        <span class="downXls" @click="export2Excel">下载客户信息</span>
 			</div>
 
 		</div>
@@ -79,9 +80,9 @@
             </div>
 
 
-            <div class="delete" v-if="parentId===0" @click="deletCustomer(item,index)">
+            <!-- <div class="delete" v-if="parentId===0" @click="deletCustomer(item,index)">
               <img src="../../assets/ali-delete.png" alt="">
-            </div>
+            </div> -->
 					</div>
 					<div class="addr">
 						{{item.province}}-{{item.city}}-{{item.area}}
@@ -141,6 +142,7 @@
 	export default {
 		data() {
 			return {
+        xlsData:[],
         time1:'',//时间文本值
         time2:'',//时间文本值
 				storeEnvironmen: [{value:'',text:'店铺星级'}],
@@ -222,6 +224,7 @@
           }
 				}
 				this.getCustomer();
+        this.getXls();
 				this.getCondition();
 				this.getProjectType();
 				this.getType();
@@ -236,6 +239,23 @@
 					name:'workOsInfoList'
 				});
 			},
+      getChangeData(){
+        this.getCustomer();
+        this.getXls();
+      },
+      export2Excel() {
+      　require.ensure([], () => {
+    　　　const { export_json_to_excel } = require('../../vendor/Export2Excel');
+    　　　const tHeader = ['店铺名称','添加时间','地址', '联系电话'];//生成Excel表格的头部标题栏
+    　　　const filterVal = ['shopName', 'createTime','address', 'phone'];//生成Excel表格的内容栏（根据自己的数据内容属性填写）
+    　　　const list = this.xlsData;//需要导出Excel的数据
+    　　　const data = this.formatJson(filterVal, list);
+    　　　export_json_to_excel(tHeader, data, '客户信息');//这里可以定义你的Excel表的默认名称
+    　　})
+      },
+      formatJson(filterVal, jsonData) {
+           return jsonData.map(v => filterVal.map(j => v[j]))
+      },
       selectDataHandle(date, selectedVal, selectedText) {
         let self = this;
         this.time1 = selectedText.join('-');
@@ -244,11 +264,13 @@
           this.time2 = this.time1;
           this.time1 = temp;
           this.getCustomer();
+          this.getXls();
         }else if(this.time2!=''&& new Date(selectedText.join('-')).getTime()==new Date(self.time2).getTime()){
           alert('不能选相同的时间');
           this.time1 = '';
         }else{
           this.getCustomer();
+          this.getXls();
         }
       },
       showDatePicker() {
@@ -531,7 +553,7 @@
 					}
 				}).then((res) => {
 					if (res.data.code == 1) {
-						console.log(res)
+						// console.log(res)
 
 						setTimeout(() => {
               self.customerList = res.data.data.bClientVos;
@@ -552,14 +574,59 @@
 			selectHandle(selectedVal, selectedIndex, selectedText) {
 				this.cityData = selectedText;
 				this.getCustomer();
+        this.getXls();
 			},
 
 			cancelHandle() {
 
 			},
+      getXls(){
+        this.page = 0;
+        let self = this;
+        if(this.cityData[0]=='省份'){
+        	this.sheng = '';
+        	this.shi = '';
+        	this.qu = ''
+        }else{
+        	this.sheng = this.cityData[0];
+        	this.shi = this.cityData[1]
+        	this.qu = this.cityData[2]
+        }
+        if(this.cityData[1] == '城市'){
+        	this.shi = '';
+        }
+        if(this.cityData[2] == '市辖区'){
+        	this.qu = '';
+        }
+
+        this.axios.post(Api.staffApi + '/business/selectBClientAll', this.qs.stringify({
+        	businessId:self.businessId,
+        	province:self.sheng,
+        	city:self.shi,
+        	area:self.qu,
+        	conditionId:self.environmenVal,
+        	typeId:self.typeVal,
+        	shopName:self.shopName,
+          startTime:self.time1,
+          endTime:self.time2,
+        	productTypeId:self.projectTypeVal
+        }), {
+        	headers: {
+        		'Content-Type': 'application/x-www-form-urlencoded'
+        	}
+        }).then((res) => {
+        	if (res.data.code == 1) {
+            console.log(res)
+            self.xlsData = res.data.data.bClientVos;
+        	} else {
+        		alert(res.data.msg)
+        	}
+        })
+      },
       listChange(val){
         this.businessId = val;
         this.getCustomer();
+        this.getXls();
       },
 			onPullingDown() {
 				// 模拟更新数据
@@ -695,6 +762,7 @@
 				.region {
 					div {
 						padding: 5px 20px 5px 10px;
+
 						/*no*/
 						margin-right: 20px;
 						border: 1px solid #e8e8e8;
@@ -707,6 +775,7 @@
 						span {
 							font-size: 26px;
 							color: #333;
+              width:100px;
 						}
 
 						img {
@@ -790,7 +859,11 @@
 			.workOsCustomer_nav {
 				padding: 0 20px;
 				padding-top: 20px;
-
+        .downXls{
+          font-size:24px;
+          color:#999;
+          margin-left:260px;
+        }
 				a {
 					font-size: 24px;
 					color: #333;

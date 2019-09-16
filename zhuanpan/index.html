@@ -115,7 +115,7 @@
 <script type="text/javascript" src="js/jquery.min.js"></script>
 <script type="text/javascript" src="js/awardRotate.js"></script>
 <script type="text/javascript">
-
+//localStorage.removeItem('userId')
 let apiUrl = 'http://app.gutouzu.com';
 let userId = '-1';
 let gudoNum = null;
@@ -381,6 +381,9 @@ function login(){
         success: function (res) {
         	
             if(res.code==1){
+            	localStorage.setItem('userId',res.user.userId);
+            	userId = res.user.userId;
+            	$(".login-dialog").removeClass('show')
             	$.ajax({
 			        url:apiUrl+'/prize/selectPrizeByType',
 			        type: "GET",
@@ -388,7 +391,9 @@ function login(){
 			        success: function (arg) {
 			        	
 			            if(arg.code==1){
+			            	console.log(arg)
 			            	gudoNum = arg.data.boneBean;
+			            	console.log(arg)
 			            	$(".sygd").text('剩余'+gudoNum+'粒骨豆');
 							$(".gd-num").text('您当前剩余'+gudoNum+'粒骨豆');
 			            }else{
@@ -396,9 +401,7 @@ function login(){
 			            }
 			        }
     			})
-            	localStorage.setItem('userId',res.user.userId);
-            	userId = res.user.userId;
-            	$(".login-dialog").removeClass('show')
+            	
             }else{
             	alert(res.msg)
             }
