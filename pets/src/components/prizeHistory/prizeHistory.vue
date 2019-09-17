@@ -5,7 +5,7 @@
       	<div class="nav_title">中奖纪录</div>
       </div>
       <div class="prize-history-cnt">
-        
+
         <div class="scroolBox">
           <cube-scroll ref="scroll" @pulling-up="onPullingUp" @pulling-down="onPullingDown" :options="options">
           <ul class="history-list">
@@ -14,33 +14,30 @@
               <div class="mid">奖品</div>
               <div class="right">领取状态</div>
             </li>
-            <li class="flex_r_s_b">
-              <div class="left">2019/04/23</div>
-              <div class="mid">20粒骨豆</div>
+            <li class="flex_r_s_b" v-for="item in dataList">
+              <div class="left">{{item.winPrizeTime}}</div>
+              <div class="mid">{{item.prizeName}}</div>
 
               <div class="right">
-                <div class="receive">待领取</div>
+                <div class="receive" v-if="item.properties==1">已领取</div>
+                <div class="receive active" v-else>待领取</div>
               </div>
             </li>
-            <li class="flex_r_s_b">
-              <div class="left">2019/04/23</div>
-              <div class="mid">20粒骨豆</div>
-              <div class="right active">
-                <div class="receive">待领取</div>
-              </div>
-            </li>
+
           </ul>
           </cube-scroll>
         </div>
-        
+
       </div>
   </div>
 </template>
 
 <script>
+  import Api from '../common/apj.js'
   export default{
     data(){
       return{
+        dataList:[],
         options:{
         	pullDownRefresh:{
         		txt:'更新成功',
@@ -56,9 +53,34 @@
         },
       }
     },
+    mounted() {
+      this.getDataList();
+    },
     methods:{
       back(){
 
+      },
+      getDataList(){
+        let self = this;
+        this.axios.get(Api.userApi+'/prize/selectWinPrizeRecordByType',{
+          params:{
+            userId:38,
+            type:1,
+            page:1,
+            rows:10
+          }
+
+        }).then(function(res) {
+              console.log(res.data.data)
+              if(res.data.code==1){
+                self.dataList = res.data.data;
+              }else{
+
+              }
+        	}).catch(function(err) {
+              alert(err)
+
+        	});
       },
       onPullingDown(){//上拉刷新
 
@@ -109,6 +131,14 @@
           box-sizing:border-box;
           li{
             padding:20px 0;
+            .left{
+              width:180px;
+              text-align:center;
+            }
+            .mid{
+              width:180px;
+              text-align:center;
+            }
             div{
               text-align: left;
               width:130px;
@@ -123,16 +153,13 @@
 
             }
             .active{
-
-              .receive{
-                background:#ff523d;
-                width:110px;
-                height:40px;
-                text-align:center;
-                line-height:40px;
-                border-radius:20px;
-                color:#fff;
-              }
+              background:#ff523d;
+              width:110px;
+              height:40px;
+              text-align:center;
+              line-height:40px;
+              border-radius:20px;
+              color:#fff;
             }
           }
           .listTop{

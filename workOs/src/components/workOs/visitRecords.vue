@@ -32,7 +32,7 @@
       		</div>
       	</div>
       </div>
-      <div class="recordsNum">共查询到{{totalNum}}条拜访记录</div>
+      <div class="recordsNum">共查询到{{totalNum}}条拜访记录 <span @click="export2Excel" v-if="parentId==0">点击下载拜访记录</span></div>
      <!-- <div class="dataNum">2019/7/19共<span>7</span>条拜访记录</div> -->
     </div>
     <div class="cntList">
@@ -69,6 +69,7 @@
     data() {
       return {
         visitList:[],
+        xlsData:[],
         shopName:'',
         staffVal: '',
         totalNum:'',
@@ -76,6 +77,7 @@
         time1:'',
         time2:'',
         page:0,
+        parentId:'-1',
         viewCompetence:'',//权限
         staffNameList:[],
         options:{
@@ -95,14 +97,37 @@
     },
     mounted() {
 
-      this.initial();
 
+      if(JSON.parse(localStorage.getItem('staff'))== null){
+      	this.$router.push({
+      		name:'workOsLogin'
+      	})
+      }else{
+        this.parentId = JSON.parse(localStorage.getItem('staff')).parentId;
+
+      }
+       this.initial();
     },
     methods: {
       nameChange() {
         // this.page = 0;
         this.getList();
+        this.getXls();
+
       },
+      export2Excel() {
+        　require.ensure([], () => {
+      　　　const { export_json_to_excel } = require('../../vendor/Export2Excel');
+      　　　const tHeader = ['店铺名称','添加时间','地址','拜访人员','备注'];//生成Excel表格的头部标题栏
+      　　　const filterVal = ['shopName', 'createTime','currentAddr','staffName','remark'];//生成Excel表格的内容栏（根据自己的数据内容属性填写）
+      　　　const list = this.xlsData;//需要导出Excel的数据
+      　　　const data = this.formatJson(filterVal, list);
+      　　　export_json_to_excel(tHeader, data, '拜访信息');//这里可以定义你的Excel表的默认名称
+      　　})
+        },
+        formatJson(filterVal, jsonData) {
+             return jsonData.map(v => filterVal.map(j => v[j]))
+        },
       initial(){
         let self = this;
         if(JSON.parse(localStorage.getItem('staff'))== null){
@@ -131,6 +156,7 @@
          }
           this.getStaffName();
           this.getList();
+          this.getXls();
         }
       },
       back() {
@@ -160,12 +186,14 @@
            this.time2 = this.time1;
            this.time1 = temp;
            this.getList();
+           this.getXls();
 
          }else if(this.time2!=''&& new Date(selectedText.join('-')).getTime()==new Date(self.time2).getTime()){
            alert('不能选相同的时间');
            this.time1 = '';
          }else{
             this.getList();
+            this.getXls();
 
          }
        },
@@ -197,24 +225,50 @@
            this.time2 = this.time1;
            this.time1 = temp;
            this.getList();
+           this.getXls();
 
          }else if(this.time1!=''&& new Date(selectedText.join('-')).getTime()==new Date(self.time1).getTime()){
            alert('不能选相同的时间');
            this.time2 = '';
          }else{
            this.getList();
+           this.getXls();
 
          }
        },
       cancelHandle2() {},
       search(){
         this.getList();
+        this.getXls();
       },
       link(item){
         this.$router.push({
           name:'visitInfoList',
           query:{
             visitInfo:item
+          }
+        })
+      },
+
+      getXls(){
+        let self = this;
+        self.axios.post(Api.staffApi + '/visit/selectVisitByCompetenceAll', this.qs.stringify({
+          isAdmin:self.isAdmin,
+          staffIds:self.staffVal,
+          startTime:self.time1,
+          endTime:self.time2,
+          shopName:self.shopName,
+        }), {
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+          }
+        }).then((res)=>{
+          if(res.data.code==1){
+
+            self.xlsData = res.data.data.list;
+
+          }else{
+            alert(res.data.msg)
           }
         })
       },
@@ -267,6 +321,7 @@
       getList(){//获取拜访记录
         let self = this;
         self.page = 0;
+
         self.axios.post(Api.staffApi + '/visit/selectVisitByCompetence', this.qs.stringify({
           isAdmin:self.isAdmin,
           staffIds:self.staffVal,
@@ -468,7 +523,10 @@
         padding: 30px 20px 0 20px;
         font-size: 30px;
         color: #333;
-
+        span{
+          color:#999;
+          margin-left:50px;
+        }
       }
       .dataNum{
         padding: 40px 20px 0 20px;

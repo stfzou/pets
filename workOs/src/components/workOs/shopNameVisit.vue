@@ -32,7 +32,7 @@
       		</div>
       	</div>
       </div> -->
-      <div class="recordsNum">共查询到{{totalNum}}条拜访记录</div>
+      <div class="recordsNum">共查询到{{totalNum}}条拜访记录 <span class="down-bf" @click="export2Excel" v-if="parentId==0">下载拜访信息</span></div>
      <!-- <div class="dataNum">2019/7/19共<span>7</span>条拜访记录</div> -->
     </div>
     <div class="cntList">
@@ -70,6 +70,8 @@
       return {
         visitList:[],
         shopName:'',
+        xlsData:[],
+        parentId:'-1',
         staffVal: '',
         totalNum:'',
         isAdmin:'',
@@ -102,11 +104,11 @@
       	})
 
       }else{
-
-        this.clientId = this.$route.query.visitInfo.shopId;
-        this.shopName = this.$route.query.visitInfo.shopName;
-        console.log(this.$route.query)
+        this.parentId = JSON.parse(localStorage.getItem('staff')).parentId;
+        this.clientId = this.$route.query.shopId;
+        this.shopName = this.$route.query.shopName;
         this.getList();
+        this.getXls();
       }
 
 
@@ -115,6 +117,19 @@
       nameChange() {
         this.getList();
       },
+      export2Excel() {
+        　require.ensure([], () => {
+      　　　const { export_json_to_excel } = require('../../vendor/Export2Excel');
+      　　　const tHeader = ['店铺名称','添加时间','地址','拜访人员','备注'];//生成Excel表格的头部标题栏
+      　　　const filterVal = ['shopName', 'createTime','currentAddr','staffName','remark'];//生成Excel表格的内容栏（根据自己的数据内容属性填写）
+      　　　const list = this.xlsData;//需要导出Excel的数据
+      　　　const data = this.formatJson(filterVal, list);
+      　　　export_json_to_excel(tHeader, data, '拜访信息');//这里可以定义你的Excel表的默认名称
+      　　})
+        },
+        formatJson(filterVal, jsonData) {
+             return jsonData.map(v => filterVal.map(j => v[j]))
+        },
       back() {
         // this.$router.push({
         //   name: 'workOsInfoList'
@@ -143,13 +158,14 @@
            this.time2 = this.time1;
            this.time1 = temp;
            this.getList();
+           this.getXls();
 
          }else if(this.time2!=''&& new Date(selectedText.join('-')).getTime()==new Date(self.time2).getTime()){
            alert('不能选相同的时间');
            this.time1 = '';
          }else{
             this.getList();
-
+            this.getXls();
          }
        },
       cancelHandle() {},
@@ -179,14 +195,15 @@
            let temp = this.time2;
            this.time2 = this.time1;
            this.time1 = temp;
-          this.getList();
+           this.getList();
+           this.getXls();
 
          }else if(this.time1!=''&& new Date(selectedText.join('-')).getTime()==new Date(self.time1).getTime()){
            alert('不能选相同的时间');
            this.time2 = '';
          }else{
            this.getList();
-
+           this.getXls();
          }
        },
       cancelHandle2() {},
@@ -198,6 +215,25 @@
           name:'visitInfoList',
           query:{
             visitInfo:item
+          }
+        })
+      },
+      getXls(){
+        let self = this;
+        self.axios.post(Api.staffApi + '/visit/selectClientVisitAll', this.qs.stringify({
+          clientId:self.clientId,
+          startTime:self.time1,
+          endTime:self.time2,
+          shopName:self.shopName
+        }), {
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+          }
+        }).then((res)=>{
+          if(res.data.code==1){
+            self.xlsData = res.data.data.list;
+          }else{
+            alert(res.data.msg)
           }
         })
       },
@@ -261,7 +297,7 @@
           }
         }).then((res)=>{
           if(res.data.code==1){
-
+            console.log(res)
             setTimeout(() => {
               self.visitList = res.data.data.list;
               if(res.data.data.num==''||res.data.data.num==null){
@@ -447,7 +483,10 @@
         padding: 30px 20px 0 20px;
         font-size: 30px;
         color: #333;
-
+        span{
+          color:#999;
+          margin-left:50px;
+        }
       }
       .dataNum{
         padding: 40px 20px 0 20px;
@@ -469,6 +508,7 @@
         li{
           align-items: flex-start;
           margin-top: 30px;
+          padding-top:10px;
           .list_left{
             width: 25%;
             .userName{

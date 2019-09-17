@@ -4,7 +4,7 @@
 	<head>
 		<meta charset="UTF-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no" />
-		<title>Document</title>
+		<title>砸金蛋</title>
 		<script src="//res.wx.qq.com/open/js/jweixin-1.2.0.js" type="text/javascript" charset="utf-8"></script>
 		<script>
 			(function(doc, win) {
@@ -169,17 +169,21 @@
 
 			</div>
 
-			<div class="footer">
-				<p>您今天还有 <span id="chance">0</span> 次抽奖机会</p>
-			</div>
+			
 
-			<div class="bottom-btn flex_r_s_b">
-				<div>
-					<a href="###">中奖规则</a>
+			<div class="bottom-btn">
+				<div class="footer">
+					<p>您今天还有 <span id="chance">0</span> 次抽奖机会</p>
 				</div>
-				<div>
-					<a href="###">中奖查询</a>
+				<div class="flex_r_s_b itemBox">
+					<div>
+						<a href="###">中奖规则</a>
+					</div>
+					<div>
+						<a href="###">中奖查询</a>
+					</div>
 				</div>
+				
 			</div>
 		</div>
 
@@ -189,6 +193,7 @@
 		<script src="js/preloadjs-NEXT.min.js"></script>
 		<script src="js/soundjs-NEXT.min.js"></script>
 		<script>
+			
 			let chance = 0; //砸蛋次数
 			let apiUrl = 'http://app.gutouzu.com';
 			let userId = '-1';
@@ -202,6 +207,7 @@
 				link: window.location.href,
 				imgUrl: '',
 				success: function() {
+					
 					$.ajax({
 						url: apiUrl + '/prize/goldenEggShare',
 						type: "POST",
@@ -209,11 +215,10 @@
 							"userId": userId
 						},
 						success: function(res) {
-							
 							if(res.code == 1) {
 								alert('分享成功,获得今日免费砸金蛋一次')
-								chance+=1;
-							} else {
+								
+							}else {
 								alert(res.msg)
 							}
 						}
@@ -353,6 +358,14 @@
 				$(".shareBtn").click(function() {
 					alert('点击右上角，进行分享')
 					$(".dialong").removeClass('diaShow');
+				});
+				
+				
+				//取消
+				$(".cancelBtn").click(function(){
+					$(".dialong").removeClass('diaShow');
+					$(".login-dialog").removeClass('diaCntShow')
+					$(".dialongCnt").removeClass('diaCntShow');
 				})
 
 			}
@@ -415,7 +428,7 @@
 								imgUrl: opt.imgUrl, // 分享图标
 								success() {
 									// 用户成功分享后执行的回调函数
-									option.success()
+									opt.success()
 								},
 								cancel() {
 									// 用户取消分享后执行的回调函数
@@ -431,7 +444,7 @@
 								imgUrl: opt.imgUrl, // 分享图标
 								success() {
 									// 用户成功分享后执行的回调函数
-									option.success()
+									opt.success()
 								},
 								cancel() {
 									// 用户取消分享后执行的回调函数
@@ -446,7 +459,7 @@
 								success() {
 									// 用户成功分享后执行的回调函数
 
-									option.success()
+									opt.success()
 								},
 								cancel() {
 									// 用户取消分享后执行的回调函数
@@ -554,12 +567,11 @@
 						success: function(res) {
 
 							if(res.code == 1) {
-								getData();
 								localStorage.setItem('userId', res.user.userId);
 								userId = res.user.userId;
 								$(".login-dialog").removeClass('diaCntShow');
 								$(".dialong").removeClass('diaShow');
-
+								getData();
 							} else {
 								alert(res.msg)
 							}

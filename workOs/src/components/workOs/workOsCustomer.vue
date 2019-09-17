@@ -44,7 +44,7 @@
 			<div class="workOsCustomer_nav">
 				<router-link class="active" :to="{name:'workOsCustomer'}">信息列表</router-link>
 				<router-link :to="{name:'workOsMap'}">地图详情</router-link>
-        <span class="downXls" @click="export2Excel">下载客户信息</span>
+        <span class="downXls" @click="export2Excel" v-if="parentId==0">下载客户信息</span>
 			</div>
 
 		</div>
@@ -59,7 +59,7 @@
 
             <div class="link flex_r_f_s">
               <span><b>{{item.shopName}}</b></span>
-              <router-link v-if="item.businessId == staffId" :to="{name:'editCustomer',params:{
+              <router-link :to="{name:'editCustomer',params:{
               	cityData:[item.province,item.city,item.area],
               	addr:item.address,
               	shopName:item.shopName,
@@ -80,9 +80,9 @@
             </div>
 
 
-            <!-- <div class="delete" v-if="parentId===0" @click="deletCustomer(item,index)">
+            <div class="delete" v-if="parentId===0" @click="deletCustomer(item,index)">
               <img src="../../assets/ali-delete.png" alt="">
-            </div> -->
+            </div>
 					</div>
 					<div class="addr">
 						{{item.province}}-{{item.city}}-{{item.area}}
@@ -246,8 +246,8 @@
       export2Excel() {
       　require.ensure([], () => {
     　　　const { export_json_to_excel } = require('../../vendor/Export2Excel');
-    　　　const tHeader = ['店铺名称','添加时间','地址', '联系电话'];//生成Excel表格的头部标题栏
-    　　　const filterVal = ['shopName', 'createTime','address', 'phone'];//生成Excel表格的内容栏（根据自己的数据内容属性填写）
+    　　　const tHeader = ['店铺名称','添加时间','省份','城市','区域','地址','联系电话','客户类型','负责人','店铺环境'];//生成Excel表格的头部标题栏
+    　　　const filterVal = ['shopName', 'createTime','province','city','area','address','phone','clientTypeName','businessName','conditionName'];//生成Excel表格的内容栏（根据自己的数据内容属性填写）
     　　　const list = this.xlsData;//需要导出Excel的数据
     　　　const data = this.formatJson(filterVal, list);
     　　　export_json_to_excel(tHeader, data, '客户信息');//这里可以定义你的Excel表的默认名称
@@ -334,11 +334,13 @@
            this.time2 = this.time1;
            this.time1 = temp;
            this.getCustomer();
+           this.getXls();
          }else if(this.time1!=''&& new Date(selectedText.join('-')).getTime()==new Date(self.time1).getTime()){
            alert('不能选相同的时间');
            this.time2 = '';
          }else{
            this.getCustomer();
+           this.getXls();
          }
       },
       deletCustomer(item,index){
@@ -392,10 +394,9 @@
         this.$router.push({
           name:'shopNameVisit',
           query:{
-            visitInfo:{
-              shopId:item.clientId,
-              shopName:item.shopName
-            }
+            
+            shopId:item.clientId,
+            shopName:item.shopName
           }
 
         })
