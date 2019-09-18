@@ -20,7 +20,7 @@
 
               <div class="right">
                 <div class="receive" v-if="item.properties==1">已领取</div>
-                <div class="receive active" v-else>待领取</div>
+                <div class="receive active" v-else @click="showBtn">待领取</div>
               </div>
             </li>
 
@@ -38,6 +38,9 @@
     data(){
       return{
         dataList:[],
+        type:'',
+        page:1,
+        userId:'',
         options:{
         	pullDownRefresh:{
         		txt:'更新成功',
@@ -54,18 +57,95 @@
       }
     },
     mounted() {
+      this.type = this.getParamValue('type');
+      this.userId = this.getParamValue('userId');
       this.getDataList();
+
+
     },
     methods:{
       back(){
 
+      },
+      isAnOrIos() {
+      	var u = navigator.userAgent,
+      		app = navigator.appVersion;
+      	var isAndroid = u.indexOf('Android') > -1 || u.indexOf('Linux') > -1; //g
+      	var isIOS = !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/); //ios终端
+      	if (isAndroid) {
+      		//这个是安卓操作系统
+      		alert('这个是安卓操作系统')
+      	}
+      	if (isIOS) {
+      		//这个是ios操作系统
+      		alert('这个是ios操作系统')
+      	}
+      },
+      getParamValue(name) {
+            var paramsArray = this.getUrlParams();
+            if (paramsArray != null) {
+              for (var i = 0 ; i < paramsArray.length ; i++) {
+                for (var j in paramsArray[i]) {
+                  if (j == name) {
+                    return paramsArray[i][j];
+                  }
+                }
+              }
+            }
+
+            return null;
+      },
+      getUrlParams() {
+          var search = window.location.search;
+          // 写入数据字典
+          var tmparray = search.substr(1, search.length).split("&");
+          var paramsArray = new Array;
+          if (tmparray != null) {
+            for (var i = 0; i < tmparray.length; i++) {
+              var reg = /[=|^==]/;  // 用=进行拆分，但不包括==
+              var set1 = tmparray[i].replace(reg, '&');
+              var tmpStr2 = set1.split('&');
+              var array = new Array;
+              array[tmpStr2[0]] = tmpStr2[1];
+              paramsArray.push(array);
+            }
+          }
+          // 将参数数组进行返回
+          return paramsArray;
+      },
+      showBtn() {
+            let self = this;
+            this.$createDialog({
+              type: 'confirm',
+              icon: 'cubeic-warn',
+              title: '',
+              content: '请下载骨米APP，在我的钱包-->抽奖-->中奖纪录中进行领取',
+              confirmBtn: {
+                text: '去下载',
+                active: true,
+                disabled: false,
+                href: 'javascript:;'
+              },
+              cancelBtn: {
+                text: '取消',
+                active: false,
+                disabled: false,
+                href: 'javascript:;'
+              },
+              onConfirm: () => {
+                self.isAnOrIos();
+              },
+              onCancel: () => {
+
+              }
+            }).show()
       },
       getDataList(){
         let self = this;
         this.axios.get(Api.userApi+'/prize/selectWinPrizeRecordByType',{
           params:{
             userId:38,
-            type:1,
+            type:self.type,
             page:1,
             rows:10
           }
@@ -73,7 +153,15 @@
         }).then(function(res) {
               console.log(res.data.data)
               if(res.data.code==1){
-                self.dataList = res.data.data;
+
+                setTimeout(() => {
+                  self.$refs.scroll.forceUpdate();
+                	self.dataList = res.data.data;
+                	setTimeout(() => {
+                		self.$refs.scroll.refresh();
+                	}, 200)
+                }, 500)
+
               }else{
 
               }
@@ -83,10 +171,51 @@
         	});
       },
       onPullingDown(){//上拉刷新
-
+        this.page = 1;
+        this.getDataList();
       },
       onPullingUp(){//下拉加载
+        let self = this;
+        self.page++
+        this.axios.get(Api.userApi+'/prize/selectWinPrizeRecordByType',{
+          params:{
+            userId:self.userId,
+            type:self.type,
+            page:self.page,
+            rows:10
+          }
 
+        }).then(function(res) {
+
+              if(res.data.code==1){
+
+                if(res.data.data.length>0){
+                  setTimeout(() => {
+                    self.$refs.scroll.forceUpdate();
+                  	self.dataList.push(...res.data.data);
+                  	setTimeout(() => {
+                  		self.$refs.scroll.refresh();
+                  	}, 200)
+                  }, 500)
+                }else{
+                  setTimeout(() => {
+                  	self.$refs.scroll.forceUpdate();
+                    self.$refs.scroll.refresh();
+                  }, 500)
+
+                }
+
+              }else{
+                alert(res.data.msg)
+                setTimeout(() => {
+                	self.$refs.scroll.forceUpdate();
+                  self.$refs.scroll.refresh();
+                }, 500)
+              }
+        	}).catch(function(err) {
+              alert(err)
+
+        	});
       }
     }
   }

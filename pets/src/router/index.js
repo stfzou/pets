@@ -43,6 +43,9 @@ import AnswerOne from '@/components/answer/answerOne'
 import AnswerTwo from '@/components/answer/answerTwo'
 import AnswerWhite from '@/components/answer/answerWhite'
 import PrizeHistory from '@/components/prizeHistory/prizeHistory'
+import InvitationGu from '@/components/invitation/invitationGu'
+import InvitationZc from '@/components/invitation/invitationZc'
+
 
 Vue.use(Router)
 export default new Router({
@@ -62,6 +65,16 @@ export default new Router({
       path:'/prizeHistory',
       name:'prizeHistory',
       component:PrizeHistory,
+    },
+    {
+      path:'/invitationGu',
+      name:'invitationGu',
+      component:InvitationGu,
+    },
+    {
+      path:'/invitationZc',
+      name:'invitationZc',
+      component:InvitationZc,
     },
     {
     	path:'/wxWhitePage',
