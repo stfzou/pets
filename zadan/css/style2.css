@@ -321,7 +321,7 @@ a:focus{outline:thin dotted;outline:5px auto -webkit-focus-ring-color;outline-of
 	line-height: 2rem;
 	border-radius: 1rem;
 }
-.gamebox .bottom-btn .itemBox div a{
+.gamebox .bottom-btn .itemBox div span{
 	color: #333;
 }
 

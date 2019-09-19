@@ -177,10 +177,10 @@
 				</div>
 				<div class="flex_r_s_b itemBox">
 					<div>
-						<a href="###">中奖规则</a>
+						<span>中奖规则</span>
 					</div>
 					<div>
-						<a href="###">中奖查询</a>
+						<span class="zjcx">中奖查询</span>
 					</div>
 				</div>
 				
@@ -193,19 +193,20 @@
 		<script src="js/preloadjs-NEXT.min.js"></script>
 		<script src="js/soundjs-NEXT.min.js"></script>
 		<script>
-			
+			//localStorage.removeItem('userId')
 			let chance = 0; //砸蛋次数
 			let apiUrl = 'http://app.gutouzu.com';
 			let userId = '-1';
+			let userName = '';
 			console.log(JSON.parse(localStorage.getItem('userId')))
 			if(JSON.parse(localStorage.getItem('userId')) != undefined || JSON.parse(localStorage.getItem('userId')) != null) {
 				userId = JSON.parse(localStorage.getItem('userId'));
 			}
 			let opt = {
-				title: '砸金蛋',
-				desc: '这是一个砸金蛋活动',
+				title: '快来参与骨米宠物快乐砸金蛋',
+				desc:'',
 				link: window.location.href,
-				imgUrl: '',
+				imgUrl:'http://gumipet.oss-cn-shenzhen.aliyuncs.com/static_img/icon_jindan.png',
 				success: function() {
 					
 					$.ajax({
@@ -569,6 +570,9 @@
 							if(res.code == 1) {
 								localStorage.setItem('userId', res.user.userId);
 								userId = res.user.userId;
+								userName = res.user.userName;
+								opt.desc = '#'+userName+'#邀请你一起参与骨米宠物快乐砸金蛋游戏，每天都有机会领取幸运大礼，快来试试吧~';
+								wxInit();
 								$(".login-dialog").removeClass('diaCntShow');
 								$(".dialong").removeClass('diaShow');
 								getData();
@@ -593,6 +597,11 @@
 				$(".okBtn").click(function() {
 
 					login();
+				})
+				
+				$(".zjcx").click(function(){
+		
+					window.location.href = 'http://app.gutouzu.com/index.html#/prizeHistory?type=2&userId='+userId;
 				})
 			})
 		</script>
