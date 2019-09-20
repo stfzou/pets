@@ -45,7 +45,7 @@ import AnswerWhite from '@/components/answer/answerWhite'
 import PrizeHistory from '@/components/prizeHistory/prizeHistory'
 import InvitationGu from '@/components/invitation/invitationGu'
 import InvitationZc from '@/components/invitation/invitationZc'
-
+import GudouShop from '@/components/invitation/gudouShop'
 
 Vue.use(Router)
 export default new Router({
@@ -75,6 +75,11 @@ export default new Router({
       path:'/invitationZc',
       name:'invitationZc',
       component:InvitationZc,
+    },
+    {
+      path:'/gudouShop',
+      name:'gudouShop',
+      component:GudouShop,
     },
     {
     	path:'/wxWhitePage',

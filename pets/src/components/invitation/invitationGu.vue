@@ -84,7 +84,7 @@
     }
     .readXy{
       .cube-checkbox{
-        width:380px;
+        width:400px;
         margin:0 auto;
       }
       .cube-checkbox-label{
