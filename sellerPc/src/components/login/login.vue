@@ -440,7 +440,7 @@
 					}).then(function(res) {
 
 						if (res.data.code === 1) {
-
+              
 							var userEntity = {
 								userName: res.data.user.userName,
 								userId: res.data.user.userId,

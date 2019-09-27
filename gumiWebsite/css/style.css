@@ -1,0 +1,269 @@
+.head{
+	background: #f1efec;
+	
+}
+.head .cntWarp{
+	height: 100px;
+}
+.head .logo{
+	width: 125px;
+}
+.head .nav{
+	width:780px;
+	
+}
+.head .nav li a{
+	font-size:18px;
+	color: #333333;
+	width: 100px;
+	display:block;
+	text-align: center;
+	padding-bottom: 10px;
+}
+.head .nav .active a{
+	color: #ff523d;
+	
+	
+}
+.head .nav .active{
+	border-bottom: 4px solid red;
+}
+/*底部*/
+.foot{
+	
+	background: #ff523d;
+}
+.foot .cntWarp{
+	height: 220px;
+}
+.foot .cntWarp .footLogo{
+	width: 232px;
+}
+.foot .cntWarp .mid{
+	width: 510px;
+}
+.foot .cntWarp .mid div{
+	color: #fff;
+	font-size:16px;
+	color:rgba(255,255,255,1);
+	line-height:40px;
+}
+.foot .cntWarp .mid div img{
+	margin-right: 20px;
+}
+/*备案*/
+.copyright{
+	background:#fb2f1e;
+	opacity:0.4;
+	height:58px;
+	font-size:14px;
+	font-weight:400;
+	color:rgba(255,255,255,1);
+	
+}
+
+/*首页*/
+.indexWarp .banner{
+	height: 600px;
+}
+.indexWarp .management .cntWarp{
+	/*align-items: flex-start;*/
+	height: 540px;
+}
+.indexWarp .management .introduce{
+	width: 508px;
+}
+.indexWarp .management .introduce p{
+	line-height:40px;
+	font-size:14px;
+	color: #666666;
+	padding-top: 22px;
+}
+.indexWarp .management .introduce .more{
+	color: #ff523d;
+	font-size: 16px;
+	padding-top: 38px;
+	display: block;
+}
+.indexWarp .management .introduce img{
+	width: 408px;;
+}
+.indexWarp .management .shopImg{
+	width: 400px;
+	height: 400px;
+}
+
+.indexWarp .banner .swiper-button-next, .swiper-button-prev{
+	width: 60px;
+	height: 60px;
+	border-radius:50%;
+	background: #FF523D;
+	color: #fff;
+	font-size: 30px;
+}
+.indexWarp .selected{
+	height: 680px;
+	background: url(../images/dog_bg.png) no-repeat 0 0;
+	background-size: cover;
+}
+.indexWarp .selected .cntWarp{
+	padding-top: 100px;
+	position: relative;
+	
+}
+.indexWarp .selected .selectBanner{
+	height: 520px;
+	background: #ffffff;
+	box-shadow:0px 0px 101px 0px rgba(162,162,162,0.5);
+}
+.indexWarp .selected .cntWarp .jx_img{
+	position: absolute;
+	right: 0;
+	top: -20px;
+	width: 416px;
+}
+.indexWarp .selected .productItem{
+	height: 520px;
+	
+}
+.indexWarp .selected .productItem li{
+	width: 240px;
+	box-shadow: 0 0 20px #fff1ef;
+}
+.indexWarp .selected .productItem img{
+	width: 240px;
+	height: 240px;
+}
+.indexWarp .selected .productItem p{
+	font-size:16px;
+	font-weight:400;
+	color:rgba(51,51,51,1);
+	line-height:24px;
+	padding: 14px 12px;
+}
+
+.indexWarp .selected .productItem .priceBox{
+	padding-bottom: 22px;
+}
+.indexWarp .selected .productItem .priceBox .span1{
+	width:60px;
+	font-size:18px;
+	color:rgba(246,69,50,1);
+	line-height:24px;
+	padding: 0 12px;
+}
+.indexWarp .selected .productItem .priceBox .span2{
+	font-size:12px;
+	text-decoration:line-through;
+	color:rgba(153,153,153,1);
+	line-height:24px;
+	
+}
+.indexWarp .petsActive .cntWarp{
+	height: 650px;
+}
+.indexWarp .petsActive .cntWarp .activity_l{
+	width: 530px;
+}
+.indexWarp .petsActive .cntWarp .activity_l .title{
+	width: 265px;
+	margin-top: 20px;
+	margin-bottom: 40px;
+}
+.indexWarp .petsActive .cntWarp .activity_l .activityItem .activityImg{
+	width:530px;
+	height: 300px;
+	
+}
+.indexWarp .petsActive .cntWarp .activity_l .activityItem .name{
+	
+	
+	font-size:20px;
+	color:rgba(51,51,51,1);
+	line-height:36px;
+}
+.indexWarp .petsActive .cntWarp .activity_l .activityItem .time img{
+	width: 14px;
+	margin-right: 10px;
+}
+.indexWarp .petsActive .cntWarp .activity_l .activityItem .time{
+	
+	font-size:14px;
+	color:rgba(102,102,102,1);
+	line-height:48px;
+}
+.indexWarp .petsActive .cntWarp .activity_l .activityItem .addr img{
+	width: 14px;
+	margin-right: 10px;
+}
+.indexWarp .petsActive .cntWarp .activity_l .activityItem .addr{
+	
+	font-size:14px;
+	color:rgba(102,102,102,1);
+	line-height:48px;
+}
+
+.indexWarp .petsActive .cntWarp .activity_r{
+	width: 620px;
+	height: 390px;
+	overflow: auto;
+	padding-left: 20px;
+}
+.indexWarp .petsActive .cntWarp .activity_r li{
+	width: 600px;
+	padding: 20px 10px;
+	box-sizing: border-box;
+	position: relative;
+}
+.indexWarp .petsActive .cntWarp .activity_r li .icon_right{
+	display: none;
+}
+.indexWarp .petsActive .cntWarp .activity_r .activeLi{
+	background: #ff523d;
+}
+.indexWarp .petsActive .cntWarp .activity_r .activeLi .icon_right{
+	display: block;
+	position: absolute;
+	left: -10px;
+	top: 50%;
+	height: 30px;
+	margin-top: -15px;
+}
+
+
+.indexWarp .petsActive .cntWarp .activity_r li .aImg{
+	width: 150px;
+	height: 80px;
+}
+.indexWarp .petsActive .cntWarp .activity_r li .list_r{
+	width: 370px;
+}
+.indexWarp .petsActive .cntWarp .activity_r li .list_r .name{
+	
+	font-size:16px;
+	color:#333333;
+	line-height:36px;
+}
+.indexWarp .petsActive .cntWarp .activity_r li .list_r .time{
+	font-size:12px;
+	color:#333333;
+	line-height:48px;
+}
+.indexWarp .petsActive .cntWarp .activity_r li .list_r .addr{
+	
+	font-size:12px;
+	/*color:#333;*/
+	line-height:48px;
+}
+
+
+
+.indexWarp .petsActive .cntWarp .activity_r .activeLi .list_r .name{
+	color: #fff;
+}
+.indexWarp .petsActive .cntWarp .activity_r .activeLi .list_r .time{
+	color: #fff;
+}
+.indexWarp .petsActive .cntWarp .activity_r .activeLi .list_r .addr{
+	color: #fff;
+}

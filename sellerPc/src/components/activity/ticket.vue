@@ -15,7 +15,7 @@
 					</div>
 				</div>
 			</li>
-			
+
 			<li class="flex_r_f_s">
 				<div class="ticketList_l">
 					<p>票劵名称<span style="color: #FF523D;">*</span></p>
@@ -24,7 +24,7 @@
 					<div class="explain flex_r_f_s">
 						<el-input class="goodsNameInput h32" type="text" :show-word-limit="true" :maxlength="30" v-model="ticketTitle"
 						 placeholder="请输入票劵名称"></el-input>
-			
+
 					</div>
 				</div>
 			</li>
@@ -34,7 +34,7 @@
 				</div>
 				<div class="ticketList_r">
 					<div class="ticketNum">
-						<el-input class="goodsNameInput h32" v-model="ticketNum" maxlength="60" placeholder="请输入票劵数量"></el-input>
+						<el-input class="goodsNameInput h32" @change="inputChange('ticketNum')" v-model="ticketNum" maxlength="60" placeholder="请输入票劵数量"></el-input>
 					</div>
 				</div>
 			</li>
@@ -44,7 +44,7 @@
 				</div>
 				<div class="ticketList_r">
 					<div class="ticketNum">
-						<el-input class="goodsNameInput h32" v-model="ticketPrice" maxlength="60" placeholder="请输入票劵价格"></el-input>
+						<el-input class="goodsNameInput h32" @change="inputChange('ticketPrice')" v-model="ticketPrice" maxlength="60" placeholder="请输入票劵价格"></el-input>
 					</div>
 				</div>
 			</li>
@@ -54,7 +54,7 @@
 				</div>
 				<div class="ticketList_r">
 					<div class="limitNum flex_r_f_s">
-						<el-input class="goodsNameInput h32" v-model="limitNum" maxlength="60" placeholder="请输入限购数量"></el-input>
+						<el-input class="goodsNameInput h32" @change="inputChange('limitNum')" v-model="limitNum" maxlength="60" placeholder="请输入限购数量"></el-input>
 						<div class="remark">张/人</div>
 					</div>
 				</div>
@@ -132,7 +132,7 @@
 					</div>
 				</div>
 			</li>
-			
+
 			<li class="flex_r_f_s" v-if="ticketStyleVal==2">
 				<div class="ticketList_l" style="width: 160px;">
 					<p>每日最多使用次数<span style="color: #FF523D;">*</span></p>
@@ -152,12 +152,12 @@
 					<div class="makeTicket flex_r_f_s">
 						<div style="margin-right: 30px;">
 							<el-radio v-model="returnVal" label="1">支持退票，委托【骨米】退票</el-radio>
-							
+
 						</div>
 						<div>
 							<el-radio v-model="returnVal" label="0">不支持退票</el-radio>
 						</div>
-				
+
 					</div>
 				</div>
 			</li>
@@ -199,13 +199,37 @@
 			}
 		},
 		mounted(){
-			
+      this.$store.commit('initialNav', {
+      	navNum: 6,
+      	subNum: 0,
+      	subData: [{
+      		subNavName: '发布活动',
+      		subIcon: require('../../assets/home/icon_home1.png'),
+      		link: 'publishActivity'
+      	}, {
+      		subNavName: '主办方管理',
+      		subIcon: require('../../assets/home/icon_home2.png'),
+      		link: 'sponsorManage'
+      	}, {
+      		subNavName: '认证',
+      		subIcon: require('../../assets/home/icon_home5.png'),
+      		link: 'realName'
+      	}]
+      });
 			// this.activeData = this.$route.params.activeData
-			console.log(this.$route.params.activeData)
+			//console.log(this.$route.params.activeData)
 			// console.log(this.capitalize(this.activeData[0]))
 			this.getActiveData();
 		},
 		methods: {
+      inputChange(value) { //input数字限制
+      	// console.log(this.tableDataCs)
+      	let reg = /^\d+\.?\d{0,2}$/
+      	if (!reg.test(this[value])) {
+      		this[value] = ''
+      	}
+
+      },
 			getActiveData(){
 				let self= this;
 				this.axios.get(Api.userApi+'/ca/selectActivityTimeAndTicketNum?userId='+ JSON.parse(sessionStorage.getItem('user')).userId, {
@@ -214,30 +238,16 @@
 					}
 				}).then(function(res) {
 					if(res.data.code == 1){
-						
-						if(res.data.data.ticketNum>0){
-							
-							self.activityData = [self.capiDate(res.data.data.startTime),self.capiDate(res.data.data.endTime)];
-							
-						}else{
-							if(self.$route.params.activeData == undefined){
-								self.$router.push({
-									name:'publishActivity'
-								})
-							}else{
-								self.activeData = self.$route.params.activeData;
-								
-							}
-							
-						}
-						self.reserveData = self.$route.params.activeData;
-						self.effectiveData = self.$route.params.activeData;
-						
+
+            self.activeData = [self.capiDate(res.data.data.startTime),self.capiDate(res.data.data.endTime)];
+            
+
+
 					}else{
 						alert(res.data.msg)
-					}	
+					}
 				})
-					
+
 			},
 			reserveDataChange(val){//限制订购时间
 				if(val[1]>this.activeData[1]){
@@ -268,14 +278,14 @@
 				return new Date(value).getTime();
 			},
 			addTicket() {
-				
+       console.log(this.activeData)
 				let self = this;
 				let examineVal = ''
 				let activeEndVal = ''
 				let activeIng = ''
 				if(self.isExamine){
 					examineVal = '1'
-					
+
 				}else{
 					examineVal = '0'
 				}
@@ -294,7 +304,7 @@
 				if(self.charge!='1'){
 					self.ticketPrice = ''
 				}
-				
+
 				if(self.ticketTitle == ''){
 					self.$message({
 						showClose: true,
@@ -319,13 +329,13 @@
 						message:'请填写限购数量',
 						type: 'error',
 					});
-				}else if(self.reserveData.length<1){
+				}else if(self.reserveData.length<1&&activeEndVal!='1'){
 					self.$message({
 						showClose: true,
 						message:'请填写订购日期',
 						type: 'error',
 					});
-				}else if(self.effectiveData.length<1){
+				}else if(self.effectiveData.length<1&&activeIng!='1'){
 					self.$message({
 						showClose: true,
 						message:'请填写有效日期',
@@ -344,7 +354,7 @@
 						type: 'error',
 					});
 				}else{
-					
+
 					self.axios.post(Api.userApi+'/ca/addCommunityActivityTicket', self.qs.stringify({
 						userId:JSON.parse(sessionStorage.getItem('user')).userId,
 						ticketType:self.charge,
@@ -365,7 +375,7 @@
 						isBearRefund:self.returnVal,
 						startTime:self.capitalize(self.activeData[0]),
 						endTime:self.capitalize(self.activeData[1])
-						
+
 					}), {
 						headers: {
 							'Content-Type': 'application/x-www-form-urlencoded'
@@ -387,14 +397,14 @@
 								type: 'error',
 							});
 						}
-					
+
 					})
 				}
-				
+
 			}
-			
+
 		}
-		
+
 	}
 </script>
 
@@ -473,7 +483,7 @@
 
 			.ticketList_l {
 				width: 100px;
-				
+
 				p {
 					color: #333;
 					font-size:14px;

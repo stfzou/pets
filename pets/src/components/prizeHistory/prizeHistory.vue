@@ -1,7 +1,7 @@
 <template>
   <div class="prizeHistory">
       <div class="top_nav flex_r_s_b">
-      	<div class="back"></div>
+      	<div class="back" v-if="!isApp"></div>
       	<div class="nav_title">中奖纪录</div>
       </div>
       <div class="prize-history-cnt">
@@ -39,6 +39,7 @@
       return{
         dataList:[],
         type:'',
+        isApp:false,
         page:1,
         userId:'',
         options:{
@@ -57,6 +58,7 @@
       }
     },
     mounted() {
+      this.getIsApp();
       this.type = this.getUrlKey('type');
       this.userId = this.getUrlKey('userId');
       this.getDataList();
@@ -80,6 +82,17 @@
       		//这个是ios操作系统
       		alert('这个是ios操作系统')
       	}
+      },
+      getIsApp() {//判断当前环境是否为APP环境
+          var ua = navigator.userAgent.toLowerCase();
+          if (ua.match(/isapp/i) == "isapp") {
+            alert('这是APP环境')
+            this.isApp = true
+          }else{
+            alert('这是网页环境')
+            this.isApp = false
+          }
+
       },
       getUrlKey(name){
           return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.href) || [, ""])[1].replace(/\+/g, '%20')) || null

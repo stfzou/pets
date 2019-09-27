@@ -46,6 +46,9 @@ import PrizeHistory from '@/components/prizeHistory/prizeHistory'
 import InvitationGu from '@/components/invitation/invitationGu'
 import InvitationZc from '@/components/invitation/invitationZc'
 import GudouShop from '@/components/invitation/gudouShop'
+import ExChangeXq from '@/components/invitation/exChangeXq'
+import PresentCenter from '@/components/invitation/presentCenter'
+import PresentSearch from '@/components/invitation/presentSearch'
 
 Vue.use(Router)
 export default new Router({
@@ -77,9 +80,24 @@ export default new Router({
       component:InvitationZc,
     },
     {
+      path:'/exChangeXq',
+      name:'exChangeXq',
+      component:ExChangeXq,
+    },
+    {
+      path:'/presentCenter',
+      name:'presentCenter',
+      component:PresentCenter,
+    },
+    {
       path:'/gudouShop',
       name:'gudouShop',
       component:GudouShop,
+    },
+    {
+      path:'/presentSearch',
+      name:'presentSearch',
+      component:PresentSearch,
     },
     {
     	path:'/wxWhitePage',

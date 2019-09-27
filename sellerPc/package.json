@@ -21,6 +21,7 @@
     "v-distpicker": "^1.0.21",
     "vue": "^2.5.2",
     "vue-amap": "^0.5.8",
+    "vue-cropper": "^0.4.9",
     "vue-gemini-scrollbar": "^2.0.0",
     "vue-quill-editor": "^3.0.6",
     "vue-router": "^3.0.1",

@@ -13,8 +13,10 @@ import store from './store/store'
 import axios from 'axios'
 import Qs from 'qs'
 import QRCode from 'qrcodejs2'
+import VueCropper from 'vue-cropper'
 
 
+Vue.use(VueCropper)//裁剪插件
 Vue.component('v-distpicker', VDistpicker)//全局注册省市选择器组件
 Vue.use(ElementUI)
 Vue.use(AMap)
@@ -26,19 +28,19 @@ Vue.prototype.axios = axios;
 Vue.prototype.qs = Qs;
 
 /** 验证用户是否登录 **/
-router.beforeEach((to,from,next) => {
-
-	if(to.name == 'login'){
-		next();
-	}else if(sessionStorage.getItem('user')){
-
-		next();
-
-	}else{
-		next('/login');
-	}
-
-})
+// router.beforeEach((to,from,next) => {
+//
+// 	if(to.name == 'login'){
+// 		next();
+// 	}else if(sessionStorage.getItem('user')){
+//
+// 		next();
+//
+// 	}else{
+// 		next('/login');
+// 	}
+//
+// })
 
 AMap.initAMapApiLoader({
   key: 'fe2312e4704c6f8f7787c7864ecebae6',

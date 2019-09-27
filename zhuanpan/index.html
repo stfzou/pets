@@ -96,8 +96,6 @@
 		<img src="images/icon_jpgd.png" id="jpgd" style="display:none;" />
 		<img src="images/icon_jp99.png" id="jp99" style="display:none;" />
 		<img src="images/icon_jp39.png" id="jp39" style="display:none;" />
-		<!--<img src="images/7.png" id="ganlan-img" style="display:none;" />
-		<img src="images/4.png" id="yusan-img" style="display:none;" />-->
 		<div class="banner" style="background-image:url(images/routaBg.png);background-size:100% 100%;">
 			<div class="turnplate">
 				<canvas class="item" id="wheelcanvas" width="422px" height="422px"></canvas>
@@ -124,20 +122,15 @@ let zpData = [];
 let userName = '';
 let opt = {
 			title: '骨米宠物幸运大转盘游戏快来参与吧',
-			desc: '#'+userName+'#邀请您一起参与骨米宠物幸运大转盘互动游戏，有机会领取99元宠物尊享大礼包，快来试试吧~',
+			desc: userName+'邀请您一起参与骨米宠物幸运大转盘互动游戏，有机会领取99元宠物尊享大礼包，快来试试吧~',
 			link: window.location.href,
 			imgUrl:'http://gumipet.oss-cn-shenzhen.aliyuncs.com/static_img/icon_zhuanpan.png',
 			success: function() {
 				
 			}
 		}
-
-if(JSON.parse(localStorage.getItem('userId'))!=undefined||JSON.parse(localStorage.getItem('userId'))!=null){
-	
-	userId = JSON.parse(localStorage.getItem('userId'));
-}
-
-
+//userId = getUrlKey('userId')
+getIsApp();
 
 var turnplate={
 		restaraunts:[],				//大转盘奖品名称
@@ -398,6 +391,7 @@ function login(){
         	
             if(res.code==1){
             	localStorage.setItem('userId',res.user.userId);
+            	localStorage.setItem('userName',res.user.userName);
             	userId = res.user.userId;
             	userName = res.user.userName;
             	opt.desc = '#'+userName+'#邀请您一起参与骨米宠物幸运大转盘互动游戏，有机会领取99元宠物尊享大礼包，快来试试吧~';
@@ -573,7 +567,30 @@ function getData(){
 	
 }
 
+//判断当前环境书否为APP
+function getIsApp() {//判断当前环境是否为APP环境
+          var ua = navigator.userAgent.toLowerCase();
+          if (ua.match(/isapp/i) == "isapp") {
+          
+          	userId = getUrlKey('userId')
+           
+            
+          }else{
+          	
+            if(JSON.parse(localStorage.getItem('userId'))!=undefined||JSON.parse(localStorage.getItem('userId'))!=null){
+	
+				userId = JSON.parse(localStorage.getItem('userId'));
+				userName = JSON.parse(localStorage.getItem('userName'));
+			}
+            
+          }
 
+}
+
+//获取地址参数数据
+function getUrlKey(name){
+    return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.href) || [, ""])[1].replace(/\+/g, '%20')) || null
+}
 
 //弹框显示
 function diaShow(){

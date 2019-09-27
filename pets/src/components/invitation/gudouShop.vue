@@ -4,7 +4,7 @@
         <div class="headCnt flex_r_s_b">
           <img class="back" src="../../assets/icon/back@2x.png" alt="">
           <div class="pageName">骨豆商场</div>
-          <div class="searchBox flex_r_s_b">
+          <div class="searchBox flex_r_s_b" @click="link">
             <input class="gudouShopSearch" type="text" v-model="searchVal">
             <img src="../../assets/icon/icon-search@2x.png" alt="">
           </div>
@@ -42,35 +42,51 @@
         <div class="hotExchangeBox">
           <div class="hotExchange exBox">
              <div class="exTitle">热门兑换</div>
-             <ul class="flex_r_f_s">
-               <li v-for="item in testArr">
-                 <div class="imgBox">
-                   <img class="goodsPic" src="../../assets/product.png" alt="">
-                   <img class="tipPic" src="../../assets/hot_tip.png" alt="">
-                 </div>
-                 <div class="desc">小型犬小型犬小型 犬洗澡优惠券</div>
-                 <div class="gudouPrice flex_r_s_c">
-                   骨豆价¥18.90
-                 </div>
-               </li>
-             </ul>
+             <cube-scroll
+               ref="scroll"
+               :data="testArr"
+               direction="horizontal"
+               class="horizontal-scroll-list-wrap">
+               <ul class="flex_r_f_s">
+                 <li v-for="item in testArr">
+                   <div class="imgBox">
+                     <img class="goodsPic" src="../../assets/product.png" alt="">
+                     <img class="tipPic" src="../../assets/hot_tip.png" alt="">
+                   </div>
+                   <div class="desc">小型犬小型犬小型 犬洗澡优惠券</div>
+                   <div class="gudouPrice flex_r_s_c">
+                     骨豆价¥18.90
+                   </div>
+                 </li>
+               </ul>
+
+             </cube-scroll>
+
           </div>
         </div>
         <div class="hotExchangeBox">
-          <div class="hotExchange exBox">
-             <div class="exTitle">热门兑换</div>
-             <ul class="flex_r_f_s">
-               <li v-for="item in testArr">
-                 <div class="imgBox">
-                   <img class="goodsPic" src="../../assets/product.png" alt="">
-                   <img class="tipPic" src="../../assets/jx_tip.png" alt="">
-                 </div>
-                 <div class="desc">小型犬小型犬小型 犬洗澡优惠券</div>
-                 <div class="gudouPrice flex_r_s_c">
-                   骨豆价¥18.90
-                 </div>
-               </li>
-             </ul>
+          <div class="exBox">
+             <div class="exTitle">精选推荐</div>
+
+             <cube-scroll
+               ref="scroll"
+               :data="testArr"
+               direction="horizontal"
+               class="horizontal-scroll-list-wrap">
+               <ul class="flex_r_f_s">
+                 <li v-for="item in testArr">
+                   <div class="imgBox">
+                     <img class="goodsPic" src="../../assets/product.png" alt="">
+                     <img class="tipPic" src="../../assets/jx_tip.png" alt="">
+                   </div>
+                   <div class="desc">小型犬小型犬小型 犬洗澡优惠券</div>
+                   <div class="gudouPrice flex_r_s_c">
+                     骨豆价¥18.90
+                   </div>
+                 </li>
+               </ul>
+
+             </cube-scroll>
           </div>
         </div>
         <div class="goodsNav">
@@ -86,6 +102,26 @@
           </cube-scroll>
 
         </div>
+        <div class="goodsNavList">
+          <ul class="flex_r_s_b">
+            <li v-for="item in [1,2,3,4]">
+              <div class="goodsImgBox">
+                <img class="goodsPic" src="../../assets/product.png" alt="">
+                <img class="sxdTip" src="../../assets/sxd_tip.png" alt="">
+              </div>
+              <div class="listBottom">
+                <div class="goodsName">FANKEC狗狗火腿肠狗狗火 腿肠150g</div>
+                <div class="exChangePeople">已有180人兑换</div>
+                <div class="deduction">骨豆直抵¥10.90</div>
+                <div class="gudouPriceBox flex_r_f_s">
+                  <div class="gudouPrice flex_r_s_c">骨豆价¥18.90</div>
+                  <div class="oldPrice">¥32.80</div>
+                </div>
+              </div>
+
+            </li>
+          </ul>
+        </div>
       </div>
   </div>
 </template>
@@ -96,9 +132,17 @@
     data(){
       return{
         searchVal:'',
-        testArr:[1,2],
+        testArr:[1,2,3,4,5],
         navArr:['全部','宠物主粮','宠物零食','营养保健','生活日用','测试','测试2']
       }
+    },
+    methods:{
+      link(){
+        this.$router.push({
+          name:'presentSearch'
+        })
+      }
+
     }
   }
 
@@ -106,6 +150,9 @@
 
 <style lang="scss">
   .gudouShop{
+    .cube-scroll-content{
+      display: inline-block;
+    }
     .gudouHead{
       height:246px;
       background: linear-gradient(90deg, #fb9f84, #f97d5c, #fd7046, #ff6c6c);
@@ -209,8 +256,7 @@
         padding:28px 20px 0 20px;
         .exBox{
           padding-left:20px;
-          background:#fff url("../../assets/hotec_bg.png") no-repeat 100% 0;
-          background-size:660px;
+          background:#fff;
           .exTitle{
             font-size:30px;
             color:#000;
@@ -259,6 +305,10 @@
             }
           }
         }
+        .hotExchange{
+          background:#fff url("../../assets/hotec_bg.png") no-repeat 100% 0;
+          background-size:660px;
+        }
       }
       .goodsNav{
 
@@ -270,11 +320,76 @@
           color:#000;
           font-size:26px;
         }
-        .cube-scroll-content{
-          display: inline-block;
-        }
+
         .textBox{
           white-space: nowrap;
+        }
+      }
+      .goodsNavList{
+        padding: 0 20px;
+        ul{
+          flex-wrap: wrap;
+
+          li{
+            width:330px;
+            background:#fff;
+            margin-bottom:28px;
+            border-radius:10px;
+            box-shadow:0px 0px 20px 0px rgba(0, 0, 0, 0.1);
+            .listBottom{
+              padding:15px 12px 20px 12px;
+            }
+            .goodsImgBox{
+              width:330px;
+              height:330px;
+              position:relative;
+              .goodsPic{
+                width:100%;
+                height:100%;
+                border-radius:10px;
+                object-fit: cover;
+              }
+              .sxdTip{
+                width:76px;
+                position:absolute;
+                left:14px;
+                top:0;
+              }
+            }
+            .goodsName{
+              line-height:45px;
+              font-size:26px;
+              color:#333;
+            }
+            .exChangePeople{
+              padding-top:12px;
+              font-size:22px;
+              color:#666666;
+            }
+            .deduction{
+              font-size:24px;
+              color:#ff523d;
+              padding-top:20px;
+            }
+            .gudouPriceBox{
+              padding-top:20px;
+              .gudouPrice{
+                width:180px;
+                height:40px;
+                background:rgba(255,82,61,1);
+                border-radius:20px;
+                color:#fff;
+                font-size:24px;
+                margin-right:20px;
+
+              }
+              .oldPrice{
+                text-decoration:line-through;
+                color:#999999;
+                font-size:24px;
+              }
+            }
+          }
         }
       }
     }

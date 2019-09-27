@@ -198,13 +198,16 @@
 			let apiUrl = 'http://app.gutouzu.com';
 			let userId = '-1';
 			let userName = '';
-			console.log(JSON.parse(localStorage.getItem('userId')))
-			if(JSON.parse(localStorage.getItem('userId')) != undefined || JSON.parse(localStorage.getItem('userId')) != null) {
-				userId = JSON.parse(localStorage.getItem('userId'));
-			}
+//			console.log(JSON.parse(localStorage.getItem('userId')))
+//			if(JSON.parse(localStorage.getItem('userId')) != undefined || JSON.parse(localStorage.getItem('userId')) != null) {
+//				userId = JSON.parse(localStorage.getItem('userId'));
+//				userName = JSON.parse(localStorage.getItem('userName'));
+//			}
+
+			getIsApp();
 			let opt = {
 				title: '快来参与骨米宠物快乐砸金蛋',
-				desc:'',
+				desc:userName+'邀请你一起参与骨米宠物快乐砸金蛋游戏，每天都有机会领取幸运大礼，快来试试吧~',
 				link: window.location.href,
 				imgUrl:'http://gumipet.oss-cn-shenzhen.aliyuncs.com/static_img/icon_jindan.png',
 				success: function() {
@@ -218,7 +221,7 @@
 						success: function(res) {
 							if(res.code == 1) {
 								alert('分享成功,获得今日免费砸金蛋一次')
-								
+								getData();
 							}else {
 								alert(res.msg)
 							}
@@ -569,6 +572,7 @@
 
 							if(res.code == 1) {
 								localStorage.setItem('userId', res.user.userId);
+								localStorage.setItem('userName', res.user.userName);
 								userId = res.user.userId;
 								userName = res.user.userName;
 								opt.desc = '#'+userName+'#邀请你一起参与骨米宠物快乐砸金蛋游戏，每天都有机会领取幸运大礼，快来试试吧~';
@@ -584,7 +588,32 @@
 				}
 
 			}
-
+			
+			//判断当前环境书否为APP
+			function getIsApp() {//判断当前环境是否为APP环境
+			          var ua = navigator.userAgent.toLowerCase();
+			          if (ua.match(/isapp/i) == "isapp") {
+			          
+			          	userId = getUrlKey('userId')
+			           
+			            
+			          }else{
+			          	
+			            if(JSON.parse(localStorage.getItem('userId'))!=undefined||JSON.parse(localStorage.getItem('userId'))!=null){
+				
+							userId = JSON.parse(localStorage.getItem('userId'));
+							userName = JSON.parse(localStorage.getItem('userName'));
+						}
+			            
+			          }
+			
+			}
+			
+			//获取地址参数数据
+			function getUrlKey(name){
+			    return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.href) || [, ""])[1].replace(/\+/g, '%20')) || null
+			}
+			
 			$(document).ready(function() {
 				wxInit();
 				getData();
