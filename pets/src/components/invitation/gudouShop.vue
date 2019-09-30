@@ -1,23 +1,25 @@
 <template>
   <div class="gudouShop">
-      <header class="gudouHead">
-        <div class="headCnt flex_r_s_b">
-          <img class="back" src="../../assets/icon/back@2x.png" alt="">
-          <div class="pageName">骨豆商场</div>
-          <div class="searchBox flex_r_s_b" @click="link">
-            <input class="gudouShopSearch" type="text" v-model="searchVal">
-            <img src="../../assets/icon/icon-search@2x.png" alt="">
-          </div>
+    <div class="headCnt flex_r_s_b">
+      <img class="back" @click="link" src="../../assets/icon/back@2x.png" alt="">
+      <div class="pageName">骨豆商场</div>
+      <div class="searchBox flex_r_s_b" @click="link">
+        <div class="gudouShopSearch"></div>
+        <img src="../../assets/icon/icon-search@2x.png" alt="">
+      </div>
 
-          <div class="giftCenter">礼品中心</div>
-        </div>
+      <div class="giftCenter" @click="link">礼品中心</div>
+
+    </div>
+      <header v-show="isShow" class="gudouHead">
+
 
       </header>
       <div class="gudouShopCnt">
-        <div class="gudouInfoBox">
+        <div class="gudouInfoBox" v-show="isShow">
           <div class="gudouInfo">
             <div class="gudouInfoTop flex_r_s_b">
-              <div class="gudouNum">您有<span>1080</span>粒骨豆可使用></div>
+              <div class="gudouNum">您有<span>{{boneBean}}</span>粒骨豆可使用></div>
               <div class="getGudou flex_r_s_c">如何获得骨豆？</div>
             </div>
             <div class="choujiang flex_r_s_b">
@@ -39,23 +41,24 @@
           </div>
 
         </div>
-        <div class="hotExchangeBox">
+        <div class="hotExchangeBox" v-show="isShow">
           <div class="hotExchange exBox">
              <div class="exTitle">热门兑换</div>
              <cube-scroll
                ref="scroll"
-               :data="testArr"
+               :data="hots"
+               :options="hOption"
                direction="horizontal"
                class="horizontal-scroll-list-wrap">
                <ul class="flex_r_f_s">
-                 <li v-for="item in testArr">
+                 <li v-for="item in hots">
                    <div class="imgBox">
-                     <img class="goodsPic" src="../../assets/product.png" alt="">
+                     <img class="goodsPic" :src="item.compressImage" alt="">
                      <img class="tipPic" src="../../assets/hot_tip.png" alt="">
                    </div>
-                   <div class="desc">小型犬小型犬小型 犬洗澡优惠券</div>
+                   <div class="desc">{{item.name|descFilter}}</div>
                    <div class="gudouPrice flex_r_s_c">
-                     骨豆价¥18.90
+                     骨豆价¥{{item.boneBeanPrice}}
                    </div>
                  </li>
                </ul>
@@ -64,24 +67,25 @@
 
           </div>
         </div>
-        <div class="hotExchangeBox">
+        <div class="hotExchangeBox" v-show="isShow">
           <div class="exBox">
              <div class="exTitle">精选推荐</div>
 
              <cube-scroll
                ref="scroll"
                :data="testArr"
+               :options="hOption"
                direction="horizontal"
                class="horizontal-scroll-list-wrap">
                <ul class="flex_r_f_s">
-                 <li v-for="item in testArr">
+                 <li v-for="item in selections">
                    <div class="imgBox">
-                     <img class="goodsPic" src="../../assets/product.png" alt="">
+                     <img class="goodsPic" :src="item.compressImage" alt="">
                      <img class="tipPic" src="../../assets/jx_tip.png" alt="">
                    </div>
-                   <div class="desc">小型犬小型犬小型 犬洗澡优惠券</div>
+                   <div class="desc">{{item.name|descFilter}}</div>
                    <div class="gudouPrice flex_r_s_c">
-                     骨豆价¥18.90
+                     骨豆价¥{{item.boneBeanPrice}}
                    </div>
                  </li>
                </ul>
@@ -89,38 +93,64 @@
              </cube-scroll>
           </div>
         </div>
-        <div class="goodsNav">
-          <cube-scroll
-            ref="scroll"
-            :data="navArr"
-            direction="horizontal"
-            class="horizontal-scroll-list-wrap">
-            <div class="textBox">
-              <span v-for="item in navArr">{{item}}</span>
-            </div>
+        <div class="goodsNav" :class="{activeNav:isNavCalss}">
+          <div class="navBox">
+            <cube-scroll
+              ref="scroll"
+              :data="navArr"
+              direction="horizontal"
+              class="horizontal-scroll-list-wrap">
+              <div class="textBox">
+                <span @click="navClick(index)" :class="{activeSpan:index==spanIndex}" v-for="(item,index) in navArr">{{item}}</span>
+              </div>
+              </cube-scroll>
+          </div>
 
-          </cube-scroll>
+
+
 
         </div>
-        <div class="goodsNavList">
+        <div class="goodsNavList" v-show="isShow">
           <ul class="flex_r_s_b">
-            <li v-for="item in [1,2,3,4]">
+            <li v-for="item in alls">
               <div class="goodsImgBox">
-                <img class="goodsPic" src="../../assets/product.png" alt="">
-                <img class="sxdTip" src="../../assets/sxd_tip.png" alt="">
+                <img class="goodsPic" :src="item.compressImage" alt="">
+                <img class="sxdTip" v-if="deduction>item.boneBeanPrice"  src="../../assets/sxd_tip.png" alt="">
               </div>
               <div class="listBottom">
-                <div class="goodsName">FANKEC狗狗火腿肠狗狗火 腿肠150g</div>
-                <div class="exChangePeople">已有180人兑换</div>
-                <div class="deduction">骨豆直抵¥10.90</div>
+                <div class="goodsName">{{item.name|typeNameFilter}}</div>
+                <div class="exChangePeople">已有{{item.sumSellNum}}人兑换</div>
+                <div class="deduction">骨豆直抵¥<span v-if="deduction>item.boneBeanPrice">{{item.boneBeanPrice}}</span><span v-else>{{deduction}}</span></div>
                 <div class="gudouPriceBox flex_r_f_s">
-                  <div class="gudouPrice flex_r_s_c">骨豆价¥18.90</div>
-                  <div class="oldPrice">¥32.80</div>
+                  <div class="gudouPrice flex_r_s_c">骨豆价¥{{item.boneBeanPrice}}</div>
+                  <div class="oldPrice">¥{{item.price}}</div>
                 </div>
               </div>
 
             </li>
           </ul>
+        </div>
+        <div class="goodsNavList activeList" v-show="!isShow">
+          <cube-scroll ref="listScroll" :options="listOpt">
+            <ul class="flex_r_s_b">
+              <li v-for="item in alls">
+                <div class="goodsImgBox">
+                  <img class="goodsPic" :src="item.compressImage" alt="">
+                  <img class="sxdTip" v-if="deduction>item.boneBeanPrice" src="../../assets/sxd_tip.png" alt="">
+                </div>
+                <div class="listBottom">
+                  <div class="goodsName">{{item.name|typeNameFilter}}</div>
+                  <div class="exChangePeople">已有{{item.sumSellNum}}人兑换</div>
+                  <div class="deduction">骨豆直抵¥<span v-if="deduction>item.boneBeanPrice">{{item.boneBeanPrice}}</span><span v-else>{{deduction}}</span></div>
+                  <div class="gudouPriceBox flex_r_f_s">
+                    <div class="gudouPrice flex_r_s_c">骨豆价¥{{item.boneBeanPrice}}</div>
+                    <div class="oldPrice">¥{{item.price}}</div>
+                  </div>
+                </div>
+
+              </li>
+            </ul>
+          </cube-scroll>
         </div>
       </div>
   </div>
@@ -131,16 +161,126 @@
   export default{
     data(){
       return{
+        scroll:'',
+        deduction:'',
         searchVal:'',
+        spanIndex:0,
+        boneBean:'',//骨豆
+        hots:[],//热门
+        selections:[],//精选
+        alls:[],//全部
+        goodstType:[],//分类
+        isShow:true,
+        isNavCalss:false,
         testArr:[1,2,3,4,5],
-        navArr:['全部','宠物主粮','宠物零食','营养保健','生活日用','测试','测试2']
+        navArr:['全部','宠物主粮','宠物零食','营养保健','生活日用','测试','测试2'],
+        hOption:{
+          preventDefault:false
+        },
+        listOpt:{
+          preventDefault:true,
+          pullDownRefresh: {
+          	txt: '更新成功',
+          	threshold: 40
+          },
+          pullUpLoad: {
+          	txt: {
+          		more: '加载更多',
+          		noMore: '没有更多数据了',
+          	},
+          	threshold: 20,
+
+          }
+        }
       }
     },
+    filters:{
+      descFilter(val){
+        if(val.length>15){
+          return val.substr(0,15)+'...'
+        }else{
+          return val
+        }
+      },
+      typeNameFilter(val){
+        if(val.length>25){
+          return val.substr(0,25)+'...'
+        }else{
+          return val
+        }
+      }
+    },
+    mounted() {
+      window.addEventListener('scroll', this.menu)
+      this.getListData();
+    },
+    destroyed () {
+     window.removeEventListener('scroll', this.menu)
+    },
     methods:{
+      navClick(index){
+       this.spanIndex = index;
+        console.log(1)
+      },
       link(){
-        this.$router.push({
-          name:'presentSearch'
-        })
+       // this.$router.push({
+       //   name:'presentSearch'
+       // })
+       this.isShow = true;
+       this.isNavCalss = false;
+       this.$refs.scroll.refresh();
+      },
+      menu() {
+        let domH = document.querySelector('.goodsNav').offsetTop;
+        let navH = document.querySelector('.goodsNav').offsetHeight;
+        let listH = document.querySelector('.goodsNavList').offsetTop;
+        this.scroll = document.documentElement.scrollTop || document.body.scrollTop;
+        if(this.scroll>navH+listH-200){
+          this.isNavCalss = true;
+          this.isShow = false;
+          setTimeout(()=>{
+            this.$refs.listScroll.refresh();
+          },200)
+
+        }
+
+        //console.log('scroll   '+this.scroll)
+      },
+      show(){
+        this.isShow = true;
+        this.isNavCalss = false;
+      },
+      getListData(){
+        let self = this;
+        this.axios.get(Api.userApi+'/boneBeanShop/selectBoneBeanShopHomePage',{
+          params:{
+            userId:38
+          }
+
+        }).then(function(res) {
+
+              if(res.data.code==1){
+                self.boneBean = res.data.data.boneBean;
+                self.deduction = res.data.data.boneBean/100;
+                console.log(self.deduction)
+                self.hots = res.data.data.hots;
+                self.alls = res.data.data.alls;
+                self.selections = res.data.data.selections;
+                setTimeout(() => {
+                  self.$refs.scroll.forceUpdate();
+                	self.dataList = res.data.data;
+                	setTimeout(() => {
+                		self.$refs.scroll.refresh();
+                	}, 200)
+                }, 500)
+
+              }else{
+
+              }
+        	}).catch(function(err) {
+              alert(err)
+
+        	});
       }
 
     }
@@ -150,49 +290,57 @@
 
 <style lang="scss">
   .gudouShop{
-    .cube-scroll-content{
-      display: inline-block;
+
+    .headCnt{
+      padding:0 20px;
+      height:98px;
+      box-sizing: border-box;
+      background: linear-gradient(90deg, #fb9f84, #f97d5c, #fd7046, #ff6c6c);
+      position:fixed;
+      left:0;
+      top:0;
+      z-index:1000;
+      .back{
+        width:26px;
+      }
+      .pageName{
+        font-size:30px;
+        color:#fff;
+      }
+      .searchBox{
+        width:340px;
+        height:60px;
+        border-radius:30px;
+        box-sizing:border-box;
+        background:#fff;
+        padding:0 20px;
+        .gudouShopSearch{
+          font-size:26px;
+          width:245px;
+        }
+        img{
+          width:34px;
+
+        }
+      }
+      .giftCenter{
+        font-size:26px;
+        color:#fff;
+      }
     }
     .gudouHead{
       height:246px;
       background: linear-gradient(90deg, #fb9f84, #f97d5c, #fd7046, #ff6c6c);
-      .headCnt{
-        padding:25px 20px;
-        box-sizing: border-box;
-        .back{
-          width:26px;
-        }
-        .pageName{
-          font-size:30px;
-          color:#fff;
-        }
-        .searchBox{
-          width:340px;
-          height:60px;
-          border-radius:30px;
-          box-sizing:border-box;
-          background:#fff;
-          padding:0 20px;
-          .gudouShopSearch{
-            font-size:26px;
-            width:245px;
-          }
-          img{
-            width:34px;
 
-          }
-        }
-        .giftCenter{
-          font-size:26px;
-          color:#fff;
-        }
-      }
     }
     .gudouShopCnt{
       background:#f3f3f3;
       .gudouInfoBox{
          height:160px;
          position:relative;
+         .cube-scroll-content{
+           display: inline-block;
+         }
         .gudouInfo{
           width:680px;
           padding:24px 0 60px 0;
@@ -254,6 +402,9 @@
       }
       .hotExchangeBox{
         padding:28px 20px 0 20px;
+        .cube-scroll-content{
+          display: inline-block;
+        }
         .exBox{
           padding-left:20px;
           background:#fff;
@@ -311,22 +462,42 @@
         }
       }
       .goodsNav{
-
-        padding:40px 0 20px 20px;
-
-
+        width:100%;
+        height:80px;
+        z-index:1000;
+        background:#f3f3f3;
+        .navBox{
+          height:80px;
+          padding:0 20px;
+          box-sizing:border-box;
+        }
+        .cube-scroll-content{
+          display: inline-block;
+        }
         span{
           margin-right:50px;
           color:#000;
           font-size:26px;
         }
-
+        .activeSpan{
+          color:#ff523d;
+        }
         .textBox{
           white-space: nowrap;
+          height:80px;
+          line-height:80px;
         }
       }
+      .activeNav{
+        position: fixed;
+        left:0;
+        top:98px;
+      }
       .goodsNavList{
+        background:#f3f3f3;
         padding: 0 20px;
+        box-sizing:border-box;
+
         ul{
           flex-wrap: wrap;
 
@@ -392,6 +563,18 @@
           }
         }
       }
+      .activeList{
+        position:fixed;
+        left:0;
+        top:178px;
+        right:0;
+        bottom:0;
+        ul{
+          // padding-top:80px;
+        }
+      }
     }
+
   }
+
 </style>

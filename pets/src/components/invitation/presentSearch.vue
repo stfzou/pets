@@ -71,10 +71,10 @@
         }
         .search{
           width:520px;
-          height:60px;
+          height:65px;
           background:rgba(255,255,255,1);
-          border:1px solid rgba(221,221,221,1);
-          border-radius: 30px;
+          border:1px solid #e8e8e8;/*no*/
+          border-radius: 35px;
           box-sizing:border-box;
           padding:0 20px;
           i{
@@ -84,6 +84,7 @@
           input{
             width:420px;
             font-size:26px;
+            line-height:60px;
           }
         }
         .searchBtn{
