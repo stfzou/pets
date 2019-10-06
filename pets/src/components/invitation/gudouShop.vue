@@ -3,7 +3,7 @@
     <div class="headCnt flex_r_s_b">
       <img class="back" @click="link" src="../../assets/icon/back@2x.png" alt="">
       <div class="pageName">骨豆商场</div>
-      <div class="searchBox flex_r_s_b" @click="link">
+      <div class="searchBox flex_r_s_b" @click="linkSearch">
         <div class="gudouShopSearch"></div>
         <img src="../../assets/icon/icon-search@2x.png" alt="">
       </div>
@@ -28,14 +28,20 @@
                   <div class="cj-name">骨豆抽奖</div>
                   <div class="cj-js">最高得价值99元礼品</div>
                 </div>
-                <img src="../../assets/icon_zhuanpan.png" alt="">
+                <a href="http://app.gutouzu.com/zhuanpan/index.html">
+                  <img src="../../assets/icon_zhuanpan.png" alt="">
+                </a>
+
               </div>
               <div class="cj-item flex_r_s_b">
                 <div>
                   <div class="cj-name">欢乐砸金蛋</div>
                   <div class="cj-js">最高得200粒骨豆</div>
                 </div>
-                <img src="../../assets/jindan.png" alt="">
+                <a href="http://app.gutouzu.com/zadan/index.html">
+                  <img src="../../assets/jindan.png" alt="">
+                </a>
+
               </div>
             </div>
           </div>
@@ -53,7 +59,7 @@
                <ul class="flex_r_f_s">
                  <li v-for="item in hots">
                    <div class="imgBox">
-                     <img class="goodsPic" :src="item.compressImage" alt="">
+                     <img class="goodsPic" @click="xqLink(item)" :src="item.compressImage" alt="">
                      <img class="tipPic" src="../../assets/hot_tip.png" alt="">
                    </div>
                    <div class="desc">{{item.name|descFilter}}</div>
@@ -80,7 +86,7 @@
                <ul class="flex_r_f_s">
                  <li v-for="item in selections">
                    <div class="imgBox">
-                     <img class="goodsPic" :src="item.compressImage" alt="">
+                     <img class="goodsPic" @click="xqLink(item)" :src="item.compressImage" alt="">
                      <img class="tipPic" src="../../assets/jx_tip.png" alt="">
                    </div>
                    <div class="desc">{{item.name|descFilter}}</div>
@@ -97,11 +103,11 @@
           <div class="navBox">
             <cube-scroll
               ref="scroll"
-              :data="navArr"
+              :data="labels"
               direction="horizontal"
               class="horizontal-scroll-list-wrap">
               <div class="textBox">
-                <span @click="navClick(index)" :class="{activeSpan:index==spanIndex}" v-for="(item,index) in navArr">{{item}}</span>
+                <span @click="navClick(item,index)" :class="{activeSpan:index==spanIndex}" v-for="(item,index) in labels">{{item.name}}</span>
               </div>
               </cube-scroll>
           </div>
@@ -110,11 +116,11 @@
 
 
         </div>
-        <div class="goodsNavList" v-show="isShow">
+        <div class="goodsNavList" v-if="isShow">
           <ul class="flex_r_s_b">
             <li v-for="item in alls">
               <div class="goodsImgBox">
-                <img class="goodsPic" :src="item.compressImage" alt="">
+                <img class="goodsPic" @click="xqLink(item)" :src="item.compressImage" alt="">
                 <img class="sxdTip" v-if="deduction>item.boneBeanPrice"  src="../../assets/sxd_tip.png" alt="">
               </div>
               <div class="listBottom">
@@ -123,19 +129,19 @@
                 <div class="deduction">骨豆直抵¥<span v-if="deduction>item.boneBeanPrice">{{item.boneBeanPrice}}</span><span v-else>{{deduction}}</span></div>
                 <div class="gudouPriceBox flex_r_f_s">
                   <div class="gudouPrice flex_r_s_c">骨豆价¥{{item.boneBeanPrice}}</div>
-                  <div class="oldPrice">¥{{item.price}}</div>
+                  <div class="oldPrice">原价:¥{{item.price}}</div>
                 </div>
               </div>
 
             </li>
           </ul>
         </div>
-        <div class="goodsNavList activeList" v-show="!isShow">
-          <cube-scroll ref="listScroll" :options="listOpt">
+        <div class="goodsNavList activeList" v-else>
+          <cube-scroll ref="listScroll" :options="listOpt" @pulling-up="onPullingUp" @pulling-down="onPullingDown">
             <ul class="flex_r_s_b">
               <li v-for="item in alls">
                 <div class="goodsImgBox">
-                  <img class="goodsPic" :src="item.compressImage" alt="">
+                  <img class="goodsPic" @click="xqLink(item)" :src="item.compressImage" alt="">
                   <img class="sxdTip" v-if="deduction>item.boneBeanPrice" src="../../assets/sxd_tip.png" alt="">
                 </div>
                 <div class="listBottom">
@@ -144,7 +150,7 @@
                   <div class="deduction">骨豆直抵¥<span v-if="deduction>item.boneBeanPrice">{{item.boneBeanPrice}}</span><span v-else>{{deduction}}</span></div>
                   <div class="gudouPriceBox flex_r_f_s">
                     <div class="gudouPrice flex_r_s_c">骨豆价¥{{item.boneBeanPrice}}</div>
-                    <div class="oldPrice">¥{{item.price}}</div>
+                    <div class="oldPrice">原价:¥{{item.price}}</div>
                   </div>
                 </div>
 
@@ -162,6 +168,7 @@
     data(){
       return{
         scroll:'',
+        userId:-1,
         deduction:'',
         searchVal:'',
         spanIndex:0,
@@ -172,8 +179,10 @@
         goodstType:[],//分类
         isShow:true,
         isNavCalss:false,
-        testArr:[1,2,3,4,5],
-        navArr:['全部','宠物主粮','宠物零食','营养保健','生活日用','测试','测试2'],
+        labels:[],
+        labelId:0,
+        page:1,
+        testArr:[],
         hOption:{
           preventDefault:false
         },
@@ -188,7 +197,7 @@
           		more: '加载更多',
           		noMore: '没有更多数据了',
           	},
-          	threshold: 20,
+          	threshold: 40,
 
           }
         }
@@ -203,24 +212,27 @@
         }
       },
       typeNameFilter(val){
-        if(val.length>25){
-          return val.substr(0,25)+'...'
+        if(val.length>20){
+          return val.substr(0,20)+'...'
         }else{
           return val
         }
       }
     },
     mounted() {
-      window.addEventListener('scroll', this.menu)
+      window.addEventListener('scroll', this.menu);
+      this.userId = this.$route.query.userId;
       this.getListData();
     },
     destroyed () {
      window.removeEventListener('scroll', this.menu)
     },
     methods:{
-      navClick(index){
+      navClick(item,index){
        this.spanIndex = index;
-        console.log(1)
+       this.labelId = item.labelId;
+       this.page = 1;
+       this.getLabelData();
       },
       link(){
        // this.$router.push({
@@ -229,6 +241,15 @@
        this.isShow = true;
        this.isNavCalss = false;
        this.$refs.scroll.refresh();
+      },
+      linkSearch(){
+        let self = this;
+        this.$router.push({
+          name:'presentSearch',
+          query:{
+            boneBean:self.boneBean
+          }
+        })
       },
       menu() {
         let domH = document.querySelector('.goodsNav').offsetTop;
@@ -250,11 +271,22 @@
         this.isShow = true;
         this.isNavCalss = false;
       },
+      xqLink(item){
+        let self = this;
+        this.$router.push({
+          name:'exChangeXq',
+          query:{
+            cId:item.cId,
+            boneBean:self.boneBean
+          }
+
+        })
+      },
       getListData(){
         let self = this;
         this.axios.get(Api.userApi+'/boneBeanShop/selectBoneBeanShopHomePage',{
           params:{
-            userId:38
+            userId:self.userId
           }
 
         }).then(function(res) {
@@ -262,15 +294,39 @@
               if(res.data.code==1){
                 self.boneBean = res.data.data.boneBean;
                 self.deduction = res.data.data.boneBean/100;
-                console.log(self.deduction)
+                console.log(res)
                 self.hots = res.data.data.hots;
                 self.alls = res.data.data.alls;
                 self.selections = res.data.data.selections;
+                self.labels = res.data.data.labels;
+
+
+              }else{
+
+              }
+        	}).catch(function(err) {
+              alert(err)
+
+        	});
+      },
+      getLabelData(){
+        let self = this;
+        this.axios.get(Api.userApi+'/boneBeanShop/selectCommodityByLabel',{
+          params:{
+            labelId:self.labelId,
+            page:self.page,
+            rows:10
+          }
+
+        }).then(function(res) {
+
+              if(res.data.code==1){
+
                 setTimeout(() => {
-                  self.$refs.scroll.forceUpdate();
-                	self.dataList = res.data.data;
+                  self.alls = res.data.data;
+                	self.$refs.listScroll.forceUpdate();
                 	setTimeout(() => {
-                		self.$refs.scroll.refresh();
+                		self.$refs.listScroll.refresh();
                 	}, 200)
                 }, 500)
 
@@ -281,8 +337,51 @@
               alert(err)
 
         	});
-      }
+      },
+      onPullingDown(){
+        this.page = 1;
+        this.getLabelData();
+      },
+      onPullingUp(){
+        let self = this;
+        self.page++;
+        this.axios.get(Api.userApi+'/boneBeanShop/selectCommodityByLabel',{
+          params:{
+            labelId:self.labelId,
+            page:self.page,
+            rows:10
+          }
 
+        }).then(function(res) {
+
+              if(res.data.code==1){
+                if(res.data.data.length>0){
+                  setTimeout(() => {
+
+                    self.alls.push(...res.data.data)
+                  	self.$refs.listScroll.forceUpdate();
+                  	setTimeout(() => {
+                  		self.$refs.listScroll.refresh();
+                  	}, 200)
+                  }, 500)
+                }else{
+                  setTimeout(() => {
+                  	self.$refs.listScroll.forceUpdate();
+                    self.$refs.listScroll.refresh();
+                  }, 500)
+                }
+
+              }else{
+                setTimeout(() => {
+                	self.$refs.listScroll.forceUpdate();
+                  self.$refs.listScroll.refresh();
+                }, 500)
+              }
+        	}).catch(function(err) {
+              alert(err)
+
+        	});
+      }
     }
   }
 
@@ -545,7 +644,7 @@
             .gudouPriceBox{
               padding-top:20px;
               .gudouPrice{
-                width:180px;
+                width:150px;
                 height:40px;
                 background:rgba(255,82,61,1);
                 border-radius:20px;

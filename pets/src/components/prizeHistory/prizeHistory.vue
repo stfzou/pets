@@ -2,7 +2,7 @@
   <div class="prizeHistory">
       <div class="top_nav flex_r_s_b">
       	<div class="back" @click="back" v-if="isApp=='-1'"></div>
-      	<div class="nav_title">中奖纪录</div>
+      	<div class="nav_title">中奖记录</div>
       </div>
       <div class="prize-history-cnt">
 
@@ -75,55 +75,24 @@
           name:'invitationGu'
         })
       },
-      isAnOrIos() {
-      	var u = navigator.userAgent,
-      		app = navigator.appVersion;
-      	var isAndroid = u.indexOf('Android') > -1 || u.indexOf('Linux') > -1; //g
-      	var isIOS = !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/); //ios终端
-      	if (isAndroid) {
-      		//这个是安卓操作系统
-      		alert('这个是安卓操作系统')
-      	}
-      	if (isIOS) {
-      		//这个是ios操作系统
-      		alert('这个是ios操作系统')
-      	}
-      },
+      
       getUrlKey(name){
           return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.href) || [, ""])[1].replace(/\+/g, '%20')) || null
       },
       showBtn() {
-            let self = this;
-            this.$createDialog({
-              type: 'confirm',
-              icon: 'cubeic-warn',
-              title: '',
-              content: '请下载骨米APP，在我的钱包-->抽奖-->中奖纪录中进行领取',
-              confirmBtn: {
-                text: '去下载',
-                active: true,
-                disabled: false,
-                href: 'javascript:;'
-              },
-              cancelBtn: {
-                text: '取消',
-                active: false,
-                disabled: false,
-                href: 'javascript:;'
-              },
-              onConfirm: () => {
-                self.isAnOrIos();
-              },
-              onCancel: () => {
-
-              }
-            }).show()
+        let self = this;
+        this.$router.push({
+          name:'gudouShop',
+          query:{
+            userId:self.userId
+          }
+        })
       },
       getDataList(){
         let self = this;
         this.axios.get(Api.userApi+'/prize/selectWinPrizeRecordByType',{
           params:{
-            userId:38,
+            userId:self.userId,
             type:self.type,
             page:1,
             rows:10
@@ -205,11 +174,13 @@
       height:100%;
       background: url(../../assets/historyBg.png) no-repeat;
       background-size:cover;
+      overflow:hidden;
       .top_nav {
       	padding: 0 20px;
       	height: 88px;
       	box-sizing: border-box;
       	z-index: 100;
+        margin-top:20px;
       	.back {
       		width: 26px;
       		height: 42px;

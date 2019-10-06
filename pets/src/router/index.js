@@ -53,7 +53,7 @@ import PresentSearch from '@/components/invitation/presentSearch'
 Vue.use(Router)
 export default new Router({
   //history
-	mode: 'history',
+	mode:'history',
     routes:[
 		{
 		  path:'',
@@ -98,6 +98,9 @@ export default new Router({
       path:'/presentSearch',
       name:'presentSearch',
       component:PresentSearch,
+      meta:{
+      	keepAlive:true // 需要要缓存
+      }
     },
     {
     	path:'/wxWhitePage',

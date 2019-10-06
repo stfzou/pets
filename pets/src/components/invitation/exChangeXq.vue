@@ -1,36 +1,36 @@
 <template>
   <div class="exChangeXq">
     <div class="top_nav flex_r_s_b">
-    	<div class="back"></div>
+    	<div class="back" @click="back"></div>
     	<div class="nav_title">店铺详情</div>
     </div>
     <div class="banner">
-        <cube-slide ref="slide" :data="items">
-          <cube-slide-item v-for="(item, index) in items" :key="index" @click.native="clickHandler(item, index)">
+        <cube-slide ref="slide" :data="bannerImg">
+          <cube-slide-item v-for="(item, index) in bannerImg" :key="index" @click.native="clickHandler(item, index)">
 
-            <img src="../../assets/banner.png">
+            <img :src="item">
 
           </cube-slide-item>
         </cube-slide>
     </div>
     <div class="cntWarp">
       <div class="goodsInfoBox">
-        <div class="goodsName">疯狂的小狗博美专用狗粮1.5KG*2包幼犬成犬粮小型犬美 毛去泪痕6斤</div>
+        <div class="goodsName">{{goodsName}}</div>
         <div class="duihuanBox flex_r_f_s">
-          <div class="num">已有180人兑换</div>
-          <div class="sxdTip flex_r_s_c">随心兑</div>
+          <div class="num">已有{{sumSellNum}}人兑换</div>
+          <div class="sxdTip flex_r_s_c" v-if="deduction>=boneBeanPrice">随心兑</div>
         </div>
-        <div class="gudouDeduction flex_r_s_c">骨豆抵￥10.90</div>
+        <div class="gudouDeduction flex_r_s_c">骨豆抵￥<span v-if="deduction>=boneBeanPrice">{{boneBeanPrice}}</span><span v-else>{{deduction}}</span></div>
         <div class="gudouPrice flex_r_f_s">
-          <span class="new">骨豆价<b>￥10.90</b></span>
-          <span class="old">￥32.80</span>
+          <span class="new">骨豆价<b>￥{{boneBeanPrice}}</b></span>
+          <span class="old">原价<span>￥{{price}}</span></span>
         </div>
       </div>
       <div class="line"></div>
-      <div class="goodsXqImg">
-        <img src="../../assets/active_bg.png" alt="">
+      <div class="goodsXqImg" v-html="descImg">
+        <!-- <img src="../../assets/active_bg.png" alt=""> -->
       </div>
-      <div class="duihuanBtn flex_r_s_c">立即兑换</div>
+      <div class="duihuanBtn flex_r_s_c" @click="showBtn">立即兑换</div>
     </div>
   </div>
 </template>
@@ -40,12 +40,97 @@
   export default{
     data(){
       return{
-        items:[1,2,3]
+        boneBean:0,
+        bannerImg:[],
+        deduction:'',
+        goodsName:'',
+        sumSellNum:'',
+        price:'',
+        boneBeanPrice:'',
+        descImg:'',
+        cId:'',
+
       }
     },
+    mounted() {
+      this.cId = this.$route.query.cId;
+      this.boneBean = this.$route.query.boneBean;
+      this.getData()
+    },
     methods:{
+      back() {
+      	this.$router.go(-1); //返回上一层
+      },
       clickHandler(item, index) {
           console.log(item, index)
+      },
+      isAnOrIos() {
+      	var u = navigator.userAgent,
+      		app = navigator.appVersion;
+      	var isAndroid = u.indexOf('Android') > -1 || u.indexOf('Linux') > -1; //g
+      	var isIOS = !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/); //ios终端
+      	if (isAndroid) {
+      		//这个是安卓操作系统
+      		alert('这个是安卓操作系统')
+      	}
+      	if (isIOS) {
+      		//这个是ios操作系统
+      		alert('这个是ios操作系统')
+      	}
+      },
+      showBtn() {
+            let self = this;
+            this.$createDialog({
+              type: 'confirm',
+              icon: 'cubeic-warn',
+              title: '',
+              content: '请下载骨米APP，在我的钱包-->抽奖-->中奖纪录中进行领取',
+              confirmBtn: {
+                text: '去下载',
+                active: true,
+                disabled: false,
+                href: 'javascript:;'
+              },
+              cancelBtn: {
+                text: '取消',
+                active: false,
+                disabled: false,
+                href: 'javascript:;'
+              },
+              onConfirm: () => {
+                self.isAnOrIos();
+              },
+              onCancel: () => {
+
+              }
+            }).show()
+      },
+      getData(){
+        let self = this;
+        this.axios.get(Api.userApi+'/boneBeanShop/selectCommodityDescById',{
+          params:{
+            cId:self.cId
+          }
+
+        }).then(function(res) {
+              console.log(res)
+              if(res.data.code==1){
+                self.bannerImg = res.data.data.image.split(',')
+                self.deduction = self.boneBean/100
+                self.goodsName = res.data.data.name
+                self.sumSellNum = res.data.data.sumSellNum
+                self.price = res.data.data.price
+                self.boneBeanPrice = res.data.data.boneBeanPrice
+                self.descImg = res.data.data.desc
+
+                console.log(self.bannerImg)
+              }else{
+
+              }
+        	}).catch(function(err) {
+              alert(err)
+
+        	});
       }
     }
   }
@@ -53,7 +138,8 @@
 
 <style lang="scss">
   .exChangeXq{
-    padding-bottom:96px;
+    padding-bottom:60px;
+    padding-top:88px;
     .line{
 
       height:10px;
@@ -64,6 +150,10 @@
     	height: 88px;
     	box-sizing: border-box;
     	z-index: 100;
+      position:fixed;
+      left:0;
+      top:0;
+      background:#fff;
     	.back {
     		width: 26px;
     		height: 42px;
@@ -155,9 +245,12 @@
           .old{
 
             font-size:28px;
-            text-decoration:line-through;
-            color:#999999;
 
+            color:#999999;
+            span{
+              text-decoration:line-through;
+              margin-left:5px;
+            }
           }
         }
 
