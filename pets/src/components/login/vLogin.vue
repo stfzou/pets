@@ -61,7 +61,7 @@
 									}
 								})
 								.then(function(response) {
-									console.log(response);
+
 								})
 								.catch(function(error) {
 									console.log(error);
@@ -73,7 +73,7 @@
 									}
 								})
 								.then(function(response) {
-									console.log(response);
+
 								})
 								.catch(function(error) {
 									console.log(error);
@@ -129,7 +129,7 @@
 					}).then(function(res) {
 
 						if (res.data.code === 1) {
-							console.log(res)
+
 							var userEntity = {
 								userName: res.data.user.userName,
 								userId: res.data.user.userId,
@@ -158,7 +158,7 @@
 
 
 						} else {
-							console.log(res)
+							
 							let toast = self.$createToast({
 								txt:res.data.msg,
 								type: 'error'

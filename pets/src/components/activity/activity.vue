@@ -345,7 +345,6 @@
 								self.evalList.forEach((e)=>{
 									e.content = self.decodeUnicode(e.content);
 								})
-                console.log(self.evalList)
 								self.commentNum = res.data.data.commentNum;
                 self.$refs.scroll.forceUpdate();
                 setTimeout(()=>{
@@ -391,7 +390,7 @@
 					}
 				}).then((res)=>{
 					if(res.data.code == 1){
-						console.log(res)
+						
             self.isPrivilege = res.data.data.isPrivilege;
 						self.mainImg = res.data.data.activityCover;
 						self.activityTitle = res.data.data.activityTitel;

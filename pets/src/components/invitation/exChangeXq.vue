@@ -54,7 +54,10 @@
     },
     mounted() {
       this.cId = this.$route.query.cId;
-      this.boneBean = this.$route.query.boneBean;
+      if(this.$route.query.boneBean!=null){
+        this.boneBean = this.$route.query.boneBean;
+      }
+      
       this.getData()
     },
     methods:{

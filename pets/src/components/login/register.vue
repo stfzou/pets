@@ -75,7 +75,7 @@
 								}
 							})
 							.then(function(response) {
-								console.log(response);
+
 							})
 							.catch(function(error) {
 								console.log(error);
@@ -169,7 +169,7 @@
 
 
 						} else {
-							console.log(res)
+							
 							let toast = self.$createToast({
 								txt:res.data.msg,
 								type: 'error'

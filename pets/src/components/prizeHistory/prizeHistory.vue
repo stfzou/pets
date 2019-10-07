@@ -20,7 +20,7 @@
 
               <div class="right">
                 <div class="receive" v-if="item.properties==1">已领取</div>
-                <div class="receive active" v-else @click="showBtn">待领取</div>
+                <div class="receive active" v-else @click="showBtn(item)">待领取</div>
               </div>
             </li>
 
@@ -42,6 +42,7 @@
         page:1,
         userId:'',
         isApp:'-1',
+        boneBean:0,
         options:{
         	pullDownRefresh:{
         		txt:'更新成功',
@@ -65,28 +66,47 @@
         this.isApp = this.getUrlKey('isApp');
         console.log(this.isApp)
       }
+      this.getBoneBean();
       this.getDataList();
 
 
     },
     methods:{
-      back(){
-        this.$router.push({
-          name:'invitationGu'
-        })
+      back() {
+      	this.$router.go(-1); //返回上一层
       },
-      
       getUrlKey(name){
           return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.href) || [, ""])[1].replace(/\+/g, '%20')) || null
       },
-      showBtn() {
+      showBtn(item) {
         let self = this;
         this.$router.push({
-          name:'gudouShop',
+          name:'exChangeXq',
           query:{
-            userId:self.userId
+            cId:item.giftBagId,
+            boneBean:self.boneBean
           }
         })
+      },
+      getBoneBean(){
+        let self = this;
+        this.axios.get(Api.userApi+'/prize/selectPrizeByType',{
+          params:{
+            userId:self.userId,
+            type:1,
+            rows:10
+          }
+
+        }).then(function(res) {
+              if(res.data.code==1){
+                self.boneBean = res.data.data.boneBean;
+              }else{
+                alert(res.data.msg)
+              }
+        	}).catch(function(err) {
+              alert(err)
+
+        	});
       },
       getDataList(){
         let self = this;
@@ -99,7 +119,7 @@
           }
 
         }).then(function(res) {
-              console.log(res.data.data)
+              
               if(res.data.code==1){
 
                 setTimeout(() => {

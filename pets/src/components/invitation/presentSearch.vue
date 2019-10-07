@@ -164,12 +164,13 @@
           }
 
         }).then(function(res) {
-
+            
               if(res.data.code==1){
                 if(res.data.data.length>0){
                   setTimeout(() => {
                     self.dataList.push(...res.data.data);
                   	self.$refs.scroll.forceUpdate();
+
                   	setTimeout(() => {
                   		self.$refs.scroll.refresh();
                   	}, 200)

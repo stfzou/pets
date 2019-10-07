@@ -2,7 +2,7 @@
   <div class="gudouShop">
     <div class="headCnt flex_r_s_b">
       <img class="back" @click="link" src="../../assets/icon/back@2x.png" alt="">
-      <div class="pageName">骨豆商场</div>
+      <div class="pageName">骨豆商城</div>
       <div class="searchBox flex_r_s_b" @click="linkSearch">
         <div class="gudouShopSearch"></div>
         <img src="../../assets/icon/icon-search@2x.png" alt="">
@@ -34,7 +34,7 @@
 
               </div>
               <div class="cj-item flex_r_s_b">
-                <div>
+                <div class="zd">
                   <div class="cj-name">欢乐砸金蛋</div>
                   <div class="cj-js">最高得200粒骨豆</div>
                 </div>
@@ -221,7 +221,10 @@
     },
     mounted() {
       window.addEventListener('scroll', this.menu);
-      this.userId = this.$route.query.userId;
+      if(this.$route.query.userId!=null){
+        this.userId = this.$route.query.userId;
+      }
+
       this.getListData();
     },
     destroyed () {
@@ -294,7 +297,6 @@
               if(res.data.code==1){
                 self.boneBean = res.data.data.boneBean;
                 self.deduction = res.data.data.boneBean/100;
-                console.log(res)
                 self.hots = res.data.data.hots;
                 self.alls = res.data.data.alls;
                 self.selections = res.data.data.selections;
@@ -302,7 +304,7 @@
 
 
               }else{
-
+                alert(res.data.msg)
               }
         	}).catch(function(err) {
               alert(err)
@@ -476,9 +478,9 @@
             padding:54px 20px 0 20px;
             box-sizing:border-box;
             .cj-item{
-              width:310px;
+              width:330px;
               img{
-                width:118px;
+                width:100px;
               }
               .cj-name{
                 font-size:30px;
@@ -494,6 +496,9 @@
                 margin-top:22px;
                 color:#666;
               }
+            }
+            .zd{
+              padding-left:30px;
             }
           }
         }

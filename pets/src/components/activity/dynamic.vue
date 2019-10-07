@@ -150,7 +150,7 @@
 					}
 				}).then((res)=>{
 					if(res.data.code == 1){
-						console.log(res)
+						
 						setTimeout(()=>{
               self.$refs.scroll.forceUpdate();
 							res.data.data.forEach((e)=>{
@@ -218,7 +218,7 @@
 				}).then((res)=>{
 					if(res.data.code == 1){
 						if(res.data.data.length>0){
-              console.log(res.data.data)
+              
 							setTimeout(()=>{
                 res.data.data.forEach((e)=>{
                 

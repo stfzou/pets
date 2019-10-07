@@ -42,7 +42,7 @@
 			let mapInfo = this.getUrlData();
  			this.center = [mapInfo.lng, mapInfo.lat];
  			this.name = mapInfo.name;
-			console.log(mapInfo)
+			
 		},
 		methods: {
 			back() {

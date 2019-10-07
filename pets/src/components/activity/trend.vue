@@ -47,7 +47,7 @@
 				<div class="follow flex_r_s_c" @click="cancelFollow" v-else>取消关注</div>
 			</div>
 			<div class="text_cnt" v-html="content">
-				
+
 			</div>
 			<div class="trend_img" v-show="compressImages!=''">
 				<!-- <img :src="item" alt="" v-for="(item,index) in images" :key="index"> -->
@@ -205,7 +205,7 @@
 			DownApp
 		},
 		methods: {
-      
+
       homeLink(){
         let self = this;
         this.$router.push({
@@ -361,12 +361,10 @@
 					}
 				}).then((res) => {
 					if (res.data.code == 1) {
-            console.log(res.data.data)
 						self.userName = res.data.data.userName;
 						self.geoLocation = res.data.data.geoLocation;
             self.dynamicLabelNames = res.data.data.dynamicLabelNames;
             self.petName = res.data.data.petName;
-            console.log(res)
 						if(res.data.data.images!=''){
 							self.images = res.data.data.images;
 						}
@@ -385,12 +383,9 @@
 						} else {
 							self.likeUserHeadImages = res.data.data.likeUserHeadImages;
 						}
-
 						self.lookCount = res.data.data.lookCount;
 						self.commentCount = res.data.data.commentCount;
-            console.log(res.data.data)
             self.uId = res.data.data.userId;
-
 						self.authorId = res.data.data.userId;
 						self.dynamicId = res.data.data.dynamicId;
 						self.isLike = res.data.data.isLike;
@@ -427,7 +422,7 @@
 					if (res.data.code == 1) {
 
 						if (res.data.data.length > 0) {
-              console.log(res.data.data)
+              
 							setTimeout(() => {
 								self.dynamicComments = res.data.data;
                 //console.log(self.dynamicComments)

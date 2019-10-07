@@ -95,7 +95,7 @@
 							'Content-Type': 'application/x-www-form-urlencoded'
 						}
 					}).then(function(res) {
-						console.log(res)
+					
 						if (res.data.code === 1) {
 
 							var userEntity = {
@@ -122,7 +122,7 @@
 
 
 						} else {
-							console.log(res)
+							
 
 							setTimeout(()=>{
 								self.loading = false;

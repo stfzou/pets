@@ -141,8 +141,6 @@
               	 },100);
               },500);
             }
-
-						console.log(res.data.data)
 					}else{
 						alert(res.data.msg);
 					}
