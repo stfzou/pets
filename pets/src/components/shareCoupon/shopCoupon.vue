@@ -49,10 +49,11 @@
       <div class="operateTypes">主营:<span v-for="item in operateTypes">{{item.typeName}}</span></div>
       <div class="shopDesc">店铺简介:{{shopDesc}}</div>
 			<a :href="navUrl" class="addr flex_r_s_b">
-        <p>地址:<span>{{shopAddress}}</span></p>
+        <p>商户地址:<span>{{shopAddress}}</span></p>
 				<img src="../../assets/icon/icon_she56@3x.png" alt="">
 			</a>
-      <div class="distance">距离:<span>{{distance | distanceFilter}}公里</span></div>
+      <div class="distance">门店距离:<span>{{distance | distanceFilter}}公里</span></div>
+      <div class="storeNum" v-if="storeNum!=0">相关门店:<span>查看{{storeNum}}家相关门店</span></div>
 		</div>
 
 		<div class="couponListBox">
@@ -68,7 +69,7 @@
 							<img @click="couponXqLink(item)" :src="item.couponIcan" alt="">
 							<div class="couponNameBox">
 								<div class="couponName" @click="couponXqLink(item)">{{item.couponName | descFilter}}</div>
-								<div class="distance">{{item.couponDesc | descFilter}}</div>
+								<!-- <div class="distance">{{item.couponDesc | descFilter}}</div> -->
 								<div class="progressBox flex_r_s_b">
 									<div class="progress">
 										<div :style="item.styleObj"></div>
@@ -128,6 +129,7 @@
 			return{
 				lng:0,
 				lat:0,
+        storeNum:0,
         environment:'',
 				uId:'',
         navUrl:'',
@@ -347,7 +349,7 @@
 					}
 				}).then((res)=>{
 					if(res.data.code == 1){
-            console.log(res.data.data)
+            // console.log(res.data.data)
             let option = {
               title: res.data.data.shopName+'的优惠券来袭啦', // 分享标题, 请自行替换
               desc:'你附近的'+res.data.data.shopName+'发布了一大波优惠信息,快来看看吧~',
@@ -383,7 +385,7 @@
 							}
 							e.sx = (100-Math.round((e.receiveNum/e.circulation * 10000)/100).toFixed(4))+'%'
 						})
-						console.log(self.couponList)
+						// console.log(self.couponList)
 					}else{
 						alert(res.data.msg)
 					}
@@ -832,6 +834,18 @@
           margin-left:20px;
         }
       }
+      .storeNum{
+        padding: 20px 20px 0 20px;
+        font-size: 26px;
+        color: #666;
+        text-align: left;
+        width: 100%;
+        box-sizing: border-box;
+        span{
+          margin-left:20px;
+          color:#ff523d;
+        }
+      }
 		}
 
     .couponListBox{
@@ -880,7 +894,7 @@
                   line-height:34px;
                 }
 								.progressBox{
-									padding-top: 20px;
+									padding-top: 80px;
 									.progress{
 										position: relative;
 										width:100px;

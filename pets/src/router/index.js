@@ -34,6 +34,7 @@ import AuthorPets from '@/components/activity/authorPets'
 import CouponList from '@/components/shareCoupon/couponList'
 import ShopCoupon from '@/components/shareCoupon/shopCoupon'
 import CouponXq from '@/components/shareCoupon/couponXq'
+import ShopStore from '@/components/shareCoupon/shopStore'
 import GumiCard from '@/components/gumika/gumiCard'
 import PayRes from '@/components/common/payRes'
 import WxWhitePage from '@/components/common/wxWhitePage'
@@ -49,6 +50,7 @@ import GudouShop from '@/components/invitation/gudouShop'
 import ExChangeXq from '@/components/invitation/exChangeXq'
 import PresentCenter from '@/components/invitation/presentCenter'
 import PresentSearch from '@/components/invitation/presentSearch'
+
 
 Vue.use(Router)
 export default new Router({
@@ -157,6 +159,11 @@ export default new Router({
 			name:'couponXq',
 			component:CouponXq,
 		},
+    {
+    	path:'/shopStore',
+    	name:'shopStore',
+    	component:ShopStore,
+    },
 		{
 			path:'/dynamicHome',
 			name:'dynamicHome',
