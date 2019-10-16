@@ -31,6 +31,7 @@ import DynamicHome from '@/components/activity/dynamicHome'
 import Dynamic from '@/components/activity/dynamic'
 import AuthorActivity from '@/components/activity/authorActivity'
 import AuthorPets from '@/components/activity/authorPets'
+import CommunityActivity from '@/components/activity/communityActivity'
 import CouponList from '@/components/shareCoupon/couponList'
 import ShopCoupon from '@/components/shareCoupon/shopCoupon'
 import CouponXq from '@/components/shareCoupon/couponXq'
@@ -191,6 +192,11 @@ export default new Router({
 			name:'activity',
 			component:Activity
 		},
+    {
+      path:'/communityActivity',
+      name:'communityActivity',
+      component:CommunityActivity
+    },
 		{
 			path:'/praise',
 			name:'praise',

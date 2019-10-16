@@ -2,69 +2,50 @@
 	<div class="dynamic">
 
 		<div class="dynamic-list">
-			<cube-scroll ref="scroll" :options="options" @pulling-up="onPullingUp" @pulling-down="onPullingDown">
-				<div class="dynamic-item" v-for="item in dynamicList">
-					<div class="item-box">
-						<div class="authorInfo flex_r_f_s">
-							<div class="author-img">
-								<img :src="item.userHeadImage" alt="">
-								<!-- <div class="author-vip flex_r_s_c">V</div> -->
-							</div>
-							<div class="authorNameBox">
-								<div class="author-name">{{item.userName}}</div>
-								<div class="time">{{item.createdTime}}</div>
-							</div>
-						</div>
-						<div class="author-cnt">
-							<div class="text_cnt">
-                <router-link v-html="item.content" :to="{name:'trend',query:{dynamicId:item.dynamicId}}">
-
-                </router-link>
-
-							</div>
-							<div class="trend_img" v-show="item.images!=''">
-
-								<div class="imgs-container flex_r_f_s" v-show="item.compressImages!=''">
-									<div class="img-box" v-for="(img,index) in item.compressImages.split(',')" :key="img">
-										<img :src="img"  @click="handleImgsClick(item.images,index)" :class="item.compressImages.split(',').length==1?classA:classB">
-									</div>
-
-								</div>
-							</div>
-						</div>
-						<div class="addr flex_r_f_s"><img src="../../assets/icon/map@2x.png" alt=""><span>{{item.geoLocation}}</span></div>
-            <div class="itemTip" v-if="item.dynamicLabelNames.length>0"><span v-for="subItem in item.dynamicLabelNames">{{subItem}}</span></div>
-            <div class="petName" v-if="item.petName!=''"><span>#{{item.petName}}</span>+撸一次</div>
-						<div class="item-foot flex_r_f_e">
-							<div class="dynamic-pj flex_r_s_c" @click="dynamicXq(item)">
-								<img src="../../assets/icon_xiaox.png" alt="">
-								<span>{{item.commentCount}}</span>
-							</div>
-							<div class="browse-num flex_r_s_c">
-								<img src="../../assets/icon-chakan.png" alt="">
-								<span>{{item.lookCount}}</span>
-							</div>
-							<div class="like-num flex_r_s_c">
-								<img src="../../assets/icon_guanzhu.png" alt="" v-if="item.isLike == 0" @click="clikeLike(item)">
-								<img src="../../assets/active_guanzhu.png" alt="" v-else @click="cancelLike(item)">
-								<span>{{item.likeCount}}</span>
-							</div>
-						</div>
-					</div>
-
-					<div class="line"></div>
-				</div>
-			</cube-scroll>
+			<vue-waterfall-easy :imgsArr="dynamicList" ref="waterfall" :mobileGap="mobileGap"  @click="clickFn" @scrollReachBottom="onPullingUp">
+        <div slot="waterfall-over">没有更多了</div>
+        <cube-loading slot="loading" slot-scope="{isFirstLoad}" :size="28"></cube-loading>
+        <div class="img-info" slot-scope="props">
+           <div class="commentNum flex_r_f_s">
+             <div class="commentIcon flex_r_f_s">
+               <img status="1" src="../../assets/icon_xiaox.png" alt="">
+               <span>{{props.value.commentCount}}</span>
+             </div>
+             <div class="loolIcon flex_r_f_s">
+               <img status="1" src="../../assets/icon-chakan.png" alt="">
+               <span>{{props.value.lookCount}}</span>
+             </div>
+           </div>
+           <div class="commentCnt">{{props.value.title}}</div>
+           <div class="user-info flex_r_s_b">
+             <div class="userName flex_r_f_s">
+               <img status="1" :src="props.value.userHeadImage" alt="">
+               <span>{{props.value.userName}}</span>
+             </div>
+             <div class="likeBox flex_r_f_s">
+               <img status="1" src="../../assets/icon_guanzhu.png" v-if="props.value.isLike===0" alt="" @click="clikeLike(props.value,props.index)">
+               <img status="1" src="../../assets/active_guanzhu.png" v-else @click="cancelLike(props.value,props.index)" alt="">
+               <span>{{props.value.likeCount}}</span>
+             </div>
+           </div>
+        </div>
+      </vue-waterfall-easy>
 		</div>
 
 	</div>
 </template>
 
 <script>
+  import vueWaterfallEasy from 'vue-waterfall-easy'
 	import Api from '../common/apj.js'
 	export default{
+    components:{
+      vueWaterfallEasy
+    },
 		data(){
 			return {
+        isLoading:false,
+        mobileGap:15,
 				dynamicList:[],
 				geoLocation:'',
 				scroll:'',
@@ -103,7 +84,7 @@
 
 		},
 		methods:{
-      
+
 			handleImgsClick(imges,index) {
         let self = this;
         this.axios.get(Api.userApi + '/image/getImageUrlArrays?keys=' + imges, {
@@ -150,21 +131,17 @@
 					}
 				}).then((res)=>{
 					if(res.data.code == 1){
-						
-						setTimeout(()=>{
-              self.$refs.scroll.forceUpdate();
+              console.log(res)
 							res.data.data.forEach((e)=>{
-
-
-								e.content = self.decodeUnicode(e.content)
-                e.content = e.content.replace(/[\n\r]/g,'<br>')
-							})
+							  e.content = self.decodeUnicode(e.content);
+							  e.content = e.content.replace(/[\n\r]/g,'<br>');
+							  e.src = e.compressImages.split(',')[0];
+							  e.href = 'http://app.gutouzu.com/index.html#/trend?dynamicId='+e.dynamicId;
+							});
               self.dynamicList = res.data.data;
-              setTimeout(()=>{
-                self.$refs.scroll.refresh();
-              },500)
 
-						},500)
+
+
 					}else{
 						alert(res.data.msg);
 					}
@@ -218,30 +195,22 @@
 				}).then((res)=>{
 					if(res.data.code == 1){
 						if(res.data.data.length>0){
-              
-							setTimeout(()=>{
                 res.data.data.forEach((e)=>{
-                
-                  e.content = self.decodeUnicode(e.content)
-                  e.content = e.content.replace(/[\n\r]/g,'<br>')
+                  e.content = self.decodeUnicode(e.content);
+                  e.content = e.content.replace(/[\n\r]/g,'<br>');
+                  e.src = e.compressImages.split(',')[0];
+                  e.href = 'http://app.gutouzu.com/index.html#/trend?dynamicId='+e.dynamicId;
                 });
-								self.$refs.scroll.forceUpdate();
                 self.dynamicList.push(...res.data.data)
-								setTimeout(()=>{
-									self.$refs.scroll.refresh();
-								},200)
-							},1000)
-
+                // self.$refs.waterfall.waterfallOver()
+                // console.log(res.data.data)
 						}else{
-							setTimeout(()=>{
-								self.$refs.scroll.forceUpdate();
-                self.$refs.scroll.refresh();
-							},500)
+							self.$refs.waterfall.waterfallOver()
 						}
 
 					}else{
 						alert(res.data.msg);
-						self.$refs.scroll.forceUpdate();
+
 					}
 				})
 
@@ -276,7 +245,7 @@
 				}).show()
 
 			},
-			clikeLike(item) {
+			clikeLike(item,index) {
 
 				if (this.userId == -1) {
 					this.goLogin('登录后才能点赞');
@@ -293,6 +262,8 @@
 						}
 					}).then((res) => {
 						if (res.data.code == 1) {
+              // self.dynamicList[index].isLike = 1
+              // self.dynamicList[index].likeCount++
 							item.isLike = 1;
 							item.likeCount++;
 						} else {
@@ -302,7 +273,7 @@
 				}
 
 			},
-			cancelLike(item) {
+			cancelLike(item,index) {
 
 				let self = this;
 				this.axios.post(Api.trendApi + '/community/disLikeDynamic', this.qs.stringify({
@@ -315,8 +286,10 @@
 					}
 				}).then((res) => {
 					if (res.data.code == 1) {
-						item.isLike = 0;
-						item.likeCount--;
+						// item.isLike = 0;
+						// item.likeCount--;
+            item.isLike = 0
+            item.likeCount--
 					} else {
 						alert(res.data.msg)
 					}
@@ -333,8 +306,21 @@
 			decodeUnicode(str) {
 				str = str.replace(/\\/g, "%");
 				return unescape(str);
-			}
+			},
+      clickFn(event, { index, value }) {
+          // 阻止a标签跳转
+          event.preventDefault()
+          // 只有当点击到图片时才进行操作
+          if (event.target.tagName.toLowerCase() == 'img'&&event.target.getAttribute('status')!=1) {
+            this.$router.push({
+            	name:'trend',
+            	query:{
+            		dynamicId:value.dynamicId
+            	}
+            })
 
+          }
+      }
 		}
 	}
 </script>
@@ -345,6 +331,12 @@
 		.dynamic-list{
       height: 800px;
       background:#fff;
+      .vue-waterfall-easy-container .vue-waterfall-easy a.img-wraper > img[data-v-ded6b974]{
+        border-radius:10px;
+      }
+      .vue-waterfall-easy-container .vue-waterfall-easy a.img-inner-box[data-v-ded6b974]{
+        box-shadow:none;
+      }
       .cube-index-list-nav{
         padding: 20px 0;
        }
@@ -356,153 +348,61 @@
          height: 50px;
          line-height: 50px;
        }
-			.dynamic-item{
-				.item-box{
-					padding: 0 20px;
-					.authorInfo{
-						height: 100px;
-						.author-img{
-							height: 60px;
-							width: 60px;
-							background: #FFDFDF;
-							border-radius: 50%;
-							position: relative;
-							margin-right: 20px;
-							img{
-								width: 60px;
-								height: 60px;
-								border-radius: 50%;
-                object-fit: cover;
-							}
-							.author-vip{
-								height: 20px;
-								width: 20px;
-								background: #ff523d;
-								color: #fff;
-								border-radius: 50%;
-								position: absolute;
-								bottom: -3px;
-								right: -3px;
-								font-size: 14px;
-							}
-						}
-						.authorNameBox{
-							.author-name{
-								font-size: 28px;
-								color: #000;
-							}
-							.time{
-								font-size: 22px;
-								color: #999;
-								margin-top: 15px;
-							}
-						}
-
-					}
-					.author-cnt{
-						.text_cnt{
-							margin-bottom: 20px;
-							font-size: 28px;
-							line-height: 36px;
-              a{
-                color: #333;
-              }
-						}
-						.trend_img {
-							.imgs-container{
-								flex-wrap: wrap;
-								.img-box{
-									position: relative;
-									overflow: hidden;
-									margin-bottom: 10px;
-									border-radius: 4px;
-									margin-right: 15px;
-                  .img {
-                  	width: 210px;
-                  	height: 210px;
-                  	display: block;
-                    object-fit: cover;
-                  	display: block;
-                  }
-                  .imgActive{
-                    max-height: 360px;
-                    max-width: 100%;
-                  }
-								}
-
-
-							}
-
-
-						}
-
-					}
-					.addr{
-						padding: 12px 0;
-						img{
-							width: 20px;
-							margin-right: 10px;
-						}
-						span{
-							font-size: 24px;
-							color: #666;
-
-						}
-					}
-          .itemTip{
-            padding: 20px 0 30px 0;
-
-            span{
-              padding: 5px 10px;
-              border: 1px solid #e8e8e8;
-              color: #e8e8e8;
-              border-radius: 18px;
-              font-size: 26px;
-              margin-right: 10px;
-              margin-bottom: 10px;
+      .img-info{
+        .commentNum{
+          font-size:22px;
+          color:#666;
+          padding-top:20px;
+          .commentIcon{
+            img{
+              width:36px;
+              margin-right:10px;
             }
           }
-          .petName{
-            font-size: 26px;
-            color: #e8e8e8;
-            padding-bottom: 20px;
-            span{
-              margin-right: 20px;
+          .loolIcon{
+            img{
+              width:40px;
+              margin-right:10px;
             }
           }
-					.item-foot{
-            border-top: 1px solid #e8e8e8;
-						padding: 18px 0;
-						span{
-							font-size: 26px;
-							color: #666;
-							margin-left: 10px;
-						}
-						.dynamic-pj{
-							img{
-								width: 36px;
-							}
 
-						}
-						.browse-num{
-							img{
-								width: 41px;
-							}
-						}
-						.like-num{
-							img{
-								width: 35px;
-							}
-						}
-					}
+        }
+        .commentCnt{
+          padding-top:20px;
+          line-height:48px;
+          font-size:24px;
+          color:#000;
+        }
+        .user-info{
+          height:32px;
+          padding-top:20px;
+          .userName{
 
-				}
+            img{
+              // width:32px;
+              width:40px;
+              height:40px;
+              border-radius:50%;
+              margin-right:10px;
+            }
+            span{
+              font-size:26px;
+              color:#000;
+            }
+          }
+          .likeBox{
+            width:100px;
+            img{
+              width:24px;
+              margin-right:10px;
+            }
+          }
+        }
+      }
 
-				.line{
-					height: 10px;
-					background: #e8e8e8;
-				}
-			}
+
+
+
 		}
 	}
 </style>

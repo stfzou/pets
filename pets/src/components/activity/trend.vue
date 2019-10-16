@@ -46,22 +46,35 @@
 				<div class="follow flex_r_s_c" @click="follow" v-if="isFocus == 0">+关注</div>
 				<div class="follow flex_r_s_c" @click="cancelFollow" v-else>取消关注</div>
 			</div>
+      <div class="trend_img">
+      	<div class="imgs-container">
+          <cube-slide ref="slide" :data="compressImages">
+            <cube-slide-item v-for="(item, index) in compressImages" :key="index">
+              <div class="img-box flex_r_s_c">
+                <img :src="item" alt="" @click="handleImgsClick(index)">
+              </div>
+
+            </cube-slide-item>
+
+          </cube-slide>
+      	</div>
+      </div>
+      <div class="activityLabel flex_r_f_s">
+        <span>#{{officialActivityName}}#</span>
+      </div>
+      <div class="trendTitle">{{trendTitle}}</div>
 			<div class="text_cnt" v-html="content">
 
 			</div>
-			<div class="trend_img" v-show="compressImages!=''">
-				<!-- <img :src="item" alt="" v-for="(item,index) in images" :key="index"> -->
-				<div class="imgs-container flex_r_f_s">
-					<div class="img-box" v-for="(img,index) in compressImages.split(',')" :key="img">
-						<img :src="img" @click="handleImgsClick(index)" :class="compressImages.split(',').length>0&&compressImages.split(',').length==1?classA:classB">
-					</div>
 
-				</div>
-			</div>
 			<div class="trend_label">
 				<div class="addr flex_r_f_s" v-if="geoLocation!=''"><img src="../../assets/icon/map@2x.png" alt=""><span>{{geoLocation}}</span></div>
-        <div class="itemTip" v-if="dynamicLabelNames.length>0"><span v-for="subItem in dynamicLabelNames">{{subItem}}</span></div>
-        <div class="petName" v-if="petName!=''"><span>#{{petName}}</span>+撸一次</div>
+       <!-- <div class="itemTip" v-if="dynamicLabelNames.length>0"><span v-for="subItem in dynamicLabelNames">{{subItem}}</span></div> -->
+        <div class="petName" v-if="petName!=''"><img src="../../assets/icon_she21@3x.png" alt=""> <span>#{{petName}}</span>+撸一次</div>
+        <div class="tLabel flex_r_f_s">
+          <img src="../../assets/icon_gu67@3x.png" alt="">
+          <span v-for="item in officialTopicNames">#{{item}}#</span>
+        </div>
 				<!-- <div class="footprint flex_r_f_s"><img src="../../assets/footprint.png" alt=""><span>胖太</span></div>
 				<div class="explain">#异瞳#</div> -->
 			</div>
@@ -118,7 +131,7 @@
 				<div class="tx">暂无评论</div>
 			</div>
 
-			<!-- " -->
+
 			<div class="send_comment flex_r_s_b">
 				<input type="text" @blur.prevent="inputLoseFocus" v-model="val" placeholder="添加一条评论" />
 				<div class="send_btn" @click="addComment">发送</div>
@@ -135,13 +148,16 @@
 		data() {
 			return {
 				val: '',
+        trendTitle:'',
         petName:'',
+        officialActivityName:'',
         dynamicLabelNames:[],
+        officialTopicNames:[],
         uId:'',
         likeLength:'',
         classA:'imgActive',
         classB:'img',
-        compressImages:'',
+        compressImages:[],
 				isMask: false,
 				isReport: false,
 				reportData: ['垃圾营销', '有害信息', '违法信息', '诈骗信息', '不实信息'],
@@ -190,9 +206,6 @@
 		},
 		mounted() {
 
-			// let h = document.documentElement.clientHeight - document.querySelector(".title").offsetTop;
-			// let bottomH = document.querySelector(".send_comment").offsetHeight;
-			// document.querySelector(".comment_list").style.height = (h-bottomH-100)+'px';
 			if (JSON.parse(localStorage.getItem('user')) != null) {
 				this.userId = JSON.parse(localStorage.getItem('user')).userId;
 			}
@@ -361,14 +374,19 @@
 					}
 				}).then((res) => {
 					if (res.data.code == 1) {
+            // console.log(res)
+            self.officialActivityName = res.data.data.officialActivityName;
+            self.trendTitle = res.data.data.title;
 						self.userName = res.data.data.userName;
 						self.geoLocation = res.data.data.geoLocation;
             self.dynamicLabelNames = res.data.data.dynamicLabelNames;
             self.petName = res.data.data.petName;
+            self.officialTopicNames = res.data.data.officialTopicNames;
 						if(res.data.data.images!=''){
 							self.images = res.data.data.images;
+              self.compressImages = res.data.data.compressImages.split(',');
 						}
-            self.compressImages = res.data.data.compressImages;
+
 						self.time = res.data.data.createdTime.split(' ')[0];
 						self.userHeadImage = res.data.data.userHeadImage;
 						// self.content = res.data.data.content;
@@ -422,7 +440,7 @@
 					if (res.data.code == 1) {
 
 						if (res.data.data.length > 0) {
-              
+
 							setTimeout(() => {
 								self.dynamicComments = res.data.data;
                 //console.log(self.dynamicComments)
@@ -878,35 +896,55 @@
 					font-size: 24px;
 				}
 			}
-
+      .activityLabel{
+        padding-top:30px;
+        span{
+          padding:10px 20px;
+          // height:40px;
+          border-radius:40px;
+          background:#ff523d;
+          color:#fff;
+          font-size:22px;
+        }
+      }
+      .trendTitle{
+        color:#000000;
+        font-size:30px;
+        padding-top:40px;
+      }
 			.text_cnt {
 				font-size: 28px;
 				color: #333;
 				line-height: 36px;
 				margin-bottom: 10px;
+        padding-top:20px;
+        line-height:48px;
 			}
 
 			.trend_img {
 				.imgs-container{
-					flex-wrap: wrap;
-					.img-box{
-						position: relative;
-						overflow: hidden;
-						margin-bottom: 10px;
-						border-radius: 4px;
-						margin-right: 15px;
-						.img {
-							width: 210px;
-							height: 210px;
-							display: block;
-              object-fit: cover;
-							display: block;
-						}
-            .imgActive{
-              max-height: 222px;
-              max-width:720px
+					// width:100%;
+          height:720px;
+          .cube-slide-dots>span{
+            width:12px;/*no*/
+            height:12px;/*no*/
+            border-radius:50%;
+            margin-right:10px;
+          }
+          .cube-slide-dots>span.active{
+            background:#ff523d;
+          }
+          .img-box{
+            height:720px;
+            img {
+              display: block;
+              height: auto;
+              max-width: 100%;
+              max-height: 100%;
             }
-					}
+
+          }
+
 
 				}
 
@@ -923,28 +961,33 @@
 				}
 
 				.addr {
+          padding-top:20px;
           font-size: 26px;
 					img {
 						width: 22px;
 						margin-right: 10px;
 					}
 				}
-        .itemTip{
-          padding: 20px 0 30px 0;
 
+        .tLabel{
+          color: #666666;
+          padding-top:20px;
+          img{
+            margin-right:10px;
+            width:24px;
+          }
           span{
-            padding: 5px 10px;
-            border: 1px solid #e8e8e8;
-            color: #e8e8e8;
-            border-radius: 18px;
-            font-size: 26px;
-            margin-right: 10px;
-            margin-bottom: 10px;
+            margin-right:15px;
           }
         }
         .petName{
           font-size: 26px;
-          color: #e8e8e8;
+          color: #666666;
+          padding-top:20px;
+          img{
+            width:22px;
+            margin-right:10px;
+          }
           span{
             margin-right: 20px;
           }
