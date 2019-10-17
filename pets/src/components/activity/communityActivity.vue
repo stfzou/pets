@@ -56,10 +56,14 @@
         dynamicList:[],
         mobileGap:15,
         page:1,
+        userId:'-1'
 
       }
     },
     mounted() {
+      if (JSON.parse(localStorage.getItem('user')) != null) {
+      	this.userId = JSON.parse(localStorage.getItem('user')).userId;
+      }
       this.getDynamic();
     },
     methods:{
@@ -141,13 +145,93 @@
         		}else{
         			self.$refs.waterfall.waterfallOver()
         		}
-        
+
         	}else{
         		alert(res.data.msg);
-        
+
         	}
         })
-      }
+      },
+      goLogin(msg) {
+      	let self = this;
+      	let url = window.location.href;
+      	this.$store.commit('setLoginUrl', url);
+      	this.$createDialog({
+      		type: 'confirm',
+      		icon: 'cubeic-warn',
+      		title:msg,
+      		confirmBtn: {
+      			text: '去登录',
+      			active: true,
+      			disabled: false,
+      			href: 'javascript:;'
+      		},
+      		cancelBtn: {
+      			text: '取消',
+      			active: false,
+      			disabled: false,
+      			href: 'javascript:;'
+      		},
+      		onConfirm: () => {
+      			self.$router.push({
+      				name: 'login'
+      			})
+
+      		},
+
+      	}).show()
+
+      },
+      clikeLike(item,index) {
+
+      	if (this.userId == -1) {
+      		this.goLogin('登录后才能点赞');
+      	} else {
+      		let self = this;
+      		this.axios.post(Api.trendApi + '/community/likeDynamic', this.qs.stringify({
+      			byLikeUserId:item.userId,
+      			dynamicId: item.dynamicId,
+      			userId: self.userId,
+      			petId:''
+      		}), {
+      			headers: {
+      				'Content-Type': 'application/x-www-form-urlencoded'
+      			}
+      		}).then((res) => {
+      			if (res.data.code == 1) {
+              // self.dynamicList[index].isLike = 1
+              // self.dynamicList[index].likeCount++
+      				item.isLike = 1;
+      				item.likeCount++;
+      			} else {
+      				alert(res.data.msg)
+      			}
+      		})
+      	}
+
+      },
+      cancelLike(item,index) {
+
+      	let self = this;
+      	this.axios.post(Api.trendApi + '/community/disLikeDynamic', this.qs.stringify({
+      		byLikeUserId: item.userId,
+      		dynamicId: item.dynamicId,
+      		userId: self.userId
+      	}), {
+      		headers: {
+      			'Content-Type': 'application/x-www-form-urlencoded'
+      		}
+      	}).then((res) => {
+      		if (res.data.code == 1) {
+      			// item.isLike = 0;
+      			// item.likeCount--;
+            item.isLike = 0
+            item.likeCount--
+      		} else {
+      			alert(res.data.msg)
+      		}
+      	})
+      },
     }
   }
 </script>

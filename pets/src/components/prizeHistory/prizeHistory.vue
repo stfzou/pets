@@ -40,6 +40,7 @@
         dataList:[],
         type:'',
         page:1,
+        
         userId:'',
         isApp:'-1',
         boneBean:0,

@@ -134,15 +134,17 @@
         endTime:'',
         useNum:'',
         totalPrice:'',
-        isCard:false
+        isCard:false,
+        inviteUserId:-1
       }
     },
     mounted() {
-      //localStorage.removeItem('user')
-      //console.log(localStorage.getItem('orderNum')!=null)
+      if(this.getUrlKey('inviteUserId')!=null){
+        this.inviteUserId = this.getUrlKey('inviteUserId');
+      }
+
       let self = this;
       window.addEventListener('scroll', self.handleScroll)
-      //console.log(localStorage.getItem('orderNum'))
       this.getEnvironment();
       this.getCardInfo()
     },
@@ -177,6 +179,7 @@
       getCardInfo(){
         //console.log(JSON.parse(localStorage.getItem('user')))
         if(JSON.parse(localStorage.getItem('user'))!= null){
+
             let self = this;
             this.axios.post(Api.userApi + '/boneMika/selectUserBoneMikaStatus', this.qs.stringify({
               userId:JSON.parse(localStorage.getItem('user')).userId
@@ -185,7 +188,9 @@
                 'Content-Type': 'application/x-www-form-urlencoded'
               }
             }).then((res)=>{
+
               if(res.data.code==1){
+                // alert(1)
                 if(res.data.data==1){
 
                   self.axios.post(Api.userApi + '/boneMika/selectBoneMikaVo', self.qs.stringify({
@@ -196,6 +201,7 @@
                     }
                   }).then((re)=>{
                     if(re.data.code==1){
+                      console.log(re)
                      self.number = (re.data.data.number+'').replace(/\s/g, '').replace(/(.{4})/g, "$1 ")
                      self.endTime = re.data.data.endTime
                      self.isCard = true
@@ -214,11 +220,8 @@
         }
 
       },
-      getUrlPara(name) {
-        var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i");
-        var r = window.location.search.substr(1).match(reg);
-        if (r != null) return (r[2]);
-        return null;
+      getUrlKey(name){
+          return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.href) || [, ""])[1].replace(/\+/g, '%20')) || null
       },
       getEnvironment() { //静默授权初始化
         var ua = window.navigator.userAgent.toLowerCase();
@@ -264,7 +267,7 @@
                   }
                 })
                 .then(function(response) {
-                  
+
                 })
                 .catch(function(error) {
                   console.log(error);
@@ -276,7 +279,7 @@
                   }
                 })
                 .then(function(response) {
-                  
+
                 })
                 .catch(function(error) {
                   console.log(error);
@@ -346,7 +349,7 @@
           }).then(function(res) {
 
             if (res.data.code === 1) {
-             
+
               var userEntity = {
                 userName: res.data.user.userName,
                 userId: res.data.user.userId,
@@ -423,7 +426,7 @@
                 orderApi:'/boneMika/selectBoneMikaOrderStatus'
               }
             })
-           
+
 
 
             // weixinPay(wxData);
@@ -480,7 +483,8 @@
         } else {
           let self = this;
           this.axios.post(Api.userApi + '/boneMika/ali/webpay', this.qs.stringify({
-            userId: self.userId
+            userId:JSON.parse(localStorage.getItem('user')).userId,
+            inviteUser:self.inviteUserId
           }), {
             headers: {
               'Content-Type': 'application/x-www-form-urlencoded'

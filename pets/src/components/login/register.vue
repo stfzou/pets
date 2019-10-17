@@ -25,7 +25,6 @@
 					</div>
 					<div class="v_code active_vcode" v-else>
 						<span>{{count}}</span>
-
 					</div>
 				</li>
 			</ul>
@@ -48,9 +47,15 @@
 				show: true,
 				count: '',
 				timer: null,
+        inviteUserId:-1,
 				reg: /^1[3456789]\d{9}$/,
 			}
 		},
+    mounted() {
+      if(this.getUrlKey('inviteUserId')!=null){
+        this.inviteUserId = this.getUrlKey('inviteUserId');
+      }
+    },
 		methods: {
 			back() {
 				this.$router.go(-1);//返回上一层
@@ -61,6 +66,9 @@
 				},100);
 
 			},
+      getUrlKey(name){
+          return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.href) || [, ""])[1].replace(/\+/g, '%20')) || null
+      },
 			getCode() {
 				//获取验证码
 				if (this.phone!='') {
@@ -147,7 +155,8 @@
 					this.axios.post(Api.shopApi+'/user_register', this.qs.stringify({
 						phone: this.phone,
 						password: this.pwd,
-						v_code: this.vCode
+						v_code: this.vCode,
+            inviteUser:this.inviteUserId
 					}), {
 						headers: {
 							'Content-Type': 'application/x-www-form-urlencoded'
@@ -169,7 +178,7 @@
 
 
 						} else {
-							
+
 							let toast = self.$createToast({
 								txt:res.data.msg,
 								type: 'error'
