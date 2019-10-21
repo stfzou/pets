@@ -60,7 +60,10 @@
       	</div>
       </div>
       <div class="activityLabel flex_r_f_s">
-        <span>#{{officialActivityName}}#</span>
+        <span>
+          <router-link :to="{name:'communityActivity',query:{ocaId:ocaId}}">#{{officialActivityName}}#</router-link>
+        </span>
+        <img v-if="isPrize" src="../../assets/icon_gu99@3x.png" alt="">
       </div>
       <div class="trendTitle">{{trendTitle}}</div>
 			<div class="text_cnt" v-html="content">
@@ -69,14 +72,13 @@
 
 			<div class="trend_label">
 				<div class="addr flex_r_f_s" v-if="geoLocation!=''"><img src="../../assets/icon/map@2x.png" alt=""><span>{{geoLocation}}</span></div>
-       <!-- <div class="itemTip" v-if="dynamicLabelNames.length>0"><span v-for="subItem in dynamicLabelNames">{{subItem}}</span></div> -->
+
         <div class="petName" v-if="petName!=''"><img src="../../assets/icon_she21@3x.png" alt=""> <span>#{{petName}}</span>+撸一次</div>
         <div class="tLabel flex_r_f_s">
           <img src="../../assets/icon_gu67@3x.png" alt="">
           <span v-for="item in officialTopicNames">#{{item}}#</span>
         </div>
-				<!-- <div class="footprint flex_r_f_s"><img src="../../assets/footprint.png" alt=""><span>胖太</span></div>
-				<div class="explain">#异瞳#</div> -->
+
 			</div>
 			<div class="like_box">
 				<div class="like flex_r_f_s">
@@ -149,6 +151,7 @@
 			return {
 				val: '',
         trendTitle:'',
+        isPrize:false,
         petName:'',
         officialActivityName:'',
         dynamicLabelNames:[],
@@ -174,6 +177,7 @@
 				commentCount: '',
 				authorId: '',
 				dynamicId: '',
+        ocaId:'',
 				isLike: '',
 				options: {
 					pullDownRefresh: {
@@ -374,8 +378,10 @@
 					}
 				}).then((res) => {
 					if (res.data.code == 1) {
-            // console.log(res)
+            console.log(res)
+            self.isPrize = res.data.data.prize;
             self.officialActivityName = res.data.data.officialActivityName;
+            self.ocaId = res.data.data.ocaId;
             self.trendTitle = res.data.data.title;
 						self.userName = res.data.data.userName;
 						self.geoLocation = res.data.data.geoLocation;
@@ -898,13 +904,21 @@
 			}
       .activityLabel{
         padding-top:30px;
+        img{
+          width:40px;
+          margin-left:10px;
+        }
         span{
           padding:10px 20px;
+          width: initial;
           // height:40px;
+          color:#fff;
           border-radius:40px;
           background:#ff523d;
-          color:#fff;
           font-size:22px;
+          a{
+            color:#fff;
+          }
         }
       }
       .trendTitle{

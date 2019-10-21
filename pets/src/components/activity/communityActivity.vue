@@ -2,16 +2,23 @@
   <div class="communityActivity">
       <div class="top_nav flex_r_s_b">
       	<div class="back" @click="back"></div>
-      	<div class="nav_title">陪你一起过圣诞节</div>
+      	<div class="nav_title">{{activityName}}</div>
+        <div class="share" @click="share"></div>
       </div>
       <div class="cntWarp">
         <vue-waterfall-easy :imgsArr="dynamicList" :mobileGap="mobileGap" @click="clickFn"  ref="waterfall"   @scrollReachBottom="onPullingUp">
             <div slot="waterfall-head" class="waterfallHead">
               <div class="activityImg flex_r_s_c">
-               <img status="1" src="../../assets/as_post.jpg" alt="">
+               <img status="1" :src="image" alt="">
               </div>
-              <div class="activityData">活动时间：2019/12/22~2019/12/30</div>
-              <div class="activityText">哈哈哈哈<br>嘻嘻嘻<br>嘿嘿嘿</div>
+              <div class="activityData flex_r_s_b">
+                <span>活动时间：{{startTime}}~{{endTime}}</span>
+                <span class="rank">
+                  <span class="span2">{{count}}人参加</span>
+                  <span class="span1">排行榜</span>
+                </span>
+               </div>
+              <div class="activityText" v-html="desc"></div>
             </div>
             <div slot="waterfall-over">没有更多了</div>
             <cube-loading slot="loading" slot-scope="{isFirstLoad}" :size="28"></cube-loading>
@@ -28,7 +35,7 @@
                </div>
                <div class="commentCnt">{{props.value.title}}</div>
                <div class="user-info flex_r_s_b">
-                 <div class="userName flex_r_f_s">
+                 <div class="userName flex_r_f_s" @click="goUserHome(props.value)">
                    <img status="1" :src="props.value.userHeadImage" alt="">
                    <span>{{props.value.userName}}</span>
                  </div>
@@ -56,7 +63,15 @@
         dynamicList:[],
         mobileGap:15,
         page:1,
-        userId:'-1'
+        userId:'-1',
+        createdTime:'',
+        desc:'',
+        image:'',
+        activityName:'',
+        ocaId:'',
+        startTime:'',
+        endTime:'',
+        count:0
 
       }
     },
@@ -64,15 +79,64 @@
       if (JSON.parse(localStorage.getItem('user')) != null) {
       	this.userId = JSON.parse(localStorage.getItem('user')).userId;
       }
-      this.getDynamic();
+      this.ocaId = this.getUrlKey('ocaId');
+
+      this.getActivity();
+
     },
     methods:{
       back() {
       	this.$router.go(-1); //返回上一层
       },
+      goUserHome(item){
+        let self = this;
+        this.$router.push({
+          name:'dynamic',
+          query:{
+            aId:item.userId
+          }
+        })
+      },
+      getUrlKey(name){
+          return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.href) || [, ""])[1].replace(/\+/g, '%20')) || null
+      },
       decodeUnicode(str) {
       	str = str.replace(/\\/g, "%");
       	return unescape(str);
+      },
+      getActivity(){
+        let self = this;
+        self.axios.get(Api.userApi+'/community/selectInitUserDynamicOfActivity',{
+          params:{
+          	ocaId:self.ocaId,
+            userId:38
+          }
+        },{
+        	headers: {
+        		'Content-Type': 'application/x-www-form-urlencoded'
+        	}
+        }).then((res)=>{
+        	if(res.data.code == 1){
+            //console.log(res)
+            self.count = res.data.data.officialActivityDo.count;
+            self.startTime = res.data.data.officialActivityDo.startTime;
+            self.endTime = res.data.data.officialActivityDo.endTime;
+            self.desc = res.data.data.officialActivityDo.desc;
+            self.image = res.data.data.officialActivityDo.image;
+            self.activityName = res.data.data.officialActivityDo.name;
+            res.data.data.dynamicVos.forEach((e)=>{
+              e.src = e.compressImages.split(',')[0];
+              e.href = 'http://app.gutouzu.com/index.html#/trend?dynamicId='+e.dynamicId;
+            })
+            self.dynamicList = res.data.data.dynamicVos;
+        	}else{
+        		let toast = self.$createToast({
+        			txt:res.data.msg,
+        			type: 'error'
+        		  })
+        		toast.show()
+        	}
+        })
       },
       clickFn(event, { index, value }) {
           // 阻止a标签跳转
@@ -88,33 +152,12 @@
 
           }
       },
-      getDynamic(){
-      	let self = this;
-      	self.axios.get(Api.trendApi + '/community/selectDynamicByUserId', {
-      		params: {
-      			beLookUserId:42,
-      			lookUserId:38,
-      			page:1,
-      			rows:5
-      		}
-      	}, {
-      		headers: {
-      			'Content-Type': 'application/x-www-form-urlencoded'
-      		}
-      	}).then((res)=>{
-      		if(res.data.code == 1){
-              console.log(res)
-      				res.data.data.forEach((e)=>{
-      				  e.content = self.decodeUnicode(e.content);
-      				  e.content = e.content.replace(/[\n\r]/g,'<br>');
-      				  e.src = e.compressImages.split(',')[0];
-      				  e.href = 'http://app.gutouzu.com/index.html#/trend?dynamicId='+e.dynamicId;
-      				});
-              self.dynamicList = res.data.data;
-      		}else{
-      			alert(res.data.msg);
-      		}
-      	})
+      share(){
+      	let toast = this.$createToast({
+      		txt: '点击顶部右上角进行分享',
+      		type: 'warn'
+      	  })
+      	toast.show()
       },
       onPullingUp(){
         let self = this;
@@ -265,6 +308,12 @@
     		transform: translate(-50%, -50%);
 
     	}
+      .share{
+      	width: 50px;
+      	height: 40px;
+      	background: url('../../assets/icon/active_share.png') no-repeat center 0;
+      	background-size: 100%;
+      }
     }
     .cntWarp{
       position:absolute;
@@ -281,7 +330,7 @@
       .waterfallHead{
         padding:30px 20px;
         box-sizing:border-box;
-        border-bottom:10px solid #e8e8e8;
+
         margin-bottom:15px;
         .activityImg{
           img{
@@ -295,6 +344,10 @@
           font-size:24px;
           color:#666;
           padding-top:30px;
+          .span1{
+            margin-left:5px;
+            color:#ff523d;
+          }
         }
         .activityText{
           padding-top:30px;

@@ -177,7 +177,8 @@
 				</div>
 				<div class="flex_r_s_b itemBox">
 					<div>
-						<span>中奖规则</span>
+						
+						<span class="zjgz">中奖规则</span>
 					</div>
 					<div>
 						<span class="zjcx">中奖查询</span>
@@ -198,12 +199,10 @@
 			let apiUrl = 'http://app.gutouzu.com';
 			let userId = '-1';
 			let userName = '';
-//			console.log(JSON.parse(localStorage.getItem('userId')))
-//			if(JSON.parse(localStorage.getItem('userId')) != undefined || JSON.parse(localStorage.getItem('userId')) != null) {
-//				userId = JSON.parse(localStorage.getItem('userId'));
-//				userName = JSON.parse(localStorage.getItem('userName'));
-//			}
-
+			let config = {
+			  "isAndroid": /Android/i.test(navigator.userAgent),//判断是否为移动端
+			  "isIOS": !!navigator.userAgent.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/)//判断是否为IOS
+			};
 			getIsApp();
 			let opt = {
 				title: '快来参与骨米宠物快乐砸金蛋',
@@ -329,8 +328,12 @@
 											}
 
 										} else if(res.code == 1102) {
+											$(".lanren").removeClass("paused");
+											$(".agg").on("click", aClick).html("").attr("style", "");
 											$(".dialong").addClass('diaShow');
 											$(".shareBox").addClass('diaCntShow');
+											$("#sorryBox").hide();
+											
 
 										} else {
 											alert(res.msg)
@@ -360,8 +363,15 @@
 
 				//分享提示
 				$(".shareBtn").click(function() {
-					alert('点击右上角，进行分享')
-					$(".dialong").removeClass('diaShow');
+					
+					if (getUrlKey('userId') == null){
+						
+						alert('点击右上角，进行分享')
+						$(".dialong").removeClass('diaShow');
+					}else{
+						isAnOrIos();
+					}
+					
 				});
 				
 				
@@ -591,22 +601,20 @@
 			
 			//判断当前环境书否为APP
 			function getIsApp() {//判断当前环境是否为APP环境
-			          var ua = navigator.userAgent.toLowerCase();
-			          if (ua.match(/isapp/i) == "isapp") {
-			          
-			          	userId = getUrlKey('userId')
-			           
-			            
-			          }else{
-			          	
-			            if(JSON.parse(localStorage.getItem('userId'))!=undefined||JSON.parse(localStorage.getItem('userId'))!=null){
-				
-							userId = JSON.parse(localStorage.getItem('userId'));
-							userName = JSON.parse(localStorage.getItem('userName'));
-						}
-			            
-			          }
-			
+		          if (getUrlKey('userId') == null) {
+      
+      	
+		           if(JSON.parse(localStorage.getItem('userId'))!=undefined||JSON.parse(localStorage.getItem('userId'))!=null){
+					
+						userId = JSON.parse(localStorage.getItem('userId'));
+						userName = localStorage.getItem('userName');
+					}
+		            
+		          }else{
+		          	
+		            userId = getUrlKey('userId')
+		            
+		          }
 			}
 			
 			//获取地址参数数据
@@ -614,10 +622,30 @@
 			    return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.href) || [, ""])[1].replace(/\+/g, '%20')) || null
 			}
 			
+			//判断是否为IOS
+			function isAnOrIos() {
+				var u = navigator.userAgent,
+					app = navigator.appVersion;
+				var isAndroid = u.indexOf('Android') > -1 || u.indexOf('Linux') > -1; //g
+				var isIOS = !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/); //ios终端
+				if (isAndroid) {
+					
+					AndroidFunction.showToast('123')
+				}
+				if (isIOS) {
+					window.webkit.messageHandlers. Share.postMessage('msg')
+				}
+			}
+			
 			$(document).ready(function() {
 				wxInit();
 				getData();
-
+				
+				$(".zjgz").click(function(){
+			
+					isAnOrIos();
+				})
+				
 				$(".getCode").click(function() {
 
 					getCode();
@@ -629,8 +657,14 @@
 				})
 				
 				$(".zjcx").click(function(){
-		
-					window.location.href = 'http://app.gutouzu.com/index.html#/prizeHistory?type=2&userId='+userId;
+					if(userId== '-1'){
+						alert('请先登录后再进行操作')
+					}else if(getUrlKey('userId') == null){
+						window.location.href = 'http://app.gutouzu.com/index.html#/prizeHistory?type=2&userId='+userId;
+					}else{
+						window.location.href = 'http://app.gutouzu.com/index.html#/prizeHistory?type=2&userId='+userId+'&isApp=1';
+					}
+					
 				})
 			})
 		</script>

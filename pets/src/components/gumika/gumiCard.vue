@@ -17,7 +17,7 @@
               <span>{{count}}</span>
             </div>
           </div>
-        </div>
+        </div> 
         <div class="btnBox flex_r_s_b">
           <div class="cancelBtn flex_r_s_c" @click="dailongHide">取消</div>
           <div class="okBtn flex_r_s_c" @click="vCodeLogin">确定</div>

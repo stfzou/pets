@@ -132,7 +132,7 @@
 						self.userName = res.data.data.userName;
 						self.userNo = res.data.data.userNo;
 						self.styleImg = res.data.data.styleImg;
-						console.log(res.data)
+						// console.log(res.data)
 					}
 				})
 			},
