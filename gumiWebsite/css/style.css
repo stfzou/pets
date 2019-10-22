@@ -63,207 +63,374 @@
 }
 
 /*首页*/
-.indexWarp .banner{
-	height: 600px;
+.indexWarp .postWarp{
+	height: 636px;
+	background: url(../images/post_01.png) no-repeat center center;
+	position: relative;
 }
-.indexWarp .management .cntWarp{
-	/*align-items: flex-start;*/
-	height: 540px;
+.indexWarp .postWarp .postCnt{
+	height: 636px;
+	position: relative;
 }
-.indexWarp .management .introduce{
-	width: 508px;
-}
-.indexWarp .management .introduce p{
-	line-height:40px;
-	font-size:14px;
-	color: #666666;
-	padding-top: 22px;
-}
-.indexWarp .management .introduce .more{
-	color: #ff523d;
-	font-size: 16px;
-	padding-top: 38px;
-	display: block;
-}
-.indexWarp .management .introduce img{
-	width: 408px;;
-}
-.indexWarp .management .shopImg{
-	width: 400px;
-	height: 400px;
+.indexWarp .postWarp .post_ewm{
+	position: absolute;
+	right:400px;
+	bottom:118px;
 }
 
-.indexWarp .banner .swiper-button-next, .swiper-button-prev{
-	width: 60px;
-	height: 60px;
-	border-radius:50%;
-	background: #FF523D;
-	color: #fff;
-	font-size: 30px;
+.indexWarp .jjfaWarp{
+	padding-top: 60px;
+	padding-bottom: 120px;
 }
-.indexWarp .selected{
+.indexWarp .jjfaWarp .title_img{
+	display: block;
+	margin: 0 auto;
+}
+.indexWarp .jjfaWarp ul{
+	padding-top: 54px;
+}
+.indexWarp .jjfaWarp ul li{
+	width:180px;
+}
+.indexWarp .jjfaWarp ul li img{
+	max-height: 100%;
+	max-width: 100%;
+}
+.indexWarp .jjfaWarp ul li p{
+	font-size:14px;
+	color:#666;
+	line-height:24px;
+	padding-top: 25px;
+	text-align: center;
+}
+.indexWarp .about_gupets{
 	height: 680px;
-	background: url(../images/dog_bg.png) no-repeat 0 0;
+	background: url(../images/index_about_bg.png) no-repeat;
 	background-size: cover;
 }
-.indexWarp .selected .cntWarp{
-	padding-top: 100px;
+.indexWarp .about_gupets .cntWarp{
+	height: 678px;
 	position: relative;
-	
 }
-.indexWarp .selected .selectBanner{
-	height: 520px;
-	background: #ffffff;
-	box-shadow:0px 0px 101px 0px rgba(162,162,162,0.5);
-}
-.indexWarp .selected .cntWarp .jx_img{
+.indexWarp .about_gupets .jieshao{
 	position: absolute;
-	right: 0;
-	top: -20px;
-	width: 416px;
+	right: 54px;
+	top: 145px;
+	width: 400px;
 }
-.indexWarp .selected .productItem{
-	height: 520px;
-	
-}
-.indexWarp .selected .productItem li{
-	width: 240px;
-	box-shadow: 0 0 20px #fff1ef;
-}
-.indexWarp .selected .productItem img{
-	width: 240px;
-	height: 240px;
-}
-.indexWarp .selected .productItem p{
-	font-size:16px;
-	font-weight:400;
-	color:rgba(51,51,51,1);
-	line-height:24px;
-	padding: 14px 12px;
-}
-
-.indexWarp .selected .productItem .priceBox{
-	padding-bottom: 22px;
-}
-.indexWarp .selected .productItem .priceBox .span1{
-	width:60px;
-	font-size:18px;
-	color:rgba(246,69,50,1);
-	line-height:24px;
-	padding: 0 12px;
-}
-.indexWarp .selected .productItem .priceBox .span2{
-	font-size:12px;
-	text-decoration:line-through;
-	color:rgba(153,153,153,1);
-	line-height:24px;
-	
-}
-.indexWarp .petsActive .cntWarp{
-	height: 650px;
-}
-.indexWarp .petsActive .cntWarp .activity_l{
-	width: 530px;
-}
-.indexWarp .petsActive .cntWarp .activity_l .title{
-	width: 265px;
-	margin-top: 20px;
-	margin-bottom: 40px;
-}
-.indexWarp .petsActive .cntWarp .activity_l .activityItem .activityImg{
-	width:530px;
-	height: 300px;
-	
-}
-.indexWarp .petsActive .cntWarp .activity_l .activityItem .name{
-	
-	
-	font-size:20px;
-	color:rgba(51,51,51,1);
-	line-height:36px;
-}
-.indexWarp .petsActive .cntWarp .activity_l .activityItem .time img{
-	width: 14px;
-	margin-right: 10px;
-}
-.indexWarp .petsActive .cntWarp .activity_l .activityItem .time{
-	
-	font-size:14px;
-	color:rgba(102,102,102,1);
-	line-height:48px;
-}
-.indexWarp .petsActive .cntWarp .activity_l .activityItem .addr img{
-	width: 14px;
-	margin-right: 10px;
-}
-.indexWarp .petsActive .cntWarp .activity_l .activityItem .addr{
-	
-	font-size:14px;
-	color:rgba(102,102,102,1);
-	line-height:48px;
-}
-
-.indexWarp .petsActive .cntWarp .activity_r{
-	width: 620px;
-	height: 390px;
-	overflow: auto;
-	padding-left: 20px;
-}
-.indexWarp .petsActive .cntWarp .activity_r li{
-	width: 600px;
-	padding: 20px 10px;
-	box-sizing: border-box;
-	position: relative;
-}
-.indexWarp .petsActive .cntWarp .activity_r li .icon_right{
-	display: none;
-}
-.indexWarp .petsActive .cntWarp .activity_r .activeLi{
-	background: #ff523d;
-}
-.indexWarp .petsActive .cntWarp .activity_r .activeLi .icon_right{
+.indexWarp .about_gupets .jieshao .title_img{
 	display: block;
-	position: absolute;
-	left: -10px;
-	top: 50%;
-	height: 30px;
-	margin-top: -15px;
+	margin: 0 auto;
 }
-
-
-.indexWarp .petsActive .cntWarp .activity_r li .aImg{
-	width: 150px;
-	height: 80px;
-}
-.indexWarp .petsActive .cntWarp .activity_r li .list_r{
-	width: 370px;
-}
-.indexWarp .petsActive .cntWarp .activity_r li .list_r .name{
-	
+.indexWarp .about_gupets .jieshao p{
+	text-align: center;
 	font-size:16px;
-	color:#333333;
-	line-height:36px;
-}
-.indexWarp .petsActive .cntWarp .activity_r li .list_r .time{
-	font-size:12px;
-	color:#333333;
 	line-height:48px;
+	color: #FFFFFF;
+	padding-top: 40px;
 }
-.indexWarp .petsActive .cntWarp .activity_r li .list_r .addr{
+.indexWarp .jytdWarp{
+	padding: 58px 0 100px 0;
+}
+.indexWarp .jytdWarp .title_img{
+	margin: 0 auto;
+	display: block;
+}
+.indexWarp .jytdWarp ul{
+	padding-top: 100px;
+}
+.indexWarp .jytdWarp ul li{
+	width: 300px;
+	padding: 50px 0 30px 0;
+	box-shadow:0px 0px 20px 0px rgba(90,90,90,0.1);
+	border-radius:20px;
+}
+.indexWarp .jytdWarp ul li img{
+	margin: 0 auto;
+	display: block;
+}
+.indexWarp .jytdWarp ul li h3{
+	color:#333333;
+	font-weight:bold;
+	font-size:18px;
+	text-align: center;
+	width: 146px;
+	padding-top: 40px;
 	
-	font-size:12px;
-	/*color:#333;*/
-	line-height:48px;
+	text-align: center;
+	margin: 0 auto;
+}
+.indexWarp .jytdWarp ul li p{
+	padding-top: 22px;
+	width: 146px;
+	color:#666666;
+	font-size:14px;
+	line-height:24px;
+	text-align: center;
+	margin: 0 auto;
+}
+.indexWarp .gujjfaWarp{
+	padding-bottom: 180px;
+}
+.indexWarp .gujjfaWarp .cntBg{
+	padding: 60px 60px 0 60px;
+	box-sizing: border-box;
+	background: url(../images/index_jjfn_bg.png) no-repeat;
+	background-size:cover;
+	height: 500px;
+}
+.indexWarp .gujjfaWarp .cntBg .title_img{
+	display: block;
+	margin: 0 auto;
+}
+.indexWarp .gujjfaWarp .cntBg ul{
+	padding-top: 70px;
+}
+.indexWarp .gujjfaWarp .cntBg ul li{
+	width: 300px;
+	
 }
 
-
-
-.indexWarp .petsActive .cntWarp .activity_r .activeLi .list_r .name{
-	color: #fff;
+.indexWarp .gujjfaWarp .cntBg ul li h3{
+	font-size:18px;
+	color:#fff;
+	text-align: center;
+	padding-bottom: 20px;
 }
-.indexWarp .petsActive .cntWarp .activity_r .activeLi .list_r .time{
-	color: #fff;
+.indexWarp .gujjfaWarp .cntBg ul li .boxCnt{
+	background:rgba(255,255,255,1);
+	border-radius:20px;
+	padding: 60px 22px 0 22px;
 }
-.indexWarp .petsActive .cntWarp .activity_r .activeLi .list_r .addr{
-	color: #fff;
+.indexWarp .gujjfaWarp .cntBg ul li .boxCnt img{
+	margin: 0 auto;
+	display: block;
+	
+}
+.indexWarp .gujjfaWarp .cntBg ul li .boxCnt p{
+	font-size:14px;
+	color: #666;
+	line-height:24px;
+	padding-top: 45px;
+}
+.indexWarp .gujjfaWarp .cntBg ul li .boxCnt .line{
+	width:160px;
+	height:5px;
+	background:rgba(255,101,98,1);
+	border-radius:3px;
+	margin: 50px auto 0 auto;
+}
+.indexWarp .hzhbWarp{
+	padding-bottom: 98px;
+}
+.indexWarp .hzhbWarp .title_img{
+	margin: 0 auto;
+	display: block;
+}
+.indexWarp .hzhbWarp ul{
+	flex-wrap: wrap;
+	padding-top: 64px;
+}
+
+/*宠物经营*/
+.cwjyWarp .postWarp{
+	height: 636px;
+	background: url(../images/post_02.png) no-repeat center center;
+	position: relative;
+}
+.cwjyWarp .postWarp .postCnt{
+	height: 636px;
+	position: relative;
+	padding-top: 80px;
+	box-sizing: border-box;
+}
+.cwjyWarp .postWarp .postCnt .register{
+	width:200px;
+	height:60px;
+	background:rgba(254,240,28,1);
+	border-radius:30px;
+	text-align: center;
+	line-height: 60px;
+	color: #333333;
+	font-size:30px;
+	margin-top: 50px;
+}
+.cwjyWarp .jytdWarp{
+	padding: 58px 0 100px 0;
+}
+.cwjyWarp .jytdWarp .title_img{
+	margin: 0 auto;
+	display: block;
+}
+.cwjyWarp .jytdWarp ul{
+	padding-top: 100px;
+}
+.cwjyWarp .jytdWarp ul li{
+	width: 300px;
+	padding: 50px 0 30px 0;
+	box-shadow:0px 0px 20px 0px rgba(90,90,90,0.1);
+	border-radius:20px;
+}
+.cwjyWarp .jytdWarp ul li img{
+	margin: 0 auto;
+	display: block;
+}
+.cwjyWarp .jytdWarp ul li h3{
+	color:#333333;
+	font-weight:bold;
+	font-size:18px;
+	text-align: center;
+	width: 146px;
+	padding-top: 40px;
+	
+	text-align: center;
+	margin: 0 auto;
+}
+.cwjyWarp .jytdWarp ul li p{
+	padding-top: 22px;
+	width: 146px;
+	color:#666666;
+	font-size:14px;
+	line-height:24px;
+	text-align: center;
+	margin: 0 auto;
+}
+.cwjyWarp .jytdWarp .serviceBox{
+	padding-top: 80px;
+}
+.cwjyWarp .jytdWarp .serviceBox .serviceList{
+	width: 465px;
+}
+.cwjyWarp .jytdWarp .serviceBox .serviceList .item{
+	padding-top: 40px;
+}
+.cwjyWarp .jytdWarp .serviceBox .serviceList h3{
+	font-size:18px;
+	color: #333;
+	width: 100px;
+	padding-bottom: 10px;
+	border-bottom: 1px solid #FF523D;
+}
+.cwjyWarp .jytdWarp .serviceBox .serviceList p{
+	font-size:14px;
+	color: #666666;
+	padding-top: 20px;
+}
+
+.cwjyWarp .yxToolWarp {
+	padding-top: 80px;
+}
+.cwjyWarp .yxToolWarp .title_img{
+	display: block;
+	margin: 0 auto;
+}
+.cwjyWarp .yxToolWarp .desc{
+	padding: 30px 100px 0 100px;
+	font-size:18px;
+	line-height:36px;
+	text-align: center;
+}
+.cwjyWarp .yxToolWarp .yxToolBottom{
+	padding-top: 46px;
+}
+.cwjyWarp .yxToolWarp .yxToolBottom ul li{
+	padding-top: 40px;
+}
+.cwjyWarp .yxToolWarp .yxToolBottom ul h3{
+	font-size:18px;
+	color: #333;
+	width: 100px;
+	padding-bottom: 10px;
+	border-bottom: 1px solid #FF523D;
+}
+.cwjyWarp .yxToolWarp .yxToolBottom ul p{
+	font-size:14px;
+	color: #666666;
+	padding-top: 20px;
+}
+
+.cwjyWarp .dataTool{
+	padding-top: 60px;
+	padding-bottom: 90px;
+}
+.cwjyWarp .dataTool .title_img{
+	display: block;
+	margin: 0 auto;
+}
+.cwjyWarp .dataTool ul{
+	padding-top: 50px;
+}
+.cwjyWarp .dataTool ul li img{
+	margin: 0 auto;
+	display: block;
+}
+.cwjyWarp .dataTool ul li h3{
+	text-align: center;
+	font-size:18px;
+	color: #333;
+	width: 150px;
+	margin: 0 auto;
+}
+.cwjyWarp .dataTool ul li p{
+	color: #666666;
+	font-size:14px;
+	line-height:24px;
+	width: 150px;
+	margin: 0 auto;
+	padding-top: 20px;
+	text-align: center;
+}
+
+/*招商加盟*/
+
+.jiamengWarp .postWarp{
+	height: 636px;
+	background: url(../images/post_03.png) no-repeat center center;
+	position: relative;
+}
+.jiamengWarp .postWarp .postCnt{
+	height: 636px;
+	position: relative;
+	padding-top: 80px;
+	box-sizing: border-box;
+}
+.jiamengWarp .postWarp .postCnt .register{
+	width:200px;
+	height:60px;
+	background:rgba(254,240,28,1);
+	border-radius:30px;
+	text-align: center;
+	line-height: 60px;
+	color: #333333;
+	font-size:30px;
+	margin-top: 50px;
+}
+.jiamengWarp .processWarp{
+	padding-top: 54px;
+	padding-bottom: 90px;
+}
+.jiamengWarp .processWarp .title_img{
+	display: block;
+	margin: 0 auto;
+}
+.jiamengWarp .processWarp .desc{
+	text-align: center;
+	font-size:18px;
+	color: #666;
+	padding-top: 40px;
+}
+.jiamengWarp .processWarp ul{
+	padding-top: 65px;
+}
+.jiamengWarp .processWarp ul h3{
+	font-size:18px;
+	color: #333;
+	text-align: center;
+}
+.jiamengWarp .processWarp ul p{
+	font-size:14px;
+	color: #666;
+	line-height:24px;
+	text-align: center;
+	padding-top: 10px;
 }
