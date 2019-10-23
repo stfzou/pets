@@ -434,3 +434,298 @@
 	text-align: center;
 	padding-top: 10px;
 }
+
+/*骨米优选*/
+.gmyxWarp .postWarp{
+	height: 636px;
+	background: url(../images/post_04.png) no-repeat center center;
+	position: relative;
+}
+.gmyxWarp .goodsShow{
+	padding: 60px 0;
+}
+.gmyxWarp .goodsShow li{
+	width:240px;
+	/*height:240px;*/
+}
+.gmyxWarp .goodsShow li img{
+	/*max-height: 100%;*/
+	max-width: 100%;
+	border-radius: 20px;
+}
+.gmyxWarp .goodsShow li .goodsName{
+	font-size:16px;
+	color: #333;
+	line-height:24px;
+	padding-top: 10px;
+}
+.gmyxWarp .goodsShow li .price{
+	padding-top: 15px;
+}
+.gmyxWarp .goodsShow li .price .new{
+	font-size:18px;
+	color: #FF523D;
+	margin-right: 10px;
+}
+.gmyxWarp .goodsShow li .price .old{
+	text-decoration:line-through;
+	font-size:12px;
+	color: #999;
+}
+.gmyxWarp .activityShow{
+	height: 680px;
+	background:url(../images/ativity_bg.png) no-repeat center center;
+	box-sizing: border-box;
+}
+.gmyxWarp .activityShow ul{
+	background: #fff;
+	padding: 40px 60px;
+	border-radius:40px;
+	box-sizing: border-box;
+	
+}
+.gmyxWarp .activityShow ul li{
+	width: 500px;
+}
+.gmyxWarp .activityShow ul li .activity_pic{
+	max-width: 100%;
+	border-radius:20px;
+}
+.gmyxWarp .activityShow ul li .userInfo{
+	height: 98px;
+}
+.gmyxWarp .activityShow ul li .userInfo img{
+	margin-right: 20px;
+}
+.gmyxWarp .activityShow ul li .userInfo span{
+	font-size:16px;
+	color: #000;
+}
+.gmyxWarp .activityShow ul li .activityName{
+	font-weight:bold;
+	font-size:18px;
+	color: #333;
+	line-height:30px;
+}
+.gmyxWarp .activityShow ul li p{
+	line-height:24px;
+	font-size:14px;
+	color: #333333;
+	padding-top: 20px;
+}
+
+.gmyxWarp .petsSnacks{
+	padding-top:60px;
+}
+.gmyxWarp .petsSnacks ul{
+	flex-wrap: wrap;
+}
+.gmyxWarp .petsSnacks ul li{
+	width: 360px;
+	margin-bottom: 40px;
+}
+.gmyxWarp .petsSnacks ul li .imgBox{
+	position: relative;
+	height: 360px;
+}
+.gmyxWarp .petsSnacks ul li .imgBox .snacksPic{
+	max-width: 100%;
+	max-height: 100%;
+	border-radius:20px;
+}
+.gmyxWarp .petsSnacks ul li .imgBox .tip{
+	position: absolute;
+	left: 0;
+	top: 20px;
+}
+.gmyxWarp .petsSnacks ul li .goodsName{
+	font-size:16px;
+	color: #333;
+	line-height:24px;
+	padding-top: 20px;
+}
+.gmyxWarp .petsSnacks ul li .price{
+	padding: 20px 0;
+}
+.gmyxWarp .petsSnacks ul li .price .new{
+	font-size:18px;
+	color: #FF523D;
+	margin-right: 10px;
+}
+.gmyxWarp .petsSnacks ul li .price .old{
+	text-decoration:line-through;
+	font-size:12px;
+	color: #999;
+}
+.gmyxWarp .petsSnacks ul li .userInfo img{
+	margin-right: 10px;
+}
+.gmyxWarp .petsSnacks ul li .userInfo .addr{
+	font-size:14px;
+	color: #999;
+}
+.gmyxWarp .petsSnacks ul li .userInfo .shopName{
+	font-size: 16px;
+	color: #666666;
+}
+
+/*关于我们*/
+
+.aboutWarp .postWarp{
+	height: 636px;
+	background: url(../images/post_05.png) no-repeat center center;
+	position: relative;
+}
+.aboutWarp .companyInt .cntBox{
+	padding: 90px 110px 90px 50px;
+	box-sizing: border-box;
+}
+.aboutWarp .companyInt .cntBox .desc p{
+	text-align: center;
+	font-size:16px;
+	color: #666;
+	line-height:48px;
+}
+.aboutWarp.companyInt .cntBox .desc .line{
+	height:2px;
+	background: #FF523D;
+	width: 350px;
+	margin: 40px auto 0 auto;
+}
+
+.aboutWarp .missionWarp{
+	height: 680px;
+	background: url(../images/about_bg.png) no-repeat center center;
+}
+.aboutWarp .missionWarp .title{
+	font-size:36px;
+	color: #fff;
+	padding-top: 108px;
+}
+
+.aboutWarp .missionWarp ul li{
+	padding-top: 60px;
+}
+.aboutWarp .missionWarp ul li img{
+	margin-right: 18px;
+}
+.aboutWarp .missionWarp ul li p{
+	font-size:16px;
+	color: #fff;
+	
+}
+
+.aboutWarp .teamWarp{
+	padding: 60px 0;
+}
+.aboutWarp .teamWarp .title_img{
+	margin: 0 auto;
+	display: block;
+}
+.aboutWarp .teamWarp ul{
+	padding-top: 20px;
+}
+.aboutWarp .teamWarp ul li{
+	padding-top: 30px;
+}
+.aboutWarp .teamWarp ul li .teamImg{
+	margin-right: 30px;
+}
+.aboutWarp .teamWarp ul li p{
+	font-size:14px;
+	color: #666;
+	line-height:24px;
+	padding-top: 20px;
+}
+
+/*商家入驻*/
+.merchanEntryWarp .postWarp{
+	height: 636px;
+	background: url(../images/post_06.png) no-repeat center center;
+	position: relative;
+}
+.merchanEntryWarp .postWarp .postCnt{
+	height: 636px;
+	position: relative;
+	padding-top: 80px;
+	box-sizing: border-box;
+}
+.merchanEntryWarp .postWarp .postCnt .register{
+	width:200px;
+	height:60px;
+	background:rgba(254,240,28,1);
+	border-radius:30px;
+	text-align: center;
+	line-height: 60px;
+	color: #333333;
+	font-size:30px;
+	margin-top: 50px;
+}
+.merchanEntryWarp .advantage{
+	padding: 60px 0;
+}
+.merchanEntryWarp .advantage .list_one{
+	padding:0 130px 0 110px;
+	box-sizing: border-box;
+}
+.merchanEntryWarp .advantage .list_one .list_l .title_img{
+	display: block;
+	margin: 0 auto;
+}
+.merchanEntryWarp .advantage .list_one .list_l p{
+	font-size:18px;
+	color: #666;
+	text-align: center;
+	padding-top: 45px;
+}
+.merchanEntryWarp .cooperation{
+	height: 680px;
+	background:url(../images/entry_bg.png) no-repeat center center;
+	padding-top: 60px;
+	padding-bottom: 36px;
+	box-sizing: border-box;
+}
+.merchanEntryWarp .cooperation .title_img{
+	display: block;
+	margin: 0 auto;
+}
+.merchanEntryWarp .cooperation .cntBox p{
+	font-size:18px;
+	color: #fff;
+	text-align: center;
+	padding: 30px 0;
+}
+.merchanEntryWarp .cooperation .cntBox .imgBox{
+	background: #FFFFFF;
+	height: 432px;
+	padding: 60px 173px;
+	border-radius:40px;
+	box-sizing: border-box;
+}
+.merchanEntryWarp .jjfaWarp{
+	padding-top: 40px;
+	padding-bottom: 60px;
+}
+.merchanEntryWarp .jjfaWarp .title_img{
+	display: block;
+	margin: 0 auto;
+}
+.merchanEntryWarp .jjfaWarp ul{
+	padding-top: 54px;
+}
+.merchanEntryWarp .jjfaWarp ul li{
+	width:180px;
+}
+.merchanEntryWarp .jjfaWarp ul li img{
+	max-height: 100%;
+	max-width: 100%;
+	display: block;
+	margin: 0 auto;
+}
+.merchanEntryWarp .jjfaWarp ul li p{
+	font-size:14px;
+	color:#666;
+	line-height:24px;
+	padding-top: 25px;
+	text-align: center;
+}
