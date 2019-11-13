@@ -46,9 +46,7 @@
 			</div>
 			</cube-scroll>
 		</div>
-		<div class="authorPetsList flex_r_s_c" v-if="isLoading">
-			<cube-loading :size="30"></cube-loading>
-		</div>
+		
 
 	</div>
 </template>

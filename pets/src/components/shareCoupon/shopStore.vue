@@ -2,7 +2,7 @@
   <div class="shopStore">
     <div class="top_nav flex_r_s_b">
     	<div class="back" @click="back"></div>
-    	<div class="nav_title">相关门店 <span>（12家）</span></div>
+    	<div class="nav_title">相关门店 <span>（{{totalShopNum}}家）</span></div>
     </div>
     <div class="shopList">
       <cube-scroll ref="scroll">
@@ -12,9 +12,13 @@
               <div class="shopName">{{item.name}}</div>
               <div class="shopAddr">{{item.address}}</div>
             </div>
-            <div class="list_r flex_c_f_e">
-              <img src="../../assets/icon/icon_she56@3x.png" alt="">
-              <p>{{item.distance}}</p>
+            <div class="list_r">
+              <a class="flex_c_f_e" :href="'https://uri.amap.com/marker?position='+item.longitude+','+item.latitude+'&name='+item.address">
+                
+                <img src="../../assets/icon/icon_she56@3x.png" alt="">
+                <p>{{item.distance}}</p>
+              </a>
+              
             </div>
           </li>
         </ul>
@@ -35,6 +39,7 @@
       return{
         lng:0,
         lat:0,
+        shopUserId:-1,
         totalShopNum:0,
         dataList:[],
         plugin: [
@@ -78,6 +83,7 @@
       }
     },
     mounted() {
+      this.shopUserId = this.$route.query.shopUserId;
       this.getShopStore();
     },
     methods:{
@@ -88,7 +94,7 @@
         let self = this;
         this.axios.get(Api.userApi+'/multipleShop/selectMultipleShopInfo',{
           params:{
-            userId:28,
+            userId:self.shopUserId,
             latitude:30.65984,
             longitude:104.10194
           }
@@ -96,7 +102,7 @@
         }).then(function(res) {
 
               if(res.data.code==1){
-
+                console.log(res)
                 self.totalShopNum = res.data.data.totalShopNum;
                 self.dataList = res.data.data.list;
 

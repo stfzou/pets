@@ -39,6 +39,7 @@ import ShopStore from '@/components/shareCoupon/shopStore'
 import GumiCard from '@/components/gumika/gumiCard'
 import PayRes from '@/components/common/payRes'
 import WxWhitePage from '@/components/common/wxWhitePage'
+import Agreement from '@/components/common/agreement'
 import QuestionOne from '@/components/answer/questionOne'
 import QuestionTwo from '@/components/answer/questionTwo'
 import AnswerOne from '@/components/answer/answerOne'
@@ -51,6 +52,9 @@ import GudouShop from '@/components/invitation/gudouShop'
 import ExChangeXq from '@/components/invitation/exChangeXq'
 import PresentCenter from '@/components/invitation/presentCenter'
 import PresentSearch from '@/components/invitation/presentSearch'
+import WbShare from '@/components/wangbu/wbShare'
+import CgShare from '@/components/chuangGuan/cgShare'
+import CgRecord from '@/components/chuangGuan/cgRecord'
 
 
 Vue.use(Router)
@@ -68,9 +72,29 @@ export default new Router({
 			component:vLogin,
 		},
     {
+    	path:'/cgShare',
+    	name:'cgShare',
+    	component:CgShare,
+    },
+    {
+    	path:'/cgRecord',
+    	name:'cgRecord',
+    	component:CgRecord,
+    },
+    {
       path:'/prizeHistory',
       name:'prizeHistory',
       component:PrizeHistory,
+    },
+    {
+      path:'/agreement',
+      name:'agreement',
+      component:Agreement,
+    },
+    {
+      path:'/wbShare',
+      name:'wbShare',
+      component:WbShare,
     },
     {
       path:'/invitationGu',

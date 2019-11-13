@@ -115,20 +115,24 @@
 						</div>
 						<div class="makeTime">{{item.couponEndTime}}前有效</div>
 						<div class="receiveBtnBox">
-							<div v-if="item.isReceive==0&&item.conditionPrice==0&&item.circulation>item.receiveNum" class="receiveBtn receivedBtn flex_r_s_c">已领取</div>
-              <div v-if="item.isReceive==0&&item.conditionPrice!=0&&item.circulation>item.receiveNum" class="receiveBtn receivedBtn flex_r_s_c">已购买</div>
-              <div v-if="item.circulation==item.receiveNum" class="receiveBtn receivedBtn flex_r_s_c">已领完</div>
-							<div @click="receive(item)" v-if="item.isReceive!=0&&item.conditionPrice==0&&item.couponType!=1" class="receiveBtn flex_r_s_c">立即领取</div>
-							<div @click="receive(item)" v-if="item.isReceive!=0&&item.conditionPrice==0&&item.couponType==1" class="receiveBtn flex_r_s_c">立即领取</div>
-							<div @click="receive(item)" v-if="item.isReceive!=0&&item.conditionPrice!=0&&item.couponType!=1" class="receiveBtn flex_r_s_c">立即购买</div>
+							<div v-if="item.isReceive==0&&item.conditionPrice==0&&item.couponType==1" class="receiveBtn receivedBtn flex_r_s_c">已领完</div>
+							<div v-if="item.isReceive==0&&item.conditionPrice==0&&item.couponType!=1" class="receiveBtn receivedBtn flex_r_s_c">已领完</div>
+							<div v-if="item.isReceive==0&&item.conditionPrice!=0&&item.couponType!=1" class="receiveBtn receivedBtn flex_r_s_c">已购买</div>
 
+
+              <div @click="receive(item)" v-if="item.isReceive!=0&&item.couponType==1" class="receiveBtn flex_r_s_c">立即领取</div>
+              <div @click="receive(item)" v-if="item.isReceive!=0&&item.conditionPrice==0&&item.couponType!=1" class="receiveBtn flex_r_s_c">立即领取</div>
+              <!-- <div @click="receive(item)" v-if="item.isReceive!=0&&item.conditionPrice==0&&item.couponType==1" class="receiveBtn flex_r_s_c">立即领取</div> -->
+              <div @click="receive(item)" v-if="item.isReceive!=0&&item.conditionPrice!=0&&item.couponType!=1" class="receiveBtn flex_r_s_c">立即购买</div>
             </div>
 						<div class="saleNum">商家共{{item.shopTotalNum}}种优惠券</div>
            <!-- <div v-if="item.isReceive!==0&&(item.shopTotalNum!=item.receiveNum)">123</div> -->
 					</div>
-          <img v-if="item.circulation==item.receiveNum" class="imprint" src="../../assets/receiveEnd.png" alt="">
-					<img v-if="(item.isReceive===0&&item.conditionPrice==0)&&item.circulation>item.receiveNum" class="imprint" src="../../assets/received.png" alt="">
-          <img v-if="item.isReceive!=2&&item.conditionPrice!=0&&item.circulation>item.receiveNum" class="imprint" src="../../assets/buyEnd.png" alt="">
+          <img v-if="item.isReceive==0" class="imprint" src="../../assets/receiveEnd.png" alt="">
+          <img v-if="item.isReceive===1&&item.couponType==1" class="imprint" src="../../assets/received.png" alt="">
+          <img v-if="item.isReceive===1&&item.couponType!=1&&item.conditionPrice==0" class="imprint" src="../../assets/received.png" alt="">
+          <!-- <img v-if="(item.isReceive===0&&item.conditionPrice==0)&&item.circulation>item.receiveNum" class="imprint" src="../../assets/received.png" alt=""> -->
+          <img v-if="item.isReceive===1&&item.conditionPrice!=0&&item.couponType!=1" class="imprint" src="../../assets/buyEnd.png" alt="">
 				</li>
 			</ul>
 			</cube-scroll>
@@ -252,8 +256,8 @@
 		},
     filters:{
       descFilter(val){
-        if(val.length>12){
-          return val.substr(0,12)+'...'
+        if(val.length>20){
+          return val.substr(0,20)+'...'
         }else{
           return val
         }
@@ -298,7 +302,7 @@
                 }
               }
               wxapi.wxRegister(option)
-              console.log(self.couponList)
+              // console.log(self.couponList)
               self.couponList.forEach((e)=>{
               	e.styleObj = {
               		width:(100-Math.round((e.receiveNum/e.circulation * 10000)/100).toFixed(4))+'%'
@@ -372,6 +376,7 @@
           }
         }).then((re) => {
           if(re.data.code ===1){
+            // console.log(re)
             if(re.data.data===1&&item.conditionPrice!=0){
               self.isDialong = true;
               self.isDialongCnt = true;
@@ -458,7 +463,7 @@
 						if(res.data.data.length>0){
 
 							setTimeout(()=>{
-                console.log(res.data.data)
+               // console.log(res.data.data)
 								res.data.data.forEach((e)=>{
 									e.styleObj = {
 										width:(100-Math.round((e.receiveNum/e.circulation * 10000)/100).toFixed(4))+'%'
@@ -542,10 +547,10 @@
         			type: 'correct'
         		  })
         		toast.show();
-        		setTimeout(()=>{
-        			self.page = 0;
-        			self.getCouponList();
-        		},500)
+              // setTimeout(()=>{
+              // 	self.page = 0;
+              // 	self.getCouponList();
+              // },500)
         	}else{
         		alert(res.data.msg)
         	}
@@ -609,7 +614,7 @@
           }
         }).then((res) => {
           if (res.data.code == 1) {
-
+            console.log(res)
             let orderInfo = {
               payUrl:res.data.data.mweb_url,
               backUrl:window.location.href,
@@ -625,7 +630,7 @@
                 orderApi:'/couponOrder/selectCouponOrderStatus'
               }
             })
-            console.log(res)
+
 
           } else {
             alert(res.data.msg)
@@ -656,7 +661,7 @@
               'paySign': res.data.data.paySign
             }, function(res) {
               if (res.err_msg === 'get_brand_wcpay_request:ok') {
-                alert('支付成功，返回活动详情页！');
+                alert('支付成功，返回优惠券列表！');
                 setTimeout(() => {
                   window.location.href = "http://app.gutouzu.com/index.html#/couponList?sj="+10000*Math.random();
                 }, 500)
@@ -688,7 +693,7 @@
               'Content-Type': 'application/x-www-form-urlencoded'
             }
           }).then((res) => {
-
+            console.log(res)
             if (res.data.code == 1) {
               //localStorage.setItem('orderNum',res.data.data.out_trade_no);
               let orderInfo = {

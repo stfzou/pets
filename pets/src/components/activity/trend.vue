@@ -59,11 +59,12 @@
           </cube-slide>
       	</div>
       </div>
-      <div class="activityLabel flex_r_f_s">
+      <div class="activityLabel flex_r_f_s" v-if="officialActivityName!=''">
+        <img v-if="isPrize" src="../../assets/icon_gu99@3x.png" alt="">
         <span>
           <router-link :to="{name:'communityActivity',query:{ocaId:ocaId}}">#{{officialActivityName}}#</router-link>
         </span>
-        <img v-if="isPrize" src="../../assets/icon_gu99@3x.png" alt="">
+
       </div>
       <div class="trendTitle">{{trendTitle}}</div>
 			<div class="text_cnt" v-html="content">
@@ -74,7 +75,7 @@
 				<div class="addr flex_r_f_s" v-if="geoLocation!=''"><img src="../../assets/icon/map@2x.png" alt=""><span>{{geoLocation}}</span></div>
 
         <div class="petName" v-if="petName!=''"><img src="../../assets/icon_she21@3x.png" alt=""> <span>#{{petName}}</span>+撸一次</div>
-        <div class="tLabel flex_r_f_s">
+        <div class="tLabel flex_r_f_s" v-if="officialTopicNames.length>0">
           <img src="../../assets/icon_gu67@3x.png" alt="">
           <span v-for="item in officialTopicNames">#{{item}}#</span>
         </div>
@@ -780,7 +781,6 @@
 		.trend_cnt {
 			padding: 0 20px 0 20px;
 			position: relative;
-
 			.trend_mask {
 				height: 100%;
 				width: 100%;
@@ -906,7 +906,7 @@
         padding-top:30px;
         img{
           width:40px;
-          margin-left:10px;
+          margin-right:10px;
         }
         span{
           padding:10px 20px;
@@ -953,8 +953,9 @@
             img {
               display: block;
               height: auto;
-              max-width: 100%;
-              max-height: 100%;
+              width: 100%;
+              height: 100%;
+              object-fit: cover;
             }
 
           }

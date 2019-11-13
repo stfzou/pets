@@ -3,7 +3,7 @@
     <DownApp v-on:closeDown="closeDown" v-show="isDown"></DownApp>
 		<div class="top flex_r_s_b">
 			<img class="back" src="../../assets/icon/back@1x.png" alt="">
-			<img class="share" src="../../assets/icon/share@1x.png" alt="">
+			<img class="share" @click="share" src="../../assets/icon/share@1x.png" alt="">
 		</div>
 		<div class="post">
 			<img :src="styleImg" alt="">
@@ -86,6 +86,13 @@
 		methods: {
       closeDown(){
       	this.isDown = false;
+      },
+      share() {
+      	let toast = this.$createToast({
+      		txt: '点击浏览器顶端最右边进行分享',
+      		type: 'warn'
+      	})
+      	toast.show()
       },
       getUrlData() { // 截取url中的数据
 
@@ -240,7 +247,7 @@
 			position: fixed;
 			top: 0;
 			left: 0;
-
+      z-index:100;
 			.back {
 				width: 26px;
 			}

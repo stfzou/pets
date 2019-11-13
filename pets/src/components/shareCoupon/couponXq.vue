@@ -44,15 +44,16 @@
       </div>
     </div>
 		<div class="couponInfoBox flex_r_s_c">
-      <cube-scroll ref="scroll">
+
 			<div class="couponInfo">
         <img v-if="couponType===3" class="privilege" src="../../assets/icon_gu30@3x.png" alt="">
         <img v-if="couponType===2" class="privilege" src="../../assets/icon_gu32@3x.png" alt="">
         <img v-if="couponType===1" class="privilege" src="../../assets/icon_gu33@3x.png" alt="">
 
-        <img v-if="circulation==receiveNum" class="sign" src="../../assets/receiveEnd.png" alt="">
-        <img v-if="(isReceive===0&&conditionPrice==0)&&circulation>receiveNum" class="sign" src="../../assets/received.png" alt="">
-        <img v-if="isReceive!=2&&conditionPrice!=0&&circulation>receiveNum" class="sign" src="../../assets/buyEnd.png" alt="">
+        <img v-if="isReceive===0" class="sign" src="../../assets/receiveEnd.png" alt="">
+        <img v-if="isReceive===1&&couponType===1" class="sign" src="../../assets/received.png" alt="">
+        <img v-if="isReceive===1&&couponType!==1&&conditionPrice==0" class="sign" src="../../assets/received.png" alt="">
+        <img v-if="isReceive===1&&conditionPrice!=0&&couponType!==1" class="sign" src="../../assets/buyEnd.png" alt="">
 				<div class="couponTop">
 					<!-- <img class="couponImg" :src="couponIcan" alt=""> -->
           <div class="couponImgBox">
@@ -86,10 +87,11 @@
 
           <div class="receiveBtnBox">
 
-            <div v-if="isReceive==0&&conditionPrice==0&&circulation>receiveNum" class="receiveBtn receivedBtn flex_r_s_c">已领取</div>
+
             <div v-if="isReceive==0&&conditionPrice!=0&&circulation>receiveNum" class="receiveBtn receivedBtn flex_r_s_c">已购买</div>
-            <div v-if="circulation==receiveNum" class="receiveBtn receivedBtn flex_r_s_c">已领完</div>
-            <div @click="receiveBtn" v-if="isReceive!=0&&conditionPrice==0&&couponType===1" class="receiveBtn flex_r_s_c">立即领取</div>
+            <div v-if="isReceive==0" class="receiveBtn receivedBtn flex_r_s_c">已领完</div>
+
+            <div @click="receiveBtn" v-if="isReceive!=0&&couponType===1" class="receiveBtn flex_r_s_c">立即领取</div>
             <div @click="receiveBtn" v-if="isReceive!=0&&conditionPrice==0&&couponType!==1" class="receiveBtn flex_r_s_c">立即领取</div>
             <div @click="receiveBtn" v-if="isReceive!=0&&conditionPrice!=0&&couponType!==1" class="receiveBtn flex_r_s_c">立即购买</div>
 					</div>
@@ -132,7 +134,7 @@
 
 				</div>
 			</div>
-      </cube-scroll>
+
     </div>
 
 
@@ -247,7 +249,6 @@
         var ua = window.navigator.userAgent.toLowerCase();
         if (ua.match(/MicroMessenger/i) == 'micromessenger') {
           this.environment = '0';
-
           this.getCode();
         } else {
           this.environment = '1';
@@ -291,18 +292,25 @@
          this.couponId = returnArr.couponId;
          this.tempCouponId = returnArr.couponId;
        },
+
       getUrlPara(name) {
         var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i");
         var r = window.location.search.substr(1).match(reg);
         if (r != null) return (r[2]);
         return null;
       },
+      getQueryString(name){
+           var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i");
+           var r = window.location.search.substr(1).match(reg);
+           if (r != null) return unescape(r[2]); return null;
+      },
       getCode () { //静默授权
       	let self = this;
       	const local = window.location.href;
-      	this.code = this.getUrlPara('code');
+        this.code = this.getUrlPara('code');
       	if (this.code == null || this.code === '') {
       	  window.location.href ='https://open.weixin.qq.com/connect/oauth2/authorize?appid=wxdf1774932d9dd96e&redirect_uri='+encodeURIComponent(local) + '&response_type=code&scope=snsapi_base&state=' + '38' + '#wechat_redirect';
+
       	}
       },
       getCardState(item){
@@ -362,7 +370,7 @@
                 orderApi:'/couponOrder/selectCouponOrderStatus'
               }
             })
-            console.log(res)
+
 
           } else {
             alert(res.data.msg)
@@ -375,7 +383,7 @@
         this.axios.post(Api.userApi + '/couponOrder/wxPay/gzhh5/prepay', this.qs.stringify({
           userId: self.uId,
           couponId:self.couponId,
-          code: self.getUrlPara('code')
+          code: self.getQueryString('code')
         }), {
           headers: {
             'Content-Type': 'application/x-www-form-urlencoded'
@@ -393,24 +401,14 @@
               'paySign': res.data.data.paySign
             }, function(res) {
               if (res.err_msg === 'get_brand_wcpay_request:ok') {
-                alert('支付成功，返回活动详情页！');
+                alert('支付成功');
                 setTimeout(() => {
-                  self.$router.push({
-                    name:'wxWhitePage',
-                    params:{
-                      wxPayBackUrl:'http://app.gutouzu.com/index.html#/couponXq?couponId='+item.couponId
-                    }
-                  })
+                  window.location.href = 'http://app.gutouzu.com/index.html#/couponXq?couponId='+item.couponId+'&sj='+10000*Math.random();
                 }, 500)
               } else if (res.err_msg === 'get_brand_wcpay_request:cancel') {
                 alert('取消支付！');
                 setTimeout(() => {
-                  self.$router.push({
-                    name:'wxWhitePage',
-                    query:{
-                      wxPayBackUrl:'http://app.gutouzu.com/index.html#/couponXq?couponId='+item.couponId
-                    }
-                  })
+                  window.location.href = 'http://app.gutouzu.com/index.html#/couponXq?couponId='+item.couponId+'&sj='+10000*Math.random();
                 }, 500)
               } else if (res.err_msg === 'get_brand_wcpay_request:fail') {
                 alert(JSON.stringify(res))
@@ -580,7 +578,6 @@
 					}
 				}).then((res)=>{
 					if(res.data.code == 1){
-            console.log(res)
 						self.couponName = res.data.data.couponName;
             self.receiveNum = res.data.data.receiveNum;
             self.circulation = res.data.data.circulation;
@@ -622,6 +619,8 @@
             self.otherImg = res.data.data.otherImg;
             self.storeNum = res.data.data.storeNum;
             self.shopUserId = res.data.data.shopUserId;
+
+
 					}else{
 						alert(res.data.msg)
 					}
@@ -701,8 +700,6 @@
 <style lang="scss">
 	.couponXq{
 		position: relative;
-		height: 100%;
-
 		background: linear-gradient(150deg, #fdb366, #fbab72, #ff8c60, #ff6060);
     padding-bottom:50px;
     .through{
@@ -854,7 +851,7 @@
 			}
 		}
 		.couponInfoBox{
-      height: calc(100% - 88px);
+
 			.couponInfo{
 				width: 590px;
         padding-bottom:30px;

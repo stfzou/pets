@@ -17,7 +17,7 @@
               <span>{{count}}</span>
             </div>
           </div>
-        </div> 
+        </div>
         <div class="btnBox flex_r_s_b">
           <div class="cancelBtn flex_r_s_c" @click="dailongHide">取消</div>
           <div class="okBtn flex_r_s_c" @click="vCodeLogin">确定</div>
@@ -135,17 +135,30 @@
         useNum:'',
         totalPrice:'',
         isCard:false,
-        inviteUserId:-1
+        inviteUserId:-1,
+        environment:'',
+
       }
     },
     mounted() {
+      //localStorage.removeItem('user')
+
+      this.getEnvironment();
+
+      if(JSON.parse(localStorage.getItem('user')) == null){
+      	// this.$store.commit('setRouterName','activity');
+      	this.userId = '';
+
+      }else{
+      	this.userId = JSON.parse(localStorage.getItem('user')).userId;
+      }
       if(this.getUrlKey('inviteUserId')!=null){
         this.inviteUserId = this.getUrlKey('inviteUserId');
       }
 
       let self = this;
       window.addEventListener('scroll', self.handleScroll)
-      this.getEnvironment();
+
       this.getCardInfo()
     },
     methods: {
@@ -178,11 +191,12 @@
       },
       getCardInfo(){
         //console.log(JSON.parse(localStorage.getItem('user')))
+
         if(JSON.parse(localStorage.getItem('user'))!= null){
 
             let self = this;
             this.axios.post(Api.userApi + '/boneMika/selectUserBoneMikaStatus', this.qs.stringify({
-              userId:JSON.parse(localStorage.getItem('user')).userId
+              userId:self.userId
             }), {
               headers: {
                 'Content-Type': 'application/x-www-form-urlencoded'
@@ -194,14 +208,14 @@
                 if(res.data.data==1){
 
                   self.axios.post(Api.userApi + '/boneMika/selectBoneMikaVo', self.qs.stringify({
-                    userId:JSON.parse(localStorage.getItem('user')).userId
+                    userId:self.userId
                   }), {
                     headers: {
                       'Content-Type': 'application/x-www-form-urlencoded'
                     }
                   }).then((re)=>{
                     if(re.data.code==1){
-                      console.log(re)
+                     self.isDialong = false;
                      self.number = (re.data.data.number+'').replace(/\s/g, '').replace(/(.{4})/g, "$1 ")
                      self.endTime = re.data.data.endTime
                      self.isCard = true
@@ -237,11 +251,15 @@
         const local = window.location.href;
         this.code = this.getUrlPara('code');
         if (this.code == null || this.code === '') {
-          window.location.href =
-            'https://open.weixin.qq.com/connect/oauth2/authorize?appid=wxdf1774932d9dd96e&redirect_uri=' +
-            encodeURIComponent(local) + '&response_type=code&scope=snsapi_base&state=' + '38' + '#wechat_redirect';
+          window.location.href ='https://open.weixin.qq.com/connect/oauth2/authorize?appid=wxdf1774932d9dd96e&redirect_uri='+encodeURIComponent(local) + '&response_type=code&scope=snsapi_base&state=' + '38' + '#wechat_redirect';
         }
 
+      },
+      getUrlPara(name) {
+        var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i");
+        var r = window.location.search.substr(1).match(reg);
+        if (r != null) return (r[2]);
+        return null;
       },
       getCode() {
         //获取验证码
@@ -371,9 +389,7 @@
 
                   if(re.data.data===1){
 
-                    setTimeout(() => {
-                      window.location.href = "http://app.gutouzu.com/index.html#/gumiCard?sj="+10000*Math.random();
-                    }, 500)
+                    self.getCardInfo();
                   }else{
 
                     self.isDialong = true;
@@ -449,6 +465,7 @@
           }
         }).then((res) => {
           if (res.data.code == 1) {
+            console.log(res)
             WeixinJSBridge.invoke('getBrandWCPayRequest', {
               'appId': res.data.data.appId,
               'timeStamp': res.data.data.timeStamp,
@@ -473,6 +490,7 @@
             });
           } else {
             alert(res.data.msg)
+            alert('错误')
           }
         })
       },
@@ -528,10 +546,14 @@
       commit() {
 
         if (this.activeIndex == '2' && this.environment == '0') {
+
           this.wxPay();
+
         } else if (this.activeIndex == '2' && this.environment == '1') {
+
           this.wxH5Pay();
         } else if (this.activeIndex == '1') {
+
           this.aliPay();
         }
       }
@@ -743,7 +765,7 @@
 
       }
       .active_nav{
-      	background: #ff523d;
+      	background: #FE8F70;
       }
     }
 

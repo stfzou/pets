@@ -32,7 +32,7 @@
 
       this.backUrl = this.$route.query.backUrl;
       this.out_trade_no = this.$route.query.out_trade_no;
-
+      console.log(this.$route.query.backUrl)
       this.$store.commit('setOrderInfo','')
 
       // this.getOrderState();

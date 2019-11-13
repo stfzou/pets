@@ -50,7 +50,7 @@
 				</li>
 				<li class="flex_r_f_s right_sjx" @click="goMap">
 					<img class="info_l" src="../../assets/icon/map@1x.png" alt="">
-					<p>{{activityAddr}}</p>
+					<p>{{address}}</p>
 				</li>
 				<li class="flex_r_f_s joinPerson">
 					<img class="info_l" src="../../assets/icon_renshu.png" alt="">
@@ -155,7 +155,7 @@
         isComment:false,
 				keep:'',
         isPrivilege:'',
-				activityAddr:'',
+				address:'',
 				endTime:'',
 				startTime:'',
 				activityPrice:'',
@@ -373,7 +373,7 @@
 					query:{
 						lat:self.lat,
 						lng:self.lng,
-						name:self.activityAddr
+						name:self.address
 					}
 				})
 			},
@@ -390,13 +390,13 @@
 					}
 				}).then((res)=>{
 					if(res.data.code == 1){
-						
+
             self.isPrivilege = res.data.data.isPrivilege;
 						self.mainImg = res.data.data.activityCover;
 						self.activityTitle = res.data.data.activityTitel;
 						self.browse = res.data.data.browse;
 						self.keep = res.data.data.keep;
-						self.activityAddr = res.data.data.activityAddr;
+						self.address = res.data.data.address;
 						self.startTime = res.data.data.startTime;
 						self.endTime = res.data.data.endTime;
             self.organizerName = res.data.data.organizerName;
@@ -430,7 +430,7 @@
               self.isCntImg = true;
             }
             self.isConduct = res.data.data.isConduct;
-						console.log(res.data.data)
+						//console.log(res.data.data)
 						// console.log(res.data.data.description)
 						// self.evalList = res.data.data.commentVos;
 					}else{
@@ -780,6 +780,7 @@
 				top: 50%;
 				transform: translate(-50%, -50%);
         width:500px;
+        text-align: center;
         overflow: hidden;/*超出部分隐藏*/
         text-overflow:ellipsis;/* 超出部分显示省略号 */
         white-space: nowrap;/*规定段落中的文本不进行换行 */
@@ -792,7 +793,7 @@
 			}
 		}
 		.active_nav{
-			background: #ff523d;
+			background: #FE8F70;
 
 		}
 		.activity_filter{

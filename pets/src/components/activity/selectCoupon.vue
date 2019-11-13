@@ -14,7 +14,7 @@
 				<div class="time">{{startTime}}~{{endTime}}</div>
 				<div class="address flex_r_f_s">
 					<img src="../../assets/icon/map@2x.png" alt="">
-					<span>{{address}} &nbsp;&nbsp;&nbsp;{{distance}}</span>
+					<span>{{address}}</span>
 				</div>
 			</div>
 		</div>
@@ -26,12 +26,13 @@
 						<div class="couponName">{{item.ticketName}}</div>
 						<div class="couponBox flex_r_s_b">
 							<div class="couponBox_l">
-								<div class="price" v-if="item.ticketType == 1">￥{{item.ticketPrice}}({{item.useNum|useNumFilter}})</div>
-								<div class="price" v-else="">￥0({{item.useNum|useNumFilter}})</div>
+								<div class="price" v-if="item.ticketType == 1">￥{{item.ticketPrice}} ({{item.useNum|useNumFilter}})</div>
+								<div class="price" v-else="">￥免费 ({{item.useNum|useNumFilter}})</div>
 								<div class="couponNum">
 									<span class="sy">剩余{{item.ticketNum-item.sellNum}}张</span>
 									<span>每人限购{{item.limitNum}}张</span>
 								</div>
+                <div class="makeTime">使用时间:{{item.validStartTime.split(' ')[0]}}~{{item.validEndTime.split(' ')[0]}}</div>
 								<div class="special_tx flex_r_f_s" v-if="item.useNum>1">
 									每日使用次数不超过{{item.useNum}}次
 								</div>
@@ -59,12 +60,10 @@
 				</li>
 			</ul>
 		</div>
-		<div class="amap-page-container" v-show="false">
-			<el-amap ref="map" vid="amapDemo" :plugin="plugin" class="amap-demo">
-			</el-amap>
 
-		</div>
-		<div class="couponBtn flex_r_s_c" @click="commit">下一步</div>
+    <div v-if="isCommit" class="couponBtn activeCommit flex_r_s_c">不在购买时间内暂不可购买</div>
+		<div v-else class="couponBtn flex_r_s_c" @click="commit">下一步</div>
+
 	</div>
 </template>
 
@@ -87,46 +86,16 @@
 				ticketInfo:null,
 				lng:0,
 				lat:0,
-				plugin: [
+        startParse:0,
+        endParse:0,
+        isCommit:false
 
-					{
-						pName: 'Geolocation',
-						enableHighAccuracy: true,//是否使用高精度定位，默认:true
-						timeout: 100,          //超过10秒后停止定位，默认：无穷大
-						maximumAge: 0,           //定位结果缓存0毫秒，默认：0
-						convert: true,           //自动偏移坐标，偏移后的坐标为高德坐标，默认：true
-						showButton: true,        //显示定位按钮，默认：true
-						buttonPosition: 'RB',    //定位按钮停靠位置，默认：'LB'，左下角
-						showMarker: true,        //定位成功后在定位到的位置显示点标记，默认：true
-						showCircle: true,        //定位成功后用圆圈表示定位精度范围，默认：true
-						panToLocation: true,     //定位成功后将定位到的位置作为地图中心点，默认：true
-						zoomToAccuracy:true,//定位成功后调整地图视野范围使定位位置及精度范围视野内可见，默认：f
-						extensions:'all',
-						events: {
-							init(o) {
-								// o 是高德地图定位插件实例
-								o.getCurrentPosition((status, result) => {
-
-									if (result && result.position) {
-
- 										self.lng = result.position.lng;
- 										self.lat = result.position.lat;
-										self.getTicket();
-
-									}else{
-										self.getTicket();
-									}
-								});
-							}
-						}
-					}
-				]
 			}
 		},
 		mounted() {
 			// this.format("2019-03-14 11:56:00",'123')
 
-
+      this.getTicket();
 		},
 		filters:{
 			isBearRefund(val){
@@ -220,7 +189,7 @@
 					}
 				}).then((res)=>{
 					if(res.data.code == 1){
-						console.log(res)
+						//console.log(res)
 						self.activiName = res.data.data.activityTitel;
 						self.priceRange = res.data.data.priceInterval;
 						self.address = res.data.data.activityAddr;
@@ -232,6 +201,14 @@
 						self.ticketList.forEach((e)=>{
 							e.isUse = 1;
 						})
+            self.startParse = Date.parse(new Date(self.ticketList[0].buyStartTime));
+            self.endParse = Date.parse(new Date(self.ticketList[0].buyEndTime));
+            let nowParse = Date.parse(new Date());
+            if(nowParse<this.startParse||nowParse>this.endParse){
+              self.isCommit = true;
+            }else{
+              self.isCommit = false;
+            }
 						self.ticketInfo = {
 							cAId:JSON.parse(localStorage.getItem('id')),
 							userId:JSON.parse(localStorage.getItem('user')).userId,
@@ -251,6 +228,14 @@
 			},
 			selectTicket(item,index){
 				this.activeIndex = index;
+        this.startParse = Date.parse(new Date(item.buyStartTime));
+        this.endParse = Date.parse(new Date(item.buyEndTime));
+        let nowParse = Date.parse(new Date());
+        if(nowParse<this.startParse||nowParse>this.endParse){
+          this.isCommit = true;
+        }else{
+          this.isCommit = false;
+        }
 				this.ticketInfo = {
 					cAId:JSON.parse(localStorage.getItem('id')),
 					userId:JSON.parse(localStorage.getItem('user')).userId,
@@ -262,6 +247,7 @@
 			},
 			commit(){
 				let self = this;
+
 				if(this.ticketInfo.ticketNum>this.ticketInfo.syticketNum){
 					let toast = self.$createToast({
 						txt: '不能超过剩余票券数量',
@@ -388,11 +374,17 @@
 					margin-top: 30px;
 					box-shadow:0px 0px 8px 0px rgba(104,104,104,0.1);
 					position: relative;
+          .makeTime{
+            font-size:24px;
+            color:#666;
+            padding:20px 0 10px 0;
+          }
 					.dotted{
 						padding: 20px;
 						padding-bottom: 10px;
 						border-top: 1px dashed #e8e8e8;/*no*/
 						font-size: 24px;
+            line-height:34px;
 						color: #666;
 						word-wrap:break-word;
 						word-break:break-all;
@@ -488,5 +480,8 @@
 			color: #fff;
 			font-size: 30px;
 		}
+    .activeCommit{
+      background:#FFAB3D;
+    }
 	}
 </style>

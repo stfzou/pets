@@ -34,9 +34,9 @@
 			<div class="buyTx">
 				<div class="title">购买须知</div>
 				<div class="cnt">
-					<p>1、请确认活动票券和时间地址无误，购票成功后将不予退换</p>
-					<p>2、购票成功后，会收到购票信息短信</p>
-					<p>3、下单即代表你同意<a href="###">《自由犬用户服务协议》</a></p>
+					<p>1、付款完成后你将收到[骨米宠物]的电子票号和二维码票根信息，参加活动时请出示你的二维码凭证给主办方核验。</p>
+					<p>2、二维码凭证在[我的]→[活动票券]中查询。</p>
+					<p>3、如果你需要支付电子票的发票，请于参加活动时向活动主办方索取。</p>
 				</div>
 			</div>
 		</div>
@@ -136,7 +136,7 @@
       },
 			getEnvironment(){
         let self = this;
-       
+
 				var ua = window.navigator.userAgent.toLowerCase();
 				if (ua.match(/MicroMessenger/i) == 'micromessenger') {
 					this.environment = '0';
@@ -329,8 +329,8 @@
                 orderApi:'/ca/selectCommunityActivityOrderStatus'
               }
             })
-						
-            
+
+
 
 
 						 // weixinPay(wxData);
@@ -357,7 +357,7 @@
 
 						if(res.data.code == 1){
               //console.log(res.data.data.out_trade_no)
-              alert(res.data.data.out_trade_no)
+              //alert(res.data.data.out_trade_no)
               let orderInfo = {
                 payUrl:res.data.data.from,
                 out_trade_no:res.data.data.out_trade_no,
@@ -568,6 +568,7 @@
 				margin-top: 30px;
 				box-shadow: 0px 0px 7px 0px rgba(104, 104, 104, 0.12);
 				border-radius: 10px;
+        border:1px solid #999;
 
 				.title {
 					font-size: 26px;
@@ -614,7 +615,7 @@
 				background: #fff;
 				box-shadow: 0px 0px 7px 0px rgba(104, 104, 104, 0.12);
 				border-radius: 10px;
-
+        border:1px solid #999;
 				.title {
 					font-size: 26px;
 					color: #666;

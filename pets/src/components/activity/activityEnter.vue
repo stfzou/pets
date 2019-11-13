@@ -11,15 +11,16 @@
           <input type="text" @blur.prevent="inputLoseFocus" v-model="userName" maxlength="10" placeholder="请输入您的姓名" />
         </li>
         <li>
-          <div class="title">昵称</div>
-          <input type="text" @blur.prevent="inputLoseFocus" maxlength="10" v-model="nickName" placeholder="请输入您的昵称" />
+          <div class="title">宠物名称</div>
+          <input type="text" @blur.prevent="inputLoseFocus" maxlength="10" v-model="nickName" placeholder="请输入宠物昵称或活动备注信息" />
         </li>
-        <li>
+        <div class="nameTip">这里填写宠物名称或者活动主办方要求填写的其他文字信息</div>
+        <li class="mt-20">
           <div class="title">电话<span>*</span></div>
           <input type="number" @blur.prevent="inputLoseFocus" v-model="phone" placeholder="请输入您的电话" />
         </li>
         <li>
-          <div class="title">邮箱<span>*</span></div>
+          <div class="title">邮箱</div>
           <input type="text" @blur.prevent="inputLoseFocus" v-model="eMail" placeholder="请输入您的邮箱" />
         </li>
       </ul>
@@ -38,7 +39,7 @@
         <cube-upload v-if="fileUrl.length<3"  @file-submitted="fileSubmitted" @file-success="addedHandler" :process-file="processFile"  :max="100" ref="upload" :action="action"  />
 
       </div>
-
+      <div class="picTip">上传活动主办方要求的图片资料或照片,可上传3张照片,支持jpg、bmp、png格式。</div>
     </div>
     <div class="couponBtn flex_r_s_c" @click="joinActivity">确定报名</div>
   </div>
@@ -253,21 +254,7 @@
           })
           toast.show()
           return false;
-        } else if (self.eMail == '') {
-          let toast = self.$createToast({
-            txt: '邮箱不能为空',
-            type: 'error'
-          })
-          toast.show()
-          return false;
-        } else if (!regEmail.test(self.eMail)) {
-          let toast = this.$createToast({
-            txt: '邮箱格式错误',
-            type: 'error'
-          })
-          toast.show()
-          return false;
-        } else {
+        }else {
           // alert(1)
           let formData = new FormData();
           formData.append("cAId",JSON.parse(localStorage.getItem('id')))
@@ -464,6 +451,12 @@
       ul {
         overflow: hidden;
         padding: 0 60px;
+        .nameTip{
+          font-size:24px;
+          color:#666;
+          padding:10px 60px 10px 18px;
+          line-height:34px;
+        }
 
         li {
           margin-top: 40px;
@@ -489,6 +482,9 @@
             font-size: 26px;
           }
         }
+        .mt-20{
+          margin-top:20px;
+        }
       }
     }
 
@@ -512,6 +508,13 @@
       padding: 50px 60px 0 60px;
       box-sizing: border-box;
       flex-wrap: wrap;
+      .picTip{
+        font-size:24px;
+        color:#666;
+
+        line-height:34px;
+
+      }
 
       .cube-upload-file-def {
         display: none;
@@ -545,7 +548,7 @@
 
       .uploadBox {
         margin-bottom: 20px;
-
+        border:1px solid #999;/*no*/
         .cube-upload-input {
           width: 100%;
           height: 100%
@@ -554,7 +557,7 @@
         .cube-upload-btn-def {
           width: 140px;
           height: 140px;
-
+          background:none;
         }
 
         .cube-upload-def .cube-upload-btn,
@@ -566,6 +569,7 @@
           width: 140px;
           height: 140px;
           // overflow: auto;
+
         }
 
         p {
