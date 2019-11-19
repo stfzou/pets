@@ -44,7 +44,7 @@
 			<div class="share" @click="share"></div>
 		</div>
 		<div class="shopBox flex_c_f_e">
-			<img class="shopImg" v-if="false" :src="shopImgAddr" alt="">
+			<img class="shopImg" v-if="shopImgAddr!=null" :src="shopImgAddr" alt="">
       <img class="shopImg" v-else src="../../assets/head_icon.png" alt="">
       <!-- <div class="operateTypes">主营:<span v-for="item in operateTypes">{{item.typeName}}</span></div> -->
       <div class="shopDesc">店铺简介:{{shopDesc}}</div>
@@ -133,6 +133,7 @@
         code:'',
 				lng:0,
 				lat:0,
+        couponId:'',
         storeNum:0,
         environment:'',
 				uId:'',
@@ -185,6 +186,7 @@
 
 										self.lng = result.position.lng;
 										self.lat = result.position.lat;
+                    
 
 									} else {
 										// self.getActivityListOne();
@@ -218,16 +220,16 @@
 
     },
 		mounted() {
+      let self = this;
       this.getEnvironment();
-			if(JSON.parse(localStorage.getItem('user')) == null){
-				// this.$store.commit('setRouterName','activity');
-				this.uId = '';
-			}else{
-				this.uId = JSON.parse(localStorage.getItem('user')).userId;
-			}
-			this.shopId = this.getUrlData().shopId;
-			this.getShopCouponList();
-
+      if(JSON.parse(localStorage.getItem('user')) == null){
+      	// this.$store.commit('setRouterName','activity');
+      	self.uId = '';
+      }else{
+      	self.uId = JSON.parse(localStorage.getItem('user')).userId;
+      }
+      self.shopId = self.getUrlKey('shopId');
+      self.getShopCouponList();
 		},
 		methods:{
 
@@ -318,27 +320,8 @@
 					}
 				})
 			},
-			getUrlData() {// 截取url中的数据
-
-				   	let tempStr = window.location.href;
-				   /**
-				    * tempArr 是一个字符串数组 格式是["key=value", "key=value", ...]
-				    */
-				   let returnArr = {};
-				   let urlArr = tempStr.split('?');
-				   if(urlArr){
-				     urlArr.forEach((e)=>{
-
-				         if(e.indexOf('=')>-1){
-
-				           returnArr[e.split('=')[0]] = e.split('=')[1];
-				         }
-
-				     })
-				   }
-				  /*输出日志*/
-				   return returnArr;
-
+			getUrlKey(name){
+			    return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.href) || [, ""])[1].replace(/\+/g, '%20')) || null
 			},
 			getShopCouponList(){
 
@@ -541,7 +524,7 @@
 
       },
       commit() {
-
+        let self = this;
         if (this.activeIndex == '2' && this.environment == '0') {
           this.wxPay();
         } else if (this.activeIndex == '2' && this.environment == '1') {
@@ -557,6 +540,7 @@
       },
 			receive(item){
 				let self = this;
+        this.couponId = item.couponId;
 				if(JSON.parse(localStorage.getItem('user')) == null){
 
 					let url = window.location.href;
@@ -590,7 +574,6 @@
 			    this.payPrice = item.conditionPrice;
 			    this.isDialong = true;
           this.isDialongCnt = true;
-			    this.couponId = item.couponId;
 			  }else if(item.couponType==3){
 
 			    this.getCardState(item)

@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-
+    <DownApp v-on:closeDown="closeDown" v-show="isDown"></DownApp>
 		<!-- <transition name="fade"> -->
 			<keep-alive>
 				<router-view v-if="$route.meta.keepAlive"></router-view>
@@ -15,14 +15,37 @@
 </template>
 
 <script>
-
+import DownApp from './components/common/downApp.vue'
 import {mapState} from 'vuex'
 export default {
 	name: 'App',
-	created() {
+	created(){
+    //this.isDown = true;
+    // console.log(11)
 
-	}
-
+	},
+  watch: {
+    $route: {
+      handler: function(val, oldVal){
+        this.isDown = true;
+      },
+      // 深度观察监听
+      deep: true
+    }
+  },
+  components:{
+  	DownApp
+  },
+  data(){
+    return{
+      isDown:true
+    }
+  },
+  methods:{
+    closeDown(){
+    	this.isDown = false;
+    }
+  }
 
 }
 </script>

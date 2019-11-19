@@ -1,6 +1,6 @@
 <template>
 	<div class="activity_warp">
-		<DownApp v-on:closeDown="closeDown" v-show="isDown"></DownApp>
+	<!-- 	<DownApp v-on:closeDown="closeDown" v-show="isDown"></DownApp> -->
     <div class="couponListDialog flex_r_s_c" @click.stop="dailongHide" v-show="isDialong">
       <div class="dialongCnt" @click.stop>
         <div class="dialongCntTop">
@@ -133,6 +133,7 @@
 </template>
 
 <script>
+  import wxapi from '../common/wxapi.js'
 	import DownApp from '../common/downApp.vue'
 	import Api from '../common/apj.js'
 	export default{
@@ -191,7 +192,7 @@
 		mounted() {
 			let self = this;
       localStorage.removeItem("activeOrderNum");
-			window.addEventListener('scroll', self.handleScroll)
+			// window.addEventListener('scroll', self.handleScroll)
 			this.getUrlData();
 			if(JSON.parse(localStorage.getItem('user')) == null){
 				// this.$store.commit('setRouterName','activity');
@@ -390,7 +391,19 @@
 					}
 				}).then((res)=>{
 					if(res.data.code == 1){
-
+            let option = {
+              title: res.data.data.activityTitel, // 分享标题, 请自行替换
+              desc:res.data.data.organizerName+'邀你'+res.data.data.startTime.split(' ')[0]+'在'+res.data.data.address+'一起参与'+res.data.data.activityTitel+',快来参加吧~~',
+              link: window.location.href, // 分享链接，根据自身项目决定是否需要split
+              imgUrl:res.data.data.activityCover, // 分享图标, 请自行替换，需要绝对路径
+              success: () => {
+                alert('分享成功')
+              },
+              error: () => {
+                alert('已取消分享')
+              }
+            }
+            wxapi.wxRegister(option)
             self.isPrivilege = res.data.data.isPrivilege;
 						self.mainImg = res.data.data.activityCover;
 						self.activityTitle = res.data.data.activityTitel;

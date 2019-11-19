@@ -432,6 +432,7 @@
 						couponId:item.couponId
 					}
 				})
+       
 			},
 			onPullingDown(){
 				//刷新

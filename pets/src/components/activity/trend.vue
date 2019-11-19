@@ -1,6 +1,6 @@
 <template>
 	<div class="trend_warp">
-		<DownApp v-on:closeDown="closeDown" v-show="isDown"></DownApp>
+		<!-- <DownApp v-on:closeDown="closeDown" v-show="isDown"></DownApp> -->
 		<div class="top_nav flex_r_s_b">
 			<div class="back" @click="back"></div>
 			<div class="nav_title">动态正文</div>
@@ -145,6 +145,7 @@
 </template>
 
 <script>
+  import wxapi from '../common/wxapi.js'
 	import DownApp from '../common/downApp.vue'
 	import Api from '../common/apj.js'
 	export default {
@@ -380,6 +381,23 @@
 				}).then((res) => {
 					if (res.data.code == 1) {
             console.log(res)
+            let option = {
+              title: '分享了'+res.data.data.userName+'的动态', // 分享标题, 请自行替换
+              desc:res.data.data.content.substring(0,30),
+              link: window.location.href, // 分享链接，根据自身项目决定是否需要split
+              imgUrl:res.data.data.compressImages.split(',')[0], // 分享图标, 请自行替换，需要绝对路径
+              success: () => {
+                alert('分享成功')
+              },
+              error: () => {
+                alert('已取消分享')
+              }
+            }
+            if(res.data.data.officialActivityName!=''){
+              option.title = res.data.data.officialActivityName;
+              option.desc = '一大波铲屎官正在讨论'+res.data.data.officialActivityName+'话题活动，邀您一起来点赞，发表您的观点，还有机会领取大礼包，快来参加吧～'
+            }
+            wxapi.wxRegister(option)
             self.isPrize = res.data.data.prize;
             self.officialActivityName = res.data.data.officialActivityName;
             self.ocaId = res.data.data.ocaId;

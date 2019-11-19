@@ -157,7 +157,7 @@
 
 						setTimeout(() => {
 							self.activityList = res.data.data;
-              console.log(self.activityList)
+              //console.log(self.activityList)
 							self.$refs.scroll.forceUpdate();
               setTimeout(()=>{
                 self.$refs.scroll.refresh();

@@ -1,6 +1,6 @@
 <template>
 	<div class="dynamicHome">
-    <DownApp v-on:closeDown="closeDown" v-show="isDown"></DownApp>
+   <!-- <DownApp v-on:closeDown="closeDown" v-show="isDown"></DownApp> -->
 		<div class="top flex_r_s_b">
 			<img class="back" src="../../assets/icon/back@1x.png" alt="">
 			<img class="share" @click="share" src="../../assets/icon/share@1x.png" alt="">
@@ -52,6 +52,7 @@
 </template>
 
 <script>
+  import wxapi from '../common/wxapi.js'
 	import Api from '../common/apj.js'
   import DownApp from '../common/downApp.vue'
 	export default {
@@ -131,6 +132,21 @@
 					}
 				}).then((res) => {
 					if (res.data.code == 1) {
+            
+            let option = {
+                title: '分享了'+res.data.data.userName+'的个人空间', // 分享标题, 请自行替换
+                desc:'给你推荐了'+res.data.data.userName+'的个人空间,快来了解一下吧',
+                link: window.location.href, // 分享链接，根据自身项目决定是否需要split
+                imgUrl:res.data.data.userHeadImage, // 分享图标, 请自行替换，需要绝对路径
+                success: () => {
+                  alert('分享成功')
+                },
+                error: () => {
+                  alert('已取消分享')
+                }
+            }
+            wxapi.wxRegister(option)
+            
 						self.fansCount = res.data.data.fansCount;
 						self.focusCount = res.data.data.focusCount;
 						self.isFocus = res.data.data.isFocus;

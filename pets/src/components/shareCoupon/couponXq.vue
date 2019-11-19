@@ -106,6 +106,7 @@
               <div class="boxTop flex_r_s_b">
                 <span class="box_l">使用门店</span>
                 <router-link v-if="storeNum!=0" class="box_r" :to="{name:'shopStore',query:{shopUserId:shopUserId}}">查看全部{{storeNum}}家门店></router-link>
+
                </div>
               <div class="shopBox">
                 <a class="flex_r_f_s" :href="'https://uri.amap.com/marker?position='+lng+','+lat+'&name='+shopAddress">
@@ -121,7 +122,7 @@
           </div>
           <div class="welfareBox">
             <div class="welfareCnt flex_r_s_b">
-              <router-link :to="{name:'shopCoupon',query:{shopId:shopId}}">该商家更多福利</router-link>
+              <a :href="'http://app.gutouzu.com/index.html#/shopCoupon?shopId='+shopId">该商家更多福利</a>
               <img :src="otherImg" alt="">
             </div>
           </div>
@@ -201,13 +202,16 @@
 		},
 		mounted() {
       this.getEnvironment();
+
+      this.couponId = this.getUrlKey('couponId');
+      this.tempCouponId = this.getUrlKey('couponId');
 			if(JSON.parse(localStorage.getItem('user')) == null){
 				// this.$store.commit('setRouterName','activity');
 				this.uId = '';
 			}else{
 				this.uId = JSON.parse(localStorage.getItem('user')).userId;
 			}
-      this.getUrlData();
+
 			this.getShopCouponList();
 		},
     filters:{
@@ -245,6 +249,7 @@
 			back() {
 				this.$router.go(-1); //返回上一层
 			},
+
       getEnvironment() { //静默授权初始化
         var ua = window.navigator.userAgent.toLowerCase();
         if (ua.match(/MicroMessenger/i) == 'micromessenger') {
@@ -270,29 +275,9 @@
         this.activeIndex = '1';
 
       },
-      getUrlData() {// 截取url中的数据
-
-         let tempStr = window.location.href;
-         /**
-          * tempArr 是一个字符串数组 格式是["key=value", "key=value", ...]
-          */
-         let returnArr = {};
-         let urlArr = tempStr.split('?');
-         if(urlArr){
-           urlArr.forEach((e)=>{
-
-               if(e.indexOf('=')>-1){
-
-                 returnArr[e.split('=')[0]] = e.split('=')[1];
-               }
-
-           })
-         }
-        /*输出日志*/
-         this.couponId = returnArr.couponId;
-         this.tempCouponId = returnArr.couponId;
-       },
-
+      getUrlKey(name){
+          return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.href) || [, ""])[1].replace(/\+/g, '%20')) || null
+      },
       getUrlPara(name) {
         var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i");
         var r = window.location.search.substr(1).match(reg);
@@ -403,12 +388,14 @@
               if (res.err_msg === 'get_brand_wcpay_request:ok') {
                 alert('支付成功');
                 setTimeout(() => {
-                  window.location.href = 'http://app.gutouzu.com/index.html#/couponXq?couponId='+item.couponId+'&sj='+10000*Math.random();
+
+                  window.location.href = 'http://app.gutouzu.com/index.html#/couponXq?couponId='+self.couponId+'&sj='+10000*Math.random();
                 }, 500)
               } else if (res.err_msg === 'get_brand_wcpay_request:cancel') {
                 alert('取消支付！');
                 setTimeout(() => {
-                  window.location.href = 'http://app.gutouzu.com/index.html#/couponXq?couponId='+item.couponId+'&sj='+10000*Math.random();
+
+                  window.location.href = 'http://app.gutouzu.com/index.html#/couponXq?couponId='+self.couponId+'&sj='+10000*Math.random();
                 }, 500)
               } else if (res.err_msg === 'get_brand_wcpay_request:fail') {
                 alert(JSON.stringify(res))

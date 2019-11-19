@@ -113,6 +113,7 @@
 </template>
 
 <script>
+  import wxapi from '../common/wxapi.js'
   import Api from '../common/apj.js'
   export default {
     data() {
@@ -142,9 +143,9 @@
     },
     mounted() {
       //localStorage.removeItem('user')
-
+      this.shareWxCnt();
       this.getEnvironment();
-
+      //this.shareWxCnt();
       if(JSON.parse(localStorage.getItem('user')) == null){
       	// this.$store.commit('setRouterName','activity');
       	this.userId = '';
@@ -158,10 +159,24 @@
 
       let self = this;
       window.addEventListener('scroll', self.handleScroll)
-
       this.getCardInfo()
     },
     methods: {
+      shareWxCnt(){
+        let option = {
+          title: '骨米优选俱乐部会员特权卡', // 分享标题, 请自行替换
+          desc:'享受身边的特权生活，有特权无所谓，真正享受0元购。精彩生活，一张卡就购了',
+          link: window.location.href, // 分享链接，根据自身项目决定是否需要split
+          imgUrl:'http://app.gutouzu.com/img/icon_tequanka.png', // 分享图标, 请自行替换，需要绝对路径
+          success: () => {
+            alert('分享成功')
+          },
+          error: () => {
+            alert('已取消分享')
+          }
+        }
+        wxapi.wxRegister(option)
+      },
       share(){
       	let toast = this.$createToast({
       		txt: '点击顶部右上角进行分享',

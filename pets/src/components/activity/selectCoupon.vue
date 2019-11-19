@@ -127,7 +127,8 @@
 			add(item,index) {
 				if(index == this.activeIndex){
 					if(item.isUse>=item.limitNum){
-						item.isUse = item.limitNum;;
+            this.tip('购买数量超过限制');
+						item.isUse = item.limitNum;
 						this.ticketInfo.ticketNum = item.limitNum;
 					}else{
 						item.isUse++;
@@ -142,7 +143,7 @@
 				}
 			},
 			reduce(item,index) {
-				console.log(index == this.activeIndex)
+				// console.log(index == this.activeIndex)
 				if(index == this.activeIndex){
 					if(item.isUse<=1){
 						item.isUse = 1;
@@ -262,7 +263,14 @@
 					})
 				}
 
-			}
+			},
+      tip(msg){
+        let toast = this.$createToast({
+        	txt: msg,
+        	type: 'error'
+          })
+        toast.show();
+      }
 
 		}
 	}

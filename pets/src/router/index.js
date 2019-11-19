@@ -60,7 +60,7 @@ import CgRecord from '@/components/chuangGuan/cgRecord'
 Vue.use(Router)
 export default new Router({
   //history
-	mode:'history',
+	mode:'hash',
     routes:[
 		{
 		  path:'',
