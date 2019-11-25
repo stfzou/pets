@@ -7,27 +7,30 @@ import BranchManage from '@/components/gmWorkOs/branchManage'
 import AddStaff from '@/components/gmWorkOs/addStaff'
 import StaffManage from '@/components/gmWorkOs/staffManage'
 import MyArchives from '@/components/gmWorkOs/myArchives'
-
-
+import AddMarketingPlan from '@/components/gmWorkOs/addMarketingPlan'
+import AddGmVisitInfo from '@/components/gmWorkOs/addGmVisitInfo'
+import SelectAddr from '@/components/gmWorkOs/selectAddr'
+import GmWorkTable from '@/components/gmWorkOs/gmWorkTable'
+import GmWorkTableXq from '@/components/gmWorkOs/gmWorkTableXq'
+import VisitXq from '@/components/gmWorkOs/visitXq'
+import GmVisitRecords from '@/components/gmWorkOs/gmVisitRecords'
+import AddGmWorkTable from '@/components/gmWorkOs/addGmWorkTable'
+import BusinessManage from '@/components/gmWorkOs/businessManage'
+import MarketPlanManage from '@/components/gmWorkOs/marketPlanManage'
+import WorkBill from '@/components/gmWorkOs/workBill'
+import GmWorkHome from '@/components/gmWorkOs/gmWorkHome'
 
 
 import WorkOsInfoList from '@/components/gmWorkOs/workOsInfoList'
-
 import WorkOsMap from '@/components/gmWorkOs/workOsMap'
 import WorkOsPcMap from '@/components/gmWorkOs/workOsPcMap'
-
 import EditCustomer from '@/components/gmWorkOs/editCustomer'
 import WorkOsChangePw from '@/components/gmWorkOs/workOsChangePw'
 import StaffInfo from '@/components/gmWorkOs/staffInfo'
-
 import EditStaff from '@/components/gmWorkOs/editStaff'
-import VisitRecords from '@/components/gmWorkOs/visitRecords'
 import ShopNameVisit from '@/components/gmWorkOs/shopNameVisit'
-import AddVisitInfo from '@/components/gmWorkOs/addVisitInfo'
-import VisitInfoList from '@/components/gmWorkOs/visitInfoList'
-import WorkTable from '@/components/gmWorkOs/workTable'
-import AddWorkTable from '@/components/gmWorkOs/addWorkTable'
-import WorkTableXq from '@/components/gmWorkOs/workTableXq'
+
+
 
 Vue.use(Router)
 export default new Router({
@@ -35,7 +38,7 @@ export default new Router({
     routes:[
 		{
 		  path:'',
-		  redirect:'/workOsInfoList'
+		  redirect:'/gmWorkHome'
 		},
 		{
 			path:'/gmWorkLogin',
@@ -68,10 +71,71 @@ export default new Router({
     	name:'myArchives',
     	component:MyArchives,
     },
+    {
+      path:'/addMarketingPlan',
+      name:'addMarketingPlan',
+      component:AddMarketingPlan,
+    },
+    {
+      path:'/addGmVisitInfo',
+      name:'addGmVisitInfo',
+      component:AddGmVisitInfo,
+    },
+    {
+      path:'/selectAddr',
+      name:'selectAddr',
+      component:SelectAddr,
+    },
+    {
+      path:'/gmWorkTable',
+      name:'gmWorkTable',
+      component:GmWorkTable,
+    },
+    {
+      path:'/gmWorkTableXq',
+      name:'gmWorkTableXq',
+      component:GmWorkTableXq,
+    },
+    {
+      path:'/visitXq',
+      name:'visitXq',
+      component:VisitXq,
+    },
+    {
+      path:'/gmVisitRecords',
+      name:'gmVisitRecords',
+      component:GmVisitRecords,
+    },
+    {
+      path:'/addGmWorkTable',
+      name:'addGmWorkTable',
+      component:AddGmWorkTable,
+    },
+    {
+      path:'/businessManage',
+      name:'businessManage',
+      component:BusinessManage,
+    },
+    {
+      path:'/marketPlanManage',
+      name:'marketPlanManage',
+      component:MarketPlanManage,
+    },
+    {
+     path:'/workBill',
+     name:'workBill',
+     component:WorkBill
+    },
+    {
+      path:'/gmWorkHome',
+      name:'gmWorkHome',
+      component:GmWorkHome
+    },
 
-    
-    
-    
+
+
+
+
 		{
 			path:'/staffInfo',
 			name:'staffInfo',
@@ -88,45 +152,15 @@ export default new Router({
 			name:'workOsChangePw',
 			component:WorkOsChangePw,
 		},
-    {
-      path:'/visitRecords',
-      name:'visitRecords',
-      component:VisitRecords,
-    },
+
     {
       path:'/shopNameVisit',
       name:'shopNameVisit',
       component:ShopNameVisit,
 
     },
-    {
-      path:'/addVisitInfo',
-      name:'addVisitInfo',
-      component:AddVisitInfo,
-    },
-    {
-      path:'/visitInfoList',
-      name:'visitInfoList',
-      component:VisitInfoList,
-    },
-    {
-      path:'/workTable',
-      name:'workTable',
-      component:WorkTable,
-      meta:{
-        keepAlive:true
-      }
-    },
-    {
-      path:'/workTableXq',
-      name:'workTableXq',
-      component:WorkTableXq
-    },
-    {
-      path:'/addWorkTable',
-      name:'addWorkTable',
-      component:AddWorkTable,
-    },
+
+
 		{
 			path:'/workOsInfoList',
 			name:'workOsInfoList',

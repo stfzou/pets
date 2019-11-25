@@ -40,6 +40,8 @@ import GumiCard from '@/components/gumika/gumiCard'
 import PayRes from '@/components/common/payRes'
 import WxWhitePage from '@/components/common/wxWhitePage'
 import Agreement from '@/components/common/agreement'
+import PaySus from '@/components/common/paySus'
+import Advertisement from '@/components/common/advertisement'
 import QuestionOne from '@/components/answer/questionOne'
 import QuestionTwo from '@/components/answer/questionTwo'
 import AnswerOne from '@/components/answer/answerOne'
@@ -71,6 +73,16 @@ export default new Router({
 			name:'vLogin',
 			component:vLogin,
 		},
+    {
+      path:'/paySus',
+      name:'paySus',
+      component:PaySus,
+    },
+    {
+      path:'/advertisement',
+      name:'advertisement',
+      component:Advertisement
+    },
     {
     	path:'/cgShare',
     	name:'cgShare',

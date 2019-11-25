@@ -22,7 +22,7 @@
     },
     mounted() {
       this.userId = JSON.parse(localStorage.getItem('user')).userId;
-
+      //alert(1)
       if(this.$store.state.orderInfo!=null){
         this.payUrl = this.$store.state.orderInfo.payUrl;
       }
@@ -32,7 +32,7 @@
 
       this.backUrl = this.$route.query.backUrl;
       this.out_trade_no = this.$route.query.out_trade_no;
-      console.log(this.$route.query.backUrl)
+      console.log(this.out_trade_no)
       this.$store.commit('setOrderInfo','')
 
       // this.getOrderState();
@@ -59,7 +59,10 @@
       },
       getOrderState(){
         let self = this;
-
+        //window.location.href = 'http://app.gutouzu.com/index.html#/paySus?type=a&oderNum=15743261458774899';
+        //self.$router.push({name:'paySus',query:{type:'a',oderNum:'15743261458774899'}});
+        //self.$router.push({name:'paySus',query:{type:'c',oderNum:'1574320031380'}});
+        //self.$router.push({name:'paySus',query:{userId:'55',type:'gmCard'}});
         this.axios.post(Api.userApi + self.$route.query.orderApi, this.qs.stringify({
           out_trade_no: self.$route.query.out_trade_no
         }), {

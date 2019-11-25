@@ -2,7 +2,7 @@
 	<div class="dynamicHome">
    <!-- <DownApp v-on:closeDown="closeDown" v-show="isDown"></DownApp> -->
 		<div class="top flex_r_s_b">
-			<img class="back" src="../../assets/icon/back@1x.png" alt="">
+			<img class="back" @click="back" src="../../assets/icon/back@1x.png" alt="">
 			<img class="share" @click="share" src="../../assets/icon/share@1x.png" alt="">
 		</div>
 		<div class="post">
@@ -87,6 +87,9 @@
 		methods: {
       closeDown(){
       	this.isDown = false;
+      },
+      back() {
+      	this.$router.go(-1); //返回上一层
       },
       share() {
       	let toast = this.$createToast({

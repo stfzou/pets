@@ -274,29 +274,36 @@
 					headers: {
 						'Content-Type': 'application/x-www-form-urlencoded'
 					}
-				}).then((res) => {
-					if (res.data.code == 1) {
+				}).then((re) => {
+					if (re.data.code == 1) {
 						WeixinJSBridge.invoke('getBrandWCPayRequest', {
-							'appId': res.data.data.appId,
-							'timeStamp': res.data.data.timeStamp,
-							'nonceStr': res.data.data.nonceStr,
-							'package': res.data.data.package,
+							'appId': re.data.data.appId,
+							'timeStamp': re.data.data.timeStamp,
+							'nonceStr': re.data.data.nonceStr,
+							'package': re.data.data.package,
 							'signType': 'MD5',
-							'paySign':res.data.data.paySign
+							'paySign':re.data.data.paySign
 						}, function(res) {
 							if (res.err_msg === 'get_brand_wcpay_request:ok') {
-								alert('支付成功，返回活动详情页！');
-								setTimeout(()=>{
-									window.location.href = 'http://app.gutouzu.com/index.html#/activity?id='+JSON.parse(localStorage.getItem('id'));
-								},500)
+                //self.$router.push({name:'paySus',query:{oderNum:res.data.data.out_trade_no,type:'a'}});
+								alert('支付成功!');
+                window.location.href = 'http://app.gutouzu.com/index.html#/paySus?type=a&oderNum='+re.data.data.out_trade_no;
+                //window.location.href = 'https://www.baidu.com'
+                // setTimeout(()=>{
+                // 	window.location.href = 'http://app.gutouzu.com/index.html#/paySus?type=a&oderNum='+res.data.data.out_trade_no;
+                // },500)
+
 							} else if (res.err_msg === 'get_brand_wcpay_request:cancel') {
 								alert('取消支付！');
+                setTimeout(()=>{
+                	window.location.href = 'http://app.gutouzu.com/index.html#/activityOrder?sj='+10000*Math.random();
+                },500)
 							}else if(res.err_msg === 'get_brand_wcpay_request:fail'){
 								alert(JSON.stringify(res))
 							}
 						});
 					} else {
-						alert(res.data.msg)
+						alert(re.data.msg)
 					}
 				})
 			},
@@ -314,25 +321,7 @@
 //
             //localStorage.setItem('orderNum',res.data.data.out_trade_no);
 						//window.location.href=res.data.data.mweb_url
-            let orderInfo = {
-              payUrl:res.data.data.mweb_url,
-              backUrl:window.location.href,
-              out_trade_no:res.data.data.out_trade_no,
-              payStyle:'wx'
-            }
-            self.$store.commit('setOrderInfo',orderInfo)
-            self.$router.push({
-              name:'payRes',
-              query:{
-                out_trade_no:res.data.data.out_trade_no,
-                backUrl:'http://app.gutouzu.com/index.html#/activity?id='+JSON.parse(localStorage.getItem('id')),
-                orderApi:'/ca/selectCommunityActivityOrderStatus'
-              }
-            })
-
-
-
-
+            self.$router.push({name:'paySus',oderNum:res.data.data.out_trade_no});
 						 // weixinPay(wxData);
 
 					} else {
@@ -356,7 +345,7 @@
 					}).then((res) => {
 
 						if(res.data.code == 1){
-              //console.log(res.data.data.out_trade_no)
+              console.log(res.data.data.out_trade_no)
               //alert(res.data.data.out_trade_no)
               let orderInfo = {
                 payUrl:res.data.data.from,

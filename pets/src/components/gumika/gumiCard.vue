@@ -478,22 +478,22 @@
           headers: {
             'Content-Type': 'application/x-www-form-urlencoded'
           }
-        }).then((res) => {
-          if (res.data.code == 1) {
-            console.log(res)
+        }).then((re) => {
+          if (re.data.code == 1) {
+
             WeixinJSBridge.invoke('getBrandWCPayRequest', {
-              'appId': res.data.data.appId,
-              'timeStamp': res.data.data.timeStamp,
-              'nonceStr': res.data.data.nonceStr,
-              'package': res.data.data.package,
+              'appId': re.data.data.appId,
+              'timeStamp': re.data.data.timeStamp,
+              'nonceStr': re.data.data.nonceStr,
+              'package': re.data.data.package,
               'signType': 'MD5',
-              'paySign': res.data.data.paySign
+              'paySign': re.data.data.paySign
             }, function(res) {
               if (res.err_msg === 'get_brand_wcpay_request:ok') {
-                alert('支付成功，返回活动详情页！');
-                setTimeout(() => {
-                  window.location.href = 'http://app.gutouzu.com/index.html#/gumiCard?sj='+10000*Math.random();
-                }, 500)
+                //alert('支付成功，返回活动详情页！');
+                //self.$router.push({name:'paySus',query:{type:'gmCard',userId:self.userId}});
+                 window.location.href = 'http://app.gutouzu.com/index.html#/paySus?type=gmCard&userId='+self.userId;
+
               } else if (res.err_msg === 'get_brand_wcpay_request:cancel') {
                 alert('取消支付！');
                 setTimeout(() => {
@@ -504,7 +504,7 @@
               }
             });
           } else {
-            alert(res.data.msg)
+            alert(re.data.msg)
             alert('错误')
           }
         })

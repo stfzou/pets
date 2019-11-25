@@ -22,12 +22,22 @@ export default {
 	created(){
     //this.isDown = true;
     // console.log(11)
-
+    if(this.$route.name=='agreement'||this.$route.name=='paySus'||this.$route.name=='advertisement'||this.$route.name=='payRes'||this.$route.name=='wxWhitePage'){
+      this.isDown = false;
+    }
+    // console.log()
 	},
   watch: {
     $route: {
       handler: function(val, oldVal){
-        this.isDown = true;
+
+        if(val.name=='agreement'||val.name=='paySus'||val.name=='advertisement'||val.name=='payRes'||val.name=='wxWhitePage'){
+          this.isDown = false;
+
+        }else{
+          this.isDown = true;
+
+        }
       },
       // 深度观察监听
       deep: true

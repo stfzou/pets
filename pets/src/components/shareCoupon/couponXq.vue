@@ -50,10 +50,12 @@
         <img v-if="couponType===2" class="privilege" src="../../assets/icon_gu32@3x.png" alt="">
         <img v-if="couponType===1" class="privilege" src="../../assets/icon_gu33@3x.png" alt="">
 
-        <img v-if="isReceive===0" class="sign" src="../../assets/receiveEnd.png" alt="">
+        <img v-if="isReceive==0&&conditionPrice==0&&couponType!==1" class="sign" src="../../assets/receiveEnd.png" alt="">
+        <img v-if="isReceive===0&&couponType===1" class="sign" src="../../assets/receiveEnd.png" alt="">
         <img v-if="isReceive===1&&couponType===1" class="sign" src="../../assets/received.png" alt="">
         <img v-if="isReceive===1&&couponType!==1&&conditionPrice==0" class="sign" src="../../assets/received.png" alt="">
-        <img v-if="isReceive===1&&conditionPrice!=0&&couponType!==1" class="sign" src="../../assets/buyEnd.png" alt="">
+        <img v-if="isReceive==0&&conditionPrice!=0&&couponType!==1" class="sign" src="../../assets/buyEnd.png" alt="">
+        <img v-if="isReceive==1&&conditionPrice!=0&&couponType!==1" class="sign" src="../../assets/buyEnd.png" alt="">
 				<div class="couponTop">
 					<!-- <img class="couponImg" :src="couponIcan" alt=""> -->
           <div class="couponImgBox">
@@ -88,9 +90,9 @@
           <div class="receiveBtnBox">
 
 
-            <div v-if="isReceive==0&&conditionPrice!=0&&circulation>receiveNum" class="receiveBtn receivedBtn flex_r_s_c">已购买</div>
-            <div v-if="isReceive==0" class="receiveBtn receivedBtn flex_r_s_c">已领完</div>
-
+            <div v-if="isReceive==0&&conditionPrice!=0&&couponType!==1" class="receiveBtn receivedBtn flex_r_s_c">已购买</div>
+            <div v-if="isReceive==0&&couponType!==1&&conditionPrice==0" class="receiveBtn receivedBtn flex_r_s_c">已领完</div>
+            <div v-if="isReceive==0&&couponType===1" class="receiveBtn receivedBtn flex_r_s_c">已领完</div>
             <div @click="receiveBtn" v-if="isReceive!=0&&couponType===1" class="receiveBtn flex_r_s_c">立即领取</div>
             <div @click="receiveBtn" v-if="isReceive!=0&&conditionPrice==0&&couponType!==1" class="receiveBtn flex_r_s_c">立即领取</div>
             <div @click="receiveBtn" v-if="isReceive!=0&&conditionPrice!=0&&couponType!==1" class="receiveBtn flex_r_s_c">立即购买</div>
@@ -110,7 +112,7 @@
                </div>
               <div class="shopBox">
                 <a class="flex_r_f_s" :href="'https://uri.amap.com/marker?position='+lng+','+lat+'&name='+shopAddress">
-                  <img src="../../assets/icon/head_icon.png" alt="">
+                  <img :src="shopImg" alt="">
                   <div class="shopInfo">
                     <div class="shopName">{{shopName}}</div>
                     <div class="shopAddr">{{shopAddress}}</div>
@@ -151,6 +153,7 @@
 			return{
 				lng:0,
 				lat:0,
+        shopImg:'',
         shopUserId:'',
         otherImg:'',
 				uId:'',
@@ -373,24 +376,27 @@
           headers: {
             'Content-Type': 'application/x-www-form-urlencoded'
           }
-        }).then((res) => {
+        }).then((re) => {
 
-          if (res.data.code == 1) {
+          if (re.data.code == 1) {
 
             WeixinJSBridge.invoke('getBrandWCPayRequest', {
-              'appId': res.data.data.appId,
-              'timeStamp': res.data.data.timeStamp,
-              'nonceStr': res.data.data.nonceStr,
-              'package': res.data.data.package,
+              'appId': re.data.data.appId,
+              'timeStamp': re.data.data.timeStamp,
+              'nonceStr': re.data.data.nonceStr,
+              'package': re.data.data.package,
               'signType': 'MD5',
-              'paySign': res.data.data.paySign
+              'paySign': re.data.data.paySign
             }, function(res) {
               if (res.err_msg === 'get_brand_wcpay_request:ok') {
+               //self.$router.push({name:'paySus',query:{oderNum:res.data.data.out_trade_no,type:'c'}});
                 alert('支付成功');
-                setTimeout(() => {
+                window.location.href = 'http://app.gutouzu.com/index.html#/paySus?type=c&oderNum='+re.data.data.out_trade_no;
 
-                  window.location.href = 'http://app.gutouzu.com/index.html#/couponXq?couponId='+self.couponId+'&sj='+10000*Math.random();
-                }, 500)
+//                 setTimeout(() => {
+//
+//                     window.location.href = 'http://app.gutouzu.com/index.html#/paySus?type=c&oderNum='+res.data.data.out_trade_no;
+//                 }, 500)
               } else if (res.err_msg === 'get_brand_wcpay_request:cancel') {
                 alert('取消支付！');
                 setTimeout(() => {
@@ -402,7 +408,7 @@
               }
             });
           } else {
-            alert(res.data.msg)
+            alert(re.data.msg)
           }
         })
       },
@@ -565,11 +571,13 @@
 					}
 				}).then((res)=>{
 					if(res.data.code == 1){
+            //console.log(res.data.data)
 						self.couponName = res.data.data.couponName;
             self.receiveNum = res.data.data.receiveNum;
             self.circulation = res.data.data.circulation;
             self.couponType = res.data.data.couponType;
             self.shopId = res.data.data.shopId;
+            self.shopImg = res.data.data.shopImg;
             let option = {
               title: res.data.data.shopName+'分享的优惠券', // 分享标题, 请自行替换
               desc:'附近的'+res.data.data.shopName+'给您分享了一张'+res.data.data.couponName+'优惠券信息，快来领取吧',
@@ -841,10 +849,11 @@
 
 			.couponInfo{
 				width: 590px;
+
         padding-bottom:30px;
 				background: #fff;
 				border-radius: 10px;
-				// overflow: hidden;
+				overflow: hidden;
 				position: relative;
         .privilege{
           position: absolute;

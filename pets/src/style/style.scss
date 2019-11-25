@@ -5,6 +5,7 @@ html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockq
   font-weight: normal;
   vertical-align: baseline;
 }
+
 input{
 	-webkit-appearance: none;border-radius: 0;
 	outline: none;
@@ -26,6 +27,7 @@ html,body{
 
 *{
   box-sizing: initial;
+  -webkit-user-select: auto;
 }
 /* HTML5 display-role reset for older browsers */
 

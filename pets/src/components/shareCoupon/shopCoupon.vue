@@ -53,7 +53,8 @@
 				<img src="../../assets/icon/icon_she56@3x.png" alt="">
 			</a>
       <div class="distance">门店距离:<span>{{distance}}</span></div>
-      <div class="storeNum" v-if="storeNum!=0">相关门店:<span>查看{{storeNum}}家相关门店</span></div>
+      <div class="storeNum" v-if="storeNum!=0">相关门店:<span @click="goShopStore">查看{{storeNum}}家相关门店</span></div>
+      <div class="distance" >营业时间:<span style="color:#000000;">{{startTime}}</span></div>
 		</div>
 
 		<div class="couponListBox">
@@ -74,7 +75,7 @@
 									<div class="progress">
 										<div :style="item.styleObj"></div>
 									</div>
-									<span>剩余{{item.sx}}</span>
+									<span>已领取{{item.lq}}</span>
 								</div>
 							</div>
 						</div>
@@ -95,7 +96,7 @@
 						<div class="receiveBtnBox">
 
 
-             <div v-if="item.isReceive==0&&item.conditionPrice==0&&item.couponType==1" class="receiveBtn receivedBtn flex_r_s_c">已领完</div>
+             <div v-if="item.isReceive==0&&item.couponType==1" class="receiveBtn receivedBtn flex_r_s_c">已领完</div>
              <div v-if="item.isReceive==0&&item.conditionPrice==0&&item.couponType!=1" class="receiveBtn receivedBtn flex_r_s_c">已领完</div>
              <div v-if="item.isReceive==0&&item.conditionPrice!=0&&item.couponType!=1" class="receiveBtn receivedBtn flex_r_s_c">已购买</div>
 
@@ -107,11 +108,13 @@
             </div>
             <div v-if="item.isReceive!=0&&item.conditionPrice!=0&&item.shopTotalNum>item.receiveNum">123</div>
 					</div>
-					<img v-if="item.isReceive==0" class="imprint" src="../../assets/receiveEnd.png" alt="">
+          <img v-if="item.isReceive==0&&item.couponType!==1&&item.conditionPrice==0" class="imprint" src="../../assets/receiveEnd.png" alt="">
+					<img v-if="item.isReceive==0&&item.couponType===1" class="imprint" src="../../assets/receiveEnd.png" alt="">
           <img v-if="item.isReceive===1&&item.couponType==1" class="imprint" src="../../assets/received.png" alt="">
           <img v-if="item.isReceive===1&&item.couponType!=1&&item.conditionPrice==0" class="imprint" src="../../assets/received.png" alt="">
 					<!-- <img v-if="(item.isReceive===0&&item.conditionPrice==0)&&item.circulation>item.receiveNum" class="imprint" src="../../assets/received.png" alt=""> -->
-					<img v-if="item.isReceive===1&&item.conditionPrice!=0&&item.couponType!=1" class="imprint" src="../../assets/buyEnd.png" alt="">
+					<img v-if="item.isReceive==0&&item.conditionPrice!=0&&item.couponType!=1" class="imprint" src="../../assets/buyEnd.png" alt="">
+          <img v-if="item.isReceive==1&&item.conditionPrice!=0&&item.couponType!=1" class="imprint" src="../../assets/buyEnd.png" alt="">
         </li>
 			</ul>
 
@@ -137,6 +140,8 @@
         storeNum:0,
         environment:'',
 				uId:'',
+        startTime:'',
+        shopUserId:'',
         navUrl:'',
 				shopId:'',
         distance:'',
@@ -186,7 +191,7 @@
 
 										self.lng = result.position.lng;
 										self.lat = result.position.lat;
-                    
+
 
 									} else {
 										// self.getActivityListOne();
@@ -232,7 +237,15 @@
       self.getShopCouponList();
 		},
 		methods:{
-
+      goShopStore(){
+        let self = this;
+        this.$router.push({
+          name:'shopStore',
+          query:{
+            shopUserId:self.shopUserId
+          }
+        })
+      },
 			back() {
 				this.$router.go(-1); //返回上一层
 			},
@@ -313,12 +326,8 @@
         })
       },
 			couponXqLink(item){
-				this.$router.push({
-					name:'couponXq',
-					query:{
-						couponId:item.couponId
-					}
-				})
+
+        window.location.href = 'http://app.gutouzu.com/index.html#/couponXq?couponId='+item.couponId;
 			},
 			getUrlKey(name){
 			    return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.href) || [, ""])[1].replace(/\+/g, '%20')) || null
@@ -337,7 +346,7 @@
 					}
 				}).then((res)=>{
 					if(res.data.code == 1){
-            console.log(res.data.data)
+            //console.log(res.data.data)
 
             let option = {
               title: res.data.data.shopName+'的优惠券来袭啦', // 分享标题, 请自行替换
@@ -351,21 +360,24 @@
                 alert('已取消分享')
               }
             }
-
+            console.log(res.data.data)
             wxapi.wxRegister(option)
+            self.shopUserId = res.data.data.shopUserId;
 						self.shopName = res.data.data.shopName;
 						self.shopImgAddr = res.data.data.shopImgAddr;
 						self.shopAddress = res.data.data.shopAddress;
 						self.couponList = res.data.data.shopCoupons;
             self.shopDesc = res.data.data.shopDesc;
             self.distance = res.data.data.distance.split(':')[1];
-
+            self.storeNum = res.data.data.storeNum;
+            self.startTime = res.data.data.startTime;
             self.navUrl = 'https://uri.amap.com/marker?position='+res.data.data.longitude+','+res.data.data.latitude+'&name='+res.data.data.shopAddress;;
 						self.couponList.forEach((e)=>{
 							e.styleObj = {
 								width:(100-Math.round((e.receiveNum/e.circulation * 10000)/100).toFixed(4))+'%'
 							}
 							e.sx = (100-Math.round((e.receiveNum/e.circulation * 10000)/100).toFixed(4))+'%'
+              e.lq = (100-(100-Math.round((e.receiveNum/e.circulation * 10000)/100).toFixed(4)))+'%'
 						})
 						// console.log(self.couponList)
 					}else{
@@ -452,21 +464,25 @@
           headers: {
             'Content-Type': 'application/x-www-form-urlencoded'
           }
-        }).then((res) => {
-          if (res.data.code == 1) {
+        }).then((re) => {
+          if (re.data.code == 1) {
+            //alert('订单号'+res.data.data.out_trade_no)
             WeixinJSBridge.invoke('getBrandWCPayRequest', {
-              'appId': res.data.data.appId,
-              'timeStamp': res.data.data.timeStamp,
-              'nonceStr': res.data.data.nonceStr,
-              'package': res.data.data.package,
+              'appId': re.data.data.appId,
+              'timeStamp': re.data.data.timeStamp,
+              'nonceStr': re.data.data.nonceStr,
+              'package': re.data.data.package,
               'signType': 'MD5',
-              'paySign': res.data.data.paySign
+              'paySign': re.data.data.paySign
             }, function(res) {
               if (res.err_msg === 'get_brand_wcpay_request:ok') {
-                alert('支付成功！');
-                setTimeout(() => {
-                  window.location.href = 'http://app.gutouzu.com/index.html#/shopCoupon?shopId='+self.shopId+'&sj='+10000*Math.random();
-                }, 500)
+                //self.$router.push({name:'paySus',query:{oderNum:res.data.data.out_trade_no,type:'c'}});
+
+                alert('支付成功');
+                window.location.href = 'http://app.gutouzu.com/index.html#/paySus?type=c&oderNum='+re.data.data.out_trade_no;
+
+
+
               } else if (res.err_msg === 'get_brand_wcpay_request:cancel') {
                 alert('取消支付！');
                 setTimeout(() => {
@@ -478,7 +494,7 @@
               }
             });
           } else {
-            alert(res.data.msg)
+            alert(re.data.msg)
           }
         })
       },
@@ -855,7 +871,7 @@
                   line-height:34px;
                 }
 								.progressBox{
-									padding-top: 60px;
+									padding-top: 120px;
 									.progress{
 										position: relative;
 										width:100px;

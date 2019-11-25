@@ -129,6 +129,7 @@
               e.href = 'http://app.gutouzu.com/index.html#/trend?dynamicId='+e.dynamicId;
             })
             self.dynamicList = res.data.data.dynamicVos;
+            console.log(self.dynamicList)
         	}else{
         		let toast = self.$createToast({
         			txt:res.data.msg,
@@ -162,10 +163,10 @@
       onPullingUp(){
         let self = this;
         this.page++;
-        self.axios.get(Api.trendApi + '/community/selectDynamicByUserId', {
+        self.axios.get(Api.trendApi + '/community/selectUserDynamicTopOfActivity', {
         	params: {
-        		beLookUserId:42,
-        		lookUserId:38,
+        		ocaId:self.ocaId,
+        		userId:self.userId,
         		page:self.page,
         		rows:5
         	}
@@ -351,7 +352,7 @@
         }
         .activityText{
           padding-top:30px;
-          text-align: center;
+
           line-height:48px;
           font-size:30px;
           color:#000;
@@ -363,6 +364,8 @@
           color:#666;
           padding-top:20px;
           .commentIcon{
+
+
             img{
               width:36px;
               margin-right:10px;
