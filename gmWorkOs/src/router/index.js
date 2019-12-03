@@ -19,12 +19,12 @@ import BusinessManage from '@/components/gmWorkOs/businessManage'
 import MarketPlanManage from '@/components/gmWorkOs/marketPlanManage'
 import WorkBill from '@/components/gmWorkOs/workBill'
 import GmWorkHome from '@/components/gmWorkOs/gmWorkHome'
+import EditBranch from '@/components/gmWorkOs/editBranch'
 
 
 import WorkOsInfoList from '@/components/gmWorkOs/workOsInfoList'
 import WorkOsMap from '@/components/gmWorkOs/workOsMap'
 import WorkOsPcMap from '@/components/gmWorkOs/workOsPcMap'
-import EditCustomer from '@/components/gmWorkOs/editCustomer'
 import WorkOsChangePw from '@/components/gmWorkOs/workOsChangePw'
 import StaffInfo from '@/components/gmWorkOs/staffInfo'
 import EditStaff from '@/components/gmWorkOs/editStaff'
@@ -33,6 +33,7 @@ import ShopNameVisit from '@/components/gmWorkOs/shopNameVisit'
 
 
 Vue.use(Router)
+
 export default new Router({
 	mode: 'hash',
     routes:[
@@ -131,6 +132,16 @@ export default new Router({
       name:'gmWorkHome',
       component:GmWorkHome
     },
+    {
+    	path:'/editStaff',
+    	name:'editStaff',
+    	component:EditStaff
+    },
+    {
+      path:'/editBranch',
+      name:'editBranch',
+      component:EditBranch
+    },
 
 
 
@@ -140,12 +151,6 @@ export default new Router({
 			path:'/staffInfo',
 			name:'staffInfo',
 			component:StaffInfo,
-		},
-
-		{
-			path:'/editStaff',
-			name:'editStaff',
-			component:EditStaff
 		},
 		{
 			path:'/workOsChangePw',
@@ -166,12 +171,6 @@ export default new Router({
 			name:'workOsInfoList',
 			component:WorkOsInfoList,
 
-		},
-
-		{
-			path:'/editCustomer',
-			name:'editCustomer',
-			component:EditCustomer
 		},
 
 		{

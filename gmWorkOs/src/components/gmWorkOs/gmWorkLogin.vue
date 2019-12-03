@@ -2,7 +2,7 @@
 	<div class="workOsLogin public_login">
 		<div class="login_nav">
 			<div class="back" @click="back"></div>
-			<div class="title">业务信息管理系统</div>
+			<div class="title">骨米业务管理系统</div>
 		</div>
 		<div class="logo flex_c_f_e">
 			<img src="../../assets/logo.png" alt="">
@@ -55,15 +55,16 @@
 				//注册
 				let self = this;
 
-				if (this.phone == '') {
+				if (this.phone == '' && this.phone!='root') {
 
 					let toast = this.$createToast({
 						txt: '手机号不能为空',
 						type: 'error'
 					  })
 					toast.show()
+
 					return false;
-				} else if (!this.reg.test(this.phone)) {
+				} else if (!this.reg.test(this.phone) && this.phone!='root') {
 
 					let toast = this.$createToast({
 						txt: '手机号格式错误',
@@ -81,7 +82,7 @@
 					return false;
 				}else {
 					self.loading = true;
-					this.axios.post(Api.staffApi+'/business/selectBusinessStaffInfo', this.qs.stringify({
+					this.axios.post(Api.staffApi+'/employee/system/registerByPwd', this.qs.stringify({
 						phone: this.phone,
 						password: this.pwd
 					}), {
@@ -89,23 +90,25 @@
 							'Content-Type': 'application/x-www-form-urlencoded'
 						}
 					}).then(function(res) {
-						console.log(res)
+						//console.log(res)
 						if (res.data.code === 1) {
-							let staffInfo = {
+							let userInfo = {
+								manager:res.data.data.manager,
+								root:res.data.data.root,
 								name:res.data.data.name,
-								staffId:res.data.data.id,
-								parentId:res.data.data.parentId,
-								phone:res.data.data.phone,
-								staffNum:res.data.data.staffNum,
-                viewCompetence:res.data.data.viewCompetence
+								token:res.data.data.token,
+								department:res.data.data.department,//部门
+                employeeId:res.data.data.employeeId,//员工Id
+                network:res.data.data.networkId ,//网点ID
+                post:res.data.data.post
 							}
 // 							self.$store.commit('setStaffNum',res.data.data.staffNum);
 // 							self.$store.commit('setCustomerNum',res.data.data.clientNum);
-							localStorage.setItem('staff', JSON.stringify(staffInfo));
+							localStorage.setItem('userInfo', JSON.stringify(userInfo));
 							setTimeout(()=>{
 								self.loading = false;
 								self.$router.push({
-									name:'workOsInfoList'
+									name:'gmWorkHome'
 								})
 							},500)
 

@@ -138,10 +138,8 @@
 
     },
     methods: {
-      back() {
-      	this.$router.push({
-      		name:'workOsInfoList'
-      	});
+      back(){
+      	this.$router.go(-1); //返回上一层
       },
       showAddressPicker() {
       	this.addressPicker.show()

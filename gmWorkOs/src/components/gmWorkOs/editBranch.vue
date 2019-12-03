@@ -1,22 +1,22 @@
 <template>
-	<div class="addStaff">
+	<div class="editBranch">
 
 		<div class="login_nav">
 			<div class="back" @click="back"></div>
-			<div class="title">添加员工</div>
+			<div class="title">编辑合作网点</div>
 		</div>
 		<div class="addCustomer_list">
 			<ul>
 				<li class="flex_r_f_s">
-					<div class="list_l"><b>*</b>员工名称:</div>
+					<div class="list_l"><b>*</b>公司名称:</div>
 					<div class="list_r">
-						<input type="text" v-model="name" />
+						<input type="text" v-model="companyName" placeholder="请输入公司名称" />
 					</div>
 				</li>
         <li class="flex_r_f_s">
-        	<div class="list_l"><b>*</b>手机号码:</div>
+        	<div class="list_l"><b>*</b>网点简称:</div>
         	<div class="list_r">
-        		<input type="text" v-model="phone" />
+        		<input type="text" v-model="networkName" placeholder="请输入网点简称" />
         	</div>
         </li>
 				<li class="flex_r_f_s">
@@ -31,26 +31,39 @@
 					</div>
 				</li>
 				<li class="flex_r_f_s">
-					<div class="list_l"><b>*</b>业务地址:</div>
+					<div class="list_l"><b>*</b>经营地址:</div>
 					<div class="list_r">
-						<input type="text" v-model="address" />
+						<input type="text" v-model="address" placeholder="请输入经营地址" />
 					</div>
 				</li>
+        <li class="flex_r_f_s">
+        	<div class="list_l"><b>*</b>负责人:</div>
+        	<div class="list_r">
+        		<input type="text" v-model="principalName" placeholder="请输入负责人" />
+        	</div>
+        </li>
 				<li class="flex_r_f_s">
-					<div class="list_l"><b>*</b>证件照片:</div>
+					<div class="list_l"><b>*</b>联系电话:</div>
+					<div class="list_r">
+						<input type="number" v-model="phone" placeholder="请输入联系电话" />
+					</div>
+				</li>
+
+				<li class="flex_r_f_s">
+					<div class="list_l"><b>*</b>执照照片:</div>
 					<div class="list_r uploadDiv">
 						<div class="flex_r_f_s">
 							<div class="uploadBox">
 
-								<cube-upload v-if="imgOne==''" ref="uploadOne":action="action":simultaneous-uploads="1" :max="1" :process-file="processFile" />
+								<cube-upload v-if="imgOne==''" ref="uploadOne" :action="action" :simultaneous-uploads="1" :max="1" :process-file="processFile"/>
 
 								<div class="img-box" v-if="imgOne!=''">
-									<img :src="imgOne.url" alt="" @click="showImagePreview('imgOne')">
+									<img :src="imgOne.url" alt="" @click="showImagePreview(imgOne.url)">
 									<i class="cubeic-wrong" @click="fileRemove('imgOne')"></i>
 								</div>
 								<p>
 
-									<span>省份证正面</span>
+									<span>营业执照</span>
 
 								</p>
 							</div>
@@ -59,58 +72,45 @@
 								<cube-upload v-if="imgTwo==''" :max="1" ref="uploadTwo":action="action":simultaneous-uploads="1" :process-file="processFile2"/>
 
 								<div class="img-box" v-if="imgTwo!=''">
-									<img :src="imgTwo.url" alt="" @click="showImagePreview('imgTwo')">
+									<img :src="imgTwo.url" alt="" @click="showImagePreview(imgTwo.url)">
 									<i class="cubeic-wrong" @click="fileRemove('imgTwo')"></i>
 								</div>
 								<p>
 
+									<span>身份证正面</span>
+								</p>
+							</div>
+							<div class="uploadBox">
+
+								<cube-upload v-if="imgThree==''" :max="1" ref="uploadThree":action="action":simultaneous-uploads="1" :process-file="processFile3"/>
+
+								<div class="img-box" v-if="imgThree!=''">
+									<img :src="imgThree.url" alt=""  @click="showImagePreview(imgThree.url)">
+									<i class="cubeic-wrong" @click="fileRemove('imgThree')"></i>
+								</div>
+								<p>
 									<span>身份证反面</span>
 								</p>
 							</div>
-
 						</div>
 
 					</div>
 				</li>
 				<li class="flex_r_f_s">
-					<div class="list_l"><b>*</b>员工部门:</div>
-					<div class="list_r staffStatus">
-						<cube-select
-						  v-model="departmentVal"
-						  :options="departmentOptions"
-              :disabled="isDepartment">
-						</cube-select>
+					<div class="list_l"><b>*</b>网点级别:</div>
+					<div class="list_r">
+            <cube-select
+              v-model="networkRank"
+              placeholder="请选择网点级别"
+              :options="options">
+            </cube-select>
 					</div>
 				</li>
         <li class="flex_r_f_s">
-        	<div class="list_l"><b>*</b>岗位名称:</div>
-        	<div class="list_r staffStatus">
-        		<cube-select
-        		  v-model="postVal"
-        		  :options="postOptions">
-        		</cube-select>
-        	</div>
-        </li>
-        <li class="flex_r_f_s">
-        	<div class="list_l"><b>*</b>初始密码:</div>
-        	<div class="list_r">
-        		<input type="password" v-model="password" />
-        	</div>
-        </li>
-        <li class="flex_r_f_s">
-        	<div class="list_l"><b>*</b>员工状态:</div>
-        	<div class="list_r staffStatus">
-        		<cube-select
-        		  v-model="staffVal"
-        		  :options="staffOptions">
-        		</cube-select>
-        	</div>
-        </li>
-        <li class="flex_r_f_s">
-					<div class="list_l"><b style="color:#fff">*</b>备注信息:</div>
+					<div class="list_l">备注信息:</div>
 					<div class="list_r">
 						<div class="remark">
-							<cube-textarea v-model="remark" :maxlength="200"></cube-textarea>
+							<cube-textarea v-model="remark" :maxlength="200" placeholder="请输入客户备注信息"></cube-textarea>
 						</div>
 					</div>
 				</li>
@@ -137,28 +137,26 @@
 		data(){
 			let self = this;
 			return{
-        staffOptions: [{value:'1',text:'启用'},{value:'2',text:'禁用'}],
-        staffVal: '',
-        departmentOptions:[{value:1,text:'办公室'},{value:2,text:'运营部'},{value:3,text:'客服部'},{value:4,text:'内勤部'}],
-				departmentVal:'',
-        postOptions:[{value:1,text:'经理'},{value:2,text:'主管'},{value:3,text:'区长'},{value:4,text:'组长'},{value:5,text:'职员'}],
-        postVal:'',
-        addUserId:'',//添加人Id
-        networkId:'',//合作网点Id,
-        name:'',
-        phone:'',
-        password:'',
-        address:'',
-        remark:'',
-        networkId:'',
+				companyName:'',
+				networkName:'',
+				address:'',
+				principalName:'',//负责人姓名
+				phone:'',
+				networkRank:'',//网点级别
+				remark:'',
 				cityData: ['省份', '城市', '地区'],
 				//图片上传
 				action: {
 				  target: '//jsonplaceholder.typicode.com/photos/'
 				},
-        isDepartment:false,
+        options: [{value:1,text:'省级'},{value:2,text:'市级'},{value:3,text:'区级'}],
 				imgOne:'',
 				imgTwo:'',
+				imgThree:'',
+        oldImg1:'',
+        oldImg2:'',
+        oldImg3:'',
+        newPhone:'',
 				reg: /^1[3456789]\d{9}$/,
 
 
@@ -172,118 +170,57 @@
 					onSelect: this.selectHandle,
 					onCancel: this.cancelHandle
 				});
-        let userInfo = JSON.parse(localStorage.getItem('userInfo'));
-        this.addUserId = JSON.parse(localStorage.getItem('userInfo')).employeeId;
-        this.networkId = JSON.parse(localStorage.getItem('userInfo')).network;
-        if(userInfo.manager){
-          this.isDepartment = false;
-        }else{
-          this.isDepartment = true;
-          this.departmentVal = userInfo.department;
-          let postArr = [];
-          this.postOptions.forEach((e)=>{
-            if(e.value>userInfo.post){
-              postArr.push(e)
-            }
-          });
-          this.postOptions = postArr;
-        }
-        // console.log(this.networkId)
-        // console.log(JSON.parse(localStorage.getItem('userInfo')))
+        this.getNetWork();
+				// let upLoad = document.querySelectorAll(".uploadBox input");
+				// upLoad.forEach((e)=>{
+				// 	e.setAttribute("capture","camera");
+				// })
+
+
+
 		},
 		methods:{
 			back(){
 				this.$router.go(-1); //返回上一层
 			},
+      getNetWork(){
+        let self = this;
+        self.axios.get(Api.userApi + '/employee/system/selectNetworkEchoInfo',{
+          params: {
+          	networkId:self.$route.query.networkId
+          }
+        },{
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        }).then((res)=>{
+          if(res.data.code==1){
+            let netWorkInfo = res.data.data;
+            self.companyName = netWorkInfo.companyName;
+            self.networkName = netWorkInfo.networkName;
+            self.address = netWorkInfo.address;
+            self.principalName = netWorkInfo.principalName;
+            self.phone = netWorkInfo.phone;
+            self.networkRank = netWorkInfo.networkRank;
+            self.cityData = [netWorkInfo.province,netWorkInfo.city,netWorkInfo.area];
+            self.remark = netWorkInfo.remark;
+            self.imgOne = {url:netWorkInfo.businessLicense};
+            self.imgTwo = {url:netWorkInfo.idCardFront};
+            self.imgThree = {url:netWorkInfo.idCardBack};
+            self.oldImg1 = netWorkInfo.businessLicense;
+            self.oldImg2 = netWorkInfo.idCardFront;
+            self.oldImg3 = netWorkInfo.idCardBack;
+            self.oldPhone = netWorkInfo.phone;
+            console.log(res)
+          }else{
+            alert(res.data.msg)
+          }
+        })
+      },
 			showImagePreview(img) {
 			  this.$createImagePreview({
-				imgs: [this[img]]
+				imgs: [img]
 			  }).show()
-			},
-
-			addCustomer(){
-				let self = this;
-				if(this.name == ''){
-
-          this.errTip('请填写员工名称')
-
-				}else if (this.phone == '') {
-
-          this.errTip('请填写手机号码')
-
-				}else if (!this.reg.test(this.phone)) {
-
-          this.errTip('手机号码格式不正确')
-
-				}else if(this.cityData[0] == '省份' ||this.cityData[1] == '城市' || this.cityData[2] == '地区'){
-
-          this.errTip('请选择省市区')
-
-				}else if (this.address == '') {
-
-          this.errTip('请填写业务地址')
-
-				}else if(this.imgOne == ''||this.imgTwo==''){
-
-					this.errTip('上传证件照片')
-
-				}else if(this.departmentVal == ''){
-
-					this.errTip('请选择员工部门')
-
-				} else if(this.postVal == ''){
-
-          this.errTip('请选择岗位名称')
-
-				}else if(this.password == ''){
-
-          this.errTip('请填写密码')
-
-        }else if(this.staffVal == ''){
-          this.errTip('请选择员工状态')
-				}else{
-          let formData = new FormData();
-          formData.append('idCardFront',self.imgOne.imgData,self.imgOne.name)
-          formData.append('idCardBack',self.imgTwo.imgData,self.imgTwo.name)
-          formData.append('userId',self.addUserId);
-          formData.append('networkId',self.networkId);
-          formData.append('name',self.name);
-          formData.append('phone',self.phone);
-          formData.append('password',self.password);
-          formData.append('province',self.cityData[0])
-          formData.append('city',self.cityData[1])
-          formData.append('area',self.cityData[2])
-          formData.append('address',self.address);
-          formData.append('department',self.departmentVal);
-          formData.append('post',self.postVal);
-          formData.append('remark',self.remark);
-          formData.append('status',self.staffVal);
-
-          self.axios.post(Api.userApi + '/employee/system/addEmployee',formData, {
-            headers: {
-              'Content-Type': 'multipart/form-data'
-            }
-          }).then((res) => {
-            if (res.data.code == 1) {
-              let toast = self.$createToast({
-                txt: '添加成功',
-                type: 'correct'
-              })
-              toast.show()
-              setTimeout(() => {
-                self.$router.push({
-                  name: 'staffManage'
-                })
-
-              },500)
-
-            } else {
-              alert(res.data.msg)
-            }
-          })
-
-        }
-
 			},
       dataURItoBlob(base64Data) {
       	var byteString;
@@ -302,6 +239,75 @@
       		type: mimeString
       	});
       },
+			addCustomer(){
+				let self = this;
+				if(this.companyName == ''){
+          this.errTip('请选择公司名称')
+				}else if(this.networkName == ''){
+          this.errTip('请选择网点简称')
+        }else if(this.cityData[0] == '省份' ||this.cityData[1] == '城市' || this.cityData[2] == '地区'){
+          this.errTip('请选择省市区')
+				}else if(this.address == ''){
+					this.errTip('请输入经营地址')
+				}else if(this.principalName == ''){
+          this.errTip('请输入负责人姓名')
+        }
+        else if (this.phone == '') {
+          this.errTip('请输联系电话')
+
+				}else{
+          let formData = new FormData();
+          if(this.imgOne.name){
+            formData.append('businessLicense',self.imgOne.imgData,self.imgOne.name)
+          }
+          if(this.imgTwo.name){
+            formData.append('idCardFront',self.imgTwo.imgData,self.imgTwo.name)
+          }
+          if(this.imgThree.name){
+            formData.append('idCardBack',self.imgThree.imgData,self.imgThree.name)
+          }
+          formData.append('oldBusinessLicenseFileName',self.oldImg1)
+          formData.append('oldIdCardFrontFileName',self.oldImg2)
+          formData.append('oldIdCardBackFileName',self.oldImg3)
+
+          formData.append('newPhone',self.phone)
+          formData.append('companyName',self.companyName)
+          formData.append('networkName',self.networkName)
+          formData.append('province',self.cityData[0])
+          formData.append('city',self.cityData[1])
+          formData.append('area',self.cityData[2])
+          formData.append('address',self.address)
+          formData.append('principalName',self.principalName)
+          formData.append('phone',self.oldPhone)
+          formData.append('networkRank',self.networkRank)
+          formData.append('remark',self.remark)
+          formData.append('status',1)
+          formData.append('networkId',self.$route.query.networkId)
+          self.axios.post(Api.userApi + '/employee/system/updateNetwork',formData, {
+            headers: {
+              'Content-Type': 'multipart/form-data'
+            }
+          }).then((res) => {
+            if (res.data.code == 1) {
+              let toast = self.$createToast({
+                txt: '编辑成功',
+                type: 'correct'
+              })
+              toast.show()
+              setTimeout(() => {
+                self.$router.push({
+                  name: 'branchManage'
+                })
+
+              },500)
+
+            } else {
+              alert(res.data.msg)
+            }
+          })
+				}
+
+			},
       errTip(msg){
         let toast = this.$createToast({
         	txt: msg,
@@ -333,27 +339,47 @@
 			      let blob = self.dataURItoBlob(file.base64)
 
 			      self.imgOne = {name:file.name,imgData:blob,url:file.base64};
-
-
-			  })
-			},
-			processFile2(file,next) {
-
-			  let self = this;
-			  compress(file, {
-			    compress: {
-			      width: 800,
-			      height: 800,
-			      quality: 0.5
-			    }
-			  },function(){
-			      console.log(file)
-			      // self.url = file.base64
-			      let blob = self.dataURItoBlob(file.base64)
-			     self.imgTwo = {name:file.name,imgData:blob,url:file.base64};
+            self.oldImg1 = '';
 
 			  })
 			},
+      processFile2(file,next) {
+
+        let self = this;
+        compress(file, {
+          compress: {
+            width: 800,
+            height: 800,
+            quality: 0.5
+          }
+        },function(){
+            console.log(file)
+            // self.url = file.base64
+            let blob = self.dataURItoBlob(file.base64)
+            self.imgTwo = {name:file.name,imgData:blob,url:file.base64};
+            self.oldImg2 = '';
+
+        })
+      },
+
+      processFile3(file,next) {
+
+        let self = this;
+        compress(file, {
+          compress: {
+            width: 800,
+            height: 800,
+            quality: 0.5
+          }
+        },function(){
+            console.log(file)
+            // self.url = file.base64
+            let blob = self.dataURItoBlob(file.base64)
+            self.imgThree = {name:file.name,imgData:blob,url:file.base64};
+            self.oldImg3 = '';
+
+        })
+      },
 
 			fileRemove(img){
 				let self = this;
@@ -376,7 +402,7 @@
 					},
 					onConfirm: () => {
 						// let self = this;
-						this[img] = '';
+						self[img] = '';
 					},
 					onCancel: () => {
 
@@ -389,7 +415,7 @@
 </script>
 
 <style lang="scss">
-	.addStaff{
+	.editBranch{
     background: #fff;
 		.amap-logo{
 			opacity:0;
@@ -560,15 +586,7 @@
 				}
 
 			}
-			.staffStatus{
-        .cube-select{
-         height: 50px;
-         padding:10px 20px 10px 10px;
-         width:410px;
-
-        }
-      }
-      .confirmBtn{
+			.confirmBtn{
 				color: #fff;
 				font-size: 30px;
 				width: 500px;

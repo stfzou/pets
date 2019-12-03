@@ -25,13 +25,48 @@ Vue.use(VueAMap);
 Vue.use(ElementUI);
 Vue.use(iView)
 Vue.prototype.axios = axios;
-Vue.prototype.http = http;
+//Vue.prototype.http = http;
 Vue.prototype.qs = Qs;
 Vue.config.productionTip = false
 // axios.defaults.baseURL = 'http://192.168.0.109:8084'
 // axios.defaults.headers.common['token'] = "B99FE190CB62097255E01FE911A271D4"
 
 // http.defaults.baseURL = 'http://192.168.0.109:8082'
+
+/** 验证用户是否登录 **/
+
+router.beforeEach((to,from,next) => {
+
+	if(to.name == 'gmWorkLogin'){
+		next();
+	}else{
+    //alert(1)
+    if(JSON.parse(localStorage.getItem('userInfo'))){
+      axios.post('http://app.gutouzu.com/employee/system/registerByToken', Qs.stringify({
+      	token:JSON.parse(localStorage.getItem('userInfo')).token
+      }), {
+      	headers: {
+      		'Content-Type': 'application/x-www-form-urlencoded'
+      	}
+      }).then((res)=>{
+        if(res.data.code==1){
+          next();
+        }else{
+          alert(res.data.msg);
+          next('/gmWorkLogin')
+        }
+
+      })
+    }else{
+
+      next('/gmWorkLogin')
+    }
+
+		// next();
+
+	}
+
+})
 
 VueAMap.initAMapApiLoader({
 	key: 'fe2312e4704c6f8f7787c7864ecebae6',
