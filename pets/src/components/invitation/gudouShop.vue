@@ -64,7 +64,7 @@
                    </div>
                    <div class="desc">{{item.name|descFilter}}</div>
                    <div class="gudouPrice flex_r_s_c">
-                     骨豆价¥{{item.boneBeanPrice}}
+                     骨豆价¥{{item.boneBeanPrice|moneyFilter}}
                    </div>
                  </li>
                </ul>
@@ -91,7 +91,7 @@
                    </div>
                    <div class="desc">{{item.name|descFilter}}</div>
                    <div class="gudouPrice flex_r_s_c">
-                     骨豆价¥{{item.boneBeanPrice}}
+                     骨豆价¥{{item.boneBeanPrice|moneyFilter}}
                    </div>
                  </li>
                </ul>
@@ -125,12 +125,13 @@
               </div>
               <div class="listBottom">
                 <div class="goodsName">{{item.name|typeNameFilter}}</div>
-                <div class="exChangePeople">已有{{item.sumSellNum}}人兑换</div>
-                <div class="deduction">骨豆直抵¥<span v-if="deduction>item.boneBeanPrice">{{item.boneBeanPrice}}</span><span v-else>{{deduction}}</span></div>
                 <div class="gudouPriceBox flex_r_f_s">
-                  <div class="gudouPrice flex_r_s_c">骨豆价¥{{item.boneBeanPrice}}</div>
-                  <div class="oldPrice">原价:¥{{item.price}}</div>
+                  <div class="gudouPrice flex_r_s_c">骨豆价¥{{item.boneBeanPrice|moneyFilter}}</div>
+                  <div class="oldPrice">原价:¥{{item.price|moneyFilter}}</div>
                 </div>
+
+                <div class="deduction">骨豆直抵¥<span v-if="deduction>item.boneBeanPrice">{{item.boneBeanPrice}}</span><span v-else>{{deduction}}</span></div>
+                <div class="exChangePeople">已有{{item.sumSellNum}}人兑换</div>
               </div>
 
             </li>
@@ -146,12 +147,13 @@
                 </div>
                 <div class="listBottom">
                   <div class="goodsName">{{item.name|typeNameFilter}}</div>
-                  <div class="exChangePeople">已有{{item.sumSellNum}}人兑换</div>
-                  <div class="deduction">骨豆直抵¥<span v-if="deduction>item.boneBeanPrice">{{item.boneBeanPrice}}</span><span v-else>{{deduction}}</span></div>
                   <div class="gudouPriceBox flex_r_f_s">
-                    <div class="gudouPrice flex_r_s_c">骨豆价¥{{item.boneBeanPrice}}</div>
-                    <div class="oldPrice">原价:¥{{item.price}}</div>
+                    <div class="gudouPrice flex_r_s_c">骨豆价¥{{item.boneBeanPrice|moneyFilter}}</div>
+                    <div class="oldPrice">原价:¥{{item.price|moneyFilter}}</div>
                   </div>
+
+                  <div class="deduction">骨豆直抵¥<span v-if="deduction>item.boneBeanPrice">{{item.boneBeanPrice}}</span><span v-else>{{deduction}}</span></div>
+                  <div class="exChangePeople">已有{{item.sumSellNum}}人兑换</div>
                 </div>
 
               </li>
@@ -217,6 +219,31 @@
         }else{
           return val
         }
+      },
+      moneyFilter(value,num){
+         
+
+        // num = num > 0 && num <= 20 ? num : 2;
+        num = 1;
+        value = parseFloat((value + "").replace(/[^\d\.-]/g, "")).toFixed(num) + ""; //将金额转成比如 123.45的字符串
+
+        var valueArr = value.split(".")[0].split("") //将字符串的数变成数组
+
+        const valueFloat = value.split(".")[1]; // 取到 小数点后的值
+
+        let valueString = "";
+
+        for (let i = 0; i < valueArr.length; i++) {
+
+        valueString += valueArr[i] + ((i + 1) % 3 == 0 && (i + 1) != valueArr.length ? "," : ""); //循环 取数值并在每三位加个','
+
+        }
+
+        const money = valueString.split("").join("") + "." + valueFloat; //拼接上小数位
+
+        return money
+
+
       }
     },
     mounted() {
@@ -230,6 +257,7 @@
     destroyed () {
      window.removeEventListener('scroll', this.menu)
     },
+
     methods:{
       navClick(item,index){
        this.spanIndex = index;
@@ -548,12 +576,12 @@
                 font-weight:400;
               }
               .gudouPrice{
-                width:180px;
-                height:40px;
+                width:150px;
+                height:36px;
                 background:rgba(255,82,61,1);
                 border-radius:20px;
                 color:#fff;
-                font-size:24px;
+                font-size:20px;
                 margin-top:18px;
                 margin-bottom:26px;
               }
@@ -643,25 +671,25 @@
             }
             .deduction{
               font-size:24px;
-              color:#ff523d;
-              padding-top:20px;
+              color:#f79744;
+              padding-top:15px;
             }
             .gudouPriceBox{
               padding-top:20px;
               .gudouPrice{
                 width:150px;
-                height:40px;
+                height:36px;
                 background:rgba(255,82,61,1);
                 border-radius:20px;
                 color:#fff;
-                font-size:24px;
+                font-size:20px;
                 margin-right:20px;
 
               }
               .oldPrice{
                 text-decoration:line-through;
                 color:#999999;
-                font-size:24px;
+                font-size:20px;
               }
             }
           }

@@ -17,22 +17,41 @@
 </template>
 
 <script>
+  import Api from '../common/apj.js'
 	export default {
     data(){
       return{
-        environment:''
+        environment:'',
+        appUrl:''
       }
     },
     mounted() {
       this.getEnvironment();
+      this.getAppUrl();
     },
 		methods: {
 			closeDown() {
 				this.$emit('closeDown');
 			},
+      getAppUrl(){
+        let self = this;
+        self.axios.post(Api.userApi+'/version/selectNewestVersionInfo',{
+        	headers: {
+        		'Content-Type': 'application/x-www-form-urlencoded'
+        	}
+        }).then((res)=>{
+          if(res.data.code==1){
+            self.appUrl = res.data.data.address;
+
+          }
+        })
+      },
 			isAnOrIos() {
+        //alert(1)
+
 				var u = navigator.userAgent,
 				app = navigator.appVersion;
+       
 				var isAndroid = u.indexOf('Android') > -1 || u.indexOf('Linux') > -1; //g
 				var isIOS = !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/); //ios终端
 				if (isAndroid) {
@@ -41,13 +60,17 @@
           if(this.environment=='-1'){
             this.$router.push({name:'wxWhitePage'})
           }else{
-            window.location.href = 'http://gutouzu.oss-cn-shenzhen.aliyuncs.com/manager/app-v1.0.0.apk'
+
+
+            window.location.href = this.appUrl;
+
+
           }
 					//alert('这个是安卓操作系统')
 				}
 				if (isIOS) {
 					//这个是ios操作系统
-          
+
 					window.location.href = 'https://itunes.apple.com/cn/app/id1437699756'
 				}
 			},

@@ -19,12 +19,14 @@
         oderNum:'',
         btnTxt:'',
         userId:'',
-        environment:''
+        environment:'',
+        appUrl:''
       }
     },
     mounted() {
       //console.log(this.$route.query.orderNum)
       this.getEnvironment();
+      this.getAppUrl();
       this.oderNum = this.getUrlKey('oderNum')
       if(this.oderNum!=null||this.oderNum!=undefined){
         if(this.getUrlKey('type')=='a'){
@@ -47,6 +49,21 @@
         } else {
           this.environment = '1';
         }
+      },
+      getAppUrl(){
+        let self = this;
+        self.axios.post(Api.userApi+'/version/selectNewestVersionInfo',{
+        	headers: {
+        		'Content-Type': 'application/x-www-form-urlencoded'
+        	}
+        }).then((res)=>{
+          if(res.data.code==1){
+            self.appUrl = res.data.data.address;
+      
+          }else{
+            alert(res.data.msg)
+          }
+        })
       },
       getActivityOrderInfo(){
         let self = this;
@@ -112,7 +129,8 @@
       	  if(this.environment=='-1'){
       	    this.$router.push({name:'wxWhitePage'})
       	  }else{
-      	    window.location.href = 'http://gutouzu.oss-cn-shenzhen.aliyuncs.com/manager/app-v1.0.0.apk'
+            
+      	    window.location.href = this.appUrl;
       	  }
       		//alert('这个是安卓操作系统')
       	}

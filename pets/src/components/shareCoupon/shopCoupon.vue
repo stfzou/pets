@@ -1,5 +1,30 @@
 <template>
 	<div class="shopCoupon">
+    <div class="guDialog flex_r_s_c" @click.stop="loginDailongHide" v-show="isLoginDialong">
+      <div class="dialongCnt" @click.stop>
+        <div class="inputBox">
+          <div class="itemList flex_r_f_s">
+            <p>手机号码</p>
+            <input type="number" v-model="phone" @blur.prevent="inputLoseFocus" placeholder="请输入手机号码" />
+          </div>
+          <div class="itemList flex_r_f_s vcode_box">
+            <p>验证码</p>
+            <input type="number" v-model="vCode" @blur.prevent="inputLoseFocus" placeholder="请输入验证码" />
+            <div class="v_code" v-if="show">
+              <span @click="getvCode">获取验证码</span>
+            </div>
+            <div class="v_code active_vcode" v-else>
+              <span>{{count}}</span>
+            </div>
+          </div>
+        </div>
+        <div class="btnBox flex_r_s_b">
+          <div class="cancelBtn flex_r_s_c" @click="loginDailongHide">取消</div>
+          <div class="okBtn flex_r_s_c" @click="vCodeLogin">确定</div>
+        </div>
+      </div>
+
+    </div>
     <div class="couponListDialog flex_r_s_c" @click.stop="dailongHide" v-show="isDialong">
       <div class="dialongCnt" @click.stop v-show="!isDialongCnt">
         <div class="dialongCntTop">
@@ -54,11 +79,11 @@
 			</a>
       <div class="distance">门店距离:<span>{{distance}}</span></div>
       <div class="storeNum" v-if="storeNum!=0">相关门店:<span @click="goShopStore">查看{{storeNum}}家相关门店</span></div>
-      <div class="distance" >营业时间:<span style="color:#000000;">{{startTime}}</span></div>
+      <div class="distance" >营业时间:<span style="color:#000000;">{{startTime}}~{{endTime}}</span></div>
 		</div>
 
 		<div class="couponListBox">
-
+      <div class="title">该商户最新优惠信息</div>
 			<ul>
 				<li class="flex_r_s_b" v-for="(item,index) in couponList" :key="index">
 
@@ -82,15 +107,16 @@
 					</div>
 					<div class="list_r">
 						<div class="sale">
-              <span v-if="item.conditionPrice!==0&&item.couponType===1">￥{{item.couponPrice|keepFloat}}</span>
-              <span v-if="item.conditionPrice!==0&&item.couponType!==1">￥{{item.conditionPrice|keepFloat}}</span>
-              <span  v-if="item.conditionPrice==0">￥{{item.couponPrice|keepFloat}}</span>
+
+              <span v-if="item.couponType!=1">￥{{item.conditionPrice|keepFloat}}</span>
+              <span v-if="item.couponType===1">￥{{item.couponPrice|keepFloat}}</span>
+
             </div>
 						<div class="condition">
 
               <span v-if="item.conditionPrice!==0&&item.couponType===1">满<span>{{item.conditionPrice|keepFloat}}</span>元使用</span>
-              <span v-if="item.conditionPrice!==0&&item.couponType!=1">原价:<span class="through">{{item.couponPrice|keepFloat}}</span></span>
-							<span v-if="item.conditionPrice==0">无门槛使用</span>
+              <span v-if="item.couponType!=1">原价:<span class="through">{{item.couponPrice|keepFloat}}</span></span>
+							<span v-if="item.conditionPrice==0&&item.couponType===1">无门槛使用</span>
 						</div>
 						<div class="makeTime">{{item.couponEndTime}}前有效</div>
 						<div class="receiveBtnBox">
@@ -106,7 +132,7 @@
              <div @click="receive(item)" v-if="item.isReceive!=0&&item.conditionPrice!=0&&item.couponType!=1" class="receiveBtn flex_r_s_c">立即购买</div>
 
             </div>
-            <div v-if="item.isReceive!=0&&item.conditionPrice!=0&&item.shopTotalNum>item.receiveNum">123</div>
+            <!-- <div v-if="item.isReceive!=0&&item.conditionPrice!=0&&item.shopTotalNum>item.receiveNum">123</div> -->
 					</div>
           <img v-if="item.isReceive==0&&item.couponType!==1&&item.conditionPrice==0" class="imprint" src="../../assets/receiveEnd.png" alt="">
 					<img v-if="item.isReceive==0&&item.couponType===1" class="imprint" src="../../assets/receiveEnd.png" alt="">
@@ -136,10 +162,18 @@
         code:'',
 				lng:0,
 				lat:0,
+        phone: '',
+        show:true,
+        vCode: '',
+        count: '',
+        timer: null,
+        reg: /^1[3456789]\d{9}$/,
+        isLoginDialong:false,
         couponId:'',
         storeNum:0,
         environment:'',
 				uId:'',
+        endTime:'',
         startTime:'',
         shopUserId:'',
         navUrl:'',
@@ -191,7 +225,7 @@
 
 										self.lng = result.position.lng;
 										self.lat = result.position.lat;
-
+                    self.getShopCouponList();
 
 									} else {
 										// self.getActivityListOne();
@@ -210,8 +244,8 @@
 		},
     filters:{
       descFilter(val){
-        if(val.length>20){
-          return val.substr(0,20)+'...'
+        if(val.length>25){
+          return val.substr(0,25)+'...'
         }else{
           return val
         }
@@ -225,6 +259,7 @@
 
     },
 		mounted() {
+      //localStorage.removeItem('user')
       let self = this;
       this.getEnvironment();
       if(JSON.parse(localStorage.getItem('user')) == null){
@@ -234,9 +269,74 @@
       	self.uId = JSON.parse(localStorage.getItem('user')).userId;
       }
       self.shopId = self.getUrlKey('shopId');
-      self.getShopCouponList();
+      this.getShopCouponList();
+
 		},
 		methods:{
+
+      getvCode() {
+        //获取验证码
+
+        if (this.phone == '') {
+
+          alert('请填写手机号码')
+          return false;
+        } else if (!this.reg.test(this.phone)) {
+
+          alert('手机号码格式错误')
+          return false;
+        }
+        if (this.phone) {
+          let _this = this;
+          const TIME_COUNT = 60;
+          if (!this.timer) {
+            this.count = TIME_COUNT;
+            this.show = false;
+            if (!this.forgetState) {
+              this.axios.get(Api.userApi + '/sms_login_code?phone=' + this.phone, {
+                  headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                  }
+                })
+                .then(function(response) {
+
+                })
+                .catch(function(error) {
+                  console.log(error);
+                });
+            } else {
+              this.axios.get('/sms_getpwd?phone=' + this.phone, {
+                  headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                  }
+                })
+                .then(function(response) {
+
+                })
+                .catch(function(error) {
+                  console.log(error);
+                });
+            }
+
+            this.timer = setInterval(() => {
+              if (this.count > 0 && this.count <= TIME_COUNT) {
+                this.count--;
+              } else {
+                this.show = true;
+                clearInterval(this.timer);
+                this.timer = null;
+              }
+            }, 1000)
+          }
+        }
+
+      },
+      inputLoseFocus() {
+        setTimeout(() => {
+          window.scrollTo(0, 0);
+        }, 100);
+
+      },
       goShopStore(){
         let self = this;
         this.$router.push({
@@ -246,9 +346,61 @@
           }
         })
       },
+      loginDailongHide(){
+         this.isLoginDialong = false;
+      },
+      vCodeLogin() {
+        let self = this;
+
+        if (this.phone == '') {
+
+          alert('请填写手机号码')
+          return false;
+        } else if (!this.reg.test(this.phone)) {
+
+          alert('手机号码格式错误')
+          return false;
+        } else if (this.vCode == '') {
+          alert('请填写验证码')
+          return false;
+        } else {
+          this.axios.post(Api.userApi + '/user_sms_login', this.qs.stringify({
+            phone: this.phone,
+            vcode: this.vCode
+          }), {
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded'
+            }
+          }).then(function(res) {
+
+            if (res.data.code === 1) {
+
+              var userEntity = {
+                userName: res.data.user.userName,
+                userId: res.data.user.userId,
+                userPhone: res.data.user.phone,
+                token: res.data.token
+              };
+              self.uId = res.data.user.userId;
+              localStorage.setItem('user', JSON.stringify(userEntity));
+              self.getShopCouponList();
+              self.isLoginDialong = false;
+            } else {
+              alert(res.data.msg)
+            }
+
+          }).catch(function(err) {
+            console.log(err)
+          })
+        }
+
+      },
 			back() {
 				this.$router.go(-1); //返回上一层
 			},
+      loginDailongHide(){
+        this.isLoginDialong = false;
+      },
 			share(){
 				let toast = this.$createToast({
 					txt: '点击顶部右上角进行分享',
@@ -327,7 +479,14 @@
       },
 			couponXqLink(item){
 
-        window.location.href = 'http://app.gutouzu.com/index.html#/couponXq?couponId='+item.couponId;
+        //window.location.href = 'http://app.gutouzu.com/index.html#/couponXq?couponId='+item.couponId;
+
+        this.$router.push({
+          name:'couponXq',
+          query:{
+            couponId:item.couponId
+          }
+        })
 			},
 			getUrlKey(name){
 			    return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.href) || [, ""])[1].replace(/\+/g, '%20')) || null
@@ -346,21 +505,29 @@
 					}
 				}).then((res)=>{
 					if(res.data.code == 1){
-            //console.log(res.data.data)
+            console.log(res.data.data)
 
             let option = {
               title: res.data.data.shopName+'的优惠券来袭啦', // 分享标题, 请自行替换
               desc:'你附近的'+res.data.data.shopName+'发布了一大波优惠信息,快来看看吧~',
               link: window.location.href, // 分享链接，根据自身项目决定是否需要split
-              imgUrl:res.data.data.shopCoupons[0].couponIcan, // 分享图标, 请自行替换，需要绝对路径
+              imgUrl:res.data.data.shopImgAddr, // 分享图标, 请自行替换，需要绝对路径
               success: () => {
-                alert('分享成功')
+                self.axios.post(Api.userApi + '/boneBeanDetail/userShareCoupon', self.qs.stringify({
+                	userId: self.uId
+                }), {
+                	headers: {
+                		'Content-Type': 'application/x-www-form-urlencoded'
+                	}
+                }).then((sus)=>{
+                
+                })
               },
               error: () => {
                 alert('已取消分享')
               }
             }
-            console.log(res.data.data)
+
             wxapi.wxRegister(option)
             self.shopUserId = res.data.data.shopUserId;
 						self.shopName = res.data.data.shopName;
@@ -371,6 +538,7 @@
             self.distance = res.data.data.distance.split(':')[1];
             self.storeNum = res.data.data.storeNum;
             self.startTime = res.data.data.startTime;
+            self.endTime = res.data.data.endTime;
             self.navUrl = 'https://uri.amap.com/marker?position='+res.data.data.longitude+','+res.data.data.latitude+'&name='+res.data.data.shopAddress;;
 						self.couponList.forEach((e)=>{
 							e.styleObj = {
@@ -559,31 +727,9 @@
         this.couponId = item.couponId;
 				if(JSON.parse(localStorage.getItem('user')) == null){
 
-					let url = window.location.href;
-					this.$store.commit('setLoginUrl',url);
-					this.$createDialog({
-						type: 'confirm',
-						icon: 'cubeic-warn',
-						title: '需要登录后才参加活动',
-						confirmBtn: {
-						  text: '去登录',
-						  active: true,
-						  disabled: false,
-						  href: 'javascript:;'
-						},
-						cancelBtn: {
-						  text: '取消',
-						  active: false,
-						  disabled: false,
-						  href: 'javascript:;'
-						},
-						onConfirm: () => {
-						  self.$router.push({
-						  	name:'login'
-						  })
-						},
-
-					}).show()
+					// let url = window.location.href;
+					// this.$store.commit('setLoginUrl',url);
+					this.isLoginDialong = true;
 
 				}else if(item.couponType==2&&item.conditionPrice!=0){
 
@@ -608,7 +754,92 @@
 
 <style lang="scss">
 	.shopCoupon{
+    .guDialog{
+      position:fixed;
+      height:100%;
+      width:100%;
+      left:0;
+      top:0;
+      z-index:100000;
+      background:rgba(0,0,0,0.6);
+      .dialongCnt{
+        width: 600px;
+        background: #fff;
+        padding-top: 20px;
 
+        .itemList {
+          padding: 30px 20px;
+          box-sizing: border-box;
+
+          input {
+            background: none;
+            outline: none;
+            border-radius: 4px;
+            font-size: 26px;
+            color: #333;
+            text-align: center;
+            height: 50px;
+            line-height: 50px;
+            width: 300px;
+            margin-left: 30px;
+            border: 1px solid #e8e8e8;
+          }
+
+          p {
+            width: 110px;
+            text-align: justify;
+            text-align-last: justify;
+            font-size: 26px;
+          }
+
+        }
+
+        .vcode_box {
+          input {
+            width: 180px;
+          }
+
+          .v_code {
+            margin-left: 30px;
+
+            span {
+              display: inline-block;
+              padding: 8px;
+              border-radius: 6px;
+              background: #ff523d;
+              color: #fff;
+              font-size: 24px;
+            }
+          }
+
+          .active_vcode {
+            span {
+              width: 60px;
+              text-align: center;
+            }
+          }
+        }
+
+        .btnBox {
+          border-top: 1px solid #e8e8e8;
+          /*no*/
+          box-sizing: border-box;
+          margin-top: 20px;
+
+          div {
+            width: 50%;
+            height: 70px;
+            font-size: 30px;
+            box-sizing: border-box;
+          }
+
+          .cancelBtn {
+            border-right: 1px solid #e8e8e8;
+            /*no*/
+          }
+        }
+      }
+    }
     .couponListDialog {
       position: fixed;
       height: 100%;
@@ -826,7 +1057,12 @@
 		}
 
     .couponListBox{
-
+      .title{
+        text-align: center;
+        color:#333;
+        font-size:28px;
+        padding-top:30px;
+      }
 			ul{
 				padding:0 20px 10px 20px;
 				overflow: hidden;
@@ -862,6 +1098,7 @@
 								.couponName{
 									font-size: 28px;
 									color: #000;
+                  height:60px;
 									line-height: 34px;
 								}
                 .distance{
@@ -930,7 +1167,7 @@
               text-align:center;
 						}
 						.receiveBtnBox{
-							padding-top: 12px;
+							padding-top: 50px;
 							.receiveBtn{
 								margin: 0 auto;
 								width:120px;

@@ -78,7 +78,7 @@
 			}
 		},
 		mounted() {
-      this.getUrlData();
+      this.aId = this.getUrlKey('aId');
 			this.getPets();
 		},
 		methods:{
@@ -89,28 +89,8 @@
         })
         toast.show()
       },
-      getUrlData() { // 截取url中的数据
-      	let tempStr = window.location.href;
-      	/**
-      	 * tempArr 是一个字符串数组 格式是["key=value", "key=value", ...]
-      	 */
-      	let returnArr = {};
-      	let urlArr = tempStr.split('?');
-      	if(urlArr){
-      	  urlArr.forEach((e)=>{
-
-      	      if(e.indexOf('=')>-1){
-
-      	        returnArr[e.split('=')[0]] = e.split('=')[1];
-      	      }
-
-      	  })
-      	}
-      	/*输出日志*/
-      	if(returnArr.aId!=undefined){
-      		//localStorage.setItem('Aid',JSON.stringify(returnArr.aId));
-          this.aId = returnArr.aId;
-      	}
+      getUrlKey(name){
+          return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.href) || [, ""])[1].replace(/\+/g, '%20')) || null
       },
 			getPets(){
 				let self = this;

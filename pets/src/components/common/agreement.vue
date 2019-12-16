@@ -34,7 +34,7 @@
             self.agreementVal = res.data.data.content;
             self.title = res.data.data.title;
           }else{
-            alert(res.data.msg);
+            //alert(res.data.msg);
           }
         })
       },
@@ -49,6 +49,9 @@
   .agreement{
     padding:20px;
     background:#fff;
+    width:100%;
+    overflow:hidden;
+    box-sizing:border-box;
     .agreementTitle{
       font-size:36px;
       text-align: center;

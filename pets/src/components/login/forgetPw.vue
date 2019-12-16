@@ -26,7 +26,7 @@
 				</li>
 				<li class="flex_r_f_s" v-if="isPwd">
 					<img src="../../assets/login/icon-pwd.png" alt="">
-					<input type="password" v-model="pwd" @blur.prevent="inputLoseFocus" placeholder="请输入您的密码" />
+					<input type="password" v-model="pwd" @blur.prevent="inputLoseFocus" placeholder="请设置您的新密码" />
 				</li>
 			</ul>
 

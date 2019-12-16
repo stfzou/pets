@@ -44,11 +44,11 @@
 					<div class="time">{{time}}</div>
 				</div>
 				<div class="follow flex_r_s_c" @click="follow" v-if="isFocus == 0">+关注</div>
-				<div class="follow flex_r_s_c" @click="cancelFollow" v-else>取消关注</div>
+				<div class="follow flex_r_s_c" @click="cancelFollow" v-else>已关注</div>
 			</div>
       <div class="trend_img">
       	<div class="imgs-container">
-          <cube-slide ref="slide" :data="compressImages">
+          <cube-slide ref="slide" :data="compressImages" :options="hOption">
             <cube-slide-item v-for="(item, index) in compressImages" :key="index">
               <div class="img-box flex_r_s_c">
                 <img :src="item" alt="" @click="handleImgsClick(index)">
@@ -62,7 +62,7 @@
       <div class="activityLabel flex_r_f_s" v-if="officialActivityName!=''">
         <img v-if="isPrize" src="../../assets/icon_gu99@3x.png" alt="">
         <span>
-          <router-link :to="{name:'communityActivity',query:{ocaId:ocaId}}">#{{officialActivityName}}#</router-link>
+          <router-link :to="{name:'communityActivity',query:{ocaId:ocaId}}">{{officialActivityName}}</router-link>
         </span>
 
       </div>
@@ -77,9 +77,12 @@
         <div class="petName" v-if="petName!=''"><img src="../../assets/icon_she21@3x.png" alt=""> <span>#{{petName}}</span>+撸一次</div>
         <div class="tLabel flex_r_f_s" v-if="officialTopicNames.length>0">
           <img src="../../assets/icon_gu67@3x.png" alt="">
-          <span v-for="item in officialTopicNames">#{{item}}#</span>
+          <span v-for="item in officialTopicNames">{{item}}</span>
         </div>
-
+        <div class="dynamicLabelNames flex_r_f_s" v-if="dynamicLabelNames.length>0">
+          <img src="../../assets/icon_gu98.png" alt="">
+          <span v-for="item in dynamicLabelNames">{{item}}</span>
+        </div>
 			</div>
 			<div class="like_box">
 				<div class="like flex_r_f_s">
@@ -205,7 +208,10 @@
 				initialIndex:0,
 				reportText:'垃圾营销',
 				byReportUserId:'',
-				petId:''
+				petId:'',
+        hOption:{
+          preventDefault:false
+        },
 
 			}
 
@@ -1023,6 +1029,18 @@
           }
           span{
             margin-right: 20px;
+          }
+        }
+        .dynamicLabelNames{
+          padding-top:15px;
+          img{
+            margin-right:10px;
+            width:26px;
+          }
+          span{
+            font-size:22px;
+            color:#999;
+            margin-right:10px;
           }
         }
 				.footprint {

@@ -51,7 +51,7 @@
     <div class="headPost">
       <div class="top_nav flex_r_s_b" :class="{active_nav:isActiveColor}">
         <div class="back" @click="back"></div>
-        <div class="nav_title">骨米卡特权权益</div>
+        <div class="nav_title">骨米会员权益</div>
         <div class="share" @click="share"></div>
       </div>
     </div>

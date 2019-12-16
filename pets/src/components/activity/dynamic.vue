@@ -58,7 +58,7 @@
            </div>
          </div>
          <div class="commentCnt" @click="dynamicXq(item)">{{item.title}}</div>
-
+         <div class="addr flex_r_f_s"><img src="../../assets/icon/map@2x.png" alt=""><span>{{item.geoLocation}}</span></div>
       </div>
        </cube-scroll>
 		</div>
@@ -105,7 +105,7 @@
 			}
 
 			// this.getHeight();
-      this.getUrlData();
+      this.aId = this.getUrlKey('aId');
 			setTimeout(()=>{
 				this.getDynamic();
 			},100)
@@ -200,29 +200,9 @@
 				})
 
 			},
-      getUrlData() { // 截取url中的数据
 
-      	let tempStr = window.location.href;
-      	/**
-      	 * tempArr 是一个字符串数组 格式是["key=value", "key=value", ...]
-      	 */
-      	let returnArr = {};
-      	let urlArr = tempStr.split('?');
-      	if(urlArr){
-      	  urlArr.forEach((e)=>{
-
-      	      if(e.indexOf('=')>-1){
-
-      	        returnArr[e.split('=')[0]] = e.split('=')[1];
-      	      }
-
-      	  })
-      	}
-      	/*输出日志*/
-      	if(returnArr.aId!=undefined){
-      		//localStorage.setItem('Aid',JSON.stringify(returnArr.aId));
-          this.aId = returnArr.aId;
-      	}
+      getUrlKey(name){
+          return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.href) || [, ""])[1].replace(/\+/g, '%20')) || null
       },
 			onPullingUp() {
 			// 模拟更新数据
@@ -492,6 +472,17 @@
             }
           }
 
+        }
+        .addr{
+          padding-top:10px;
+          img{
+            width:26px;
+            margin-right:15px;
+          }
+          span{
+            font-size:24px;
+            color:#999;
+          }
         }
         .commentCnt{
           padding-top:20px;

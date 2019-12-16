@@ -23,13 +23,21 @@
 					<div class="fansBox flex_r_s_b">
 						<div class="fansNum flex_r_s_b">
 							<span>骨粉{{fansCount}}</span>
+
 							<div class="shuxian"></div><span class="followNum">关注{{focusCount}}</span>
 						</div>
 						<div class="gumiNum">骨米号:{{userNo}}</div>
 					</div>
+
 				</div>
 			</div>
 		</div>
+    <div class="autograph" v-if="signature!=''">
+      <p>{{signature}}</p>
+    </div>
+    <div class="autograph" v-else>
+      <p>TA很懒,什么都没有留下</p>
+    </div>
 		<div class="dynamicNav flex_r_f_e">
 
 			<router-link :to="{name:'dynamic',query:{aId:aId}}" class="flex_r_s_c">
@@ -69,6 +77,7 @@
 				userId: -1,
 				aId: '',
         isDown:true,
+        signature:''
 			}
 		},
     components:{
@@ -79,7 +88,8 @@
 			if (JSON.parse(localStorage.getItem('user')) != null) {
 				this.userId = JSON.parse(localStorage.getItem('user')).userId;
 			}
-      this.getUrlData();
+      this.aId = this.getUrlKey('aId');
+      localStorage.setItem('Aid',this.aId);
 			this.getAuthorInfo();
 
 			// console.log(window.location.href)
@@ -98,29 +108,9 @@
       	})
       	toast.show()
       },
-      getUrlData() { // 截取url中的数据
 
-      	let tempStr = window.location.href;
-      	/**
-      	 * tempArr 是一个字符串数组 格式是["key=value", "key=value", ...]
-      	 */
-      	let returnArr = {};
-      	let urlArr = tempStr.split('?');
-      	if(urlArr){
-      	  urlArr.forEach((e)=>{
-
-      	      if(e.indexOf('=')>-1){
-
-      	        returnArr[e.split('=')[0]] = e.split('=')[1];
-      	      }
-
-      	  })
-      	}
-      	/*输出日志*/
-      	if(returnArr.aId!=undefined){
-      		localStorage.setItem('Aid',JSON.stringify(returnArr.aId));
-          this.aId = returnArr.aId;
-      	}
+      getUrlKey(name){
+          return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.href) || [, ""])[1].replace(/\+/g, '%20')) || null
       },
 			getAuthorInfo() {
 				let self = this;
@@ -135,7 +125,7 @@
 					}
 				}).then((res) => {
 					if (res.data.code == 1) {
-            
+
             let option = {
                 title: '分享了'+res.data.data.userName+'的个人空间', // 分享标题, 请自行替换
                 desc:'给你推荐了'+res.data.data.userName+'的个人空间,快来了解一下吧',
@@ -149,7 +139,7 @@
                 }
             }
             wxapi.wxRegister(option)
-            
+
 						self.fansCount = res.data.data.fansCount;
 						self.focusCount = res.data.data.focusCount;
 						self.isFocus = res.data.data.isFocus;
@@ -158,7 +148,8 @@
 						self.userName = res.data.data.userName;
 						self.userNo = res.data.data.userNo;
 						self.styleImg = res.data.data.styleImg;
-						// console.log(res.data)
+            self.signature = res.data.data.signature;
+						//console.log(res.data)
 					}
 				})
 			},
@@ -363,17 +354,17 @@
 						padding-left: 160px;
 						padding-right: 18px;
 						height: 72px;
+
 						box-sizing: border-box;
 
 						.fansNum {
-							width: 250px;
+							width: 160px;
 							font-size: 24px;
 							color: #333;
 
 							.shuxian {
 								height: 33px;
-								width: 1px;
-								/*no*/
+								width: 2px;/*no*/
 								background: #333;
 							}
 						}
@@ -383,12 +374,31 @@
 							color: #333;
 						}
 					}
-				}
+
+        }
 			}
 		}
-
+    .autograph{
+      font-size:24px;
+      padding:30px 20px 0 20px;
+      p{
+        width:680px;
+        height:60px;
+        background:rgba(255,255,255,1);
+        box-shadow:0px 4px 12px 0px rgba(15,15,15,0.16);
+        border-radius:10px;
+        line-height:60px;
+        padding:0 20px;
+        text-align:center;
+        color:#999;
+        box-sizing:border-box;
+        overflow: hidden;/*超出部分隐藏*/
+        white-space: nowrap;/*不换行*/
+        text-overflow:ellipsis;/*超出部分文字以...显示*/
+      }
+    }
 		.dynamicNav {
-			margin-top: 20px;
+			margin-top: 30px;
 			border-bottom: 1px solid #e8e8e8;
 
 			/*no*/

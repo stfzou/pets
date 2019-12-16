@@ -2,7 +2,7 @@
   <div class="activityEnter">
     <div class="top_nav flex_r_s_b">
       <div class="back" @click="back"></div>
-      <div class="nav_title">报名名单</div>
+      <div class="nav_title">报名表单</div>
     </div>
     <div class="joinList">
       <ul>

@@ -1,6 +1,31 @@
 <template>
 	<div class="activity_warp">
 	<!-- 	<DownApp v-on:closeDown="closeDown" v-show="isDown"></DownApp> -->
+  <div class="guDialog flex_r_s_c" @click.stop="loginDailongHide" v-show="isLoginDialong">
+    <div class="dialongCnt" @click.stop>
+      <div class="inputBox">
+        <div class="itemList flex_r_f_s">
+          <p>手机号码</p>
+          <input type="number" v-model="phone" placeholder="请输入手机号码" />
+        </div>
+        <div class="itemList flex_r_f_s vcode_box">
+          <p>验证码</p>
+          <input type="number" v-model="vCode" placeholder="请输入验证码" />
+          <div class="v_code" v-if="show">
+            <span @click="getvCode">获取验证码</span>
+          </div>
+          <div class="v_code active_vcode" v-else>
+            <span>{{count}}</span>
+          </div>
+        </div>
+      </div>
+      <div class="btnBox flex_r_s_b">
+        <div class="cancelBtn flex_r_s_c" @click="loginDailongHide">取消</div>
+        <div class="okBtn flex_r_s_c" @click="vCodeLogin">确定</div>
+      </div>
+    </div>
+
+  </div>
     <div class="couponListDialog flex_r_s_c" @click.stop="dailongHide" v-show="isDialong">
       <div class="dialongCnt" @click.stop>
         <div class="dialongCntTop">
@@ -140,6 +165,13 @@
 		data(){
 			let self = this;
 			return {
+        phone: '',
+        show:true,
+        vCode: '',
+        count: '',
+        timer: null,
+        reg: /^1[3456789]\d{9}$/,
+        isLoginDialong:false,
 				evalList:[],
         isDialong:false,
         isCntImg:true,
@@ -191,16 +223,16 @@
 		},
 		mounted() {
 			let self = this;
-      localStorage.removeItem("activeOrderNum");
-			// window.addEventListener('scroll', self.handleScroll)
+      //localStorage.removeItem('user')
+      window.addEventListener('scroll', self.handleScroll)
 			this.getUrlData();
 			if(JSON.parse(localStorage.getItem('user')) == null){
-				// this.$store.commit('setRouterName','activity');
+
 				this.uId = '-1';
 			}else{
 				this.uId = JSON.parse(localStorage.getItem('user')).userId;
 			}
-			// console.log(JSON.parse(localStorage.getItem('user')))
+
 			this.getActivity();
 			this.getEval();
 
@@ -214,10 +246,134 @@
       }
     },
 		methods:{
+      handleScroll () {
+
+      	setTimeout(()=>{
+      		var scrollTop = window.scrollY;
+      		let elHeight = document.querySelector(".top_nav").offsetHeight;
+      		if(scrollTop>elHeight){
+
+      			this.isActiveColor = true;
+      		}else{
+      			this.isActiveColor = false;
+      		}
+
+      	},200)
+
+      },
       guCardLink(){
         this.$router.push({
           name:'gumiCard'
         })
+      },
+      getvCode() {
+        //获取验证码
+
+        if (this.phone == '') {
+
+          alert('请填写手机号码')
+          return false;
+        } else if (!this.reg.test(this.phone)) {
+
+          alert('手机号码格式错误')
+          return false;
+        }
+        if (this.phone) {
+          let _this = this;
+          const TIME_COUNT = 60;
+          if (!this.timer) {
+            this.count = TIME_COUNT;
+            this.show = false;
+            if (!this.forgetState) {
+              this.axios.get(Api.userApi + '/sms_login_code?phone=' + this.phone, {
+                  headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                  }
+                })
+                .then(function(response) {
+
+                })
+                .catch(function(error) {
+                  console.log(error);
+                });
+            } else {
+              this.axios.get('/sms_getpwd?phone=' + this.phone, {
+                  headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                  }
+                })
+                .then(function(response) {
+
+                })
+                .catch(function(error) {
+                  console.log(error);
+                });
+            }
+
+            this.timer = setInterval(() => {
+              if (this.count > 0 && this.count <= TIME_COUNT) {
+                this.count--;
+              } else {
+                this.show = true;
+                clearInterval(this.timer);
+                this.timer = null;
+              }
+            }, 1000)
+          }
+        }
+
+      },
+      loginDailongHide(){
+         this.isLoginDialong = false;
+      },
+      vCodeLogin() {
+        let self = this;
+
+        if (this.phone == '') {
+
+          alert('请填写手机号码')
+          return false;
+        } else if (!this.reg.test(this.phone)) {
+
+          alert('手机号码格式错误')
+          return false;
+        } else if (this.vCode == '') {
+          alert('请填写验证码')
+          return false;
+        } else {
+          this.axios.post(Api.userApi + '/user_sms_login', this.qs.stringify({
+            phone: this.phone,
+            vcode: this.vCode
+          }), {
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded'
+            }
+          }).then(function(res) {
+
+            if (res.data.code === 1) {
+
+              var userEntity = {
+                userName: res.data.user.userName,
+                userId: res.data.user.userId,
+                userPhone: res.data.user.phone,
+                token: res.data.token
+              };
+              self.uId = res.data.user.userId;
+              localStorage.setItem('user', JSON.stringify(userEntity));
+
+              self.isLoginDialong = false;
+            } else {
+              alert(res.data.msg)
+            }
+
+          }).catch(function(err) {
+            console.log(err)
+          })
+        }
+
+      },
+      loginDailongHide(){
+        this.isLoginDialong = false;
       },
       dailongShow() {
         this.isDialong = true;
@@ -226,6 +382,7 @@
         this.isDialong = false;
 
       },
+
       getCardState(){
         let self = this;
         self.axios.post(Api.userApi + '/boneMika/selectUserBoneMikaStatus', self.qs.stringify({//查询骨米卡状态
@@ -391,13 +548,22 @@
 					}
 				}).then((res)=>{
 					if(res.data.code == 1){
+            //console.log(res)
             let option = {
               title: res.data.data.activityTitel, // 分享标题, 请自行替换
               desc:res.data.data.organizerName+'邀你'+res.data.data.startTime.split(' ')[0]+'在'+res.data.data.address+'一起参与'+res.data.data.activityTitel+',快来参加吧~~',
               link: window.location.href, // 分享链接，根据自身项目决定是否需要split
               imgUrl:res.data.data.activityCover, // 分享图标, 请自行替换，需要绝对路径
               success: () => {
-                alert('分享成功')
+                self.axios.post(Api.userApi + '/boneBeanDetail/userShareCommunityActivity', self.qs.stringify({
+                	userId: self.uId
+                }), {
+                	headers: {
+                		'Content-Type': 'application/x-www-form-urlencoded'
+                	}
+                }).then((sus)=>{
+
+                })
               },
               error: () => {
                 alert('已取消分享')
@@ -669,34 +835,15 @@
 			join(){
 				let self = this;
 				if(JSON.parse(localStorage.getItem('user')) == null){
-					let url = window.location.href;
-					this.$store.commit('setLoginUrl',url);
-					this.$createDialog({
-						type: 'confirm',
-						icon: 'cubeic-warn',
-						title: '需要登录后才能参加活动',
-						confirmBtn: {
-						  text: '去登录',
-						  active: true,
-						  disabled: false,
-						  href: 'javascript:;'
-						},
-						cancelBtn: {
-						  text: '取消',
-						  active: false,
-						  disabled: false,
-						  href: 'javascript:;'
-						},
-						onConfirm: () => {
-						  self.$router.push({
-						  	name:'login'
-						  })
-						},
+					this.isLoginDialong = true;
 
-					 }).show()
-
-				}else{
-					this.getCardState();
+				}else if(self.isPrivilege == 1){
+          this.getCardState();
+        }
+        else{
+					self.$router.push({
+						name:'selectCoupon'
+					})
 				}
 
 			},
@@ -720,6 +867,92 @@
 	.activity_warp{
     background: #fff;
     padding-bottom: 200px;
+    .guDialog{
+      position:fixed;
+      height:100%;
+      width:100%;
+      left:0;
+      top:0;
+      z-index:100000;
+      background:rgba(0,0,0,0.6);
+      .dialongCnt{
+        width: 600px;
+        background: #fff;
+        padding-top: 20px;
+
+        .itemList {
+          padding: 30px 20px;
+          box-sizing: border-box;
+
+          input {
+            background: none;
+            outline: none;
+            border-radius: 4px;
+            font-size: 26px;
+            color: #333;
+            text-align: center;
+            height: 50px;
+            line-height: 50px;
+            width: 300px;
+            margin-left: 30px;
+            border: 1px solid #e8e8e8;
+          }
+
+          p {
+            width: 110px;
+            text-align: justify;
+            text-align-last: justify;
+            font-size: 26px;
+          }
+
+        }
+
+        .vcode_box {
+          input {
+            width: 180px;
+          }
+
+          .v_code {
+            margin-left: 30px;
+
+            span {
+              display: inline-block;
+              padding: 8px;
+              border-radius: 6px;
+              background: #ff523d;
+              color: #fff;
+              font-size: 24px;
+            }
+          }
+
+          .active_vcode {
+            span {
+              width: 60px;
+              text-align: center;
+            }
+          }
+        }
+
+        .btnBox {
+          border-top: 1px solid #e8e8e8;
+          /*no*/
+          box-sizing: border-box;
+          margin-top: 20px;
+
+          div {
+            width: 50%;
+            height: 70px;
+            font-size: 30px;
+            box-sizing: border-box;
+          }
+
+          .cancelBtn {
+            border-right: 1px solid #e8e8e8;
+            /*no*/
+          }
+        }
+      }
+    }
     .couponListDialog {
       position: fixed;
       height: 100%;
@@ -884,7 +1117,7 @@
 				}
 
 				.richeng{
-					background: url("../../assets/icon/icon_she55@3x.png") no-repeat 100% center;
+
 					background-size: 28px;
           img{
             width: 30px;

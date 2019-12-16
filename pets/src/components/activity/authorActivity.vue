@@ -24,13 +24,19 @@
 							</div>
 						</div>
 						<div class="cost flex_r_s_b">
-							<div class="price" v-if="item.maxPrice == 0">免费</div>
-							<div class="price" v-if="item.maxPrice>0&&item.maxPrice!=item.minPrice">{{item.minPrice}} ~ {{item.maxPrice}}元</div>
-              <div class="price" v-if="item.maxPrice==item.minPrice&&item.maxPrice>0">{{item.maxPrice}}元</div>
+              <div>
+                <div class="price" v-if="item.maxPrice == 0">免费</div>
+                <div class="price" v-if="item.maxPrice>0&&item.maxPrice!=item.minPrice">{{item.minPrice}} ~ {{item.maxPrice}}元</div>
+                <div class="price" v-if="item.maxPrice==item.minPrice&&item.maxPrice>0">{{item.maxPrice}}元</div>
+              </div>
+							<div class="surplusBox flex_r_s_b">
+                <div class="surplus">仅剩{{item.limitNum-item.joinNum}}名额</div>
+                <router-link class="flex_r_s_c" v-if="item.isConduct===1" :to="{name:'activity',query:{id:item.id}}">立即报名</router-link>
+                <a class="flex_r_s_c grayBg" v-if="(new Date()).getTime()<(new Date(item.startTime)).getTime()&&item.isConduct!=1">未开始</a>
+                <a class="flex_r_s_c grayBg" v-if="(new Date()).getTime()>=(new Date(item.endTime)).getTime()&&item.isConduct!=1">已过期</a>
+              </div>
 							<!-- <a href="###" class="flex_r_s_c">立即报名</a> -->
-							<router-link class="flex_r_s_c" v-if="item.isConduct===1" :to="{name:'activity',query:{id:item.id}}">立即报名</router-link>
-              <a class="flex_r_s_c grayBg" v-if="(new Date()).getTime()<(new Date(item.startTime)).getTime()&&item.isConduct!=1">未开始</a>
-              <a class="flex_r_s_c grayBg" v-if="(new Date()).getTime()>=(new Date(item.endTime)).getTime()&&item.isConduct!=1">已过期</a>
+
 						</div>
 					</div>
 				</div>
@@ -105,11 +111,11 @@
 			}
 		},
 		mounted() {
-      this.getUrlData();
+      this.aId = this.getUrlKey('aId');
       this.getActivityList();
 		},
 		methods: {
-      
+
       showToastType() {
         const toast = this.$createToast({
           txt: 'TA还没有活动',
@@ -117,28 +123,8 @@
         })
         toast.show()
       },
-      getUrlData() { // 截取url中的数据
-      	let tempStr = window.location.href;
-      	/**
-      	 * tempArr 是一个字符串数组 格式是["key=value", "key=value", ...]
-      	 */
-      	let returnArr = {};
-      	let urlArr = tempStr.split('?');
-      	if(urlArr){
-      	  urlArr.forEach((e)=>{
-
-      	      if(e.indexOf('=')>-1){
-
-      	        returnArr[e.split('=')[0]] = e.split('=')[1];
-      	      }
-
-      	  })
-      	}
-      	/*输出日志*/
-      	if(returnArr.aId!=undefined){
-      		//localStorage.setItem('Aid',JSON.stringify(returnArr.aId));
-          this.aId = returnArr.aId;
-      	}
+      getUrlKey(name){
+          return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.href) || [, ""])[1].replace(/\+/g, '%20')) || null
       },
 			getActivityList() {
 				let self = this;
@@ -157,7 +143,7 @@
 
 						setTimeout(() => {
 							self.activityList = res.data.data;
-              //console.log(self.activityList)
+              console.log(self.activityList)
 							self.$refs.scroll.forceUpdate();
               setTimeout(()=>{
                 self.$refs.scroll.refresh();
@@ -172,10 +158,12 @@
 			},
 			onPullingDown() {
 			// 模拟更新数据
+        this.page = 0;
 				this.getActivityList();
 			},
 			onPullingUp() {
 			// 模拟更新数据
+
 				let self = this;
 				this.page++;
 				self.axios.post(Api.userApi + '/ca/selectCommunityActivityListByUserId', self.qs.stringify({
@@ -192,13 +180,13 @@
 					if(res.data.code == 1){
 						if(res.data.data.length>0){
 
-							setTimeout(()=>{
+              setTimeout(() => {
                 self.$refs.scroll.forceUpdate();
-                self.activityList.push(...res.data.data)
-								self.$refs.scroll.refresh();
-
-							},800)
-
+                self.activityList.push(...res.data.data);
+              	setTimeout(() => {
+              		self.$refs.scroll.refresh();
+              	}, 100)
+              }, 500)
 						}else{
 							setTimeout(()=>{
 								self.$refs.scroll.forceUpdate();
@@ -314,6 +302,14 @@
 							text-align: right;
 						}
 					}
+          .surplusBox{
+            width:320px;
+            .surplus{
+              color:#ff523d;
+              font-size:26px;
+            }
+          }
+
 
 					.cost {
 						padding: 10px 0 22px 0;

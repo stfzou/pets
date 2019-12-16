@@ -11,7 +11,7 @@
 			<div class="c_r">
 				<div class="activiName">{{activiName}}</div>
 				<div class="price">{{priceInterval}}</div>
-				<div class="time">{{startTime}}~{{endTime}}</div>
+				<div class="time">时间:{{startTime}}~{{endTime}}</div>
 				<div class="address flex_r_f_s">
 					<img src="../../assets/icon/map@2x.png" alt="">
 					<span>{{address}}</span>
@@ -33,6 +33,7 @@
 									<span>每人限购{{item.limitNum}}张</span>
 								</div>
                 <div class="makeTime">使用时间:{{item.validStartTime.split(' ')[0]}}~{{item.validEndTime.split(' ')[0]}}</div>
+                <div class="buyTime">购票时间:{{item.buyStartTime}}~{{item.buyEndTime}}</div>
 								<div class="special_tx flex_r_f_s" v-if="item.useNum>1">
 									每日使用次数不超过{{item.useNum}}次
 								</div>
@@ -190,10 +191,10 @@
 					}
 				}).then((res)=>{
 					if(res.data.code == 1){
-						//console.log(res)
+						console.log(res)
 						self.activiName = res.data.data.activityTitel;
 						self.priceRange = res.data.data.priceInterval;
-						self.address = res.data.data.activityAddr;
+						self.address = res.data.data.address;
 						self.distance = res.data.data.distance;
 						self.startTime = self.format(res.data.data.startTime);
 						self.endTime = self.format(res.data.data.endTime);
@@ -378,6 +379,7 @@
 				li {
 					padding-bottom: 10px;
 					box-sizing: border-box;
+          border: 1px solid #fff;
 					background: #fff;
 					margin-top: 30px;
 					box-shadow:0px 0px 8px 0px rgba(104,104,104,0.1);
@@ -386,6 +388,11 @@
             font-size:24px;
             color:#666;
             padding:20px 0 10px 0;
+          }
+          .buyTime{
+            font-size:22px;
+            color:#999;
+            padding:10px 0;
           }
 					.dotted{
 						padding: 20px;

@@ -39,6 +39,7 @@ import ShopStore from '@/components/shareCoupon/shopStore'
 import GumiCard from '@/components/gumika/gumiCard'
 import PayRes from '@/components/common/payRes'
 import WxWhitePage from '@/components/common/wxWhitePage'
+import AppShow from '@/components/common/appShow'
 import Agreement from '@/components/common/agreement'
 import PaySus from '@/components/common/paySus'
 import Advertisement from '@/components/common/advertisement'
@@ -57,6 +58,7 @@ import PresentSearch from '@/components/invitation/presentSearch'
 import WbShare from '@/components/wangbu/wbShare'
 import CgShare from '@/components/chuangGuan/cgShare'
 import CgRecord from '@/components/chuangGuan/cgRecord'
+import NearbyActivity from '@/components/activity/nearbyActivity'
 
 
 Vue.use(Router)
@@ -66,13 +68,18 @@ export default new Router({
     routes:[
 		{
 		  path:'',
-		  redirect:'/trend'
+		  redirect:'/appShow'
 		},
 		{
 			path:'/vLogin',
 			name:'vLogin',
 			component:vLogin,
 		},
+    {
+      path:'/nearbyActivity',
+      name:'nearbyActivity',
+      component:NearbyActivity
+    },
     {
       path:'/paySus',
       name:'paySus',
@@ -83,6 +90,11 @@ export default new Router({
       name:'advertisement',
       component:Advertisement
     },
+	{
+		path:'/appShow',
+		name:'appShow',
+		component:AppShow
+	},
     {
     	path:'/cgShare',
     	name:'cgShare',
