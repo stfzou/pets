@@ -17,19 +17,19 @@
           <img src="../../assets/icon_geren02.png" alt="">
           <p>商户管理</p>
         </li>
-        <li  @click="goLink2" v-if="userInfo.root!=true">
+       <!-- <li  @click="goLink2" v-if="userInfo.root!=true">
           <img src="../../assets/icon_geren03.png" alt="">
           <p>工作报表</p>
-        </li>
+        </li> -->
         <li  @click="goLink3" v-if="userInfo.root==true">
           <img src="../../assets/icon_geren04.png" alt="">
           <p>合作网点</p>
         </li>
-        <li  @click="goLink4" v-if="userInfo.root!=true">
+       <!-- <li  @click="goLink4" v-if="userInfo.root!=true">
           <img src="../../assets/icon_geren05.png" alt="">
           <p>营销计划</p>
-        </li>
-        <li  @click="goLink5" v-if="userInfo.root!=true">
+        </li> -->
+        <li  @click="goLink5" v-if="userInfo.root!=true&&userInfo.post<5">
           <img src="../../assets/icon_geren06.png" alt="">
           <p>员工管理</p>
         </li>
@@ -60,6 +60,7 @@
     },
     mounted() {
       this.userInfo = JSON.parse(localStorage.getItem('userInfo'));
+
       //console.log(this.userInfo)
       if(this.userInfo.root!=true && this.userInfo.manager!=true){
         this.departmentOptions.forEach((e)=>{

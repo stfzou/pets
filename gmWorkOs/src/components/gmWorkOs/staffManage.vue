@@ -42,7 +42,7 @@
             <div class="listItem">{{item.province}}-{{item.city}}-{{item.area}}</div>
             <div class="listItem">用户数量:{{item.userNum}}</div>
             <div class="listItem">商户数量:{{item.shopNum}}</div>
-            <div class="listItem">添加日期:2019-11-12</div>
+            <div class="listItem">添加日期:{{item.createdTime}}</div>
           </li>
         </ul>
       </div>

@@ -5,3 +5,4 @@ export default{
 }
 //https://customer.gutouzu.com
 //http://app.gutouzu.com
+//https://h5.gumipet.com

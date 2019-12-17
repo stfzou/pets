@@ -146,7 +146,7 @@
           }
         }).then((res) => {
           if (res.data.code == 1) {
-
+            
             self.name = res.data.data.name;
             self.phone = res.data.data.phone;
             self.province = res.data.data.province;
@@ -176,7 +176,7 @@
         //获取验证码
 
           let _this = this;
-          const TIME_COUNT = 30;
+          const TIME_COUNT = 5;
           if (!this.timer) {
             this.count = TIME_COUNT;
             this.show = false;

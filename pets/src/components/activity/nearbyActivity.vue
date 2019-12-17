@@ -250,11 +250,12 @@
             onSelect: function(selectedVal, selectedIndex, selectedText){
                 if(selectedText=='全部'){
                   self.navindex3 = '';
-                  self.val3 = selectedVal[0];
+                  self.val3 = '';
                   self.time2 = '';
                   self.time1 = '';
                   self.getActivityList();
                 }else if(selectedText=='自定义'){
+                  self.navindex3 = 3;
                   self.isDia = true;
                 }else{
                   self.val3 = selectedVal[0];
@@ -299,6 +300,7 @@
       },
       getActivityList() {
       	let self = this;
+        this.page = 0;
       	self.axios.post(Api.userApi + '/ca/selectCommunityActivityList', self.qs.stringify({
       		param:self.searchVal,
           typeIds:self.val1,
@@ -377,7 +379,7 @@
         })
       },
       onPullingDown(){
-        this.page = 0;
+
         this.getActivityList();
       },
       diaHide(){
@@ -385,6 +387,7 @@
       },
       selectTime(){
         this.isDia = false;
+        this.val3 = '';
         this.getActivityList();
       },
       showDatePicker() {

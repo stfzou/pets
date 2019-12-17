@@ -219,23 +219,25 @@
           }
         }).then((res)=>{
           if(res.data.code==1){
-            this.name = res.data.data.name;
-            this.phone = res.data.data.phone;
-            this.newPhone = res.data.data.phone;
-            this.password = res.data.data.password;
-            this.newPwd = res.data.data.password;
-            this.cityData[0] = res.data.data.province;
-            this.cityData[1] = res.data.data.city;
-            this.cityData[2] = res.data.data.area;
-            this.address = res.data.data.address;
-            this.imgOne = {url:res.data.data.idCardFront};
-            this.imgTwo = {url:res.data.data.idCardBack};
-            this.oldImg1 = res.data.data.idCardFront;
-            this.oldImg2 = res.data.data.idCardBack;
-            this.departmentVal = res.data.data.department;
-            this.postVal = res.data.data.post;
-            this.staffVal = res.data.data.status;
-            this.remark = res.data.data.remark;
+            self.name = res.data.data.name;
+            self.phone = res.data.data.phone;
+            self.newPhone = res.data.data.phone;
+            self.password = res.data.data.password;
+            self.newPwd = res.data.data.password;
+            self.cityData[0] = res.data.data.province;
+            self.cityData[1] = res.data.data.city;
+            self.cityData[2] = res.data.data.area;
+            self.address = res.data.data.address;
+            self.imgOne = {url:res.data.data.idCardFront};
+            self.imgTwo = {url:res.data.data.idCardBack};
+            self.oldImg1 = res.data.data.idCardFront;
+            self.oldImg2 = res.data.data.idCardBack;
+            self.departmentVal = res.data.data.department;
+            self.postVal = res.data.data.post;
+            self.staffVal = res.data.data.status;
+            self.remark = res.data.data.remark;
+            self.employeeId = res.data.data.employeeId;
+            console.log(res)
           }else{
             alert(res.data.msg)
           }
@@ -290,7 +292,7 @@
             formData.append('idCardBack',self.imgTwo.imgData,self.imgTwo.name)
           }
           formData.append('userId',self.addUserId);
-          formData.append('networkId',self.networkId);
+          // formData.append('networkId',self.networkId);
           formData.append('name',self.name);
           formData.append('phone',self.phone);
           formData.append('password',self.password);
@@ -306,7 +308,7 @@
           formData.append('oldIdCardBackFileName',self.oldImg2);
           formData.append('newPhone',self.newPhone);
           formData.append('newPassword',self.newPwd);
-          formData.append('employeeId','15753372524023515');
+          formData.append('employeeId',self.employeeId);
 
           self.axios.post(Api.userApi + '/employee/system/updateEmployee',formData, {
             headers: {

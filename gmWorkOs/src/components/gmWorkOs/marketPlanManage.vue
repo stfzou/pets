@@ -63,7 +63,7 @@
         <div class="btn flex_r_s_c">查询</div>
       </div>
     </div>
-    <div class="businessManageCnt">
+    <div class="marketPlanCnt">
       <cube-scroll ref="scroll">
         <ul class="businessManageList">
           <li class="listItem" v-for="item in [1,2,3,4,5]">
@@ -383,7 +383,7 @@
        }
      }
   }
-    .businessManageCnt{
+    .marketPlanCnt{
       // padding:0 22px;
       position:absolute;
       top:400px;

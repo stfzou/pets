@@ -40,6 +40,7 @@ import GumiCard from '@/components/gumika/gumiCard'
 import PayRes from '@/components/common/payRes'
 import WxWhitePage from '@/components/common/wxWhitePage'
 import AppShow from '@/components/common/appShow'
+import ShopShow from '@/components/common/shopShow'
 import Agreement from '@/components/common/agreement'
 import PaySus from '@/components/common/paySus'
 import Advertisement from '@/components/common/advertisement'
@@ -59,7 +60,10 @@ import WbShare from '@/components/wangbu/wbShare'
 import CgShare from '@/components/chuangGuan/cgShare'
 import CgRecord from '@/components/chuangGuan/cgRecord'
 import NearbyActivity from '@/components/activity/nearbyActivity'
-
+import NearbyCoupon from '@/components/shareCoupon/nearbyCoupon'
+import HelpHome from '@/components/help/helpHome'
+import HelpList from '@/components/help/helpList'
+import HelpCnt from '@/components/help/helpCnt'
 
 Vue.use(Router)
 export default new Router({
@@ -81,6 +85,26 @@ export default new Router({
       component:NearbyActivity
     },
     {
+      path:'/nearbyCoupon',
+      name:'nearbyCoupon',
+      component:NearbyCoupon
+    },
+    {
+      path:'/helpHome',
+      name:'helpHome',
+      component:HelpHome
+    },
+    {
+      path:'/helpList',
+      name:'helpList',
+      component:HelpList
+    },
+    {
+      path:'/helpCnt',
+      name:'helpCnt',
+      component:HelpCnt
+    },
+    {
       path:'/paySus',
       name:'paySus',
       component:PaySus,
@@ -95,6 +119,11 @@ export default new Router({
 		name:'appShow',
 		component:AppShow
 	},
+  {
+  	path:'/shopShow',
+  	name:'shopShow',
+  	component:ShopShow
+  },
     {
     	path:'/cgShare',
     	name:'cgShare',

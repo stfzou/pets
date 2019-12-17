@@ -20,12 +20,13 @@ import MarketPlanManage from '@/components/gmWorkOs/marketPlanManage'
 import WorkBill from '@/components/gmWorkOs/workBill'
 import GmWorkHome from '@/components/gmWorkOs/gmWorkHome'
 import EditBranch from '@/components/gmWorkOs/editBranch'
+import ChangePw from '@/components/gmWorkOs/changePw'
 
 
 import WorkOsInfoList from '@/components/gmWorkOs/workOsInfoList'
 import WorkOsMap from '@/components/gmWorkOs/workOsMap'
 import WorkOsPcMap from '@/components/gmWorkOs/workOsPcMap'
-import WorkOsChangePw from '@/components/gmWorkOs/workOsChangePw'
+
 import StaffInfo from '@/components/gmWorkOs/staffInfo'
 import EditStaff from '@/components/gmWorkOs/editStaff'
 import ShopNameVisit from '@/components/gmWorkOs/shopNameVisit'
@@ -142,7 +143,11 @@ export default new Router({
       name:'editBranch',
       component:EditBranch
     },
-
+    {
+    	path:'/changePw',
+    	name:'changePw',
+    	component:ChangePw,
+    },
 
 
 
@@ -152,11 +157,7 @@ export default new Router({
 			name:'staffInfo',
 			component:StaffInfo,
 		},
-		{
-			path:'/workOsChangePw',
-			name:'workOsChangePw',
-			component:WorkOsChangePw,
-		},
+		
 
     {
       path:'/shopNameVisit',

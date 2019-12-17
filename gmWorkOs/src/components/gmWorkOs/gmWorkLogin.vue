@@ -36,7 +36,7 @@
 			}
 		},
     mounted() {
-
+       // localStorage.removeItem('userInfo')
     },
 		methods: {
 			back() {
@@ -90,17 +90,17 @@
 							'Content-Type': 'application/x-www-form-urlencoded'
 						}
 					}).then(function(res) {
-						//console.log(res)
+						console.log(typeof res.data.data.token)
 						if (res.data.code === 1) {
 							let userInfo = {
 								manager:res.data.data.manager,
 								root:res.data.data.root,
 								name:res.data.data.name,
 								token:res.data.data.token,
-								department:res.data.data.department,//部门
+								department:res.data.data.department,//岗位
                 employeeId:res.data.data.employeeId,//员工Id
-                network:res.data.data.networkId ,//网点ID
-                post:res.data.data.post
+                network:res.data.data.networkId,//网点ID
+                post:res.data.data.post//部门
 							}
 // 							self.$store.commit('setStaffNum',res.data.data.staffNum);
 // 							self.$store.commit('setCustomerNum',res.data.data.clientNum);

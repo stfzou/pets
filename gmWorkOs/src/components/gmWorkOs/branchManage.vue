@@ -38,7 +38,7 @@
             <div class="listItem">{{item.province}}-{{item.city}}-{{item.area}}</div>
             <div class="listItem">用户数量:{{item.userNum}}</div>
             <div class="listItem">商户数量:{{item.shopNum}}</div>
-            <div class="listItem flex_r_s_b"><span>添加日期:2019-11-12</span><span style="color: #ff523d;" @click="editLink(item)">编辑</span></div>
+            <div class="listItem flex_r_s_b"><span>添加日期:{{item.createdTime}}</span><span style="color: #ff523d;" @click="editLink(item)">编辑</span></div>
           </li>
         </ul>
       </div>
