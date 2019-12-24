@@ -21,12 +21,16 @@ import WorkBill from '@/components/gmWorkOs/workBill'
 import GmWorkHome from '@/components/gmWorkOs/gmWorkHome'
 import EditBranch from '@/components/gmWorkOs/editBranch'
 import ChangePw from '@/components/gmWorkOs/changePw'
+import CommissionSet from '@/components/gmWorkOs/commissionSet'
+import AddCoopShop from '@/components/gmWorkOs/addCoopShop'
+import AddMoneyDeclare from '@/components/gmWorkOs/addMoneyDeclare'
+import MoneyDeclareManage from '@/components/gmWorkOs/moneyDeclareManage'
+import CoopShopManage from '@/components/gmWorkOs/coopShopManage'
 
 
 import WorkOsInfoList from '@/components/gmWorkOs/workOsInfoList'
 import WorkOsMap from '@/components/gmWorkOs/workOsMap'
 import WorkOsPcMap from '@/components/gmWorkOs/workOsPcMap'
-
 import StaffInfo from '@/components/gmWorkOs/staffInfo'
 import EditStaff from '@/components/gmWorkOs/editStaff'
 import ShopNameVisit from '@/components/gmWorkOs/shopNameVisit'
@@ -47,6 +51,31 @@ export default new Router({
 			name:'gmWorkLogin',
 			component:GmWorkLogin,
 		},
+    {
+      path:'/addCoopShop',
+      name:'addCoopShop',
+      component:AddCoopShop
+    },
+    {
+      path:'/coopShopManage',
+      name:'coopShopManage',
+      component:CoopShopManage
+    },
+    {
+      path:'/addMoneyDeclare',
+      name:'addMoneyDeclare',
+      component:AddMoneyDeclare
+    },
+    {
+      path:'/moneyDeclareManage',
+      name:'moneyDeclareManage',
+      component:MoneyDeclareManage
+    },
+    {
+      path:'/commissionSet',
+      name:'commissionSet',
+      component:CommissionSet
+    },
     {
     	path:'/addBranch',
     	name:'addBranch',
@@ -152,12 +181,15 @@ export default new Router({
 
 
 
+
+
+
 		{
 			path:'/staffInfo',
 			name:'staffInfo',
 			component:StaffInfo,
 		},
-		
+
 
     {
       path:'/shopNameVisit',

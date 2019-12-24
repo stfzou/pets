@@ -59,6 +59,7 @@
 			}
 		},
 		mounted() {
+      
 			this.getStaffList();
 		},
 		methods: {

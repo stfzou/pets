@@ -1,0 +1,21 @@
+<template>
+  <div class="bargainGoods">
+     123
+  </div>
+</template>
+
+<script>
+  export default{
+    data(){
+      return{
+
+      }
+    }
+  }
+</script>
+
+<style lang="scss">
+  .bargainGoods{
+
+  }
+</style>

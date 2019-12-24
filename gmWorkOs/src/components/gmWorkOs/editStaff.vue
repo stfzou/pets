@@ -94,7 +94,7 @@
         <li class="flex_r_f_s">
         	<div class="list_l"><b>*</b>初始密码:</div>
         	<div class="list_r">
-        		<input type="password" v-model="password" />
+        		<input type="password" v-model="newPwd" />
         	</div>
         </li>
         <li class="flex_r_f_s">
@@ -296,9 +296,9 @@
           formData.append('name',self.name);
           formData.append('phone',self.phone);
           formData.append('password',self.password);
-          formData.append('province',self.cityData[0])
-          formData.append('city',self.cityData[1])
-          formData.append('area',self.cityData[2])
+          formData.append('province',self.cityData[0]);
+          formData.append('city',self.cityData[1]);
+          formData.append('area',self.cityData[2]);
           formData.append('address',self.address);
           formData.append('department',self.departmentVal);
           formData.append('post',self.postVal);

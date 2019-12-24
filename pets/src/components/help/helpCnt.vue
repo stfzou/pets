@@ -2,7 +2,7 @@
   <div class="helpCntWarp">
     <div class="top_nav flex_r_s_b">
     	<div class="back" @click="back"></div>
-    	<div class="nav_title">随机</div>
+    	<div class="nav_title">{{title}}</div>
     </div>
     <div class="cnt" v-html="value"></div>
   </div>
@@ -13,10 +13,14 @@
   export default{
     data(){
       return{
-        value:''
+        value:'',
+        title:'',
+        sysHelpId:''
       }
     },
     mounted() {
+      this.title = this.$route.query.title;
+      this.sysHelpId = this.$route.query.sysHelpId;
       this.getCnt();
     },
     methods:{
@@ -27,7 +31,7 @@
         let self = this;
         self.axios.get(Api.userApi + '/systemHelp/selectSystemHelpDetails', {
           params: {
-            sysHelpId:'15744112169002484'
+            sysHelpId:self.sysHelpId
           }
         }, {
           headers: {
@@ -36,7 +40,7 @@
         }).then((res)=>{
           if(res.data.code==1){
             //console.log(res)
-            this.value = res.data.data;
+            self.value = res.data.data;
 
           }else{
             alert(res.data.msg)
@@ -50,6 +54,7 @@
 <style lang="scss">
   .helpCntWarp{
     padding-top:88px;
+
     .top_nav {
     	padding: 0 20px;
       position: fixed;
@@ -70,6 +75,8 @@
     	.nav_title {
     		font-size: 30px;
     		color: #333;
+        width:80%;
+        text-align: center;
     		position: absolute;
     		left: 50%;
     		top: 50%;
@@ -80,6 +87,7 @@
     }
     .cnt{
       padding:20px;
+      overflow:hidden;
     }
   }
 </style>

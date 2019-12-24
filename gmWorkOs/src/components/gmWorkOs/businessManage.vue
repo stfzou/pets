@@ -328,7 +328,7 @@
           }
         }).then((res) => {
           if (res.data.code == 1) {
-            //console.log(res)
+            console.log(res)
             if(res.data.data.length<1){
               alert('暂无数据')
               self.$refs.scroll.forceUpdate();

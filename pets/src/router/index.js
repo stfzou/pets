@@ -64,6 +64,7 @@ import NearbyCoupon from '@/components/shareCoupon/nearbyCoupon'
 import HelpHome from '@/components/help/helpHome'
 import HelpList from '@/components/help/helpList'
 import HelpCnt from '@/components/help/helpCnt'
+import BargainGoods from '@/components/bargain/bargainGoods'
 
 Vue.use(Router)
 export default new Router({
@@ -71,7 +72,7 @@ export default new Router({
 	mode:'hash',
     routes:[
 		{
-		  path:'',
+		  path:'', 
 		  redirect:'/appShow'
 		},
 		{
@@ -83,6 +84,11 @@ export default new Router({
       path:'/nearbyActivity',
       name:'nearbyActivity',
       component:NearbyActivity
+    },
+    {
+      path:'/bargainGoods',
+      name:'bargainGoods',
+      component:BargainGoods
     },
     {
       path:'/nearbyCoupon',

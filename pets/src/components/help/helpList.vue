@@ -2,12 +2,12 @@
   <div class="helpList">
     <div class="top_nav flex_r_s_b">
     	<div class="back" @click="back"></div>
-    	<div class="nav_title">随机</div>
+    	<div class="nav_title">{{title}}</div>
     </div>
     <div class="helpListCnt">
       <ul>
-        <li class="flex_r_s_b" v-for="item in [1,2,3,4,5,6,7,8,9]">
-          <span>少时诵诗书所所</span>
+        <li class="flex_r_s_b" v-for="item in listData" @click="goCntLink(item)">
+          <span>{{item.title}}</span>
           <img src="../../assets/icon/right_sjx.png" alt="">
         </li>
       </ul>
@@ -16,29 +16,70 @@
 </template>
 
 <script>
+  import Api from '../common/apj.js'
   export default{
     data(){
       return{
-
+        title:'',
+        typeId:'',
+        listData:[]
       }
+    },
+    mounted() {
+      this.title = this.$route.query.title;
+      this.typeId = this.$route.query.typeId;
+      this.getList();
     },
     methods:{
       back() {
       	this.$router.go(-1); //返回上一层
       },
+      getList(){
+        let self = this;
+        self.axios.get(Api.userApi + '/systemHelp/selectSystemHelpByType', {
+          params: {
+            type:self.typeId
+          }
+        }, {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        }).then((res)=>{
+          if(res.data.code==1){
+            //console.log(res)
+            self.listData = res.data.data;
+
+          }else{
+            alert(res.data.msg)
+          }
+        })
+      },
+      goCntLink(item){
+        this.$router.push({
+          name:'helpCnt',
+          query:{
+            sysHelpId:item.sysHelpId,
+            title:item.title
+          }
+        })
+      }
     }
   }
 </script>
 
 <style lang="scss">
   .helpList{
+    padding-top:88px;
     .top_nav {
     	padding: 0 20px;
+    	position: fixed;
+    	left:0;
+    	top:0;
     	height: 88px;
     	box-sizing: border-box;
     	z-index: 100;
-      border-bottom:1px solid #ff523d;/*no*/
-      // background: #fdb366;
+    	background:#fff;
+    	border-bottom:1px solid #ff523d;/*no*/
     	.back {
     		width: 26px;
     		height: 42px;

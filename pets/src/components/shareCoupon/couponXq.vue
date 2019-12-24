@@ -152,14 +152,14 @@
           </div>
           <div class="welfareBox">
             <div class="welfareCnt flex_r_s_b">
-              <a :href="'http://app.gutouzu.com/index.html#/shopCoupon?shopId='+shopId">该商家更多福利</a>
+              <a :href="'https://h5.gumipet.com/index.html#/shopCoupon?shopId='+shopId">该商家更多福利</a>
               <img :src="otherImg" alt="">
             </div>
           </div>
           <div class="makeDesc">
             <div class="title">使用说明</div>
             <p v-html="couponDesc">
-             
+
             </p>
           </div>
 
@@ -503,7 +503,7 @@
               name:'payRes',
               query:{
                 out_trade_no:res.data.data.out_trade_no,
-                backUrl:'http://app.gutouzu.com/index.html#/couponXq?couponId='+self.couponId,
+                backUrl:'https://h5.gumipet.com/index.html#/couponXq?couponId='+self.couponId,
                 orderApi:'/couponOrder/selectCouponOrderStatus'
               }
             })
@@ -540,7 +540,7 @@
               if (res.err_msg === 'get_brand_wcpay_request:ok') {
                //self.$router.push({name:'paySus',query:{oderNum:res.data.data.out_trade_no,type:'c'}});
                 alert('支付成功');
-                window.location.href = 'http://app.gutouzu.com/index.html#/paySus?type=c&oderNum='+re.data.data.out_trade_no;
+                window.location.href = 'https://h5.gumipet.com/index.html#/paySus?type=c&oderNum='+re.data.data.out_trade_no;
 
 //                 setTimeout(() => {
 //
@@ -550,7 +550,7 @@
                 alert('取消支付！');
                 setTimeout(() => {
 
-                  window.location.href = 'http://app.gutouzu.com/index.html#/couponXq?couponId='+self.couponId+'&sj='+10000*Math.random();
+                  window.location.href = 'https://h5.gumipet.com/index.html#/couponXq?couponId='+self.couponId+'&sj='+10000*Math.random();
                 }, 500)
               } else if (res.err_msg === 'get_brand_wcpay_request:fail') {
                 alert(JSON.stringify(res))
@@ -588,7 +588,7 @@
                 name:'payRes',
                 query:{
                   out_trade_no:res.data.data.out_trade_no,
-                  backUrl:'http://app.gutouzu.com/index.html#/couponXq?couponId='+self.couponId,
+                  backUrl:'https://h5.gumipet.com/index.html#/couponXq?couponId='+self.couponId,
                   orderApi:'/couponOrder/selectCouponOrderStatus'
                 }
               })
@@ -718,7 +718,7 @@
                 		'Content-Type': 'application/x-www-form-urlencoded'
                 	}
                 }).then((sus)=>{
-                  
+
                 })
               },
               error: () => {

@@ -28,7 +28,7 @@
                   <div class="cj-name">骨豆抽奖</div>
                   <div class="cj-js">最高得价值99元礼品</div>
                 </div>
-                <a href="http://app.gutouzu.com/zhuanpan/index.html">
+                <a href="https://h5.gumipet.com/zhuanpan/index.html">
                   <img src="../../assets/icon_zhuanpan.png" alt="">
                 </a>
 
@@ -38,7 +38,7 @@
                   <div class="cj-name">欢乐砸金蛋</div>
                   <div class="cj-js">最高得200粒骨豆</div>
                 </div>
-                <a href="http://app.gutouzu.com/zadan/index.html">
+                <a href="https://h5.gumipet.com/zadan/index.html">
                   <img src="../../assets/jindan.png" alt="">
                 </a>
 

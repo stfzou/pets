@@ -17,15 +17,18 @@
     <div class="cntWarp">
       <div class="goodsInfoBox">
         <div class="gudouPrice flex_r_f_s">
-          <span class="new">骨豆价<b>￥{{boneBeanPrice|moneyFilter}}</b></span>
+          <span class="new">￥<b>{{boneBeanPrice|moneyFilter}}</b></span>
           <span class="old">原价<span>￥{{price|moneyFilter}}</span></span>
         </div>
-        <div class="gudouDeductionBox flex_r_f_s">
-          <div class="gudouDeduction flex_r_s_c">
-            骨豆直抵￥<span v-if="deduction>=boneBeanPrice">{{boneBeanPrice|moneyFilter}}</span><span v-else>{{deduction|moneyFilter}}</span>
+        <div class="gudouDeductionBox flex_r_s_b">
+          <div class="flex_r_f_s leftBox">
+            <div class="gudouDeduction flex_r_s_c">
+              骨豆直抵￥<span v-if="deduction>=boneBeanPrice">{{boneBeanPrice|moneyFilter}}</span><span v-else>{{deduction|moneyFilter}}</span>
+            </div>
+            <div class="tip">100粒骨豆可以抵扣1.00元</div>
           </div>
-          <div class="tip">100粒骨豆可以抵扣1.00元</div>
 
+          <div class="getBon" @click="showBtn('请下载骨米宠物APP赚取骨豆')">去赚骨豆</div>
         </div>
         <div class="goodsName">{{goodsName}}</div>
         <div class="duihuanBox flex_r_f_s">
@@ -34,13 +37,13 @@
         </div>
 
 
-         <div class="getBon" @click="isAnOrIos">去赚骨豆</div>
+
       </div>
       <div class="line"></div>
       <div class="goodsXqImg" v-html="descImg">
         <!-- <img src="../../assets/active_bg.png" alt=""> -->
       </div>
-      <div class="duihuanBtn flex_r_s_c" @click="showBtn">立即兑换</div>
+      <div class="duihuanBtn flex_r_s_c" @click="showBtn('请下载骨米宠物APP开始兑换')">立即兑换</div>
     </div>
   </div>
 </template>
@@ -80,28 +83,28 @@
     filters:{
       moneyFilter(value,num){
          
-      
+
         // num = num > 0 && num <= 20 ? num : 2;
         num = 1;
         value = parseFloat((value + "").replace(/[^\d\.-]/g, "")).toFixed(num) + ""; //将金额转成比如 123.45的字符串
-      
+
         var valueArr = value.split(".")[0].split("") //将字符串的数变成数组
-      
+
         const valueFloat = value.split(".")[1]; // 取到 小数点后的值
-      
+
         let valueString = "";
-      
+
         for (let i = 0; i < valueArr.length; i++) {
-      
+
         valueString += valueArr[i] + ((i + 1) % 3 == 0 && (i + 1) != valueArr.length ? "," : ""); //循环 取数值并在每三位加个','
-      
+
         }
-      
+
         const money = valueString.split("").join("") + "." + valueFloat; //拼接上小数位
-      
+
         return money
-      
-      
+
+
       }
     },
     methods:{
@@ -167,12 +170,12 @@
           this.environment = '1';
         }
       },
-      showBtn() {
+      showBtn(cnt) {
             let self = this;
             this.$createDialog({
               type: 'confirm',
               title: '提示',
-              content: '请下载骨米宠物APP开始兑换',
+              content:cnt,
               confirmBtn: {
                 text: '去下载',
                 active: true,
@@ -228,6 +231,7 @@
   .exChangeXq{
     padding-bottom:60px;
     padding-top:88px;
+	background:#fff;
     .line{
 
       height:10px;
@@ -291,18 +295,14 @@
         padding: 10px 20px 0 20px;
         position: relative;
         .getBon{
-          position:absolute;
-          right:20px;
-          top:50%;
-          transform: translateY(50%);
+          // margin-left:30px;
           color:#ff523d;
         }
         .goodsName{
           font-size:26px;
-          width:500px;
           font-weight:bold;
           color:rgba(0,0,0,1);
-          line-height:48px;
+          line-height:40px;
           padding-top:20px;
         }
         .duihuanBox{
@@ -324,6 +324,9 @@
         }
         .gudouDeductionBox{
           padding-top:20px;
+          .leftBox{
+            width:500px;
+          }
           .tip{
             color:#666;
             margin-left:30px;

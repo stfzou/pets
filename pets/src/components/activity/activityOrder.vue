@@ -287,7 +287,7 @@
 							if (res.err_msg === 'get_brand_wcpay_request:ok') {
                 //self.$router.push({name:'paySus',query:{oderNum:res.data.data.out_trade_no,type:'a'}});
 								alert('支付成功!');
-                window.location.href = 'http://app.gutouzu.com/index.html#/paySus?type=a&oderNum='+re.data.data.out_trade_no;
+                window.location.href = 'https://h5.gumipet.com/index.html#/paySus?type=a&oderNum='+re.data.data.out_trade_no;
                 //window.location.href = 'https://www.baidu.com'
                 // setTimeout(()=>{
                 // 	window.location.href = 'http://app.gutouzu.com/index.html#/paySus?type=a&oderNum='+res.data.data.out_trade_no;
@@ -296,7 +296,7 @@
 							} else if (res.err_msg === 'get_brand_wcpay_request:cancel') {
 								alert('取消支付！');
                 setTimeout(()=>{
-                	window.location.href = 'http://app.gutouzu.com/index.html#/activityOrder?sj='+10000*Math.random();
+                	window.location.href = 'https://h5.gumipet.com/index.html#/activityOrder?sj='+10000*Math.random();
                 },500)
 							}else if(res.err_msg === 'get_brand_wcpay_request:fail'){
 								alert(JSON.stringify(res))
@@ -358,7 +358,7 @@
                 name:'payRes',
                 query:{
                   out_trade_no:res.data.data.out_trade_no,
-                  backUrl:'http://app.gutouzu.com/index.html#/activity?id='+JSON.parse(localStorage.getItem('id')),
+                  backUrl:'https://h5.gumipet.com/index.html#/activity?id='+JSON.parse(localStorage.getItem('id')),
                   orderApi:'/ca/selectCommunityActivityOrderStatus'
                 }
               })

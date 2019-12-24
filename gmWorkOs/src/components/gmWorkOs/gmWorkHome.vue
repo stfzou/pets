@@ -41,6 +41,10 @@
           <img src="../../assets/icon_geren08.png" alt="">
           <p>我的档案</p>
         </li>
+        <li  v-if="userInfo.manager" @click="goLink8">
+          <img src="../../assets/icon_geren08.png" alt="">
+          <p>佣金设置</p>
+        </li>
       </ul>
       <div class="cancellation flex_r_s_c" @click="cancellation">注销</div>
     </div>
@@ -113,6 +117,11 @@
           name:'myArchives'
         })
       },
+      goLink8(){
+        this.$router.push({
+          name:'commissionSet'
+        })
+      },
       cancellation(){
         localStorage.removeItem('userInfo');
         this.$router.push({
@@ -166,8 +175,8 @@
         padding:0 40px;
         box-sizing:border-box;
         li{
-          width:104px;
-          margin-right:72px;
+          width:110px;
+          margin-right:64px;
           padding-top:30px;
           img{
             width:56px;

@@ -627,7 +627,7 @@
               name:'payRes',
               query:{
                 out_trade_no:res.data.data.out_trade_no,
-                backUrl:'http://app.gutouzu.com/index.html#/couponList',
+                backUrl:'https://h5.gumipet.com/index.html#/couponList',
                 orderApi:'/couponOrder/selectCouponOrderStatus'
               }
             })

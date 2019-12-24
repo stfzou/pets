@@ -6,7 +6,7 @@
         <img src="../../assets/wbLogo.png" alt="">
         <div class="mid">
           <h3>骨米旺步</h3>
-          <p>一款遛宠就能赚钱的健身软件</p>
+          <p>一款遛狗就能得奖励的健身软件</p>
         </div>
       </div>
       <div class="download flex_r_s_c" @click="isAnOrIos">下载</div>

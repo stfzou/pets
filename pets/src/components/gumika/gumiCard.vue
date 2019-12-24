@@ -453,7 +453,7 @@
               name:'payRes',
               query:{
                 out_trade_no:res.data.data.out_trade_no,
-                backUrl:'http://app.gutouzu.com/index.html#/gumiCard',
+                backUrl:'https://h5.gumipet.com/index.html#/gumiCard',
                 orderApi:'/boneMika/selectBoneMikaOrderStatus'
               }
             })
@@ -492,12 +492,12 @@
               if (res.err_msg === 'get_brand_wcpay_request:ok') {
                 //alert('支付成功，返回活动详情页！');
                 //self.$router.push({name:'paySus',query:{type:'gmCard',userId:self.userId}});
-                 window.location.href = 'http://app.gutouzu.com/index.html#/paySus?type=gmCard&userId='+self.userId;
+                 window.location.href = 'https://h5.gumipet.com/index.html#/paySus?type=gmCard&userId='+self.userId;
 
               } else if (res.err_msg === 'get_brand_wcpay_request:cancel') {
                 alert('取消支付！');
                 setTimeout(() => {
-                  window.location.href = 'http://app.gutouzu.com/index.html#/gumiCard?sj='+10000*Math.random();
+                  window.location.href = 'https://h5.gumipet.com/index.html#/gumiCard?sj='+10000*Math.random();
                 }, 500)
               } else if (res.err_msg === 'get_brand_wcpay_request:fail') {
                 alert(JSON.stringify(res))
@@ -536,7 +536,7 @@
                 name:'payRes',
                 query:{
                   out_trade_no:res.data.data.out_trade_no,
-                  backUrl:'http://app.gutouzu.com/index.html#/gumiCard',
+                  backUrl:'https://h5.gumipet.com/index.html#/gumiCard',
                   orderApi:'/boneMika/selectBoneMikaOrderStatus'
                 }
               })

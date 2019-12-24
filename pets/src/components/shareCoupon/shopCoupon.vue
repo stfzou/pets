@@ -647,14 +647,14 @@
                 //self.$router.push({name:'paySus',query:{oderNum:res.data.data.out_trade_no,type:'c'}});
 
                 alert('支付成功');
-                window.location.href = 'http://app.gutouzu.com/index.html#/paySus?type=c&oderNum='+re.data.data.out_trade_no;
+                window.location.href = 'https://h5.gumipet.com/index.html#/paySus?type=c&oderNum='+re.data.data.out_trade_no;
 
 
 
               } else if (res.err_msg === 'get_brand_wcpay_request:cancel') {
                 alert('取消支付！');
                 setTimeout(() => {
-                  window.location.href = 'http://app.gutouzu.com/index.html#/shopCoupon?shopId='+self.shopId+'&sj='+10000*Math.random();
+                  window.location.href = 'https://h5.gumipet.com/index.html#/shopCoupon?shopId='+self.shopId+'&sj='+10000*Math.random();
                 }, 500)
 
               } else if (res.err_msg === 'get_brand_wcpay_request:fail') {
@@ -693,7 +693,7 @@
                 name:'payRes',
                 query:{
                   out_trade_no:res.data.data.out_trade_no,
-                  backUrl:'http://app.gutouzu.com/index.html#/shopCoupon?shopId='+self.shopId,
+                  backUrl:'https://h5.gumipet.com/index.html#/shopCoupon?shopId='+self.shopId,
                   orderApi:'/couponOrder/selectCouponOrderStatus'
                 }
               })
