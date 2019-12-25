@@ -8,72 +8,65 @@
 		<div class="addCustomer_list">
       <div class="searchGmNum flex_r_f_s">
         <span>骨米号查询:</span>
-        <input v-model="gmNum"  type="number" name="" id="">
-        <div class="searchBtn flex_r_s_c">查询</div>
+        <input v-model="gmSearchNum"  type="number" name="" id="">
+        <div class="searchBtn flex_r_s_c" @click="search">查询</div>
       </div>
 			<ul>
 				<li class="flex_r_f_s">
 					<div class="list_l"><b>*</b>骨米号:</div>
 					<div class="list_r">
-						<input type="text" readonly="readonly" v-model="name" />
+						<input type="number" style="background:#E9E9E9;" readonly="readonly" v-model="gmNum" />
 					</div>
 				</li>
         <li class="flex_r_f_s">
         	<div class="list_l"><b>*</b>用户昵称:</div>
         	<div class="list_r">
-        		<input type="text" readonly="readonly" v-model="phone" />
+        		<input type="text" style="background:#E9E9E9;" readonly="readonly"  v-model="userName" />
         	</div>
         </li>
         <li class="flex_r_f_s">
         	<div class="list_l"><b>*</b>店铺名称:</div>
         	<div class="list_r">
-        		<input type="password" v-model="password" />
+        		<input type="text" style="background:#E9E9E9;" readonly="readonly" v-model="shopName" />
         	</div>
         </li>
         <li class="flex_r_f_s">
         	<div class="list_l"><b>*</b>类型:</div>
         	<div class="list_r staffStatus">
-        		<cube-select
-        		  v-model="departmentVal"
-        		  :options="departmentOptions"
-              :disabled="isDepartment">
-        		</cube-select>
+        		<input type="text" style="background:#E9E9E9;" readonly="readonly" v-model="typeName" />
         	</div>
         </li>
         <li class="flex_r_f_s">
         	<div class="list_l"><b>*</b>性质:</div>
         	<div class="list_r staffStatus">
-        		<cube-select
-        		  v-model="postVal"
-        		  :options="postOptions">
-        		</cube-select>
+        		<input type="text" style="background:#E9E9E9;" readonly="readonly" v-model="natureName" />
         	</div>
         </li>
 
         <li class="flex_r_f_s">
         	<div class="list_l"><b>*</b>电话:</div>
         	<div class="list_r">
-        		<input type="password" v-model="password" />
+        		<input type="number" style="background:#E9E9E9;" readonly="readonly" v-model.number="phone" />
         	</div>
         </li>
         <li class="flex_r_f_s">
         	<div class="list_l"><b>*</b>负责人:</div>
         	<div class="list_r">
-        		<input type="password" v-model="password" />
+        		<input type="text" style="background:#E9E9E9;" readonly="readonly" v-model="fzr" />
         	</div>
         </li>
 				<li class="flex_r_f_s">
 					<div class="list_l"><b>*</b>地址:</div>
 					<div class="list_r">
-						<input type="text" v-model="address" />
+						<input type="text" style="background:#E9E9E9;" readonly="readonly" v-model="addr" />
 					</div>
 				</li>
         <li class="flex_r_f_s">
         	<div class="list_l"><b>*</b>费用类型:</div>
         	<div class="list_r staffStatus">
         		<cube-select
-        		  v-model="postVal"
-        		  :options="postOptions">
+        		  v-model="moneyVal"
+        		  :options="moneyType">
         		</cube-select>
         	</div>
         </li>
@@ -109,11 +102,11 @@
         			</div>
               <div class="uploadBox">
 
-              	<cube-upload v-if="imgTwo==''" :max="1" ref="uploadTwo":action="action":simultaneous-uploads="1" :process-file="processFile2"/>
+              	<cube-upload v-if="imgTherr==''" :max="1" ref="uploadTherr":action="action":simultaneous-uploads="1" :process-file="processFile3"/>
 
-              	<div class="img-box" v-if="imgTwo!=''">
-              		<img :src="imgTwo.url" alt="" @click="showImagePreview('imgTwo')">
-              		<i class="cubeic-wrong" @click="fileRemove('imgTwo')"></i>
+              	<div class="img-box" v-if="imgTherr!=''">
+              		<img :src="imgTherr.url" alt="" @click="showImagePreview('imgTherr')">
+              		<i class="cubeic-wrong" @click="fileRemove('imgTherr')"></i>
               	</div>
               </div>
 
@@ -124,15 +117,15 @@
         <li class="flex_r_f_s">
         	<div class="list_l"><b>*</b>请款金额:</div>
         	<div class="list_r">
-        		<input type="password" v-model="password" />
+        		<input type="number" v-model.number="money" />
         	</div>
         </li>
         <li class="flex_r_f_s">
         	<div class="list_l"><b>*</b>支付方式:</div>
         	<div class="list_r staffStatus">
         		<cube-select
-        		  v-model="postVal"
-        		  :options="postOptions">
+        		  v-model="payVal"
+        		  :options="payStay">
         		</cube-select>
         	</div>
         </li>
@@ -146,71 +139,45 @@
 
 <script>
 	import Api from '../common/apj.js'
-	import {provinceList,cityList,areaList} from '../../data/area'
 	import compress from '../../data/image'
-	const addressData = provinceList
-	addressData.forEach(province => {
-		province.children = cityList[province.value]
-		province.children.forEach(city => {
-			city.children = areaList[city.value]
-		})
-	})
+
 	export default {
 		data(){
 			let self = this;
 			return{
         gmNum:'',
-        staffOptions: [{value:'1',text:'启用'},{value:'2',text:'禁用'}],
-        staffVal: '',
-        departmentOptions:[{value:1,text:'办公室'},{value:2,text:'运营部'},{value:3,text:'客服部'},{value:4,text:'内勤部'}],
-				departmentVal:'',
-        postOptions:[{value:1,text:'经理'},{value:2,text:'主管'},{value:3,text:'区长'},{value:4,text:'组长'},{value:5,text:'职员'}],
-        postVal:'',
-        addUserId:'',//添加人Id
-        networkId:'',//合作网点Id,
-        name:'',
+        gmSearchNum:'',
+        userName:'',
+        shopName:'',
+        typeName:'',
+        natureName:'',
         phone:'',
-        password:'',
-        address:'',
+        fzr:'',
+        addr:'',
+        moneyType:[{value:'1',text:'广告费'},{value:'2',text:'佣金'},{value:'3',text:'服务费'},{value:'4',text:'稿费'}],
         remark:'',
-        networkId:'',
-				cityData: ['省份', '城市', '地区'],
-				//图片上传
+        money:'',
+        moneyVal:'',
+        payStay:[{value:'1',text:'现金'},{value:'2',text:'骨币'},{value:'3',text:'骨豆'}],
+        payVal:'',
 				action: {
 				  target: '//jsonplaceholder.typicode.com/photos/'
 				},
-        isDepartment:false,
+        money:'',
 				imgOne:'',
 				imgTwo:'',
+        imgTherr:'',
+        userId:'',
+        id:'',
 				reg: /^1[3456789]\d{9}$/,
-
+        typeData:[],
+        natureData:[],
 
 			}
 		},
 		mounted() {
-
-				this.addressPicker = this.$createCascadePicker({
-					title: '城市选择',
-					data: addressData,
-					onSelect: this.selectHandle,
-					onCancel: this.cancelHandle
-				});
-        let userInfo = JSON.parse(localStorage.getItem('userInfo'));
-        this.addUserId = JSON.parse(localStorage.getItem('userInfo')).employeeId;
-        this.networkId = JSON.parse(localStorage.getItem('userInfo')).network;
-        if(userInfo.manager){
-          this.isDepartment = false;
-        }else{
-          this.isDepartment = true;
-          this.departmentVal = userInfo.department;
-          let postArr = [];
-          this.postOptions.forEach((e)=>{
-            if(e.value>userInfo.post){
-              postArr.push(e)
-            }
-          });
-          this.postOptions = postArr;
-        }
+        this.getCooperationTypeAll();
+        this.getDeclareAll();
         // console.log(this.networkId)
         // console.log(JSON.parse(localStorage.getItem('userInfo')))
 		},
@@ -223,89 +190,153 @@
 				imgs: [this[img]]
 			  }).show()
 			},
+      getCooperationTypeAll(){//查询类型
+        let self = this;
+        self.axios.post(Api.userApi + '/cooperation/selectCooperationTypeAll',{
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        }).then((res) => {
+          if (res.data.code == 1) {
+            res.data.data.forEach((e)=>{
+              self.typeData.push({
+                text:e.name,
+                value:e.id
+              })
+            })
 
+          } else {
+            alert(res.data.msg)
+          }
+        })
+      },
+      getDeclareAll(){//查询商户性质
+        let self = this;
+        self.axios.post(Api.userApi + '/cooperation/selectCooperationNatureAll',{
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        }).then((res) => {
+          if (res.data.code == 1) {
+            res.data.data.forEach((e)=>{
+              self.natureData.push({
+                text:e.name,
+                value:e.id
+              })
+            })
+
+          } else {
+            alert(res.data.msg)
+          }
+        })
+      },
+      search(){
+        this.getUserNo();
+        this.getShopInfo();
+      },
+      getUserNo(){//根据骨米号查询信息
+        let self = this;
+        self.axios.post(Api.userApi + '/cooperation/selectUserInfoByUserNo',this.qs.stringify({
+          userNo:self.gmSearchNum
+        }), {
+          headers: {
+          	'Content-Type': 'application/x-www-form-urlencoded'
+          }
+        }).then((res) => {
+          if (res.data.code == 1) {
+            self.userId = res.data.data.userId;
+            self.gmNum = res.data.data.userNo;
+            self.userName = res.data.data.userName;
+
+          } else {
+            alert(res.data.msg)
+          }
+        })
+      },
+      getShopInfo(){
+        let self = this;
+        self.axios.post(Api.userApi + '/cooperation/selectCooperationShopsByUserNo',this.qs.stringify({
+          userNo:self.gmSearchNum
+        }), {
+          headers: {
+          	'Content-Type': 'application/x-www-form-urlencoded'
+          }
+        }).then((res) => {
+          if (res.data.code == 1) {
+            self.id = res.data.data.id;
+            self.staffId = res.data.data.employeeId;
+            self.shopName = res.data.data.shopName;
+            self.phone = res.data.data.phone;
+            self.fzr = res.data.data.principal;
+            self.typeData.forEach((e)=>{
+              if(e.value==res.data.data.typeId){
+                self.typeName = e.text;
+              }
+            });
+            self.natureData.forEach((e)=>{
+
+              if(e.value==res.data.data.natureId){
+                self.natureName = e.text;
+              }
+
+            })
+            self.addr = res.data.data.province+res.data.data.city+res.data.data.area+res.data.data.address;
+          } else {
+            alert(res.data.msg)
+          }
+        })
+      },
 			addCustomer(){
 				let self = this;
-				if(this.name == ''){
+				if(this.gmNum == ''){
 
-          this.errTip('请填写员工名称')
+				  this.errTip('请先查询用户信息')
 
-				}else if (this.phone == '') {
+				}else if(this.remark==''){
 
-          this.errTip('请填写手机号码')
+          this.errTip('请填写请款说明')
 
-				}else if (!this.reg.test(this.phone)) {
+        }else if(this.imgOne == ''||this.imgTwo==''||this.imgTherr==''){
 
-          this.errTip('手机号码格式不正确')
+					this.errTip('请上传单证照片')
 
-				}else if(this.cityData[0] == '省份' ||this.cityData[1] == '城市' || this.cityData[2] == '地区'){
-
-          this.errTip('请选择省市区')
-
-				}else if (this.address == '') {
-
-          this.errTip('请填写业务地址')
-
-				}else if(this.imgOne == ''||this.imgTwo==''){
-
-					this.errTip('上传证件照片')
-
-				}else if(this.departmentVal == ''){
-
-					this.errTip('请选择员工部门')
-
-				} else if(this.postVal == ''){
-
-          this.errTip('请选择岗位名称')
-
-				}else if(this.password == ''){
-
-          this.errTip('请填写密码')
-
-        }else if(this.staffVal == ''){
-          this.errTip('请选择员工状态')
 				}else{
-          let formData = new FormData();
-          formData.append('idCardFront',self.imgOne.imgData,self.imgOne.name)
-          formData.append('idCardBack',self.imgTwo.imgData,self.imgTwo.name)
-          formData.append('userId',self.addUserId);
-          formData.append('networkId',self.networkId);
-          formData.append('name',self.name);
-          formData.append('phone',self.phone);
-          formData.append('password',self.password);
-          formData.append('province',self.cityData[0])
-          formData.append('city',self.cityData[1])
-          formData.append('area',self.cityData[2])
-          formData.append('address',self.address);
-          formData.append('department',self.departmentVal);
-          formData.append('post',self.postVal);
-          formData.append('remark',self.remark);
-          formData.append('status',self.staffVal);
+				  let formData = new FormData();
+				  formData.append('imgA',self.imgOne.imgData,self.imgOne.name)
+				  formData.append('imgB',self.imgTwo.imgData,self.imgTwo.name)
+				  formData.append('imgC',self.imgTherr.imgData,self.imgTherr.name)
+				  formData.append('cSId',self.id)
+				  formData.append('employeeId',self.staffId)
+				  formData.append('declareType',self.moneyVal)
+				  formData.append('declareDesc',self.remark);
+          formData.append('declarePrice',self.money);
+          formData.append('payType',self.payVal);
 
-          self.axios.post(Api.userApi + '/employee/system/addEmployee',formData, {
-            headers: {
-              'Content-Type': 'multipart/form-data'
-            }
-          }).then((res) => {
-            if (res.data.code == 1) {
-              let toast = self.$createToast({
-                txt: '添加成功',
-                type: 'correct'
-              })
-              toast.show()
-              setTimeout(() => {
-                self.$router.push({
-                  name: 'staffManage'
-                })
+				  self.axios.post(Api.userApi + '/cooperation/addCooperationDeclare',formData, {
+				    headers: {
+				      'Content-Type': 'multipart/form-data'
+				    }
+				  }).then((res) => {
+				    if (res.data.code == 1) {
+				      let toast = self.$createToast({
+				        txt: '添加成功',
+				        type: 'correct'
+				      })
+				      toast.show()
+				      setTimeout(() => {
+				        self.$router.push({
+				          name: 'moneyDeclareManage'
+				        })
 
-              },500)
+				      },500)
 
-            } else {
-              alert(res.data.msg)
-            }
-          })
+				    } else {
+				      alert(res.data.msg)
+				    }
+				  })
 
         }
+
 
 			},
       dataURItoBlob(base64Data) {
@@ -332,15 +363,8 @@
           })
         toast.show()
       },
-			showAddressPicker() {
-				this.addressPicker.show()
-			},
-			selectHandle(selectedVal, selectedIndex, selectedText) {
-				this.cityData = selectedText
-			},
-			cancelHandle() {
 
-			},
+
 			processFile(file,next) {
 
 			  let self = this;
@@ -377,7 +401,23 @@
 
 			  })
 			},
+      processFile3(file,next) {
 
+        let self = this;
+        compress(file, {
+          compress: {
+            width: 800,
+            height: 800,
+            quality: 0.5
+          }
+        },function(){
+            console.log(file)
+            // self.url = file.base64
+            let blob = self.dataURItoBlob(file.base64)
+           self.imgTherr = {name:file.name,imgData:blob,url:file.base64};
+
+        })
+      },
 			fileRemove(img){
 				let self = this;
 				this.$createDialog({

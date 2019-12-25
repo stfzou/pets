@@ -2,13 +2,13 @@
   <div class="moneyDeclareManage">
     <div class="moneyDeclareManageTop">
      <div class="login_nav">
-     	<div class="back"></div>
+     	<div class="back" @click="back"></div>
      	<div class="title">合作商户管理</div>
-       <router-link :to="{name:'addBranch'}">添加</router-link>
+       <router-link :to="{name:'addMoneyDeclare'}">添加</router-link>
      </div>
      <div class="typeBox flex_r_s_b">
-       <div class="flex_r_s_b"><span>类型</span><i class="cubeic-pulldown"></i></div>
-       <div class="flex_r_s_b"><span>性质</span><i class="cubeic-pulldown"></i></div>
+       <div class="flex_r_s_b"><input type="text" readonly="readonly" placeholder="类型" v-model="val"><i class="cubeic-pulldown"></i></div>
+       <div class="flex_r_s_b"><input type="text" readonly="readonly" placeholder="性质" v-model="val"><i class="cubeic-pulldown"></i></div>
      </div>
      <div class="inputBox flex_r_s_b">
        <input type="text" placeholder="请输入名称" v-model="val">
@@ -594,6 +594,10 @@
           border-radius:40px;
           padding:0 20px;
           box-sizing:border-box;
+          input{
+            width:200px;
+            background:#f1f1f1;
+          }
         }
       }
       .inputBox{

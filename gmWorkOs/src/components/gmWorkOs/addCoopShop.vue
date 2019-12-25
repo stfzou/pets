@@ -1,6 +1,14 @@
 <template>
 	<div class="addCoopShop">
+    <div class="mapDia flex_r_s_c" v-show="isDia" @click.stop="diaHide">
+      <div class="mapBox">
+      	<el-amap ref="map" vid="amapDemo" :center="center" :zoom="18" :dragEnable="false" :zoomEnable="false" class="amap-demo" :plugin="plugin">
 
+      		<el-amap-marker v-if="isMark"  :draggable="true" :events="markers" :icon="require('../../assets/icon/map@2x.png')" vid="component-marker"></el-amap-marker>
+
+      	</el-amap>
+      </div>
+    </div>
 		<div class="login_nav">
 			<div class="back" @click="back"></div>
 			<div class="title">添加合作商户</div>
@@ -8,35 +16,34 @@
 		<div class="addCustomer_list">
       <div class="searchGmNum flex_r_f_s">
         <span>骨米号查询:</span>
-        <input v-model="gmNum"  type="number" name="" id="">
-        <div class="searchBtn flex_r_s_c">查询</div>
+        <input v-model.number="gmSearchNum"  type="number" name="" id="">
+        <div class="searchBtn flex_r_s_c" @click="getUserNo">查询</div>
       </div>
 			<ul>
 				<li class="flex_r_f_s">
 					<div class="list_l"><b>*</b>骨米号:</div>
 					<div class="list_r">
-						<input type="text" readonly="readonly" v-model="name" />
+						<input type="text" style="background:#E9E9E9;" readonly="readonly" v-model.number="gmNum" />
 					</div>
 				</li>
         <li class="flex_r_f_s">
         	<div class="list_l"><b>*</b>用户昵称:</div>
         	<div class="list_r">
-        		<input type="text" readonly="readonly" v-model="phone" />
+        		<input type="text" style="background:#E9E9E9;" readonly="readonly" v-model="userName" />
         	</div>
         </li>
         <li class="flex_r_f_s">
         	<div class="list_l"><b>*</b>店铺名称:</div>
         	<div class="list_r">
-        		<input type="password" v-model="password" />
+        		<input type="text" v-model="shopName" />
         	</div>
         </li>
         <li class="flex_r_f_s">
         	<div class="list_l"><b>*</b>类型:</div>
         	<div class="list_r staffStatus">
         		<cube-select
-        		  v-model="departmentVal"
-        		  :options="departmentOptions"
-              :disabled="isDepartment">
+        		  v-model="typeVal"
+        		  :options="typeData">
         		</cube-select>
         	</div>
         </li>
@@ -44,8 +51,8 @@
         	<div class="list_l"><b>*</b>性质:</div>
         	<div class="list_r staffStatus">
         		<cube-select
-        		  v-model="postVal"
-        		  :options="postOptions">
+        		  v-model="natureVal"
+        		  :options="natureData">
         		</cube-select>
         	</div>
         </li>
@@ -53,30 +60,26 @@
         <li class="flex_r_f_s">
         	<div class="list_l"><b>*</b>电话:</div>
         	<div class="list_r">
-        		<input type="password" v-model="password" />
+        		<input type="number" v-model.number="phone" />
         	</div>
         </li>
         <li class="flex_r_f_s">
         	<div class="list_l"><b>*</b>负责人:</div>
         	<div class="list_r">
-        		<input type="password" v-model="password" />
+        		<input type="text" v-model="fzr" />
         	</div>
         </li>
         <li class="flex_r_f_s">
         	<div class="list_l"><b>*</b>区域:</div>
-        	<div class="list_r">
-        		<div class="region flex_r_f_s">
-        			<div class="sheng flex_r_s_b" @click="showAddressPicker" v-for="item in cityData">
-        				<span>{{item}}</span>
-        				<i class="cube-select-icon"></i>
-        			</div>
-        		</div>
+        	<div class="list_r areaBox flex_r_f_s">
+            <span>{{sheng}}--{{shi}}--{{qu}}</span>
         	</div>
+          <div class="posationBtn flex_r_s_c" @click="diaShow">去定位</div>
         </li>
 				<li class="flex_r_f_s">
 					<div class="list_l"><b>*</b>门牌地址:</div>
 					<div class="list_r">
-						<input type="text" v-model="address" />
+						<input type="text" v-model="addr" />
 					</div>
 				</li>
 
@@ -104,11 +107,11 @@
         			</div>
               <div class="uploadBox">
 
-              	<cube-upload v-if="imgTwo==''" :max="1" ref="uploadTwo":action="action":simultaneous-uploads="1" :process-file="processFile2"/>
+              	<cube-upload v-if="imgTherr==''" :max="1" ref="uploadTwo":action="action":simultaneous-uploads="1" :process-file="processFile3"/>
 
-              	<div class="img-box" v-if="imgTwo!=''">
-              		<img :src="imgTwo.url" alt="" @click="showImagePreview('imgTwo')">
-              		<i class="cubeic-wrong" @click="fileRemove('imgTwo')"></i>
+              	<div class="img-box" v-if="imgTherr!=''">
+              		<img :src="imgTherr.url" alt="" @click="showImagePreview('imgTherr')">
+              		<i class="cubeic-wrong" @click="fileRemove('imgTherr')"></i>
               	</div>
               </div>
 
@@ -126,13 +129,15 @@
 				</li>
 			</ul>
 			<div class="confirmBtn flex_r_s_c" @click="addCustomer">确定</div>
-		</div>
+
+    </div>
 
 
 	</div>
 </template>
 
 <script>
+  //province
 	import Api from '../common/apj.js'
 	import {provinceList,cityList,areaList} from '../../data/area'
 	import compress from '../../data/image'
@@ -147,31 +152,86 @@
 		data(){
 			let self = this;
 			return{
+        gmSearchNum:'',
+        isDia:false,
+        isMark:false,
         gmNum:'',
-        staffOptions: [{value:'1',text:'启用'},{value:'2',text:'禁用'}],
-        staffVal: '',
-        departmentOptions:[{value:1,text:'办公室'},{value:2,text:'运营部'},{value:3,text:'客服部'},{value:4,text:'内勤部'}],
-				departmentVal:'',
-        postOptions:[{value:1,text:'经理'},{value:2,text:'主管'},{value:3,text:'区长'},{value:4,text:'组长'},{value:5,text:'职员'}],
-        postVal:'',
-        addUserId:'',//添加人Id
-        networkId:'',//合作网点Id,
-        name:'',
+        sheng:'',
+        shi:'',
+        qu:'',
+        userName:'',
+        shopName:'',
         phone:'',
-        password:'',
-        address:'',
+        fzr:'',
+        addr:'',
         remark:'',
-        networkId:'',
-				cityData: ['省份', '城市', '地区'],
 				//图片上传
 				action: {
 				  target: '//jsonplaceholder.typicode.com/photos/'
 				},
-        isDepartment:false,
+        ywyId:'',
+        userId:'',
+        typeData:[],
+        typeVal:'',
+        natureData:[],
+        natureVal:'',
 				imgOne:'',
 				imgTwo:'',
+        imgTherr:'',
 				reg: /^1[3456789]\d{9}$/,
+        plugin: [{
+        	pName: 'Geolocation',
+        	enableHighAccuracy: true,//是否使用高精度定位，默认:true
+        	timeout: 10000,          //超过10秒后停止定位，默认：无穷大
+        	showMarker: false,        //定位成功后在定位到的位置显示点标记，默认：true
+        	showCircle: false,        //定位成功后用圆圈表示定位精度范围，默认：true
+        	panToLocation: true,     //定位成功后将定位到的位置作为地图中心点，默认：true
+        	zoomToAccuracy:false,//定位成功后调整地图视野范围使定位位置及精度范围视野内可见，默认：f
+        	useNative:true,
+        	events: {
+        	  init(o) {
+        		// o 是高德地图定位插件实例
+        		o.getCurrentPosition((status, result) => {
+        		  if (result && result.position) {
+                self.sheng = result.addressComponent.province;
+                self.shi = result.addressComponent.city;
+                self.qu = result.addressComponent.district;
+                self.lng = result.position.lng;
+                self.lat = result.position.lat;
+                self.center = [result.position.lng, result.position.lat];
+                self.isMark = true;
+        			// self.$nextTick();
+        		  }else{
+                alert('定位失败，请刷新重试')
+              }
+        		});
+        	  },
+        	  complete(res){
 
+        		 self.isMark = false;
+
+        		 setTimeout(()=>{
+        			  self.isMark = true;
+        			  self.lng = res.position.lng;
+        			  self.lat = res.position.lat;
+        			  self.center = [result.position.lng, result.position.lat];
+        		 },200)
+        	  }
+        	}
+         }],
+        markers:{
+        	position:self.center,
+        	dragend: (e) => {
+        		// var geocoder = new AMap.Geocoder();
+        		self.lng = e.lnglat.lng;
+        		self.lat = e.lnglat.lat;
+            console.log(self.lat)
+
+        	}
+        },
+        center:[104.0658400000,30.6574200000],
+        lat:0,
+        lng:0
 
 			}
 		},
@@ -183,27 +243,16 @@
 					onSelect: this.selectHandle,
 					onCancel: this.cancelHandle
 				});
+        this.getCooperationTypeAll();
+        this.getDeclareAll();
         let userInfo = JSON.parse(localStorage.getItem('userInfo'));
-        this.addUserId = JSON.parse(localStorage.getItem('userInfo')).employeeId;
-        this.networkId = JSON.parse(localStorage.getItem('userInfo')).network;
-        if(userInfo.manager){
-          this.isDepartment = false;
-        }else{
-          this.isDepartment = true;
-          this.departmentVal = userInfo.department;
-          let postArr = [];
-          this.postOptions.forEach((e)=>{
-            if(e.value>userInfo.post){
-              postArr.push(e)
-            }
-          });
-          this.postOptions = postArr;
-        }
-        // console.log(this.networkId)
-        // console.log(JSON.parse(localStorage.getItem('userInfo')))
+        this.ywyId = JSON.parse(localStorage.getItem('userInfo')).employeeId;
+
+
 		},
 		methods:{
 			back(){
+        
 				this.$router.go(-1); //返回上一层
 			},
 			showImagePreview(img) {
@@ -211,66 +260,125 @@
 				imgs: [this[img]]
 			  }).show()
 			},
+      diaShow(){
+        this.isDia = true;
+      },
+      diaHide(){
+        this.isDia = false;
+      },
+      getDeclareAll(){//查询商户性质
+        let self = this;
+        self.axios.post(Api.userApi + '/cooperation/selectCooperationNatureAll',{
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        }).then((res) => {
+          if (res.data.code == 1) {
+            res.data.data.forEach((e)=>{
+              self.natureData.push({
+                text:e.name,
+                value:e.id
+              })
+            })
 
+          } else {
+            alert(res.data.msg)
+          }
+        })
+      },
+      getCooperationTypeAll(){//查询类型
+        let self = this;
+        self.axios.post(Api.userApi + '/cooperation/selectCooperationTypeAll',{
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        }).then((res) => {
+          if (res.data.code == 1) {
+            res.data.data.forEach((e)=>{
+              self.typeData.push({
+                text:e.name,
+                value:e.id
+              })
+            })
+
+          } else {
+            alert(res.data.msg)
+          }
+        })
+      },
+      getUserNo(){//根据骨米号查询信息
+        let self = this;
+        self.axios.post(Api.userApi + '/cooperation/selectUserInfoByUserNo',this.qs.stringify({
+          userNo:self.gmSearchNum
+        }), {
+          headers: {
+          	'Content-Type': 'application/x-www-form-urlencoded'
+          }
+        }).then((res) => {
+          if (res.data.code == 1) {
+            self.userId = res.data.data.userId;
+            self.gmNum = res.data.data.userNo;
+            self.userName = res.data.data.userName;
+
+          } else {
+            alert(res.data.msg)
+          }
+        })
+      },
 			addCustomer(){
 				let self = this;
-				if(this.name == ''){
+				if(this.gmNum == ''||this.userName == ''){
 
-          this.errTip('请填写员工名称')
+          this.errTip('请先查询用户信息')
 
-				}else if (this.phone == '') {
+				}else if(this.typeVal == ''){
+          this.errTip('请选择商户类型')
+        }else if(this.natureVal == ''){
+          this.errTip('请选择商户性质')
+        }else if(this.phone == '') {
 
           this.errTip('请填写手机号码')
 
-				}else if (!this.reg.test(this.phone)) {
+				}else if(!this.reg.test(this.phone)) {
 
           this.errTip('手机号码格式不正确')
 
-				}else if(this.cityData[0] == '省份' ||this.cityData[1] == '城市' || this.cityData[2] == '地区'){
+				}else if(this.fzr == ''){
+          this.errTip('请填写负责人')
+        }else if(this.sheng == '' ){
 
-          this.errTip('请选择省市区')
+          this.errTip('请刷新页面重新进行定位')
 
 				}else if (this.address == '') {
 
-          this.errTip('请填写业务地址')
+          this.errTip('请填写门牌地址')
 
-				}else if(this.imgOne == ''||this.imgTwo==''){
+				}else if(this.imgOne == ''||this.imgTwo==''||this.imgTherr==''){
 
-					this.errTip('上传证件照片')
+					this.errTip('请上传照片信息')
 
-				}else if(this.departmentVal == ''){
-
-					this.errTip('请选择员工部门')
-
-				} else if(this.postVal == ''){
-
-          this.errTip('请选择岗位名称')
-
-				}else if(this.password == ''){
-
-          this.errTip('请填写密码')
-
-        }else if(this.staffVal == ''){
-          this.errTip('请选择员工状态')
 				}else{
           let formData = new FormData();
-          formData.append('idCardFront',self.imgOne.imgData,self.imgOne.name)
-          formData.append('idCardBack',self.imgTwo.imgData,self.imgTwo.name)
-          formData.append('userId',self.addUserId);
-          formData.append('networkId',self.networkId);
-          formData.append('name',self.name);
+          formData.append('imgA',self.imgOne.imgData,self.imgOne.name)
+          formData.append('imgB',self.imgTwo.imgData,self.imgTwo.name)
+          formData.append('imgC',self.imgTherr.imgData,self.imgTherr.name)
+          formData.append('userId',self.userId)
+          formData.append('userNo',self.gmNum)
+          formData.append('employeeId',self.ywyId)
+          formData.append('shopName',self.shopName);
           formData.append('phone',self.phone);
-          formData.append('password',self.password);
-          formData.append('province',self.cityData[0])
-          formData.append('city',self.cityData[1])
-          formData.append('area',self.cityData[2])
-          formData.append('address',self.address);
-          formData.append('department',self.departmentVal);
-          formData.append('post',self.postVal);
+          formData.append('principal',self.fzr);
+          formData.append('typeId',self.typeVal);
+          formData.append('natureId',self.natureVal);
+          formData.append('province',self.sheng);
+          formData.append('city',self.shi);
+          formData.append('area',self.qu);
+          formData.append('address',self.addr);
+          formData.append('latitude',self.lat);
+          formData.append('longitude',self.lng);
           formData.append('remark',self.remark);
-          formData.append('status',self.staffVal);
 
-          self.axios.post(Api.userApi + '/employee/system/addEmployee',formData, {
+          self.axios.post(Api.userApi + '/cooperation/addCooperationShops',formData, {
             headers: {
               'Content-Type': 'multipart/form-data'
             }
@@ -283,7 +391,7 @@
               toast.show()
               setTimeout(() => {
                 self.$router.push({
-                  name: 'staffManage'
+                  name: 'coopShopManage'
                 })
 
               },500)
@@ -365,7 +473,23 @@
 
 			  })
 			},
+      processFile3(file,next) {
 
+        let self = this;
+        compress(file, {
+          compress: {
+            width: 800,
+            height: 800,
+            quality: 0.5
+          }
+        },function(){
+            console.log(file)
+            // self.url = file.base64
+            let blob = self.dataURItoBlob(file.base64)
+           self.imgTherr = {name:file.name,imgData:blob,url:file.base64};
+
+        })
+      },
 			fileRemove(img){
 				let self = this;
 				this.$createDialog({
@@ -402,6 +526,20 @@
 <style lang="scss">
 	.addCoopShop{
     background: #fff;
+    .mapDia{
+      position:fixed;
+      left:0;
+      top:0;
+      height:100%;
+      z-index:1000;
+      background:rgba(0,0,0,0.6);
+      box-sizing:border-box;
+      width:100%;
+      .mapBox{
+        height:600px;
+        width:600px;
+      }
+    }
 		.amap-logo{
 			opacity:0;
 		}
@@ -476,10 +614,12 @@
 			.uploadDiv{
 				width: 80%;
 			}
+
 			.list_r{
 				margin-left: 20px;
 				flex-wrap:wrap;
         width:500px;
+
 				&>input{
 					border: 1px solid #e8e8e8;
 					height: 50px;
@@ -515,39 +655,7 @@
 
 					}
 				}
-				.region {
-					div {
-						height:50px;
-            width:150px;
-						/*no*/
-						margin-right: 20px;
-						border: 1px solid #e8e8e8;
-						/*no*/
-						text-align: center;
-						border-radius: 2px;
-						/*no*/
 
-
-						span {
-							font-size: 26px;
-							color: #333;
-              overflow:hide;
-              width:100px;
-              height:50px;
-              line-height:50px;
-              display:block;
-              overflow: hidden;        /*内容会被修剪，并且其余内容是不可见的*/
-              text-overflow:ellipsis;  /*显示省略符号来代表被修剪的文本。*/
-              white-space: nowrap;     /*文本不换行*/
-
-						}
-
-						img {
-							width: 30px;
-						}
-					}
-
-				}
 				.customerType {
 
 					.cube-select {
@@ -598,7 +706,24 @@
 				}
 
 			}
-			.staffStatus{
+			.areaBox{
+			  width:300px;
+        border: 1px solid #e8e8e8;
+        height: 50px;
+
+        padding:0 10px;
+        font-size: 26px;
+			}
+      .posationBtn{
+        width:100px;
+        height:40px;
+        font-size:24px;
+        color:#fff;
+        border-radius:30px;
+        background:#ff523d;
+        margin-left:20px;
+      }
+      .staffStatus{
         .cube-select{
          height: 50px;
          padding:10px 20px 10px 10px;

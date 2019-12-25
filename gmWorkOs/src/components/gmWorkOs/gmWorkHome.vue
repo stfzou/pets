@@ -41,6 +41,14 @@
           <img src="../../assets/icon_geren08.png" alt="">
           <p>我的档案</p>
         </li>
+        <li  @click="goLink9" v-if="userInfo.root!=true">
+          <img src="../../assets/icon_geren08.png" alt="">
+          <p>合作商户管理</p>
+        </li>
+        <li  @click="goLink10" v-if="userInfo.root!=true">
+          <img src="../../assets/icon_geren08.png" alt="">
+          <p>添加费用申报</p>
+        </li>
         <li  v-if="userInfo.manager" @click="goLink8">
           <img src="../../assets/icon_geren08.png" alt="">
           <p>佣金设置</p>
@@ -120,6 +128,16 @@
       goLink8(){
         this.$router.push({
           name:'commissionSet'
+        })
+      },
+      goLink9(){
+        this.$router.push({
+          name:'coopShopManage'
+        })
+      },
+      goLink10(){
+        this.$router.push({
+          name:'moneyDeclareManage'
         })
       },
       cancellation(){

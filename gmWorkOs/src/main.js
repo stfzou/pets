@@ -42,7 +42,7 @@ router.beforeEach((to,from,next) => {
 	}else{
     //alert(1)
     if(JSON.parse(localStorage.getItem('userInfo'))){
-      axios.post('https://h5.gumipet.com/employee/system/registerByToken', Qs.stringify({
+      axios.post('http://app.gutouzu.com/employee/system/registerByToken', Qs.stringify({
       	token:JSON.parse(localStorage.getItem('userInfo')).token
       }), {
       	headers: {
