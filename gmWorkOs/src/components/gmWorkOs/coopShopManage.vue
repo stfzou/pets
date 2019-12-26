@@ -29,7 +29,7 @@
         <cube-scroll ref="scroll" @pulling-up="onPullingUp" @pulling-down="onPullingDown" :options="options">
         <ul class="coopShopManageList">
           <li v-for="item in coopeShopList">
-            <div class="shopName flex_r_s_b"><span>{{item.shopName}}</span><div class="edit">编辑</div></div>
+            <div class="shopName flex_r_s_b"><span>{{item.shopName}}</span><div class="edit" @click="edit(item)">编辑</div></div>
             <div class="shopType flex_r_f_s"><div class="type">[类型:{{item.typeName}}]</div><div class="xz">[性质:{{item.natureName}}]</div></div>
             <div class="fzr flex_r_s_b">
               <div class="div_l">负责人:{{item.principal}}</div>
@@ -103,8 +103,16 @@
     },
     methods:{
       back(){
-      
+
       	this.$router.go(-1); //返回上一层
+      },
+      edit(item){
+        this.$router.push({
+          name:'editCoopShop',
+          query:{
+            userNo:item.userNo
+          }
+        })
       },
       onPullingUp(){
         let self = this;
@@ -524,6 +532,7 @@
           box-shadow:0px 4px 12px 0px rgba(15,15,15,0.16);
           border-radius:10px;
           padding:30px 20px;
+          margin-bottom:30px;
           .imgBox{
             padding-top:30px;
             div{

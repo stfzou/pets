@@ -3,90 +3,118 @@
     <div class="moneyDeclareManageTop">
      <div class="login_nav">
      	<div class="back" @click="back"></div>
-     	<div class="title">合作商户管理</div>
+     	<div class="title">合作商户管理({{totalNum}})</div>
        <router-link :to="{name:'addMoneyDeclare'}">添加</router-link>
      </div>
      <div class="typeBox flex_r_s_b">
-       <div class="flex_r_s_b"><input type="text" readonly="readonly" placeholder="类型" v-model="val"><i class="cubeic-pulldown"></i></div>
-       <div class="flex_r_s_b"><input type="text" readonly="readonly" placeholder="性质" v-model="val"><i class="cubeic-pulldown"></i></div>
+       <div class="flex_r_s_b" @click="typeShowPicker"><input type="text" readonly="readonly" placeholder="类型" v-model="typeName"><i class="cubeic-pulldown"></i></div>
+       <div class="flex_r_s_b" @click="natureShowPicker"><input type="text" readonly="readonly" placeholder="性质" v-model="natureName"><i class="cubeic-pulldown"></i></div>
      </div>
      <div class="inputBox flex_r_s_b">
-       <input type="text" placeholder="请输入名称" v-model="val">
-       <input type="text" placeholder="请输入骨米号" v-model="val">
+       <input type="text" placeholder="请输入名称" v-model="shopName">
+       <input type="number" placeholder="请输入骨米号" v-model.number="gmNum">
      </div>
      <div class="timeBox flex_r_s_b">
-       <div class="flex_r_f_s">{{time1}}</div>
+       <input type="text" v-model="time1" @click="showDatePicker" placeholder="开始时间" readonly="readonly">
        <span></span>
-       <div class="flex_r_f_s">{{time2}}</div>
+       <input type="text" v-model="time2" @click="showDatePicker2" placeholder="结束时间" readonly="readonly">
      </div>
      <div class="shopNameSearch flex_r_s_b">
-       <input type="text" placeholder="请输入电话号码" v-model="val">
-       <span class="searchBtn flex_r_s_c">查询</span>
+       <input type="number" placeholder="请输入电话号码" v-model.number="phone">
+       <span class="searchBtn flex_r_s_c" @click="search">查询</span>
      </div>
       <div class="storeInfo">
         <div class="title">汇款总额</div>
         <div class="registerNum flex_r_s_b">
-          <div>现金 : {{dataInfo.shopNum}}</div>
-          <div>骨币 : {{dataInfo.userNum}}</div>
-          <div>骨豆 : {{dataInfo.shopQualifiedNum}}</div>
+          <div>现金 : {{sumCash}}</div>
+          <div>骨币 : {{sumBoneCurrency}}</div>
+          <div>骨豆 : {{sumBoneBean}}</div>
         </div>
       </div>
     </div>
     <div class="moneyDeclareManageCnt">
       <cube-scroll ref="scroll" @pulling-up="onPullingUp" @pulling-down="onPullingDown" :options="options">
         <ul class="moneyDeclareManageList">
-           <li class="flex_r_s_b" v-for="(item,index) in dataInfo.list">
+           <li class="flex_r_s_b" v-for="(item,index) in declareList">
              <div class="list_l">
                <div class="mid">
-                 <div class="shopName">紫东杂货店</div>
+                 <div class="shopName">{{item.shopName}}</div>
                  <div class="receivables flex_r_f_s">
-                   <div>收款人: <b>张小白</b></div>
+                   <div>收款人: <b>{{item.principal}}</b></div>
                    <div class="midPhone">电话: <b>15283133594</b></div>
                  </div>
                  <div class="receivables flex_r_f_s">
-                   <div>类型: <b>广告费</b></div>
-                   <div class="midPhone">请款人: <b>张三</b></div>
+                   <div>类型: <b>{{item.typeName}}</b></div>
+                   <div class="midPhone">请款人: <b>{{item.principal}}</b></div>
                  </div>
+                 <div class="statusDesc" v-if="item.status==3"><span style="color:#666">审批备注:</span>{{item.statusDesc}}</div>
+                 <div class="declareTime">{{item.createTime}}</div>
                </div>
              </div>
 
              <div class="list_r">
-               <div class="money">¥{{item.income}}</div>
-               <div class="zcStatus moeyType">[现金]</div>
-               <div class="zcStatus spStatus" style="color:#3dc0ff">已审批</div>
+               <div class="money">¥{{item.declarePrice}}</div>
+               <div class="zcStatus moeyType">[{{item.payType|payText}}]</div>
+               <div class="zcStatus spStatus">
+                <span v-if="item.status==0">未审批</span>
+                <span v-if="item.status==1" style="color:#3dc0ff">已审批</span>
+                <span v-if="item.status==2" style="color:greenyellow">已支付</span>
+                <span v-if="item.status==3" style="color:#ff523d">已拒绝</span>
+               </div>
+               <div class="spBtn flex_r_s_c" @click="diaShow(item)">审批</div>
              </div>
            </li>
         </ul>
       </cube-scroll>
     </div>
+    <div class="remarkMask flex_r_s_c" v-show="isDialog" @click.stop="diaHide">
+      <div class="maskCnt" @click.stop>
+        <div class="title">审批</div>
+        <div class="radioBox">
+          <cube-radio-group v-model="radioVal" @input="radioChange"  :horizontal="true" position="right" :options="radiOptions" />
+        </div>
+        <cube-textarea v-model="remark" :disabled="isDisabled" placeholder="请填写不批准原因" :autoExpand="true" :maxlength="200"></cube-textarea>
+        <div class="remarkBtn flex_r_f_e">
+          <span @click.stop="diaHide">取消</span>
+          <span style="color:#ff523d" @click="commit">确认</span>
+        </div>
+      </div>
 
+    </div>
   </div>
 </template>
 
 <script>
   import Api from '../common/apj.js'
-  import {provinceList,cityList,areaList} from '../../data/area'
-  const addressData = provinceList
-  addressData.forEach(province => {
-  	province.children = cityList[province.value]
-  	province.children.forEach(city => {
-  		city.children = areaList[city.value]
-  	})
-  })
+
   export default{
     data(){
       return{
-        cityData: ['省份', '城市', '地区'],
-        typeVal:0,
-        val:'',
-        ywVal:'',
+        id:'',
+        employeeId:'',
+        isDisabled:false,
+        radioVal:0,
+        radiOptions:[{label:'不批准',value: 0},{label:'批准',value: 1}],
         remark:'',
-        typeOpt: [{text:'用户',value:1},{text:'商户',value:2},{text:'全部',value:0}],
+        isDialog:false,
+        sumCash:0,
+        totalNum:0,
+        sumBoneCurrency:0,//骨币
+        sumBoneBean:0,//骨豆
+        declareList:[],
+        typeData:[],
+        typeVal:'',
+        typeName:'',
+        natureData:[],
+        natureVal:'',
+        natureName:'',
+        userName:'',
+        shopName:'',
+        gmNum:'',
+        page:0,
         time1:'',
         time2:'',
-        dataInfo:'',
-        column:[{text:'全部',value:''}],
-        page:1,
+        phone:'',
         options:{
         	pullDownRefresh:{
         		txt:'更新成功',
@@ -104,244 +132,164 @@
       }
     },
     mounted() {
-      this.addressPicker = this.$createCascadePicker({
-      	title: '城市选择',
-      	data: addressData,
-      	onSelect: this.selectHandle,
-      	onCancel: this.cancelHandle
-      });
-      this.monthnow();
-      this.getBill();
-      this.getAssign();
-
+      this.employeeId = JSON.parse(localStorage.getItem('userInfo')).employeeId;
+      this.getDeclareAll();
+      this.getCooperationTypeAll();
+      this.getDeclareList();
     },
     filters:{
-      typeFilter(val){
-        if(val==1){
-          return '用户注册'
-        }else if(val==2){
-          return '商户注册'
-        }else if(val==3){
-          return '商户票卷达标'
-        }else if(val==4){
-          return '商户票卷核销'
-        }else if(val==5){
-          return '商家首单成交'
-        }else if(val==6){
-          return '用户首单成交'
+        payText(val){
+          if(val==1){
+            return '现金'
+          }else if(val==2){
+            return '骨币'
+          }else if(val==3){
+            return '骨豆'
+          }
         }
-      }
     },
     methods: {
       back(){
       	this.$router.go(-1); //返回上一层
       },
-      showAddressPicker() {
-      	this.addressPicker.show()
+      radioChange(val){
+        if(val==0){
+          this.isDisabled = false;
+        }else{
+          this.isDisabled = true;
+        }
       },
-      selectHandle(selectedVal, selectedIndex, selectedText) {
-      	this.cityData = selectedText;
-        this.getBill();
+      search(){
+        if(this.time1!=''&&this.time2==''){
+          this.errTip('请填写结束时间')
+        }else{
+          this.getDeclareList();
+        }
       },
-      cancelHandle() {
-
-      },
-      upDataStatusTrue(item,index){
+      commit(){
         let self = this;
-        this.axios.post(Api.staffApi+'/employee/system/updateStatus', this.qs.stringify({
-        	ebdId:item.ebdId+'',
-        	status:1
-        }), {
-        	headers: {
-        		'Content-Type': 'application/x-www-form-urlencoded'
-        	}
-        }).then((res)=>{
-          if(res.data.code==1){
-            let toast = self.$createToast({
-            	txt: '账单恢复正常',
-            	type: 'correct'
-             })
-            toast.show();
-            item.status = 1;
-          }else{
-            alert(res.data.msg)
-          }
-
-        })
-      },
-      upDataStatusFalse(item,index){
-        let self = this;
-        this.axios.post(Api.staffApi+'/employee/system/updateStatus', this.qs.stringify({
-        	ebdId:item.ebdId+'',
-        	status:2
-        }), {
-        	headers: {
-        		'Content-Type': 'application/x-www-form-urlencoded'
-        	}
-        }).then((res)=>{
-          if(res.data.code==1){
-            let toast = self.$createToast({
-            	txt: '账单已作废',
-            	type: 'correct'
-             })
-            toast.show();
-            item.status = 2;
-          }else{
-            alert(res.data.msg)
-          }
-
-        })
-      },
-      monthnow(){
-         var dd= new Date();
-
-         dd.setDate(dd.getDate());//获取AddDayCount天后的日期
-
-         var y = dd.getFullYear();
-
-         var m = dd.getMonth()+1;//获取当前月份的日期
-
-         var d = dd.getDate();
-         this.time1 = y+"-"+m;
-
-      },
-      onPullingDown(){
-        this.page = 1;
-        let self = this;
-        let sheng = '';
-        let shi = '';
-        let qu = '';
-        if(this.cityData.length===3){
-          if(this.cityData[0]=='省份'){
-            sheng = '';
-            shi = '';
-            qu = '';
-          }else if(this.cityData[2]=='市辖区'){
-            sheng = this.cityData[0];
-            shi = this.cityData[1];
-            qu = '';
-          }else{
-            sheng = this.cityData[0];
-            shi = this.cityData[1];
-            qu = this.cityData[2];
-          }
-        }else if(this.cityData.length===2){
-          if(this.cityData[1]=='城市'){
-            sheng = this.cityData[0];
-            shi = '';
-            qu = '';
-          }else{
-            sheng = this.cityData[0];
-            shi = this.cityData[1];
-            qu = '';
-          }
-
+        if(self.radioVal==0&&self.remark==''){
+          self.errTip('请填写不批准原因');
+        }else{
+          self.axios.post(Api.userApi + '/cooperation/updateDeclareApproval',this.qs.stringify({
+            employeeId:JSON.parse(localStorage.getItem('userInfo')).employeeId,
+            id:self.id,
+            status:self.radioVal,
+            statusDesc:self.remark
+          }), {
+            headers: {
+            	'Content-Type': 'application/x-www-form-urlencoded'
+            }
+          }).then((res)=>{
+            if(res.data.code==1){
+              self.isDialog = false;
+              self.id = '';
+              self.remark = '';
+              let toast = this.$createToast({
+                  txt: '审批完成',
+                  type: 'correct'
+              })
+              toast.show()
+              self.getDeclareList();
+            }else{
+              alert(res.data.msg)
+            }
+          })
         }
 
-        self.axios.get(Api.userApi + '/employee/system/selectOtherEmployeeBillingDetails', {
-          params: {
-            province:sheng,
-            city:shi,
-            area:qu,
-            startTime:self.time1,
-            endTime:self.time2,
-            userId:JSON.parse(localStorage.getItem('userInfo')).employeeId,
-            employeeId:self.ywVal,
-            type:self.typeVal,
-            networkId: JSON.parse(localStorage.getItem('userInfo')).network,
-            department: JSON.parse(localStorage.getItem('userInfo')).department,
-            post: JSON.parse(localStorage.getItem('userInfo')).post,
-            page:1,
-            rows:10
-          }
-        }, {
+      },
+      diaShow(item) {
+        this.isDialog = true;
+        this.id = item.id;
+
+        // this.remark = item.remark;
+
+      },
+      diaHide() {
+        this.isDialog = false;
+        this.radioVal = 0;
+        this.remark = '';
+        this.id = '';
+      },
+      errTip(msg){
+        let toast = this.$createToast({
+        	txt: msg,
+        	type: 'error'
+          })
+        toast.show()
+      },
+      getDeclareAll(){//查询商户性质
+        let self = this;
+        self.axios.post(Api.userApi + '/cooperation/selectCooperationNatureAll',{
           headers: {
             'Content-Type': 'multipart/form-data'
           }
         }).then((res) => {
           if (res.data.code == 1) {
-            console.log(res)
-            if(res.data.data.length<1){
-              alert('暂无数据')
-              self.$refs.scroll.forceUpdate();
-              self.$refs.scroll.refresh();
-              self.dataInfo.list = res.data.data;
-            }else{
-              setTimeout(() => {
-                self.dataInfo.list = res.data.data;
-                self.$refs.scroll.forceUpdate();
-              	setTimeout(() => {
-              		self.$refs.scroll.refresh();
-              	}, 100)
-              }, 500)
-            }
-
+            res.data.data.forEach((e)=>{
+              self.natureData.push({
+                text:e.name,
+                value:e.id
+              })
+            })
 
           } else {
-            alert(res.data.msg);
+            alert(res.data.msg)
           }
         })
+      },
+      getCooperationTypeAll(){//查询类型
+        let self = this;
+        self.axios.post(Api.userApi + '/cooperation/selectCooperationTypeAll',{
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        }).then((res) => {
+          if (res.data.code == 1) {
+            res.data.data.forEach((e)=>{
+              self.typeData.push({
+                text:e.name,
+                value:e.id
+              })
+            })
+
+          } else {
+            alert(res.data.msg)
+          }
+        })
+      },
+      onPullingDown(){
+        this.getDeclareList();
       },
       onPullingUp(){
         let self = this;
-        this.page++;
-        let sheng = '';
-        let shi = '';
-        let qu = '';
-        if(this.cityData.length===3){
-          if(this.cityData[0]=='省份'){
-            sheng = '';
-            shi = '';
-            qu = '';
-          }else if(this.cityData[2]=='市辖区'){
-            sheng = this.cityData[0];
-            shi = this.cityData[1];
-            qu = '';
-          }else{
-            sheng = this.cityData[0];
-            shi = this.cityData[1];
-            qu = this.cityData[2];
-          }
-        }else if(this.cityData.length===2){
-          if(this.cityData[1]=='城市'){
-            sheng = this.cityData[0];
-            shi = '';
-            qu = '';
-          }else{
-            sheng = this.cityData[0];
-            shi = this.cityData[1];
-            qu = '';
-          }
-
-        }
-
-        self.axios.get(Api.userApi + '/employee/system/selectOtherEmployeeBillingDetails', {
-          params: {
-            province:sheng,
-            city:shi,
-            area:qu,
-            startTime:self.time1,
-            endTime:self.time2,
-            userId:JSON.parse(localStorage.getItem('userInfo')).employeeId,
-            employeeId:self.ywVal,
-            type:self.typeVal,
-            networkId: JSON.parse(localStorage.getItem('userInfo')).network,
-            department: JSON.parse(localStorage.getItem('userInfo')).department,
-            post: JSON.parse(localStorage.getItem('userInfo')).post,
-            page:self.page,
-            rows:10
-          }
-        }, {
+        self.page++;
+        self.axios.post(Api.userApi + '/cooperation/selectCooperationDeclareManager',this.qs.stringify({
+          shopName:self.shopName,
+          userNo:self.gmNum,
+          typeId:self.typeVal,
+          natureId:self.natureVal,
+          employeeId:'',
+          phone:self.phone,
+          startTime:self.time1,
+          endTime:self.time2,
+          pageNo:self.page,
+          pageSize:10
+        }), {
           headers: {
-            'Content-Type': 'multipart/form-data'
+          	'Content-Type': 'application/x-www-form-urlencoded'
           }
         }).then((res) => {
           if (res.data.code == 1) {
-
-            if(res.data.data.length>1){
-              self.$refs.scroll.forceUpdate();
-              self.$refs.scroll.refresh();
-              self.dataInfo.list.push(...res.data.data);
+            self.totalNum = res.data.data.num;
+            if(res.data.data.list>0){
+              setTimeout(() => {
+                self.$refs.scroll.forceUpdate();
+              	self.declareList.push(...res.data.data.list);
+              	setTimeout(() => {
+              		self.$refs.scroll.refresh();
+              	}, 100)
+              }, 500)
             }else{
               setTimeout(() => {
                 self.$refs.scroll.forceUpdate();
@@ -351,21 +299,48 @@
               }, 500)
             }
 
-
           } else {
-            alert(res.data.msg);
-            setTimeout(() => {
-              self.$refs.scroll.forceUpdate();
-            	setTimeout(() => {
-            		self.$refs.scroll.refresh();
-            	}, 100)
-            }, 500)
+            alert(res.data.msg)
           }
         })
       },
-      change(value, index, text) {
-        this.getBill();
+      typeShowPicker() {
+        let self = this;
+            if (!this.typePicker) {
+              this.typePicker = this.$createPicker({
+                title: '类型',
+                data: [self.typeData],
+                onSelect: function (selectedVal, selectedIndex, selectedText) {
+
+                  self.typeVal = selectedVal[0]
+                  self.typeName = selectedText[0]
+
+                },
+                onCancel: function () {
+
+                },
+              })
+            }
+            this.typePicker.show()
       },
+      natureShowPicker() {
+            let self = this;
+            if (!this.naturePicker) {
+              this.naturePicker = this.$createPicker({
+                title: '性质',
+                data: [self.natureData],
+                onSelect: function (selectedVal, selectedIndex, selectedText) {
+                  self.natureVal = selectedVal[0]
+                  self.natureName = selectedText[0]
+                },
+                onCancel: function () {
+
+                }
+              })
+            }
+            this.naturePicker.show()
+      },
+
       showDatePicker() {
          if (!this.datePicker) {
            this.datePicker = this.$createDatePicker({
@@ -373,7 +348,7 @@
              min: new Date(2008, 7, 8),
              max: new Date(),
              value: new Date(),
-             columnCount:2,
+             columnCount:3,
              onSelect: this.selectHandle1,
              onCancel: function(){}
            })
@@ -399,37 +374,14 @@
          }
        },
 
-      getAssign(){
-        let self = this;
-        self.axios.get(Api.userApi + '/employee/system/selectAssignEmployeeInfo', {
-          params: {
-            networkId: JSON.parse(localStorage.getItem('userInfo')).network,
-            department: JSON.parse(localStorage.getItem('userInfo')).department,
-            post: JSON.parse(localStorage.getItem('userInfo')).post,
-          }
-        }, {
-          headers: {
-            'Content-Type': 'multipart/form-data'
-          }
-        }).then((res)=>{
-          if(res.data.code==1){
-            //console.log(res)
-            res.data.data.forEach((e)=>{
-              self.column.push({text:e.name,value:e.employeeId})
-            })
 
-          }else{
-            alert(res.data.msg)
-          }
-        })
-      },
       showDatePicker2() {
          if (!this.datePicker2) {
            this.datePicker2 = this.$createDatePicker({
              title: '时间选择',
              min: new Date(2008, 7),
              max: new Date(),
-             columnCount:2,
+             columnCount:3,
              value: new Date(),
              onSelect: this.selectHandle2,
              onCancel: function(){}
@@ -460,81 +412,49 @@
           this.getBill();
          }
        },
-       getBill(){
+      getDeclareList(){
          let self = this;
-         let sheng = '';
-         let shi = '';
-         let qu = '';
-         if(this.cityData.length===3){
-           if(this.cityData[0]=='省份'){
-             sheng = '';
-             shi = '';
-             qu = '';
-           }else if(this.cityData[2]=='市辖区'){
-             sheng = this.cityData[0];
-             shi = this.cityData[1];
-             qu = '';
-           }else{
-             sheng = this.cityData[0];
-             shi = this.cityData[1];
-             qu = this.cityData[2];
-           }
-         }else if(this.cityData.length===2){
-           if(this.cityData[1]=='城市'){
-             sheng = this.cityData[0];
-             shi = '';
-             qu = '';
-           }else{
-             sheng = this.cityData[0];
-             shi = this.cityData[1];
-             qu = '';
-           }
-
-         }
-
-         self.axios.get(Api.userApi + '/employee/system/selectEmployeeBillingDetailsByFirst', {
-           params: {
-             province:sheng,
-             city:shi,
-             area:qu,
-             startTime:self.time1,
-             endTime:self.time2,
-             userId:JSON.parse(localStorage.getItem('userInfo')).employeeId,
-             employeeId:self.ywVal,
-             type:self.typeVal,
-             networkId: JSON.parse(localStorage.getItem('userInfo')).network,
-             department: JSON.parse(localStorage.getItem('userInfo')).department,
-             post: JSON.parse(localStorage.getItem('userInfo')).post,
-
-           }
-         }, {
+         self.page = 0;
+         self.axios.post(Api.userApi + '/cooperation/selectCooperationDeclareManager',this.qs.stringify({
+           shopName:self.shopName,
+           userNo:self.gmNum,
+           typeId:self.typeVal,
+           natureId:self.natureVal,
+           employeeId:'',
+           phone:self.phone,
+           startTime:self.time1,
+           endTime:self.time2,
+           pageNo:0,
+           pageSize:10
+         }), {
            headers: {
-             'Content-Type': 'multipart/form-data'
+           	'Content-Type': 'application/x-www-form-urlencoded'
            }
          }).then((res) => {
            if (res.data.code == 1) {
              console.log(res)
-             if(res.data.data.length<1){
+             self.totalNum = res.data.data.num;
+             self.sumCash = res.data.data.sumCash;
+             self.sumBoneCurrency = res.data.data.sumBoneCurrency;
+             self.sumBoneBean = res.data.data.sumBoneBean;
+             if(res.data.data.list.length<1){
                alert('暂无数据')
-               self.$refs.scroll.forceUpdate();
-               self.$refs.scroll.refresh();
-               self.dataInfo = res.data.data;
+               self.declareList = res.data.data.list;
              }else{
                setTimeout(() => {
-                 self.dataInfo = res.data.data;
-                 self.$refs.scroll.forceUpdate();
+                self.$refs.scroll.forceUpdate();
+               	self.declareList = res.data.data.list;
                	setTimeout(() => {
                		self.$refs.scroll.refresh();
                	}, 100)
                }, 500)
              }
 
-
            } else {
-             alert(res.data.msg);
+             alert(res.data.msg)
            }
          })
-       }
+      }
 
     }
   }
@@ -615,7 +535,7 @@
       .timeBox{
         padding:30px 20px 0 20px;
         box-sizing:border-box;
-        div{
+        input{
           width:310px;
           height:60px;
           background:#f1f1f1;
@@ -728,7 +648,6 @@
       }
      }
 
-  }
     .moneyDeclareManageCnt{
       // padding:0 22px;
       position:absolute;
@@ -764,6 +683,15 @@
                   margin-left:40px;
                 }
               }
+              .declareTime{
+                font-size:24px;
+                padding-top:20px;
+              }
+              .statusDesc{
+                line-height:40px;
+                padding-top:10px;
+                color:#ff523d;
+              }
             }
           }
 
@@ -779,11 +707,56 @@
               font-size:24px;
               text-align:right;
             }
-
+            .spBtn{
+              width:80px;
+              height:40px;
+              background:rgba(255,82,61,1);
+              border:1px solid rgba(221,221,221,1);
+              border-radius:40px;
+              color:#fff;
+              margin:20px 0 0 40px;
+            }
           }
         }
       }
 
     }
+    .remarkMask {
+      position: fixed;
+      left: 0;
+      top: 0;
+      height: 100%;
+      width: 100%;
+      z-index: 100;
+      background: rgba(0, 0, 0, 0.6);
+
+      .maskCnt {
+
+        width: 580px;
+        height: 480px;
+        background: rgba(255, 255, 255, 1);
+        border-radius: 10px;
+        padding: 0 15px;
+        box-sizing: border-box;
+
+        .title {
+          color: #000;
+          text-align: center;
+          padding: 30px 0;
+        }
+
+        .cube-textarea-wrapper {
+          margin-top: 30px;
+          height: 180px;
+        }
+
+        .remarkBtn {
+          padding-top: 30px;
+        }
+
+      }
+    }
+  }
+
 
 </style>

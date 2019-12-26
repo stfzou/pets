@@ -42,15 +42,15 @@
           <p>我的档案</p>
         </li>
         <li  @click="goLink9" v-if="userInfo.root!=true">
-          <img src="../../assets/icon_geren08.png" alt="">
+          <img src="../../assets/icon_geren09.png" alt="">
           <p>合作商户管理</p>
         </li>
         <li  @click="goLink10" v-if="userInfo.root!=true">
-          <img src="../../assets/icon_geren08.png" alt="">
+          <img src="../../assets/icon_geren10.png" alt="">
           <p>添加费用申报</p>
         </li>
         <li  v-if="userInfo.manager" @click="goLink8">
-          <img src="../../assets/icon_geren08.png" alt="">
+          <img src="../../assets/icon_geren11.png" alt="">
           <p>佣金设置</p>
         </li>
       </ul>

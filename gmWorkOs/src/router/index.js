@@ -26,6 +26,9 @@ import AddCoopShop from '@/components/gmWorkOs/addCoopShop'
 import AddMoneyDeclare from '@/components/gmWorkOs/addMoneyDeclare'
 import MoneyDeclareManage from '@/components/gmWorkOs/moneyDeclareManage'
 import CoopShopManage from '@/components/gmWorkOs/coopShopManage'
+import EditCoopShop from '@/components/gmWorkOs/editCoopShop'
+
+
 
 
 import WorkOsInfoList from '@/components/gmWorkOs/workOsInfoList'
@@ -55,6 +58,11 @@ export default new Router({
       path:'/addCoopShop',
       name:'addCoopShop',
       component:AddCoopShop
+    },
+    {
+      path:'/editCoopShop',
+      name:'editCoopShop',
+      component:EditCoopShop
     },
     {
       path:'/coopShopManage',
