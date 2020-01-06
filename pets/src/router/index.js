@@ -65,6 +65,9 @@ import HelpHome from '@/components/help/helpHome'
 import HelpList from '@/components/help/helpList'
 import HelpCnt from '@/components/help/helpCnt'
 import BargainGoods from '@/components/bargain/bargainGoods'
+import Bargain from '@/components/bargain/bargain'
+import BargainRule from '@/components/bargain/bargainRule'
+
 
 Vue.use(Router)
 export default new Router({
@@ -80,6 +83,16 @@ export default new Router({
 			name:'vLogin',
 			component:vLogin,
 		},
+    {
+      path:'/bargain',
+      name:'bargain',
+      component:Bargain
+    },
+    {
+      path:'/bargainRule',
+      name:'bargainRule',
+      component:BargainRule
+    },
     {
       path:'/nearbyActivity',
       name:'nearbyActivity',

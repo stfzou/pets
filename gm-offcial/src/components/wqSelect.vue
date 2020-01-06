@@ -50,7 +50,7 @@
           params:{
             userId:38,
             page:1,
-            rows:15
+            rows:30
           }
         },{
         	headers: {
@@ -94,7 +94,7 @@
   .wqSelectWarp{
     padding-top:106px;
     .wqSelectCnt{
-      height:1500px;
+      height:2500px;
       // background:yellow;
       .title{
         text-align:left;

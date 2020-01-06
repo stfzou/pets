@@ -40,4 +40,7 @@ export default {
   height:100%;
   
 }
+.el-upload-list--picture .el-upload-list__item {
+						display: none;
+					}
 </style>
