@@ -22,7 +22,7 @@
         </div>
 
         </vue-waterfall-easy>
-        <div class="more pointer">查看更多</div>
+        <div class="more pointer" @click="maskShow">查看更多</div>
      </div>
   </div>
 </template>
@@ -35,6 +35,7 @@
       return{
         dynamicList:[],
         mobileGap:15,
+        tempArr:[]
       }
     },
     components:{
@@ -42,15 +43,65 @@
     },
     mounted() {
       this.getWqSelect();
+      this.tempArr = [{
+        src:'http://gutouzu.oss-cn-shenzhen.aliyuncs.com/re/1575899639065598.jpg',
+        href : 'http://gmpet.com',
+        userName : '恍恍惚惚',
+        userHeadImage : 'http://gutouzu.oss-cn-shenzhen.aliyuncs.com/re/1575891162279.jpg',
+        likeCount : 10,
+        title : '真狗粮',
+        type:1,
+        videoId:0
+      },{
+        src:'http://gutouzu.oss-cn-shenzhen.aliyuncs.com/re/1577026552776302.jpg',
+        href : 'http://gmpet.com',
+        userName : '星河灿烂',
+        userHeadImage : 'http://gutouzu.oss-cn-shenzhen.aliyuncs.com/re/1575942342856.jpg',
+        likeCount : 8,
+        title : '你是人间理想',
+        type:1,
+        videoId:1
+      },{
+        src:'http://gutouzu.oss-cn-shenzhen.aliyuncs.com/re/1576805654024482.jpg',
+        href : 'http://gmpet.com',
+        userName : '为你伏笔',
+        userHeadImage : 'http://gutouzu.oss-cn-shenzhen.aliyuncs.com/re/1576744856386.jpg',
+        likeCount : 18,
+        title : '阳光正好，微风不燥',
+        type:1,
+        videoId:2
+      },{
+        src:'http://gutouzu.oss-cn-shenzhen.aliyuncs.com/re/1577067143497134.jpg',
+        href : 'http://gmpet.com',
+        userName : '天晴等你',
+        userHeadImage : 'http://gutouzu.oss-cn-shenzhen.aliyuncs.com/re/1575870248803.jpg',
+        likeCount : 32,
+        title : '两只胖猪',
+        type:1,
+        videoId:3
+      },{
+        src:'http://gutouzu.oss-cn-shenzhen.aliyuncs.com/re/1577724354012913.jpg',
+        href : 'http://gmpet.com',
+        userName : '窗外的风景',
+        userHeadImage : 'http://gutouzu.oss-cn-shenzhen.aliyuncs.com/re/1577644950267.jpg',
+        likeCount : 18,
+        title : '哈哈，好可爱',
+        type:1,
+        videoId:4
+      }];
+      this.dynamicList.push(...this.tempArr)
     },
     methods:{
+      maskShow(){
+        this.$popup();
+      },
       getWqSelect(){
         let self = this;
         self.axios.get(Api.httpApi+'/community/selectJxUserDynamic',{
           params:{
             userId:38,
             page:1,
-            rows:30
+            rows:25
           }
         },{
         	headers: {
@@ -64,8 +115,11 @@
               e.src = e.compressImages.split(',')[0];
               e.href = 'http://app.gutouzu.com/index.html#/trend?dynamicId='+e.dynamicId;
             })
-            self.dynamicList = res.data.data;
-            console.log(self.dynamicList)
+            // {type:1,videoId:1},{type:1,videoId:2},{type:1,videoId:3},{type:1,videoId:4},{type:1,videoId:5}
+
+
+            self.dynamicList.push(...res.data.data);
+            // console.log(self.dynamicList)
             self.$refs.waterfall.waterfallOver()
         	}else{
 
@@ -76,15 +130,25 @@
           // 阻止a标签跳转
           event.preventDefault()
           // 只有当点击到图片时才进行操作
-          if (event.target.tagName.toLowerCase() == 'img'&&event.target.getAttribute('status')!=1) {
-            this.$router.push({
-            	name:'trend',
-            	query:{
-            		dynamicId:value.dynamicId
-            	}
-            })
+            console.log(value)
+            if(value.type==1){
+              this.$router.push({
+              	name:'dynamicVido',
+              	query:{
+              		videoId:value.videoId
+              	}
+              })
+            }else{
+              this.$router.push({
+              	name:'dynamicDetails',
+              	query:{
+              		dynamicId:value.dynamicId
+              	}
+              })
+            }
 
-          }
+
+
       },
     }
   }
@@ -120,7 +184,7 @@
           }
         }
         .like{
-          width:50px;
+          width:70px;
           img{
             width:25px;
             margin-right:5px;

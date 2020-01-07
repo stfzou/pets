@@ -7,7 +7,7 @@
               <div class="activityTitle">{{activityTitle}}</div>
               <div class="gumiCard" v-if="isPrivilege==1">骨米卡专享</div>
               <div class="price" v-if="minPrice==0">免费</div>
-              <div class="price" v-else>¥{{minPrice.toFixed(2)}}</div>
+              <div class="price" v-else>¥{{minPrice}}</div>
               <ul>
                 <li class="flex_r_f_s">
                   <div class="list_l">主办方</div>
@@ -27,7 +27,7 @@
                 </li>
                 <li class="flex_r_f_s">
                   <div class="list_l"></div>
-                  <div class="list_r"><div class="joinBtn pointer">立即参加</div></div>
+                  <div class="list_r"><div class="joinBtn pointer" @click="maskShow">立即参加</div></div>
                 </li>
               </ul>
 
@@ -68,7 +68,7 @@
                 <div class="listImg" v-bind:style="{'background-image':'url('+item.activityCover+')'}"></div>
                 <div class="listTitle">宠物摄影大赛</div>
                 <div class="price" v-if="item.minPrice==0">免费</div>
-                <div class="price" v-else>¥{{item.maxPrice}}~¥{{item.minPrice}}元</div>
+                <div class="price" v-else>{{item.maxPrice}}~{{item.minPrice}}元</div>
               </li>
             </ul>
           </div>
@@ -102,18 +102,23 @@
         commentList:[],
         commentNum:0,
         navIndex:1,
-        activityList:[]
+        activityList:[],
+        activityId:'',
       }
     },
     mounted() {
+      this.activityId = this.$route.query.activityId;
       this.getActivity();
       this.getActivityList();
     },
     methods:{
+      maskShow(){
+        this.$popup();
+      },
       getActivity(){
       	let self = this;
       	self.axios.post(Api.httpApi+'/ca/selectCommunityActivityDetails',self.qs.stringify({
-      		id:168,
+      		id:self.activityId,
       		userId:-1,
       		latitude:0,
       		longitude:0
@@ -144,11 +149,9 @@
             // if(res.data.data.maxPrice!=0){
             //   self.maxPrice = res.data.data.maxPrice;
             // }
-            if(res.data.data.minPrice==0){
-              self.minPrice = '免费'
-            }else{
-              self.minPrice = res.data.data.minPrice;
-            }
+
+            self.minPrice = res.data.data.minPrice;
+
       			self.limitNum = res.data.data.limitNum;
       			self.joinNum = res.data.data.joinNum;
       			self.lat = res.data.data.latitude;

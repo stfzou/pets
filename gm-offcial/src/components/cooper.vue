@@ -17,32 +17,32 @@
             给宠物爱好者带来更多养宠乐趣的同时，还能帮助中小宠
             物门店实现科学管理、精准营销与流量变现。
           </p>
-          
+
           <div class="btn flex_r_f_e pointer">宠物门店入驻</div>
         </div>
       </div>
       <div class="shopList">
         <ul>
-          <li class="flex_r_s_b" v-for="item in [1,2,3,4,5]">
+          <li class="flex_r_s_b" v-for="item in shopList">
             <div class="list_l">
-              <div class="shopName">宠物店名称</div>
-              <div class="types">主营: 宠物主粮、宠物主粮、宠物主粮、宠物主粮、宠物主粮、宠物主粮、宠物主粮、宠物主粮、宠物主粮、宠物主粮、宠物主粮、宠物主粮</div>
-              <div class="openTime">营业时间: 9:00-20:00</div>
+              <div class="shopName">{{item.shopName}}</div>
+              <div class="types">主营:{{item.shopsTypes|typeFilter}}</div>
+              <div class="openTime">营业时间: {{item.startTime}}-{{item.endTime}}</div>
               <div class="addr">地址: 成都市锦江区东恒国际</div>
             </div>
             <div class="list_r">
-              <div class="shopCoupon flex_r_s_b">
-                <div class="item" v-for="i in [1,2,3,4]">
+              <div class="shopCoupon flex_r_f_s">
+                <div class="item" v-for="i in item.couponList.slice(0,3)">
                   <div class="imgBox">
-                    <img src="http://gutouzu.oss-cn-shenzhen.aliyuncs.com/re/1575903006560218.jpg" alt="">
+                    <img :src="i.compressImg" alt="">
                   </div>
-                  <div class="price">¥12.00</div>
+                  <div class="price">¥{{i.couponPrice.toFixed(2)}}</div>
                 </div>
               </div>
             </div>
           </li>
         </ul>
-        <div class="more"><a href="###">查看附近更多商家</a></div>
+        <div class="more pointer" @click="maskShow">查看更多商家</div>
       </div>
     </div>
 
@@ -50,10 +50,53 @@
 </template>
 
 <script>
+  import Api from '../api/api.js'
   export default{
     data(){
       return{
+        shopList:[],
+        shopTyoe:'',
+      }
+    },
+    mounted() {
+      this.getShopList();
+    },
+    filters:{
+      typeFilter(arr){
+        let tempArr = [];
+        arr.forEach(e=>{
+          tempArr.push(e.name)
+        });
+        return tempArr.join('、');
 
+      }
+    },
+    methods:{
+      maskShow(){
+        this.$popup();
+      },
+      getShopList(){
+        let self = this;
+        this.axios.get(Api.httpApi + '/coupon/selectShopCouponListVo',{
+          params:{
+            keyword:'',
+            latitude:0,
+            longitude:0,
+            pageNo:0,
+            pageSize:10
+          }
+        }, {
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+          }
+        }).then((res)=>{
+          if(res.data.code==1){
+            self.shopList = res.data.data;
+
+          }else{
+            alert(res.data.msg);
+          }
+        })
       }
     }
   }
@@ -133,10 +176,13 @@
               .imgBox{
                 width:130px;
                 height:130px;
+                margin-right:20px;
+                border-radius:10px;
                 img{
                   width: 100%;
                   height: 100%;
                   object-fit: cover;
+                  border-radius:10px;
                 }
               }
               .price{
@@ -151,10 +197,8 @@
           text-align:center;
           font-size:18px;
           padding-top:30px;
-
-          a{
-            color:#ff523d;
-          }
+          color:#ff523d;
+          
         }
       }
     }

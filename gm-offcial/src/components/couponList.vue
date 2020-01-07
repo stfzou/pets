@@ -2,7 +2,7 @@
   <div class="couponListWarp">
      <div class="couponListCnt">
         <ul class="couponList flex_r_f_s">
-          <li v-for="item in couponList">
+          <li v-for="item in couponList" @click="couponXq(item)">
              <div class="couponImgBox pointer">
                <img class="couponImg" :src="item.compressImg" alt="">
                <img v-if="item.couponType===3" class="privilege" src="../assets/icon_gu30@3x.png" alt="">
@@ -11,10 +11,10 @@
              </div>
              <div class="couponName">{{item.couponName|descFilter}}</div>
              <div class="shopName pointer">{{item.shopName}}</div>
-             <div class="distance">{{item.distance}}</div>
+            <!-- <div class="distance">{{item.distance}}</div> -->
           </li>
         </ul>
-        <div class="more"><a href="###">查看更多附近优惠信息</a></div>
+        <div class="more pointer" @click="maskShow">查看更多优惠信息</div>
      </div>
   </div>
 </template>
@@ -32,14 +32,25 @@
     },
     filters:{
       descFilter(val){
-        if(val.length>10){
-          return val.substr(0,10)+'...'
+        if(val.length>20){
+          return val.substr(0,20)+'...'
         }else{
           return val
         }
       },
     },
     methods:{
+      couponXq(item){
+        this.$router.push({
+          name:'couponDetails',
+          query:{
+            couponId:item.couponId
+          }
+        })
+      },
+      maskShow(){
+        this.$popup();
+      },
       getCouponList(){
       	let self = this;
       	self.axios.post(Api.httpApi + '/coupon/selectCouponList', self.qs.stringify({
@@ -108,12 +119,13 @@
            }
            .couponName{
              font-size:16px;
-             color:#333;
+             color:#000;
+             line-height:20px;
              padding-top:10px;
            }
            .shopName{
-             font-size:16px;
-             color:#333;
+             font-size:14px;
+             color:#666;
              padding-top:10px;
            }
            .distance{
@@ -129,11 +141,9 @@
       .more{
         text-align:center;
         font-size:18px;
-        padding-top:20px;
+        padding-top:50px;
+        color:#ff523d;
 
-        a{
-          color:#ff523d;
-        }
       }
     }
   }

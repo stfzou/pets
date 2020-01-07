@@ -8,7 +8,7 @@
     </div>
     <div class="activityList">
       <ul class="flex_r_s_b">
-        <li v-for="item in activityList" class="pointer">
+        <li v-for="item in activityList" class="pointer" @click="activityXq(item)">
           <div class="activityImg">
             <img :src="item.activityCover" alt="">
           </div>
@@ -17,7 +17,7 @@
           <div class="activityAddr">活动地点: {{item.address}}</div>
         </li>
       </ul>
-      <div class="more"><a href="###">查看更多圈子活动</a></div>
+      <div class="more" @click="maskShow">查看更多圈子活动</div>
     </div>
   </div>
 </template>
@@ -34,6 +34,17 @@
       this.getActivity();
     },
     methods:{
+      maskShow(){
+        this.$popup();
+      },
+      activityXq(item){
+        this.$router.push({
+          name:'activityDetails',
+          query:{
+            activityId:item.id
+          }
+        })
+      },
       getActivity(){
         let self = this;
         self.axios.post(Api.httpApi + '/ca/selectCommunityActivityList', self.qs.stringify({
@@ -122,10 +133,8 @@
         text-align:center;
         font-size:18px;
         padding-top:30px;
+        color:#ff523d;
 
-        a{
-          color:#ff523d;
-        }
       }
     }
   }

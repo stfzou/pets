@@ -3,7 +3,11 @@
       <div class="header flex_r_s_b">
         <div class="logo"><a href="###"><img src="../assets/logo.png" alt=""></a></div>
         <ul class="navList">
-          <li v-for="(item,index) in navData"><a href="###">{{item.text}}</a></li>
+          <li v-for="(item,index) in navData">
+            <router-link :to="{name:item.link}">
+              <span class="navSpan">{{item.text}}</span>
+            </router-link>
+          </li>
         </ul>
       </div>
       <div class="cntWarp">
@@ -11,9 +15,9 @@
       </div>
       <div class="footer">
         <div class="agreement flex_r_f_e">
-          <a href="">注册协议</a>
-          <a href="">隐私协议</a>
-          <a href="">侵权投诉指引</a>
+          <router-link :to="{name:'agreement',query:{agreementId:2}}">注册协议</router-link>
+          <router-link :to="{name:'agreement',query:{agreementId:1}}">隐私协议</router-link>
+          <router-link :to="{name:'agreement',query:{agreementId:3}}">侵权投诉指引</router-link>
         </div>
         <div class="addrBox">
           <span>地址:四川省成都市锦江区一环路东五段108号东恒国际2栋2单元11层1104号</span><span style="margin: 0 20px;">电话:028-62498867  13608212022</span><span>邮箱:info@gumipet.com</span>
@@ -30,7 +34,7 @@ export default {
   name: 'HelloWorld',
   data () {
     return {
-      navData:[{text:'首页',link:''},{text:'汪圈精选',link:''},{text:'限时特惠',link:''},{text:'招商合作',link:''},{text:'圈子活动',link:''},{text:'关于我们',link:''},{text:'加入我们',link:''}],
+      navData:[{text:'首页',link:'index'},{text:'汪圈精选',link:'wqSelect'},{text:'限时特惠',link:'couponList'},{text:'招商合作',link:'cooper'},{text:'圈子活动',link:'activity'},{text:'关于我们',link:'about'},{text:'加入我们',link:'agreement'}],
       isActive:false,
     }
   },
@@ -81,6 +85,7 @@ export default {
       box-sizing:border-box;
       height:106px;
       z-index:1000;
+      // background:#fff;
       .navList{
         width: 1014px;
         flex-direction: row;
@@ -91,6 +96,16 @@ export default {
           font-size:16px;
           color:#000;
           margin-left:58px;
+          span{
+            display:inline-block;
+            line-height:40px;
+          }
+        }
+        .router-link-active{
+          .navSpan{
+            border-bottom:3px solid #ff523d;
+
+          }
         }
       }
     }

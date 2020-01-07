@@ -11,6 +11,11 @@ import '@/style/style.css'
 import Video from 'video.js'
 import 'video.js/dist/video-js.css'
 
+// 自定义全局弹窗组件
+import Popup from './globalComponents/popup'
+Vue.prototype.$popup = Popup.install
+
+
 import VueQuillEditor from 'vue-quill-editor'
 import 'quill/dist/quill.core.css'
 import 'quill/dist/quill.snow.css'

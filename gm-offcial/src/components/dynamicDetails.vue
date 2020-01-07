@@ -102,7 +102,7 @@
                     </div>
                   </li>
                 </ul>
-                 <div class="more">查看更多</div>
+                 <div class="more" @click="maskShow">查看更多</div>
               </div>
 
             </div>
@@ -133,15 +133,19 @@
         userNo:0,
         signature:'',
         imgIndex:0,
-        dynamicList:[]
+        dynamicList:[],
+        userId:'-1',
       }
     },
     mounted() {
       this.getTrend();
-      this.getAuthor();
-      this.getDynamic();
+      // this.getAuthor();
+     
     },
     methods:{
+      maskShow(){
+        this.$popup();
+      },
       slidChange(index){
         this.imgIndex = index;
       },
@@ -150,7 +154,7 @@
         this.page = 1;
       	self.axios.get(Api.httpApi + '/community/selectDynamicByUserId', {
       		params: {
-      			beLookUserId:'76',
+      			beLookUserId:self.userId,
       			lookUserId:'-1',
       			page:1,
       			rows:5
@@ -172,7 +176,7 @@
       	let self = this;
       	self.axios.get(Api.httpApi + '/userCenter/selectUserCenterByUserId', {
       		params: {
-      			beLookUserId:76,
+      			beLookUserId:self.userId,
       			lookUserId:'-1'
       		}
       	}, {
@@ -219,7 +223,7 @@
       	self.axios.get(Api.httpApi + '/community/selectDynamicDetails', {
       		params: {
       			userId:38,
-      			dynamicId:'15758977744071721'
+      			dynamicId:self.$route.query.dynamicId
       		}
       	}, {
       		headers: {
@@ -227,14 +231,16 @@
       		}
       	}).then((res) => {
       		if (res.data.code == 1) {
-           // console.log(res)
+           //console.log(res)
             self.trendTitle = res.data.data.title;
       			self.userName = res.data.data.userName;
       			if(res.data.data.images!=''){
       				self.images = res.data.data.images;
               self.compressImages = res.data.data.compressImages.split(',');
       			}
-
+            self.userId = res.data.data.userId;
+            self.getAuthor();
+            self.getDynamic();
             self.getImgs();
       			self.time = res.data.data.createdTime.split(' ')[0];
       			self.userHeadImage = res.data.data.userHeadImage;

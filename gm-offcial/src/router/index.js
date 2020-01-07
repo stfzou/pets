@@ -12,6 +12,9 @@ import EditExChange from '@/components/editExChange'
 import DynamicVido from '@/components/dynamicVido'
 import ActivityDetails from '@/components/activityDetails'
 import CouponDetails from '@/components/CouponDetails'
+import About from '@/components/about'
+import Agreement from '@/components/agreement'
+import Popup from '@/globalComponents/popup.vue'
 
 Vue.use(Router)
 
@@ -21,6 +24,11 @@ export default new Router({
       path: '/',
       name: 'home',
       component:Home
+    },
+    {
+      path:'/popup',
+      name:'popup',
+      component:Popup
     },
     {
       path:'/exchange',
@@ -33,15 +41,16 @@ export default new Router({
       component:EditExChange
     },
     {
+      path: '/index',
+      name: 'index',
+      component:Index
+    },
+    {
       path: '/home',
       name: 'home',
       component:Home,
       children:[
-        {
-          path: '/index',
-          name: 'index',
-          component:Index
-        },
+
         {
           path:'/couponList',
           name:'couponList',
@@ -81,6 +90,16 @@ export default new Router({
           path:'/dynamicVido',
           name:'dynamicVido',
           component:DynamicVido
+        },
+        {
+          path:'/about',
+          name:'about',
+          component:About
+        },
+        {
+          path:'/agreement',
+          name:'agreement',
+          component:Agreement
         }
       ]
     }
