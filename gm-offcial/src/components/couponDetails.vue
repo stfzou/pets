@@ -17,9 +17,19 @@
           </div>
             <div class="activityInfo">
               <div class="activityTitle">{{couponName}}</div>
-               <div class="condition">
-                 <b>¥{{couponPrice.toFixed(2)}}</b>
-                 <span>满{{conditionPrice.toFixed(2)}}元使用</span>
+               <div class="conditionBox flex_r_f_s">
+                 <!-- <b>¥{{couponPrice.toFixed(2)}}</b>
+                 <span>满{{conditionPrice.toFixed(2)}}元使用</span> -->
+                 <div class="sale">
+                   <span v-if="couponType!=1">￥{{conditionPrice.toFixed(1)}}</span>
+                   <span v-if="couponType===1">￥{{couponPrice.toFixed(1)}}</span>
+                 </div>
+                 <div class="condition">
+                   <span v-if="conditionPrice!==0&&couponType===1">满<span>{{conditionPrice.toFixed(1)}}</span>元使用</span>
+                   <span v-if="couponType!=1">原价:<span class="through">{{couponPrice.toFixed(1)}}</span></span>
+                   <span v-if="conditionPrice==0&&couponType===1">无门槛使用</span>
+                 </div>
+
                </div>
               <ul>
                 <li class="flex_r_f_s">
@@ -34,7 +44,7 @@
                 <li class="flex_r_f_s">
                   <div class="list_l">使用门店</div>
                   <div class="list_r">
-                    <div class="shopName">{{shopName}}</div>
+                    <div class="shopName pointer" @click="shopLink">{{shopName}}</div>
                     <div class="addr"><i class="el-icon-location"></i>{{shopAddress}}</div>
                   </div>
                 </li>
@@ -54,9 +64,23 @@
           <div class="title">商家更多福利</div>
           <div class="shopCouponList">
             <ul class="flex_r_f_s">
-              <li v-for="item in shopCoupons">
+              <li class="pointer" v-for="item in shopCoupons" @click="couponXq(item)">
                  <div class="imgBox" v-bind:style="{'background-image':'url('+item.couponIcan+')'}"></div>
-                 <div class="couponName">{{item.couponName}}</div>
+                 <div class="couponName">{{item.couponName|descFilter}}</div>
+                 <div class="priceBox flex_r_f_s">
+                   <div class="sale">
+
+                     <span v-if="item.couponType!=1">￥{{item.conditionPrice.toFixed(1)}}</span>
+                     <span v-if="item.couponType===1">￥{{item.couponPrice.toFixed(1)}}</span>
+
+                   </div>
+                   <div class="condition">
+
+                     <span v-if="item.conditionPrice!==0&&item.couponType===1">满<span>{{item.conditionPrice.toFixed(1)}}</span>元使用</span>
+                     <span v-if="item.couponType!=1">原价:<span class="through">{{item.couponPrice.toFixed(1)}}</span></span>
+                   	<span v-if="item.conditionPrice==0&&item.couponType===1">无门槛使用</span>
+                   </div>
+                 </div>
               </li>
             </ul>
             <div class="more pointer" @click="maskShow">查看更多</div>
@@ -93,13 +117,47 @@
         shopCoupons:[]
       }
     },
+    filters:{
+      descFilter(val){
+        if(val.length>22){
+          return val.substr(0,22)+'...'
+        }else{
+          return val
+        }
+      },
+    },
     mounted() {
       this.couponId = this.$route.query.couponId;
       this.getShopCouponList();
     },
+    watch:{
+      $route( to , from ){
+          this.couponId = to.query.couponId;
+          this.$router.go(0);
+      }
+    },
+
     methods:{
       maskShow(){
         this.$popup();
+      },
+      shopLink(){
+        let self = this;
+        this.$router.push({
+          name:'shopCoupon',
+          query:{
+            shopId:self.shopId
+          }
+        })
+      },
+      couponXq(item){
+
+        this.$router.push({
+          name:'couponDetails',
+          query:{
+            couponId:item.couponId
+          }
+        })
       },
       leftClick(){
         if(this.couponIndex <=0 ){
@@ -178,8 +236,8 @@
         }).then(res=>{
           if(res.data.code==1){
 
-            if(res.data.data.shopCoupons.length>8){
-              self.shopCoupons = res.data.data.shopCoupons.slice(0,8);
+            if(res.data.data.shopCoupons.length>6){
+              self.shopCoupons = res.data.data.shopCoupons.slice(0,6);
             }else{
               self.shopCoupons = res.data.data.shopCoupons;
             }
@@ -193,8 +251,11 @@
 <style lang="scss" scoped="scoped">
   .couponDetails{
     padding-top:108px;
+    .through{
+      text-decoration:line-through;
+    }
     .couponDetailsCnt{
-      width:1350px;
+      width:1100px;
       margin:0 auto;
       .couponDetailsPost{
         align-items:flex-start;
@@ -226,7 +287,6 @@
               height:70px;
               border-radius:10px;
               margin-right:20px;
-
               box-sizing:border-box;
             }
             .activeLi{
@@ -236,22 +296,26 @@
 
         }
         .activityInfo{
-          width:800px;
+          width:600px;
           .activityTitle{
             font-size:20px;
             line-height:36px;
           }
-          .condition{
-            padding-top:30px;
-            color:#ff523d;
-            b{
+          .conditionBox{
+            padding-top:20px;
+            .sale{
               font-size:30px;
-              margin-right:15px;
-
+              color:#ff523d;
+              font-weight:bold;
+              margin-right:10px;
+            }
+            .condition{
+              color:#999;
             }
           }
+
           ul{
-            padding-top:20px;
+
             li{
               color:#666;
               padding-top:20px;
@@ -329,8 +393,19 @@
             }
             .couponName{
               padding-top:10px;
-              line-height:30px;
+              line-height:20px;
               color:#666;
+            }
+            .priceBox {
+              padding-top:10px;
+              .sale{
+                font-size:18px;
+                color:#ff523d;
+                margin-right:10px;
+              }
+              .condition{
+                color:#999;
+              }
             }
           }
         }

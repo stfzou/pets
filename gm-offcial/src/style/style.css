@@ -6,6 +6,7 @@ html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockq
   vertical-align: baseline;
 }
 
+
 .divider {
   height: 16px;
   width: 100%;
@@ -138,7 +139,7 @@ body {
 	justify-content:center; */
 	flex-direction: row;
 	flex-start:center;
-  
+
 }
 .container{
 	width:100%;

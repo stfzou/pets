@@ -5,6 +5,36 @@
         <ul>
           <li class="flex_r_f_s">
             <div class="item_l">
+              商品类型:
+            </div>
+            <div class="item_r w300">
+              <el-select v-model="goodsTypeVal" @change="typeChange" placeholder="请选择">
+                  <el-option
+                    v-for="item in goodsTypeData"
+                    :key="item.value"
+                    :label="item.label"
+                    :value="item.value">
+                  </el-option>
+                </el-select>
+            </div>
+          </li>
+          <li class="flex_r_f_s">
+            <div class="item_l">
+              商品标签:
+            </div>
+            <div class="item_r w300">
+              <el-select v-model="goodsTipVal" placeholder="请选择">
+                  <el-option
+                    v-for="item in goodsTipData"
+                    :key="item.value"
+                    :label="item.label"
+                    :value="item.value">
+                  </el-option>
+                </el-select>
+            </div>
+          </li>
+          <li class="flex_r_f_s">
+            <div class="item_l">
               商品名称:
             </div>
             <div class="item_r w300">
@@ -52,70 +82,6 @@
                 </el-select>
             </div>
           </li>
-          <li class="flex_r_f_s" v-if="goodsAttrVal==-1">
-            <div class="item_l">
-              库存:
-            </div>
-            <div class="item_r w300">
-              <el-input v-model="stock" type="text" @change="inputChange('freight')"  placeholder="库存"></el-input>
-            </div>
-          </li>
-          <li class="flex_r_f_s">
-            <div class="item_l">
-              商品类型:
-            </div>
-            <div class="item_r w300">
-              <el-select v-model="goodsTypeVal" placeholder="请选择">
-                  <el-option
-                    v-for="item in goodsTypeData"
-                    :key="item.value"
-                    :label="item.label"
-                    :value="item.value">
-                  </el-option>
-                </el-select>
-            </div>
-          </li>
-          <li class="flex_r_f_s">
-            <div class="item_l">
-              商品标签:
-            </div>
-            <div class="item_r w300">
-              <el-select v-model="goodsTipVal" placeholder="请选择">
-                  <el-option
-                    v-for="item in goodsTipData"
-                    :key="item.value"
-                    :label="item.label"
-                    :value="item.value">
-                  </el-option>
-                </el-select>
-            </div>
-          </li>
-          <li class="flex_r_f_s">
-            <div class="item_l">
-              市场价:
-            </div>
-            <div class="item_r w300">
-              <el-input v-model="marketPrice" type="text" @change="inputChange('marketPrice')" placeholder="请输入市场价"></el-input>
-            </div>
-          </li>
-          <li class="flex_r_f_s">
-            <div class="item_l">
-              骨豆价:
-            </div>
-            <div class="item_r w300">
-              <el-input v-model="gdPric" @change="inputChange('gdPric')" type="text" placeholder="请输入价格"></el-input>
-            </div>
-          </li>
-          <li class="flex_r_f_s">
-            <div class="item_l">
-              运费:
-            </div>
-            <div class="item_r w300">
-              <el-input v-model="freight" type="text" @change="inputChange('freight')"  placeholder="请输入运费"></el-input>
-            </div>
-          </li>
-        </ul>
-        <ul>
           <li class="flex_r_f_s" v-if="norms.length>0">
             <div class="item_l">
               规格值:
@@ -139,7 +105,48 @@
               <el-input v-model="item.normsSum" type="text" placeholder="库存"></el-input>
             </div>
           </li>
+          <li class="flex_r_f_s" v-if="goodsAttrVal==-1">
+            <div class="item_l">
+              库存:
+            </div>
+            <div class="item_r w300">
+              <el-input v-model="stock" type="text" @change="inputChange('freight')"  placeholder="库存"></el-input>
+            </div>
+          </li>
+          <li class="flex_r_f_s">
+            <div class="item_l">
+              成本价:
+            </div>
+            <div class="item_r w300">
+              <el-input v-model="costPrice" type="text" @change="inputChange('freight')"  placeholder="请输入运费"></el-input>
+            </div>
+          </li>
+          <li class="flex_r_f_s">
+            <div class="item_l">
+              市场价:
+            </div>
+            <div class="item_r w300">
+              <el-input v-model="marketPrice" type="text" @change="inputChange('marketPrice')" placeholder="请输入市场价"></el-input>
+            </div>
+          </li>
+          <li class="flex_r_f_s">
+            <div class="item_l">
+              {{gudouText}}:
+            </div>
+            <div class="item_r w300">
+              <el-input v-model="gdPric" @change="inputChange('gdPric')" type="text" placeholder="请输入价格"></el-input>
+            </div>
+          </li>
+          <li class="flex_r_f_s" v-show="goodsTypeVal!=5">
+            <div class="item_l">
+              运费:
+            </div>
+            <div class="item_r w300">
+              <el-input v-model="freight" type="text" @change="inputChange('freight')"  placeholder="请输入运费"></el-input>
+            </div>
+          </li>
         </ul>
+
 
       </div>
       <div class="goodsDesc flex_r_f_s">
@@ -169,12 +176,13 @@
         goodsAttrVal:'',
         goodsAttrData:[{value:-1,label:'无规格'}],
         goodsTypeVal:'',
-        goodsTypeData:[{value:1,label:'普通'},{value:2,label:'推荐'},{value:3,label:'热门'},{value:4,label:'抽签商品'},{value:5,label:'砍价商品'}],
+        goodsTypeData:[{value:1,label:'普通'},{value:2,label:'推荐'},{value:3,label:'热门'},{value:4,label:'抽签商品'},{value:5,label:'砍价商品'},{value:6,label:'抢购商品'}],
         goodsTipVal:'',
         goodsTipData:[],
         marketPrice:'',
         gdPric:'',
         freight:'',//运费
+        costPrice:'',
         descVal:'',
         goodsMainList:[],
         norms:[],
@@ -183,7 +191,8 @@
         normsDataVal:[],
         stock:'',
         editor:'',
-        cPId:''
+        cPId:'',
+        gudouText:'骨豆价'
 
       }
     },
@@ -222,6 +231,16 @@
       getUrlKey(name){
           return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.href) || [, ""])[1].replace(/\+/g, '%20')) || null
       },
+      typeChange(val){
+        if(val==4||val==5){
+          this.goodsAttrVal = -1;
+        }
+        if(val==6){
+          this.gudouText = '销售价'
+        }else{
+          this.gudouText = '骨豆价'
+        }
+      },
       getGoodsInfo(){
         let self = this;
         self.axios.post(self.api + '/convertP/m/selectConvertProductMVoById', self.qs.stringify({
@@ -242,9 +261,13 @@
             })
             // console.log(res)
             self.goodsAttrVal = res.data.data.skuNId;
+            self.costPrice = res.data.data.costPrice;
             self.marketPrice = res.data.data.originalPrice;
             self.gdPric = res.data.data.boneBeanPrice;
             self.goodsTypeVal = res.data.data.pType;
+            if(self.goodsTypeVal==6){
+              self.gudouText = '销售价'
+            }
             self.editor.txt.html(res.data.data.pDesc);
             self.freight = res.data.data.fare;
             self.goodsTipVal = res.data.data.labelId;
@@ -307,18 +330,6 @@
           	message: '上传商品图片',
           	type: 'error',
           });
-        }else if(self.goodsAttrVal==''){
-          this.$message({
-          	showClose: true,
-          	message: '请选择规格属性',
-          	type: 'error',
-          });
-        }else if(self.goodsAttrVal==-1&&self.stock==''){
-          this.$message({
-          	showClose: true,
-          	message: '请输入库存',
-          	type: 'error',
-          });
         }else if(self.goodsTypeVal==''){
           this.$message({
           	showClose: true,
@@ -331,28 +342,10 @@
           	message: '请选择商品标签',
           	type: 'error',
           });
-        }else if(self.marketPrice==''){
+        }else if(self.goodsTypeVal==6&&self.gdPric>self.marketPrice){
           this.$message({
           	showClose: true,
-          	message: '选择输入市场价',
-          	type: 'error',
-          });
-        }else if(self.gdPric==''){
-          this.$message({
-          	showClose: true,
-          	message: '选择输入骨豆价',
-          	type: 'error',
-          });
-        }else if(self.freight==''){
-          this.$message({
-          	showClose: true,
-          	message: '选择输入运费',
-          	type: 'error',
-          });
-        }else if(self.goodsAttrVal!=''&&self.goodsAttrVal!=-1&&self.normsVal==''){
-          this.$message({
-          	showClose: true,
-          	message: '选择输规格值',
+          	message: '销售价必须小于市场价',
           	type: 'error',
           });
         }else{
@@ -389,6 +382,7 @@
           formData.append('pDesc',self.editor.txt.html())
           formData.append('labelId',self.goodsTipVal)
           formData.append('sumStock',stockVal)
+          formData.append('costPrice',self.costPrice)
           if(self.goodsMainList.length > 0) {
 
             self.goodsMainList.forEach((e) => {

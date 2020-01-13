@@ -2,15 +2,29 @@
   <div class="couponListWarp">
      <div class="couponListCnt">
         <ul class="couponList flex_r_f_s">
-          <li v-for="item in couponList" @click="couponXq(item)">
+          <li v-for="item in couponList">
              <div class="couponImgBox pointer">
-               <img class="couponImg" :src="item.compressImg" alt="">
+               <img class="couponImg" :src="item.compressImg" alt="" @click="couponXq(item)">
                <img v-if="item.couponType===3" class="privilege" src="../assets/icon_gu30@3x.png" alt="">
                <img v-if="item.couponType===2" class="privilege" src="../assets/icon_gu32@3x.png" alt="">
                <img v-if="item.couponType===1" class="privilege" src="../assets/icon_gu33@3x.png" alt="">
              </div>
-             <div class="couponName">{{item.couponName|descFilter}}</div>
-             <div class="shopName pointer">{{item.shopName}}</div>
+             <div class="couponName pointer" @click="couponXq(item)">{{item.couponName|descFilter}}</div>
+             <div class="priceBox flex_r_f_s">
+               <div class="sale">
+
+                 <span v-if="item.couponType!=1">￥{{item.conditionPrice.toFixed(1)}}</span>
+                 <span v-if="item.couponType===1">￥{{item.couponPrice.toFixed(1)}}</span>
+
+               </div>
+               <div class="condition">
+
+                 <span v-if="item.conditionPrice!==0&&item.couponType===1">满<span>{{item.conditionPrice.toFixed(1)}}</span>元使用</span>
+                 <span v-if="item.couponType!=1">原价:<span class="through">{{item.couponPrice.toFixed(1)}}</span></span>
+               	<span v-if="item.conditionPrice==0&&item.couponType===1">无门槛使用</span>
+               </div>
+             </div>
+             <div class="shopName pointer" @click="shopLink(item)">{{item.shopName}}</div>
             <!-- <div class="distance">{{item.distance}}</div> -->
           </li>
         </ul>
@@ -32,8 +46,8 @@
     },
     filters:{
       descFilter(val){
-        if(val.length>20){
-          return val.substr(0,20)+'...'
+        if(val.length>22){
+          return val.substr(0,22)+'...'
         }else{
           return val
         }
@@ -51,27 +65,30 @@
       maskShow(){
         this.$popup();
       },
+      shopLink(item){
+        this.$router.push({
+          name:'shopCoupon',
+          query:{
+            shopId:item.shopId
+          }
+        })
+      },
       getCouponList(){
       	let self = this;
-      	self.axios.post(Api.httpApi + '/coupon/selectCouponList', self.qs.stringify({
-      		userId:'',
+      	self.axios.post(Api.httpApi + '/coupon/selectCouponAll', self.qs.stringify({
+      		userId:'-1',
+          pageSize:60,
       		pageNo:0,
-      		city:'',
-      		couponPrice:'',
-      		condition:'',
-      		distance:'',
-      		pageSize: 15,
       		latitude: 0,
       		longitude: 0,
-      		couponPTypeId:-1,
-          couponType:3
+
       	}), {
       		headers: {
       			'Content-Type': 'application/x-www-form-urlencoded'
       		}
       	}).then((res)=>{
       		if(res.data.code == 1){
-            console.log(res)
+            //console.log(res)
       			self.couponList = res.data.data;
       		}else{
       			alert(res.data.msg)
@@ -89,6 +106,9 @@
   .couponListWarp{
     padding-top:106px;
     // padding-bottom:180px;
+    .through{
+      text-decoration:line-through;
+    }
     .couponListCnt{
       width:1350px;
       margin:0 auto;
@@ -97,6 +117,7 @@
          flex-wrap:wrap;
          padding:0 90px;
          box-sizing:border-box;
+         align-items:flex-start;
          li{
             width:200px;
             margin-right:30px;
@@ -128,10 +149,16 @@
              color:#666;
              padding-top:10px;
            }
-           .distance{
-             font-size:16px;
-             color:#333;
+           .priceBox {
              padding-top:10px;
+             .sale{
+               font-size:18px;
+               color:#ff523d;
+               margin-right:10px;
+             }
+             .condition{
+               color:#999;
+             }
            }
          }
          li:nth-child(5){

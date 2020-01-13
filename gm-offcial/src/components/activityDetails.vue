@@ -64,7 +64,7 @@
           </div>
           <div class="activityImg_r">
             <ul>
-              <li v-for="item in activityList" class="pointer">
+              <li v-for="item in activityList" class="pointer" @click="activityXq(item)">
                 <div class="listImg" v-bind:style="{'background-image':'url('+item.activityCover+')'}"></div>
                 <div class="listTitle">宠物摄影大赛</div>
                 <div class="price" v-if="item.minPrice==0">免费</div>
@@ -111,9 +111,24 @@
       this.getActivity();
       this.getActivityList();
     },
+    watch: {
+      $route( to , from ){
+          this.activityId = to.query.activityId;
+          this.$router.go(0);
+      }
+
+    },
     methods:{
       maskShow(){
         this.$popup();
+      },
+      activityXq(item){
+        this.$router.push({
+          name:'activityDetails',
+          query:{
+            activityId:item.id
+          }
+        })
       },
       getActivity(){
       	let self = this;
@@ -198,10 +213,10 @@
   .activityDetails{
     padding-top:108px;
     .activityDetailsCnt{
-      width:1350px;
+      width:1100px;
       margin:0 auto;
       .activityPost{
-        align-items:flex-start;
+        // align-items:flex-start;
         text-align:left;
         .activityCover{
           width:620px;
@@ -211,7 +226,7 @@
           background-position: 50%;
         }
         .activityInfo{
-          width:650px;
+          width:400px;
           .activityTitle{
             font-size:20px;
             line-height:36px;
@@ -269,7 +284,7 @@
         .nav_l{
           height:50px;
           background:#F5F5F5;
-          width:810px;
+          width:700px;
           .itemNav{
             height:50px;
             box-sizing:border-box;
@@ -292,7 +307,7 @@
       .activityImgBox{
         align-items:flex-start;
         .activityImg_l{
-          width:810px;
+          width:700px;
           .activityImgs{
             padding:30px;
             img{
@@ -308,6 +323,7 @@
               border-bottom:1px dashed #eee;
               .list_l{
                 width:40px;
+                margin-right:10px;
                 .headImg{
                   background-size:cover;
                   background-repeat: no-repeat;
@@ -315,10 +331,11 @@
                   width:40px;
                   height:40px;
                   border-radius:50%;
+
                 }
               }
               .list_mid{
-                width:550px;
+                width:500px;
                 text-align:left;
                 .userName{
                   color:#333;
@@ -349,6 +366,7 @@
                 background-size:cover;
                 background-repeat: no-repeat;
                 background-position: 50%;
+                border-radius:10px;
               }
               .listTitle{
                 font-size:20px;

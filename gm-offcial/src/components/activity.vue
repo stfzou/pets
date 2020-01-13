@@ -3,7 +3,7 @@
     <div class="activityPost">
         <div class="btnBox">
           <p>让宠物活动更有趣</p>
-          <div class="btn pointer flex_r_f_e">发布宠物活动</div>
+          <div class="btn pointer flex_r_f_e" @click="maskShow">发布宠物活动</div>
         </div>
     </div>
     <div class="activityList">
@@ -58,7 +58,7 @@
         	}
         }).then((res)=>{
         	if(res.data.code == 1){
-            console.log(res)
+            //console.log(res)
         		self.activityList = res.data.data;
         	}else{
         		alert(res.data.msg)
@@ -76,7 +76,7 @@
     .activityPost{
        height: 500px;
        position: relative;
-       background:yellow;
+       background:url('../assets/activityBg.jpg') no-repeat;
        .btnBox{
          position: absolute;
          right:300px;
@@ -99,17 +99,19 @@
        }
     }
     .activityList{
-      width:1350px;
+      width:1100px;
       margin:0 auto;
       ul{
          flex-wrap: wrap;
+
         li{
+          width:500px;
           padding-top:50px;
           text-align:left;
           font-size:18px;
           color:#333;
           .activityImg{
-            width:600px;
+            width:500px;
             height:300px;
             img{
               width: 100%;
@@ -126,6 +128,7 @@
           }
           .activityAddr{
             padding-top:15px;
+            line-height:20px;
           }
         }
       }

@@ -1,8 +1,11 @@
 <template>
     <div class="popupMask" v-if="show">
         <div class="maskCnt">
-            <img src="../assets/ewm.png" alt="">
-            <i class="el-icon-error closeMask pointer" @click="closeMask"></i>
+          <div class="maskImg">
+            <img src="../assets/pupEwm.png" alt="">
+          </div>
+          <div class="maskTip">扫码下载骨米宠物APP <br>养宠上骨米  生活更有趣</div>
+          <div class="closeMask pointer" @click="closeMask">关闭</div>
         </div>
     </div>
 </template>
@@ -32,26 +35,39 @@
       z-index:10000;
       background:rgba(0,0,0,0.5);
       .maskCnt{
-        width:220px;
-        height:220px;
+        width:280px;
+        height:280px;
         background:#fff;
         position: absolute;
         left:50%;
         top:50%;
-        margin-top:-110px;
-        margin-left:-110px;
+        margin-top:-175px;
+        margin-left:-150px;
+        box-sizing:border-box;
+        padding-top:20px;
+        border-radius:10px;
+        .maskImg{
+          width:130px;
+          height:130px;
+          margin:0 auto;
+          img{
+            width:100%;
+            height:100%;
 
-        img{
-          width:100%;
-          height:100%;
+          }
 
         }
+        .maskTip{
+          text-align:center;
+          line-height:30px;
+          font-size: 14px;
+          color: #555;
+          padding-top:20px;
+        }
         .closeMask{
-          position: absolute;
-          color:#ff523d;
-          right:-10px;
-          top:-10px;
-          font-size:30px;
+          padding: 10px 0;
+          color: #5b92e1;
+          text-align:center;
         }
       }
     }

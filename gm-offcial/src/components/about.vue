@@ -6,8 +6,14 @@
     			<img src="../assets/about_01.png" alt="" />
     			<div class="desc">
     				<p>
-    					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;骨米宠物是成都爱之宠宠物有用品限公司旗下的网站，创立于2018年4月，致力于打造成全国知名的宠物行业深度分销平台。创始核心团队人员主要来自阿里巴巴及百度，致力于将海内外最新的宠物行业顶级品牌、最新的宠物营销知识、最好的消费理念通过全中国宠物店，带给国内大中城市的宠物消费者，帮助消费者完成消费升级。
-    				</p>
+    					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 成都爱之宠宠物有用品限公司创立于2014年，专注服务于宠物门店经营管理、产品规划、陈列培训，公司代理全球数百个知名品牌，致力于打造人宠共享的全生态链应用平台。为养宠用户带来乐趣，为宠物商家创造价值是我们的企业宗旨。
+            </p>
+            <p>
+             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;公司创始核心团队人员主要来自阿里巴巴及百度，致力于将海内外最新的宠物行业顶级品牌、最新的宠物营销知识、最好的消费理念通过全中国宠物店，带给国内大中城市的宠物消费者，帮助消费者完成消费升级。
+
+            </p>
+
+
     				<div class="line"></div>
     			</div>
     		</div>
@@ -104,15 +110,20 @@
     .aboutWarp .companyInt .cntBox{
     	padding: 90px 0;
     	box-sizing: border-box;
+      align-items:flex-start;
+      img{
+        width:600px;
+      }
     }
     .aboutWarp .companyInt .cntBox .desc{
-    	width: 400px;
+    	width: 480px;
     }
     .aboutWarp .companyInt .cntBox .desc p{
 
     	font-size:16px;
     	color: #666;
-    	line-height:48px;
+    	line-height:36px;
+      text-align:left;
     }
     .aboutWarp.companyInt .cntBox .desc .line{
     	height:2px;

@@ -1,5 +1,5 @@
 <template>
-  <div class="agreement">
+  <div class="agreementWarp">
     <h1 class="agreementTitle">{{title}}</h1>
     <p v-html="agreementVal"></p>
   </div>
@@ -20,7 +20,7 @@
       $route( to , from ){
           this.agreementId = to.query.agreementId
           this.$router.go(0);
-        }
+      }
 
     },
     mounted() {
@@ -63,7 +63,7 @@
 </script>
 
 <style lang="scss">
-  .agreement{
+  .agreementWarp{
     padding-top:108px;
     background:#fff;
     width:100%;

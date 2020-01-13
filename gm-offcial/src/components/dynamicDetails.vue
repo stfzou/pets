@@ -15,6 +15,7 @@
             <div class="imgIndex">
               <span class="pointer" :class="{active:imgIndex==index}" @click="setActiveItem(index)" v-for="(item,index) in compressImages" :src="item" v-bind:style="{'background-image':'url('+item+')'}"></span>
             </div>
+            <div class="centTitle">{{trendTitle}}</div>
             <div class="content" v-html="content">
 
             </div>
@@ -85,11 +86,11 @@
                 </div>
               </div>
             </div>
-            <div class="relevantDyna">
+            <div class="relevantDyna" v-if="dynamicList.length>0">
               <div class="title">相关动态</div>
               <div class="dynamicList">
                 <ul>
-                  <li v-for="item in dynamicList" class="flex_r_f_s">
+                  <li v-for="item in dynamicList" class="flex_r_f_s pointer" @click="dynamicXq(item)">
                     <div class="imgBox">
                       <img :src="item.compressImages.split(',')[0]" alt="">
                     </div>
@@ -140,7 +141,14 @@
     mounted() {
       this.getTrend();
       // this.getAuthor();
-     
+
+    },
+    watch: {
+      $route( to , from ){
+          this.userId = to.query.userId;
+          this.$router.go(0);
+      }
+
     },
     methods:{
       maskShow(){
@@ -148,6 +156,14 @@
       },
       slidChange(index){
         this.imgIndex = index;
+      },
+      dynamicXq(item){
+        this.$router.push({
+        	name:'dynamicDetails',
+        	query:{
+        		dynamicId:item.dynamicId
+        	}
+        })
       },
       getDynamic(){
       	let self = this;
@@ -276,6 +292,13 @@
       align-items:flex-start;
       .dynamic_l{
         width:500px;
+        .centTitle{
+          font-size: 24px;
+          font-weight: 500;
+          color:#333;
+          text-align:left;
+          padding-top:20px;
+        }
         .dynamicSlide{
           .slidImg{
             height:100%;

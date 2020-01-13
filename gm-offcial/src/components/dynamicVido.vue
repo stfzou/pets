@@ -5,32 +5,33 @@
             <div class="dynamicSlide">
 
                    <video
-                   src="http://v.xiaohongshu.com/aecede64fe5805515ae37dbf923a19390f982da4_v1?sign=e362c74e3c96e60d7b83d95653d84a4c&t=5e10b680"
-                   controls="controls" objectfit="contain" class="videocontent"></video>
+                   :src="vidoInfo.vidoUrl"
+                   controls="controls" objectfit="contain" class="videocontent">
+                   </video>
 
             </div>
-            
-            <div class="content" v-html="content">
+            <div class="centTitle">{{vidoInfo.authorTitile}}</div>
+            <div class="content" v-html="vidoInfo.authorContent">
 
             </div>
             <div class="likeBox flex_r_f_s">
               <div class="flex_r_f_s like">
                 <img src="../assets/like.png" alt="">
-                <span>{{likeCount}}</span>
+                <span>{{vidoInfo.likeCount}}</span>
               </div>
               <div class="flex_r_f_s commentNum">
                 <img src="../assets/comment.png" alt="">
-                <span>{{commentCount}}</span>
+                <span>{{vidoInfo.commentCount}}</span>
               </div>
               <div class="flex_r_f_s look">
                 <img src="../assets/look.png" alt="">
-                <span>{{lookCount}}</span>
+                <span>{{vidoInfo.lookCount}}</span>
               </div>
             </div>
-            <div class="time">发布于 {{createdTime}}</div>
+            <div class="time">发布于 {{vidoInfo.createdTime}}</div>
             <div class="commentBox">
               <div class="title">汪圈评论</div>
-              <ul class="commentList" v-if="comment.length>1">
+              <!-- <ul class="commentList" v-if="vidoInfo.comment.length>1">
                 <li class="flex_r_s_b" v-for="item in comment">
                   <div class="list_l flex_r_f_s">
                     <div class="commentUserHead">
@@ -47,8 +48,8 @@
                     <span>回复</span>
                   </div>
                 </li>
-              </ul>
-              <div class="more pointer"  v-if="comment.length>1">查看更多</div>
+              </ul> -->
+              <!-- <div class="more pointer"  v-if="vidoInfo.comment.length>1">查看更多</div> -->
             </div>
         </div>
         <div class="dynamic_r">
@@ -56,31 +57,31 @@
               <div class="title">汪圈作者</div>
               <div class="wqAuthorInfo">
                 <div class="authorHead flex_r_f_s">
-                  <div class="imgBox"><img :src="userHeadImage" alt=""></div>
+                  <div class="imgBox"><img :src="vidoInfo.authorHeadImage" alt=""></div>
                   <div class="authorNamebox">
-                    <div class="author">{{userName}}</div>
-                    <div v-if="signature==''" class="autograph">暂无签名</div>
-                    <div v-else class="autograph">{{signature}}</div>
+                    <div class="author">{{vidoInfo.authorName}}</div>
+                    <div v-if="vidoInfo.signature==''" class="autograph">暂无签名</div>
+                    <div v-else class="autograph">{{vidoInfo.signature}}</div>
                   </div>
 
                 </div>
                 <div class="fansBox flex_r_s_b">
                   <div class="fansItem">
                     <div class="fansText">骨粉</div>
-                    <div class="num">{{fansCount}}</div>
+                    <div class="num">{{vidoInfo.fansCount}}</div>
                   </div>
                   <div class="fansItem">
                     <div class="fansText">关注</div>
-                    <div class="num">{{focusCount}}</div>
+                    <div class="num">{{vidoInfo.focusCount}}</div>
                   </div>
                   <div class="fansItem">
                     <div class="fansText">骨米号</div>
-                    <div class="num">{{userNo}}</div>
+                    <div class="num">{{vidoInfo.userNo}}</div>
                   </div>
                 </div>
               </div>
             </div>
-            <div class="relevantDyna">
+            <!-- <div class="relevantDyna">
               <div class="title">相关动态</div>
               <div class="dynamicList">
                 <ul>
@@ -100,7 +101,7 @@
                  <div class="more">查看更多</div>
               </div>
 
-            </div>
+            </div> -->
         </div>
       </div>
   </div>
@@ -111,146 +112,278 @@
   export default{
     data(){
       return{
-        trendTitle:'',
-        userName:'',
-        compressImages:[],
-        images:'',
-        imgData:[],
-        userHeadImage:'',
-        content:'',
-        likeCount:0,
-        lookCount:0,
-        comment:[],
-        commentCount:0,
-        createdTime:'',
-        fansCount:0,
-        focusCount:0,
-        userNo:0,
-        signature:'',
-        imgIndex:0,
-        dynamicList:[]
+        vidoInfo:'',
+        cntData:[{
+          authorName : '恍恍惚惚',
+          authorHeadImage : 'http://gutouzu.oss-cn-shenzhen.aliyuncs.com/re/1575891162279.jpg',
+          authorContent:'小猫咪真可爱',
+          vidoUrl:'https://gutouzu.oss-cn-shenzhen.aliyuncs.com/videoTest/3.mp4',
+          authorTitile:'逗猫玩',
+          likeCount:88,
+          commentCount:0,
+          lookCount:66,
+          createdTime:'2019/12/8 17:22',
+          comment:[],
+          signature:'红红火火,恍恍惚惚',
+          fansCount:166,
+          focusCount:199,
+          userNo:11241512
+        },{
+          authorName : '星河灿烂',
+          authorHeadImage : 'http://gutouzu.oss-cn-shenzhen.aliyuncs.com/re/1575942342856.jpg',
+          authorContent:'刚出生的小奶狗，太萌了',
+          vidoUrl:'https://gutouzu.oss-cn-shenzhen.aliyuncs.com/videoTest/4.mp4',
+          authorTitile:'小不点狗狗',
+          likeCount:28,
+          commentCount:0,
+          lookCount:11,
+          createdTime:'2020/1/8 15:15',
+          comment:[],
+          signature:'星河滚烫，人间理想',
+          fansCount:106,
+          focusCount:60,
+          userNo:11241819
+        },{
+          authorName : '为你伏笔',
+          authorHeadImage : 'http://gutouzu.oss-cn-shenzhen.aliyuncs.com/re/1576805654024482.jpg',
+          authorContent:'需要配种的快来哦',
+          vidoUrl:'https://gutouzu.oss-cn-shenzhen.aliyuncs.com/videoTest/5.mp4',
+          authorTitile:'奶油脸借公配种',
+          likeCount:136,
+          commentCount:0,
+          lookCount:205,
+          createdTime:'2019/8/9 18:52',
+          comment:[],
+          signature:'为你应下了轻语',
+          fansCount:101,
+          focusCount:76,
+          userNo:11241776
+        },{
+          authorName : '天晴等你',
+          authorHeadImage : 'http://gutouzu.oss-cn-shenzhen.aliyuncs.com/re/1575870248803.jpg',
+          authorContent:'摇头晃脑的真好玩',
+          vidoUrl:'https://gutouzu.oss-cn-shenzhen.aliyuncs.com/videoTest/6.mp4',
+          authorTitile:'好奇的猫',
+          likeCount:25,
+          commentCount:0,
+          lookCount:152,
+          createdTime:'2019/10/1 09:30',
+          comment:[],
+          signature:'天青色等烟雨，天晴我等你',
+          fansCount:66,
+          focusCount:52,
+          userNo:11241118
+        },{
+          authorName : '窗外的风景',
+          authorHeadImage : 'http://gutouzu.oss-cn-shenzhen.aliyuncs.com/re/1577644950267.jpg',
+          authorContent:'看我如何欺负一只漂亮的小猫咪',
+          vidoUrl:'https://gutouzu.oss-cn-shenzhen.aliyuncs.com/videoTest/7.mp4',
+          authorTitile:'贪玩小猫咪',
+          likeCount:50,
+          commentCount:0,
+          lookCount:80,
+          createdTime:'2019/11/11 13:50',
+          comment:[],
+          signature:'你装饰了我的梦',
+          fansCount:56,
+          focusCount:32,
+          userNo:11241955
+        },
+
+
+        {
+          authorName : '天之蓝',
+          authorHeadImage : 'http://www.gumipet.com/head/heiad_01.jpg',
+          authorContent:'钻刀圈',
+          vidoUrl:'https://gutouzu.oss-cn-shenzhen.aliyuncs.com/videoTest/mp4_01.mp4',
+          authorTitile:'绝活',
+          likeCount:135,
+          commentCount:0,
+          lookCount:80,
+          createdTime:'2019/8/25 08:50',
+          comment:[],
+          signature:'',
+          fansCount:200,
+          focusCount:275,
+          userNo:11241861
+        },{
+          authorName : '眸七443',
+          authorHeadImage : 'http://www.gumipet.com/head/head_02.jpg',
+          authorContent:'青春真好',
+          vidoUrl:'https://gutouzu.oss-cn-shenzhen.aliyuncs.com/videoTest/mp4_02.mp4',
+          authorTitile:'青云洋溢',
+          likeCount:78,
+          commentCount:0,
+          lookCount:101,
+          createdTime:'2019/9/11 9:50',
+          comment:[],
+          signature:'',
+          fansCount:136,
+          focusCount:89,
+          userNo:11891935
+        },{
+          authorName : '斜阳',
+          authorHeadImage : 'http://www.gumipet.com/head/head_03.jpg',
+          authorContent:'来摘橘子咯',
+          vidoUrl:'https://gutouzu.oss-cn-shenzhen.aliyuncs.com/videoTest/mp4_03.mp4',
+          authorTitile:'国庆摘桔子咯',
+          likeCount:350,
+          commentCount:0,
+          lookCount:501,
+          createdTime:'2019/10/01 14:50',
+          comment:[],
+          signature:'今天天气不错',
+          fansCount:86,
+          focusCount:52,
+          userNo:11241415
+        },{
+          authorName : '看我你怕了没',
+          authorHeadImage : 'http://www.gumipet.com/head/head_04.jpg',
+          authorContent:'舞蹈真好看',
+          vidoUrl:'https://gutouzu.oss-cn-shenzhen.aliyuncs.com/videoTest/mp4_04.mp4',
+          authorTitile:'舞蹈',
+          likeCount:50,
+          commentCount:0,
+          lookCount:80,
+          createdTime:'2019/7/9 20:50',
+          comment:[],
+          signature:'',
+          fansCount:127,
+          focusCount:100,
+          userNo:11241895
+        },{
+          authorName : '嘻嘻嘻',
+          authorHeadImage : 'http://www.gumipet.com/head/head_05.jpg',
+          authorContent:'妖娆的广告，你怕了没',
+          vidoUrl:'https://gutouzu.oss-cn-shenzhen.aliyuncs.com/videoTest/mp4_05.mp4',
+          authorTitile:'打广告',
+          likeCount:235,
+          commentCount:0,
+          lookCount:310,
+          createdTime:'2019/10/11 10:50',
+          comment:[],
+          signature:'',
+          fansCount:99,
+          focusCount:85,
+          userNo:11981915
+        },{
+          authorName : '刷你滴卡',
+          authorHeadImage : 'http://www.gumipet.com/head/head_06.jpg',
+          authorContent:'来看看这走秀怎么样',
+          vidoUrl:'https://gutouzu.oss-cn-shenzhen.aliyuncs.com/videoTest/mp4_06.mp4',
+          authorTitile:'时装秀',
+          likeCount:110,
+          commentCount:0,
+          lookCount:180,
+          createdTime:'2019/8/11 14:20',
+          comment:[],
+          signature:'',
+          fansCount:156,
+          focusCount:132,
+          userNo:11248465
+        },{
+          authorName : '7的意志',
+          authorHeadImage : 'http://www.gumipet.com/head/head_07.jpg',
+          authorContent:'逛超市真开心',
+          vidoUrl:'https://gutouzu.oss-cn-shenzhen.aliyuncs.com/videoTest/mp4_07.mp4',
+          authorTitile:'买东西咯',
+          likeCount:27,
+          commentCount:0,
+          lookCount:136,
+          createdTime:'2019/11/20 17:50',
+          comment:[],
+          signature:'',
+          fansCount:86,
+          focusCount:54,
+          userNo:11587412
+        },{
+          authorName : '遇见',
+          authorHeadImage : 'http://www.gumipet.com/head/head_08.jpg',
+          authorContent:'八哥真可爱',
+          vidoUrl:'https://gutouzu.oss-cn-shenzhen.aliyuncs.com/videoTest/mp4_08.mp4',
+          authorTitile:'八哥宝宝',
+          likeCount:61,
+          commentCount:0,
+          lookCount:80,
+          createdTime:'2019/11/09 11:50',
+          comment:[],
+          signature:'',
+          fansCount:56,
+          focusCount:32,
+          userNo:14211958
+        },{
+          authorName : '低调的咸鱼',
+          authorHeadImage : 'http://www.gumipet.com/head/head_09.jpg',
+          authorContent:'领导发表重要讲话',
+          vidoUrl:'https://gutouzu.oss-cn-shenzhen.aliyuncs.com/videoTest/mp4_09.mp4',
+          authorTitile:'公司年会',
+          likeCount:98,
+          commentCount:0,
+          lookCount:120,
+          createdTime:'2020/01/08 19:50',
+          comment:[],
+          signature:'',
+          fansCount:116,
+          focusCount:52,
+          userNo:11691155
+        },{
+          authorName : '星期日',
+          authorHeadImage : 'http://www.gumipet.com/head/head_010.jpg',
+          authorContent:'认真开车的男人真帅',
+          vidoUrl:'https://gutouzu.oss-cn-shenzhen.aliyuncs.com/videoTest/mp4_010.mp4',
+          authorTitile:'开车的男人',
+          likeCount:77,
+          commentCount:0,
+          lookCount:108,
+          createdTime:'2019/9/11 16:50',
+          comment:[],
+          signature:'',
+          fansCount:36,
+          focusCount:12,
+          userNo:18969552
+        },{
+          authorName : '潇湘夜雨',
+          authorHeadImage : 'http://www.gumipet.com/head/head_011.jpg',
+          authorContent:'逗小黑',
+          vidoUrl:'https://gutouzu.oss-cn-shenzhen.aliyuncs.com/videoTest/mp4_011.mp4',
+          authorTitile:'小黑',
+          likeCount:185,
+          commentCount:0,
+          lookCount:280,
+          createdTime:'2019/8/30 15:50',
+          comment:[],
+          signature:'',
+          fansCount:106,
+          focusCount:82,
+          userNo:19864255
+        },{
+          authorName : '偶滴天呐',
+          authorHeadImage : 'http://www.gumipet.com/head/head_012.jpg',
+          authorContent:'认真学习的学员们',
+          vidoUrl:'https://gutouzu.oss-cn-shenzhen.aliyuncs.com/videoTest/mp4_012.mp4',
+          authorTitile:'宠物培训',
+          likeCount:123,
+          commentCount:0,
+          lookCount:160,
+          createdTime:'2019/12/30 09:50',
+          comment:[],
+          signature:'',
+          fansCount:36,
+          focusCount:10,
+          userNo:11256982
+        }]
       }
     },
     mounted() {
-      this.getTrend();
-      this.getAuthor();
-      this.getDynamic();
+      this.getVidoInfo();
     },
     methods:{
-      slidChange(index){
-        this.imgIndex = index;
-      },
-      getDynamic(){
-      	let self = this;
-        this.page = 1;
-      	self.axios.get(Api.httpApi + '/community/selectDynamicByUserId', {
-      		params: {
-      			beLookUserId:'76',
-      			lookUserId:'-1',
-      			page:1,
-      			rows:5
-      		}
-      	}, {
-      		headers: {
-      			'Content-Type': 'application/x-www-form-urlencoded'
-      		}
-      	}).then((res)=>{
-      		if(res.data.code == 1){
-              console.log(res)
-              self.dynamicList = res.data.data;
-      		}else{
-      			alert(res.data.msg);
-      		}
-      	})
-      },
-      getAuthor(){
-      	let self = this;
-      	self.axios.get(Api.httpApi + '/userCenter/selectUserCenterByUserId', {
-      		params: {
-      			beLookUserId:76,
-      			lookUserId:'-1'
-      		}
-      	}, {
-      		headers: {
-      			'Content-Type': 'application/x-www-form-urlencoded'
-      		}
-      	}).then((res) => {
-      		if (res.data.code == 1) {
-
-
-      			self.fansCount = res.data.data.fansCount;
-      			self.focusCount = res.data.data.focusCount;
-      			self.userNo = res.data.data.userNo;
-      	    self.signature = res.data.data.signature;
-      			//console.log(res.data)
-      		}
-      	})
-      },
-      decodeUnicode(str) {
-      	str = str.replace(/\\/g, "%");
-      	return unescape(str);
-      },
-      setActiveItem(index){
-        this.$refs.carousel.setActiveItem(index);
-        this.imgIndex = index;
-      },
-      getImgs() {
-      	let self = this;
-      	this.axios.get(Api.httpApi + '/image/getImageUrlArrays?keys=' + self.images, {
-      	    headers: {
-      	      'Content-Type': 'application/x-www-form-urlencoded'
-      	    }
-      	}).then((res)=>{
-      	    if(res.data.code==1){
-      	      // self.initialIndex = index
-      	      self.imgData = res.data.data;
-
-      	    }
-
-      	})
-      },
-      getTrend() {
-      	let self = this;
-      	self.axios.get(Api.httpApi + '/community/selectDynamicDetails', {
-      		params: {
-      			userId:38,
-      			dynamicId:'15758977744071721'
-      		}
-      	}, {
-      		headers: {
-      			'Content-Type': 'application/x-www-form-urlencoded'
-      		}
-      	}).then((res) => {
-      		if (res.data.code == 1) {
-           // console.log(res)
-            self.trendTitle = res.data.data.title;
-      			self.userName = res.data.data.userName;
-      			if(res.data.data.images!=''){
-      				self.images = res.data.data.images;
-              self.compressImages = res.data.data.compressImages.split(',');
-      			}
-
-            self.getImgs();
-      			self.time = res.data.data.createdTime.split(' ')[0];
-      			self.userHeadImage = res.data.data.userHeadImage;
-      			// self.content = res.data.data.content;
-            self.lookCount = res.data.data.lookCount;
-            self.createdTime = res.data.data.createdTime;
-      			self.content = self.decodeUnicode(res.data.data.content);
-            self.content = self.content.replace(/[\n\r]/g,'<br>')
-      			self.likeCount = res.data.data.likeCount;
-      			self.commentCount = res.data.data.commentCount;
-            if(res.data.data.dynamicComments.length>2){
-              self.comment = res.data.data.dynamicComments.slice(0,2);
-            }else{
-              self.comment = res.data.data.dynamicComments;
-            }
-
-      		} else {
-      			alert(res.data.msg)
-      		}
-      	})
-      },
+      getVidoInfo(){
+        let self = this;
+        this.vidoId = this.$route.query.videoId;
+        this.vidoInfo = this.cntData[self.vidoId];
+        console.log(this.cntData[parseInt(self.videoId)])
+      }
     }
   }
 </script>
@@ -265,6 +398,13 @@
       align-items:flex-start;
       .dynamic_l{
         width:500px;
+        .centTitle{
+          font-size: 24px;
+          font-weight: 500;
+          color:#333;
+          text-align:left;
+          padding-top:20px;
+        }
         .dynamicSlide{
           width: 500px;
           height: 500px;

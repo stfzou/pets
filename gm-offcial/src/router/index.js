@@ -14,21 +14,18 @@ import ActivityDetails from '@/components/activityDetails'
 import CouponDetails from '@/components/CouponDetails'
 import About from '@/components/about'
 import Agreement from '@/components/agreement'
-import Popup from '@/globalComponents/popup.vue'
+import ShopCoupon from '@/components/shopCoupon.vue'
+import FlashSale from '@/components/flash/flashSale.vue'
+import AddFlashSale from '@/components/flash/addFlashSale.vue'
 
 Vue.use(Router)
 
 export default new Router({
   routes: [
     {
-      path: '/',
-      name: 'home',
-      component:Home
-    },
-    {
-      path:'/popup',
-      name:'popup',
-      component:Popup
+      path: '',
+      name: 'index',
+      component:Index
     },
     {
       path:'/exchange',
@@ -39,6 +36,16 @@ export default new Router({
       path:'/editExChange',
       name:'editExChange',
       component:EditExChange
+    },
+    {
+      path:'/flashSale',
+      name:'flashSale',
+      component:FlashSale
+    },
+    {
+      path:'/addFlashSale',
+      name:'addFlashSale',
+      component:AddFlashSale
     },
     {
       path: '/index',
@@ -100,7 +107,12 @@ export default new Router({
           path:'/agreement',
           name:'agreement',
           component:Agreement
-        }
+        },
+        {
+          path:'/shopCoupon',
+          name:'shopCoupon',
+          component:ShopCoupon
+        },
       ]
     }
 

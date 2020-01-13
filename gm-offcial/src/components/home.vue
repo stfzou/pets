@@ -1,8 +1,16 @@
 <template>
   <div class="homeWarp">
       <div class="header flex_r_s_b">
-        <div class="logo"><a href="###"><img src="../assets/logo.png" alt=""></a></div>
+        <div class="logo">
+
+          <router-link :to="{name:'index'}"><img src="../assets/logo.png" alt=""></router-link>
+        </div>
         <ul class="navList">
+          <li>
+            <router-link :to="{name:'index'}">
+              <span style="border: none;">首页</span>
+            </router-link>
+          </li>
           <li v-for="(item,index) in navData">
             <router-link :to="{name:item.link}">
               <span class="navSpan">{{item.text}}</span>
@@ -18,12 +26,14 @@
           <router-link :to="{name:'agreement',query:{agreementId:2}}">注册协议</router-link>
           <router-link :to="{name:'agreement',query:{agreementId:1}}">隐私协议</router-link>
           <router-link :to="{name:'agreement',query:{agreementId:3}}">侵权投诉指引</router-link>
+          <router-link :to="{name:'agreement',query:{agreementId:16}}">未成年保护协议</router-link>
+          <router-link :to="{name:'agreement',query:{agreementId:17}}">自审制度</router-link>
         </div>
         <div class="addrBox">
           <span>地址:四川省成都市锦江区一环路东五段108号东恒国际2栋2单元11层1104号</span><span style="margin: 0 20px;">电话:028-62498867  13608212022</span><span>邮箱:info@gumipet.com</span>
         </div>
         <div class="KeepRecord">
-          <p>成都爱之宠宠物用品有限公司版权所有 Copyright2018-2019 <a href="">蜀ICP备16029284号-2</a></p>
+          <p>成都爱之宠宠物用品有限公司版权所有 Copyright2018-2019 <a href="http://www.beian.miit.gov.cn/">蜀ICP备16029284号-2</a></p>
         </div>
       </div>
   </div>
@@ -34,7 +44,7 @@ export default {
   name: 'HelloWorld',
   data () {
     return {
-      navData:[{text:'首页',link:'index'},{text:'汪圈精选',link:'wqSelect'},{text:'限时特惠',link:'couponList'},{text:'招商合作',link:'cooper'},{text:'圈子活动',link:'activity'},{text:'关于我们',link:'about'},{text:'加入我们',link:'agreement'}],
+      navData:[{text:'汪圈精选',link:'wqSelect'},{text:'限时特惠',link:'couponList'},{text:'招商合作',link:'cooper'},{text:'圈子活动',link:'activity'},{text:'关于我们',link:'about'}],
       isActive:false,
     }
   },
