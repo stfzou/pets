@@ -106,14 +106,14 @@
               <el-input v-model="item.normsSum" type="text" placeholder="库存"></el-input>
             </div>
           </li>
-          <li class="flex_r_f_s" v-if="goodsAttrVal==-1">
+          <!-- <li class="flex_r_f_s" v-if="goodsAttrVal==-1">
             <div class="item_l">
               库存:
             </div>
             <div class="item_r w300">
               <el-input v-model="stock" type="text" @change="inputChange('freight')"  placeholder="库存"></el-input>
             </div>
-          </li>
+          </li> -->
 
           <li class="flex_r_f_s">
             <div class="item_l">
@@ -176,7 +176,7 @@
         api:'http://app.gutouzu.com',
         goodsName:'',
         goodsAttrVal:'',
-        goodsAttrData:[{value:-1,label:'无规格'}],
+        goodsAttrData:[],
         goodsTypeVal:'',
         goodsTypeData:[{value:1,label:'普通'},{value:2,label:'推荐'},{value:3,label:'热门'},{value:4,label:'抽奖商品'},{value:5,label:'砍价商品'},{value:6,label:'抢购商品'}],
         goodsTipVal:'',
@@ -247,7 +247,14 @@
           	message: '上传商品图片',
           	type: 'error',
           });
-        }else if(self.goodsTypeVal==''){
+        }else if(self.goodsAttrVal==''){
+          this.$message({
+          	showClose: true,
+          	message: '请选择规格属性',
+          	type: 'error',
+          });
+        }
+        else if(self.goodsTypeVal==''){
           this.$message({
           	showClose: true,
           	message: '选择商品类型',

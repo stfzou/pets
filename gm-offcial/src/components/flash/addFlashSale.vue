@@ -23,8 +23,8 @@
                  size="mini"
                  class="nameInput"
                  placeholder="请输入内容"
-                 v-model="input"
-                 maxlength="10"
+                 v-model="activityName"
+
                  show-word-limit>
                </el-input>
              </div>
@@ -37,10 +37,11 @@
 
                 <el-date-picker
                       size="mini"
-                      v-model="value1"
+                      v-model="activityTime"
                       @change="dataChange"
-                      value-format="yyyy-MM-dd H"
-                      type="datetimerange"
+                      :picker-options="pickerOptions"
+                      value-format="yyyy-MM-dd"
+                      type="daterange"
                       range-separator="至"
                       start-placeholder="开始日期"
                       end-placeholder="结束日期">
@@ -49,15 +50,15 @@
           </li>
           <li class="flex_r_f_s">
              <div class="list_l">
-               <b>*</b>活动描述
+               <b style="color:#fff">*</b>活动描述
              </div>
              <div class="list_r">
 
                <el-input
                  type="textarea"
                  placeholder="请输入活动描述"
-                 v-model="textarea"
-                 maxlength="30"
+                 v-model="activityDesc"
+                 maxlength="200"
                  show-word-limit
                >
                </el-input>
@@ -150,7 +151,7 @@
                   >
                   </el-table-column>
                   <el-table-column
-                    prop="originalPrice"
+                    prop="costPrice"
                     label="成本价(元)"
                   >
                   </el-table-column>
@@ -169,7 +170,7 @@
                 </el-table>
                 <div class="paginationBox flex_r_s_b">
                   <div class="pagination_l">
-                      <el-button size="mini" @click="batchJoin">批量参加</el-button>
+                      <el-button size="mini" @click="batchJoin" :disabled="selectGoodsSelection.length==0">批量参加</el-button>
                   </div>
                   <el-pagination
                     background
@@ -184,8 +185,20 @@
             </el-tab-pane>
 
             <el-tab-pane :label="'设置折扣'+'('+saleTable.length+')'" name="second" class="setSaleBox">
-                <div class="addBtnBox flex_r_s_b">
+                <div class="addBtnBox flex_r_f_s">
                   <!-- <el-button type="primary" size="small"></el-button> -->
+                  <div class="largeSale">
+                    <el-button size="mini" :disabled="selectSetGoodsSelection.length==0" @click="isLargeChange(1)">批量打折</el-button>
+                    <el-button size="mini" :disabled="selectSetGoodsSelection.length==0" @click="isLargeChange(2)">批量减价</el-button>
+                  </div>
+                  <div class="largeInput" v-show="isLargeSale===1&&isBtn==true">
+                    <el-input v-model="largeSale" @change="batchJoinSale" size="mini" type="number"></el-input>
+                    <span>折</span>
+                  </div>
+                  <div class="largeInput" v-show="isLargeSale===2&&isBtn==true">
+                    <el-input @change="batchReduce" v-model="reduceVal" size="mini" type="number"></el-input>
+                    <span>元</span>
+                  </div>
 
               </div>
               <el-table
@@ -194,7 +207,7 @@
                   :data="saleTable"
                   tooltip-effect="dark"
                   style="width: 100%"
-                  @selection-change="handleSelectionChange">
+                  @selection-change="setGoodsSelectionChange">
                   <el-table-column
                     type="selection"
                     width="55"
@@ -202,7 +215,7 @@
                   </el-table-column>
                   <el-table-column
                     label="商品名称"
-                    width="300">
+                    width="250">
                     <template slot-scope="scope">
                     <div class="imgBox flex_r_f_s pointer">
                       <img width="50" height="50" :src="scope.row.pIcon.split(',')[0]" alt="顶致宽台面碗">
@@ -217,12 +230,17 @@
                     show-overflow-tooltip>
                   </el-table-column>
                   <el-table-column
+                    prop="costPrice"
+                    label="成本价(元)"
+                  >
+                  </el-table-column>
+                  <el-table-column
                     prop="boneBeanPrice"
                     label="销售价(元)"
                     show-overflow-tooltip>
                   </el-table-column>
                   <el-table-column
-                    width="400"
+                    width="320"
                     label="折扣设置"
                     class="head123"
                     align="center"
@@ -231,16 +249,19 @@
                      <div class="setSaleInput flex_r_s_b">
                         <div class="inputBox">
                           <span>打折</span>
-                          <el-input type="number" v-model="scope.row.sale" @change="saleChange(scope.row)" size="mini"></el-input>
+                          <el-input class="input" type="number" v-model="scope.row.sale" @change="saleChange(scope.row)" size="mini"></el-input>
+                         <!-- <input type="number"  v-model="scope.row.sale" @change="saleChange(scope.row)"> -->
                         </div>
                         <div class="inputBox">
                           <span>减价</span>
                           <!-- <el-input type="number" v-model="scope.row.boneBeanPrice-scope.row.sale*0.1*scope.row.boneBeanPrice" size="mini"></el-input> -->
-                          <el-input type="number" v-model="scope.row.reduce" @change="function(val){return reduceChange(val,scope.row)}" size="mini"></el-input>
+                         <el-input class="input" type="number" size="mini" v-model="scope.row.reduce" @change="function(val){return reduceChange(val,scope.row)}"></el-input>
+                         <!-- <input type="number"  v-model="scope.row.reduce" @change="function(val){return reduceChange(val,scope.row)}"> -->
                         </div>
                         <div class="inputBox">
                           <span>减价后</span>
-                          <el-input type="number" v-model="scope.row.reduced" :readonly="true" size="mini"></el-input>
+                         <el-input class="input" type="number" v-model="scope.row.reduced" :readonly="true" size="mini"></el-input>
+                           <!-- <input type="number"  v-model="scope.row.reduced" readonly> -->
                         </div>
                      </div>
 
@@ -252,14 +273,14 @@
                     show-overflow-tooltip>
                     <template slot-scope="scope">
                      <div class="operation">
-                       <span class="cancelJoin pointer" style="color:#409EFF;">取消参加</span>
+                       <span @click="setCancel(scope.row)" class="cancelJoin pointer" style="color:#409EFF;">取消参加</span>
                      </div>
                     </template>
                   </el-table-column>
                 </el-table>
                 <div class="paginationBox flex_r_s_b">
                   <div class="pagination_l">
-                      <el-button size="mini">批量取消</el-button>
+                      <el-button size="mini" :disabled="selectSetGoodsSelection.length==0" @click="batchCancel">批量取消</el-button>
                   </div>
                   <el-pagination
                     background
@@ -277,7 +298,7 @@
     </div>
     <div class="saveBox">
       <el-button size="mini">取消</el-button>
-      <el-button type="primary" size="mini">保存</el-button>
+      <el-button type="primary" size="mini" @click="commit">保存</el-button>
     </div>
   </div>
 </template>
@@ -286,12 +307,35 @@
   import Api from '../../api/api.js'
   export default{
     data(){
+      let self = this;
       return{
-        input:'',
-        value1:'',
-        radio:'',
+         pickerOptions:{
+
+                disabledDate: (time) => {
+
+                    if(self.minTime){
+                      if((time.getMonth()+'月份'+time.getDate())==self.minTime||(time.getMonth()+'月份'+time.getDate())==self.maxTime){
+                        return false
+                      }else{
+                        return true
+                      }
+                    }
+                },
+                onPick(timeVal){
+
+                  // self.minTime = '';
+                  // self.maxTime = '';
+                  self.minTime = timeVal.minDate.getMonth()+'月份'+timeVal.minDate.getDate();
+                  self.maxTime = timeVal.minDate.getMonth()+'月份'+(timeVal.minDate.getDate()+1);
+                }
+        },
+        minTime:'',
+        maxTime:'',
         input2:'',
-        textarea:'',
+        activityName:'',//活动名称
+        radio:'',
+        activityTime:'',//生效时间
+        activityDesc:'',//活动描述
         checked: true,
         activeName: 'first',
         selectGoodsSelection: [],//选中的选择商品table数据
@@ -300,14 +344,61 @@
         selectGoodsIndexPage:0,//选择商品当前页数
         setSaleTotalPage:0,//设置折扣总页数
         setSaleIndexPage:0,//设置折扣当前页
-        saleTable:[]//折扣table
-
+        saleTable:[],//折扣table
+        selectSetGoodsSelection:[],//选中要设置的商品
+        isLargeSale:'',
+        largeSale:'',//批量打折
+        reduceVal:'',//批量减价
       }
     },
     mounted() {
       this.getSelectGoods();
+
     },
     methods:{
+      dealDisabledDate (time) {
+                  // time 是一个new Date数据
+
+          // return time.getTime() < Date.now() - 1*8.64e7;//两天之内 根据自己需求来定
+          return false
+
+      },
+      batchJoinSale(){//批量打折
+        let self = this;
+        if(this.largeSale>10){
+          this.largeSale=10;
+        }else if(this.largeSale<0){
+          this.largeSale=0;
+        }
+        this.selectSetGoodsSelection.forEach(e=>{
+          e.reduce = (e.boneBeanPrice-self.largeSale*0.1*e.boneBeanPrice).toFixed(2);
+          e.reduced = (e.boneBeanPrice-e.reduce).toFixed(2);
+          e.sale = this.largeSale;
+        })
+      },
+      batchReduce(){//批量减价
+          let self = this;
+          if(this.reduceVal<0){
+            this.reduceVal=0
+          }else{
+
+            this.selectSetGoodsSelection.forEach(e=>{
+              // e.reduce = (e.boneBeanPrice-self.largeSale*0.1*e.boneBeanPrice).toFixed(2);
+              // e.reduced = (e.boneBeanPrice-e.reduce).toFixed(2);
+              // e.sale = this.largeSale;
+              if(self.reduceVal>e.boneBeanPrice){
+                e.reduce = e.boneBeanPrice;
+                e.sale = 0;
+                e.reduced = e.boneBeanPrice-e.reduce;
+              }else{
+                e.reduce = self.reduceVal;
+                e.sale = ((e.boneBeanPrice-self.reduceVal)/e.boneBeanPrice*10).toFixed(1);
+                e.reduced = e.boneBeanPrice-self.reduceVal;
+              }
+
+            })
+          }
+      },
       batchJoin(){//批量加入
         let self = this
         if(this.selectGoodsSelection.length>0){
@@ -320,33 +411,70 @@
         }
 
       },
+      isLargeChange(num){
+        this.isLargeSale = num;
+        this.isBtn = true;
+      },
+      btnHide(){
+        this.isBtn = false;
+      },
       single(row){//单个加入
         row.isJoin = true;
         this.saleTable.push(row);
+        this.$refs.multipleTable.clearSelection();
       },
       saleChange(row){
         if(row.sale>10){
           row.sale=10;
 
         }else if(row.sale<0){
-          row.sale=0
+          row.sale=0;
         }
-        row.reduce = (row.boneBeanPrice-row.sale*0.1*row.boneBeanPrice).toFixed(2);
-        row.reduced = (row.boneBeanPrice-row.reduce).toFixed(2);
+        row.reduce = (row.boneBeanPrice-row.sale*0.1*row.boneBeanPrice).toFixed(1);
+        row.reduced = (row.boneBeanPrice-row.reduce).toFixed(1);
       },
+
       reduceChange(val,row){
 
         if(row.reduce>row.boneBeanPrice){
           row.reduce = row.boneBeanPrice;
-        }else if(row.reduce<0){
+        }else if(row.reduce<=0){
           row.reduce = 0;
         }else{
           row.reduce = val;
         }
-        row.sale = ((row.boneBeanPrice-row.reduce)/row.boneBeanPrice*10).toFixed(2);
-        row.reduced = (row.boneBeanPrice-val).toFixed(2);
+        row.sale = ((row.boneBeanPrice-row.reduce)/row.boneBeanPrice*10).toFixed(1);
+        row.reduced = (row.boneBeanPrice-val).toFixed(1);
       },
-      
+      setCancel(row){//设置tab商品取消
+        for(let i = 0; i<this.selectGoodsTable.length;i++){
+          if(this.selectGoodsTable[i].cPId==row.cPId){
+            this.selectGoodsTable[i].isJoin = false;
+            break;
+          }
+        }
+        for (let i = 0; i <this.saleTable.length;i++) {
+            if(this.saleTable[i].cPId==row.cPId){
+              this.saleTable.splice(i,1);
+              break;
+            }
+        }
+        this.$refs.multipleTable2.clearSelection();
+      },
+      batchCancel(){//批量取消
+
+        for(let i = 0; i<this.selectGoodsTable.length;i++){
+          for (let j = 0; j<this.selectSetGoodsSelection.length;j++) {
+              if(this.selectSetGoodsSelection[j].cPId==this.selectGoodsTable[i].cPId){
+                this.selectGoodsTable[i].isJoin = false;
+                console.log(this.selectGoodsTable[i])
+              }
+          }
+        }
+
+        this.saleTable = this.getArrDifference(this.saleTable,this.selectSetGoodsSelection);
+        this.$refs.multipleTable2.clearSelection();
+      },
       cancelSingle(row){//单个取消参加
         row.isJoin = false;
         for (let i = 0; i <this.saleTable.length;i++) {
@@ -356,6 +484,11 @@
             }
         }
         //console.log(this.saleTable)
+      },
+      getArrDifference(arr1, arr2) {//取出两个元素中不同的元素
+          return arr1.concat(arr2).filter(function(v, i, arr) {
+            return arr.indexOf(v) === arr.lastIndexOf(v);
+          });
       },
       getSelectGoods(){
         let self = this;
@@ -370,13 +503,39 @@
         }).then((res)=>{
         	if(res.data.code == 1){
             self.selectGoodsTotalPage = res.data.data.total;
-            res.data.data.rows.forEach(e=>{
-              e.isJoin = false;
-              e.sale = 10;
-              e.reduce = 0;
-              e.reduced = 0;
-            })
-            self.selectGoodsTable = res.data.data.rows;
+            if(self.saleTable.length>0){
+
+              self.saleTable.forEach((e)=>{
+                res.data.data.rows.forEach((j)=>{
+
+                  if(e.cPId == j.cPId){
+                    j.isJoin = true;
+                    j.sale = 10;
+                    j.reduce = 0;
+                    j.reduced = 0;
+                  }else{
+                    j.isJoin = false;
+                    j.sale = 10;
+                    j.reduce = 0;
+                    j.reduced = 0;
+                  }
+
+                })
+
+              })
+              self.selectGoodsTable = res.data.data.rows;
+
+            }else{
+              res.data.data.rows.forEach((e,i)=>{
+                //self.saleTable.forEach()
+                e.isJoin = false;
+                e.sale = 10;
+                e.reduce = 0;
+                e.reduced = 0;
+              })
+              self.selectGoodsTable = res.data.data.rows;
+            }
+
             //console.log(self.selectGoodsTable)
         	}else{
         		alert(res.data.msg)
@@ -408,17 +567,112 @@
       handleSelectionChange(val) {
         this.selectGoodsSelection = val;
       },
+      setGoodsSelectionChange(val){
+        this.selectSetGoodsSelection = val;
+      },
       handleClick(){
 
       },
-      dataChange(val){
-        console.log(val)
+      judgeTimeChange(time){//判断时间是否重合
+
+        this.axios.post(Api.gtzApi + '/am/addActivityDiscount', this.qs.stringify({
+        	startTime:time[0]+' 10',
+          endTime:time[1]+' 10'
+
+        }), {
+        	headers: {
+        		'Content-Type': 'application/x-www-form-urlencoded'
+        	}
+        }).then((res)=>{
+        	if(res.data.code != 1){
+            alert(res.data.msg)
+        	}
+
+        })
+      },
+      dataChange(time){
+        //console.log(val)
+        this.minTime = '';
+        this.maxTime = '';
+        if(time!=null){
+          this.judgeTimeChange(time)
+        }
+
+      },
+      commit(){
+        let isCommit = true;
+        for(let i=0;i<this.saleTable.length;i++){
+          if(this.saleTable[i].sale==10){
+            isCommit = false;
+            break;
+          }
+        }
+        if(this.activityName==''){
+          this.$message({
+            message:'请填写活动名称',
+            type: 'warning'
+          });
+        }else if(this.activityTime==''){
+          this.$message({
+            message:'请选择活动时间',
+            type: 'warning'
+          });
+        }else if(this.saleTable.length<1){
+          this.$message({
+            message:'请选择折扣商品',
+            type: 'warning'
+          });
+        }else{
+
+          if(!isCommit){
+            this.$message({
+              message:'有商品还未设置折扣',
+              type: 'warning'
+            });
+          }else{
+            let self = this;
+            let arr = [];
+            this.saleTable.forEach(e=>{
+              arr.push({
+                cPId:e.cPId,
+                type:1,
+                discount:e.sale,
+                activityPrice:e.reduced
+              })
+            })
+            self.axios.post(Api.gtzApi + '/am/addActivityDiscount', self.qs.stringify({
+            	activityName:self.activityName,
+              activityType:1,
+              activityDesc:self.activityDesc,
+              startTime:self.activityTime[0]+' 10',
+              endTime:self.activityTime[1]+' 10',
+              discountProducts:JSON.stringify(arr)
+            }), {
+            	headers: {
+            		'Content-Type': 'application/x-www-form-urlencoded'
+            	}
+            }).then((res)=>{
+            	if(res.data.code == 1){
+                setTimeout(()=>{
+                  self.$message({
+                    message: '添加成功',
+                    type: 'success'
+                  });
+                },500)
+            	}else{
+            		alert(res.data.msg)
+            	}
+
+            })
+          }
+
+        }
       }
     }
   }
 </script>
 
-<style lang="scss"scoped="scoped">
+<style lang="scss">
   .addFlashSaleWarp{
     padding-bottom:50px;
     .title{
@@ -520,6 +774,19 @@
           }
         }
         .setSaleBox{
+          .addBtnBox{
+            padding-bottom:10px;
+            .largeInput{
+              margin-left:20px;
+              width:120px;
+              .el-input{
+                width:100px;
+              }
+            }
+            .suerBtn{
+              margin-left:20px;
+            }
+          }
           .paginationBox{
             padding:30px 0;
           }
@@ -532,13 +799,20 @@
             width:120px;
             margin-right:5px;
             font-size:12px;
-            .el-input--mini .el-input__inner{
-              width:85px;
-            }
             .el-input{
-              width:85px;
+               width:60px;
             }
+            .input{
+              input{
+                padding:0;
+                width:55px;
+                padding-left:5px;
+              }
+            }
+
+
           }
+
         }
         .itemTitle{
           padding:20px 0 20px 0;
