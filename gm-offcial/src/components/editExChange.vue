@@ -98,21 +98,14 @@
             </div>
           </li>
           <li class="flex_r_f_s" v-for="item in normsArr" v-if="normsArr.length>0">
-            <div class="item_l">
+            <div class="item_l" style="color:#ff523d;">
               {{item.name}}:
             </div>
             <div class="item_r w300">
               <el-input v-model="item.normsSum" type="text" placeholder="库存"></el-input>
             </div>
           </li>
-          <!-- <li class="flex_r_f_s" v-if="goodsAttrVal==-1">
-            <div class="item_l">
-              库存:
-            </div>
-            <div class="item_r w300">
-              <el-input v-model="stock" type="text" @change="inputChange('freight')"  placeholder="库存"></el-input>
-            </div>
-          </li> -->
+
           <li class="flex_r_f_s">
             <div class="item_l">
               成本价:
@@ -129,7 +122,7 @@
               <el-input v-model="marketPrice" type="text" @change="inputChange('marketPrice')" placeholder="请输入市场价"></el-input>
             </div>
           </li>
-          <li class="flex_r_f_s">
+          <li class="flex_r_f_s" v-show="goodsTypeVal!=5&&goodsTypeVal!=4">
             <div class="item_l">
               {{gudouText}}:
             </div>
@@ -171,25 +164,25 @@
     data(){
       return{
 
-        api:'http://app.gutouzu.com',
+        api:'https://h5.gumipet.com',
         goodsName:'',
         goodsAttrVal:'',
         goodsAttrData:[],
         goodsTypeVal:'',
-        goodsTypeData:[{value:1,label:'普通'},{value:2,label:'推荐'},{value:3,label:'热门'},{value:4,label:'抽签商品'},{value:5,label:'砍价商品'},{value:6,label:'抢购商品'}],
+        goodsTypeData:[{value:1,label:'普通'},{value:2,label:'推荐'},{value:3,label:'热门'},{value:4,label:'抽奖商品'},{value:5,label:'砍价商品'},{value:6,label:'抢购商品'},{value:7,label:'骨米卡专享'}],
         goodsTipVal:'',
         goodsTipData:[],
-        marketPrice:'',
-        gdPric:'',
-        freight:'',//运费
-        costPrice:'',
+        marketPrice:0,
+        gdPric:0,
+        freight:0,//运费
+        costPrice:0,
         descVal:'',
         goodsMainList:[],
         norms:[],
         normsVal:[],
         normsArr:[],
         normsDataVal:[],
-        stock:'',
+        stock:0,
         editor:'',
         cPId:'',
         gudouText:'骨豆价'
@@ -208,21 +201,26 @@
       let self = this;
       this.cPId = this.getUrlKey('cPId');
       this.editor = new E('#editor');
-      this.editor.customConfig.uploadImgMaxLength = 5;
+      this.editor.customConfig.uploadImgMaxLength = 10;
       this.editor.customConfig.customUploadImg = (files, insert) => {
-        let formData = new FormData();
-        formData.append('Img', files[0]);
-        // formData.append('path', 'files/ne-icev3-dashboard/content/content/');
-        this.axios.post(self.api+'/upload/uploadImg', formData).then(res => {
-          //console.log(res)
-          // const result = res.data;
-          if (res.data.code == 1 ) {
-            const data = res.data.data.imgAddr;
-            insert(data);
-          }
-        });
+       const formData = new FormData();
+       files.forEach(e=>{
+         formData.append('Imgs',e);
+       })
+
+       // formData.append('path', 'files/ne-icev3-dashboard/content/content/');
+       this.axios.post(self.api+'/updateImgs', formData).then(res => {
+
+         if (res.data.code == 1 ) {
+            res.data.data.forEach(e=>{
+              insert(e)
+            })
+
+         }
+       });
       };
       this.editor.create();
+      document.querySelector('.w-e-text-container').style.zIndex=1000;
       this.getAttr();
       this.getTip();
       this.getGoodsInfo();
@@ -232,11 +230,11 @@
           return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.href) || [, ""])[1].replace(/\+/g, '%20')) || null
       },
       typeChange(val){
-        if(val==4||val==5){
-          this.goodsAttrVal = -1;
-        }
+
         if(val==6){
           this.gudouText = '销售价'
+        }else if(val==7){
+          this.gudouText = '专享价'
         }else{
           this.gudouText = '骨豆价'
         }
@@ -259,23 +257,32 @@
                 url:e
               })
             })
-            // console.log(res)
+            console.log(res)
             self.goodsAttrVal = res.data.data.skuNId;
-            self.costPrice = res.data.data.costPrice;
-            self.marketPrice = res.data.data.originalPrice;
-            self.gdPric = res.data.data.boneBeanPrice;
+            if(res.data.data.costPrice!=null){
+              self.costPrice = res.data.data.costPrice;
+            }
+            if(res.data.data.originalPrice!=null){
+              self.marketPrice = res.data.data.originalPrice;
+            }
+            if(res.data.data.boneBeanPrice!=null){
+              self.gdPric = res.data.data.boneBeanPrice;
+            }
+
             self.goodsTypeVal = res.data.data.pType;
+
             if(self.goodsTypeVal==6){
               self.gudouText = '销售价'
+            }else if(self.goodsTypeVal==7){
+              self.gudouText = '专享价'
             }
             self.editor.txt.html(res.data.data.pDesc);
-            self.freight = res.data.data.fare;
-            self.goodsTipVal = res.data.data.labelId;
-            if(res.data.data.skuNId==-1){
-              self.stock = res.data.data.sumStock;
-            }else{
 
-              self.axios.post(self.api + '/convertP/m/selectANV', self.qs.stringify({
+            if(res.data.data.fare!=null){
+              self.freight = res.data.data.fare;
+            }
+            self.goodsTipVal = res.data.data.labelId;
+            self.axios.post(self.api + '/convertP/m/selectANV', self.qs.stringify({
               	attrNameId:res.data.data.skuNId
               }), {
               	headers: {
@@ -284,7 +291,6 @@
               }).then((re)=>{
               	if(re.data.code == 1){
                   //console.log(res)
-                  self.norms = [];
                   re.data.data.forEach((e)=>{
                     self.norms.push({
                       label:e.attrValueName,
@@ -307,7 +313,7 @@
               	}
 
               })
-            }
+
           }
         })
 
@@ -318,6 +324,15 @@
         let stockVal = 0;
         let skus = [];
         let imgAddrArr = [];
+        let isStock = true;
+        if(self.normsArr.length>0){
+          for(let i=0;i<self.normsArr.length;i++){
+            if(self.normsArr[i].normsSum==''){
+              isStock=false;
+              break;
+            }
+          }
+        }
         if(self.goodsName==''){
           this.$message({
           	showClose: true,
@@ -336,8 +351,19 @@
           	message: '请选择规格属性',
           	type: 'error',
           });
-        }
-        else if(self.goodsTypeVal==''){
+        }else if(self.normsVal<1){
+          this.$message({
+          	showClose: true,
+          	message: '请选择规格值',
+          	type: 'error',
+          });
+        }else if(isStock==false){
+          this.$message({
+          	showClose: true,
+          	message: '请输入库存',
+          	type: 'error',
+          });
+        }else if(self.goodsTypeVal==''){
           this.$message({
           	showClose: true,
           	message: '选择商品类型',
@@ -349,7 +375,8 @@
           	message: '请选择商品标签',
           	type: 'error',
           });
-        }else if(self.goodsTypeVal==6&&self.gdPric>self.marketPrice){
+        }else if(self.goodsTypeVal==6&&parseInt(self.gdPric)>parseInt(self.marketPrice)){
+
           this.$message({
           	showClose: true,
           	message: '销售价必须小于市场价',
@@ -357,9 +384,7 @@
           });
         }else{
 
-          if(this.goodsAttrVal==-1){
-            stockVal = self.stock;
-          }else{
+         
             //console.log(this.normsArr)
             this.normsArr.forEach((e)=>{
               stockVal+= parseInt(e.normsSum)
@@ -377,7 +402,7 @@
             })
 
             formData.append('skus',JSON.stringify(skus))
-          }
+          
           // console.log(self.descVal)
           formData.append('cPId',self.cPId)
           formData.append('pName',self.goodsName)
@@ -405,14 +430,14 @@
           }).then((res)=>{
           	if(res.data.code == 1){
               //console.log(res)
-               this.$message({
-                  showClose: true,
-                  message: '编辑成功',
-                  type: 'success'
+                self.$message({
+                   showClose: true,
+                   message: '编辑成功',
+                   type: 'success'
                 });
                 setTimeout(()=>{
                   self.$router.go(0)
-                },500)
+                },1000)
           	}else{
           		alert(res.data.msg)
 
@@ -452,11 +477,10 @@
       },
       attrChange(val){
         let self = this;
-        if(val==-1){
-          self.norms = [];
-          self.normsArr = [];
-          self.normsVal = '';
-        }else{
+        //console.log(val)
+        self.norms = [];
+        self.normsArr = [];
+        self.normsVal = '';
           self.axios.post(self.api + '/convertP/m/selectANV', self.qs.stringify({
           	attrNameId:val
           }), {
@@ -479,18 +503,19 @@
           	}
 
           })
-        }
+
 
       },
       getAttr(){//获取属性
         let self = this;
+
         self.axios.post(self.api + '/convertP/m/selectAttrNameAll',{
           headers: {
             'Content-Type': 'multipart/form-data'
           }
         }).then((res) => {
           if (res.data.code == 1) {
-            //console.log(res)
+            console.log(res)
             res.data.data.forEach((e)=>{
               self.goodsAttrData.push({
                 label:e.attrName,
@@ -690,7 +715,7 @@
   }
 </script>
 
-<style lang="scss" scoped="scoped">
+<style lang="scss">
   .editExchangeWarp{
     text-align:left;
     padding-bottom:100px;
@@ -738,7 +763,7 @@
           margin-right:10px;
           font-size:16px;
           color:#333;
-          width:80px;
+          width:100px;
           text-align:right;
         }
         .goods_main_pic {
@@ -804,7 +829,7 @@
         margin-right:10px;
         font-size:16px;
         color:#333;
-        width:80px;
+        width:100px;
         text-align:right;
       }
       .descWangeditor{

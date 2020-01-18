@@ -17,6 +17,8 @@ import Agreement from '@/components/agreement'
 import ShopCoupon from '@/components/shopCoupon.vue'
 import FlashSale from '@/components/flash/flashSale.vue'
 import AddFlashSale from '@/components/flash/addFlashSale.vue'
+import EditFlashSale from '@/components/flash/editFlashSale.vue'
+
 
 Vue.use(Router)
 
@@ -46,6 +48,11 @@ export default new Router({
       path:'/addFlashSale',
       name:'addFlashSale',
       component:AddFlashSale
+    },
+    {
+      path:'/editFlashSale',
+      name:'editFlashSale',
+      component:EditFlashSale
     },
     {
       path: '/index',

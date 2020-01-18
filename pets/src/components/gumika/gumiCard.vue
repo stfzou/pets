@@ -77,9 +77,9 @@
       <img src="../../assets/icon_gu10@2x.png" alt="">
       <img src="../../assets/icon_gu11@2x.png" alt="">
       <img src="../../assets/icon_gu12@2x.png" alt="">
-      <img src="../../assets/icon_gu13@2x.png" alt="">
+      <!-- <img src="../../assets/icon_gu13@2x.png" alt="">
       <img src="../../assets/icon_gu14@2x.png" alt="">
-      <img src="../../assets/icon_gu15@2x.png" alt="">
+      <img src="../../assets/icon_gu15@2x.png" alt=""> -->
     </div>
     <div class="interestsBox">
       <div class="interests">

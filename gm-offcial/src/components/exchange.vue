@@ -68,7 +68,7 @@
               </div>
             </div>
           </li>
-          <li class="flex_r_f_s" v-show="goodsTypeVal!=5&&goodsTypeVal!=4">
+          <li class="flex_r_f_s">
             <div class="item_l">
               规格属性:
             </div>
@@ -106,7 +106,7 @@
               <el-input v-model="item.normsSum" type="text" placeholder="库存"></el-input>
             </div>
           </li>
-          <!-- <li class="flex_r_f_s" v-if="goodsAttrVal==-1">
+          <!-- <li class="flex_r_f_s" v-if="goodsAttrVal==100">
             <div class="item_l">
               库存:
             </div>
@@ -131,7 +131,7 @@
               <el-input v-model="marketPrice" type="text" @change="inputChange('marketPrice')" placeholder="请输入市场价"></el-input>
             </div>
           </li>
-          <li class="flex_r_f_s" v-show="goodsTypeVal!=5&&goodsTypeVal!=4">
+          <li class="flex_r_f_s">
             <div class="item_l">
               {{gudouText}}:
             </div>
@@ -158,7 +158,7 @@
                 v-model="descVal"
                 ref="myQuillEditor">
             </quill-editor> -->
-            <div id="editor" style="height:300px;background: #ffffff;"></div>
+            <div id="editor" style="height:300px;background: #ffffff;z-index: 1000;"></div>
           </div>
 
       </div>
@@ -173,12 +173,12 @@
     data(){
       return{
 
-        api:'http://app.gutouzu.com',
+        api:'https://h5.gumipet.com',
         goodsName:'',
         goodsAttrVal:'',
         goodsAttrData:[],
         goodsTypeVal:'',
-        goodsTypeData:[{value:1,label:'普通'},{value:2,label:'推荐'},{value:3,label:'热门'},{value:4,label:'抽奖商品'},{value:5,label:'砍价商品'},{value:6,label:'抢购商品'}],
+        goodsTypeData:[{value:1,label:'普通'},{value:2,label:'推荐'},{value:3,label:'热门'},{value:4,label:'抽奖商品'},{value:5,label:'砍价商品'},{value:6,label:'抢购商品'},{value:7,label:'骨米卡专享'}],
         goodsTipVal:'',
         goodsTipData:[],
         marketPrice:'',
@@ -208,22 +208,27 @@
     mounted() {
       let self = this;
       this.editor = new E('#editor');
-      this.editor.customConfig.uploadImgMaxLength = 5;
+      this.editor.customConfig.uploadImgMaxLength = 10;
       this.editor.customConfig.customUploadImg = (files, insert) => {
         const formData = new FormData();
-        formData.append('Img', files[0]);
+        files.forEach(e=>{
+          formData.append('Imgs',e);
+        })
+
         // formData.append('path', 'files/ne-icev3-dashboard/content/content/');
-        this.axios.post(self.api+'/upload/uploadImg', formData).then(res => {
-          console.log(res)
-          // const result = res.data;
+        this.axios.post(self.api+'/updateImgs', formData).then(res => {
+
           if (res.data.code == 1 ) {
-            const data = res.data.data.imgAddr;
-            insert(data);
+             res.data.data.forEach(e=>{
+               insert(e)
+             })
+
           }
         });
       };
 
       this.editor.create();
+      document.querySelector('.w-e-text-container').style.zIndex=1000;
       this.getAttr();
       this.getTip();
     },
@@ -234,7 +239,15 @@
         let formData = new FormData();
         let stockVal = 0;
         let skus = [];
-
+        let isStock = true;
+        if(self.normsArr.length>0){
+          for(let i=0;i<self.normsArr.length;i++){
+            if(self.normsArr[i].normsSum==''){
+              isStock=false;
+              break;
+            }
+          }
+        }
         if(self.goodsName==''){
           this.$message({
           	showClose: true,
@@ -253,8 +266,19 @@
           	message: '请选择规格属性',
           	type: 'error',
           });
-        }
-        else if(self.goodsTypeVal==''){
+        }else if(self.normsVal<1){
+          this.$message({
+          	showClose: true,
+          	message: '请选择规格值',
+          	type: 'error',
+          });
+        }else if(isStock==false){
+          this.$message({
+          	showClose: true,
+          	message: '请输入库存',
+          	type: 'error',
+          });
+        }else if(self.goodsTypeVal==''){
           this.$message({
           	showClose: true,
           	message: '选择商品类型',
@@ -272,17 +296,13 @@
           	message: '请填写成本价',
           	type: 'error',
           });
-        }else if(self.goodsTypeVal==6&&self.gdPric>self.marketPrice){
+        }else if(self.goodsTypeVal==6&&parseInt(self.gdPric)>parseInt(self.marketPrice)){
           this.$message({
           	showClose: true,
           	message: '销售价必须小于市场价',
           	type: 'error',
           });
         }else{
-
-          if(this.goodsAttrVal==-1){
-            stockVal = self.stock;
-          }else{
             this.normsArr.forEach((e)=>{
               stockVal+= parseInt(e.normsSum)
             })
@@ -296,9 +316,7 @@
                 }
               })
             })
-            formData.append('skus',JSON.stringify(skus))
-          }
-          //console.log(self.descVal)
+          formData.append('skus',JSON.stringify(skus))
           formData.append('pName',self.goodsName)
           formData.append('skuNId',self.goodsAttrVal)
           formData.append('originalPrice',self.marketPrice)
@@ -322,7 +340,7 @@
           }).then((res)=>{
           	if(res.data.code == 1){
               //console.log(res)
-              this.$message({
+              self.$message({
                  showClose: true,
                  message: '添加-成功',
                  type: 'success'
@@ -365,16 +383,14 @@
             }
           })
         })
-        console.log(this.normsArr)
+
       },
       attrChange(val){
         let self = this;
-        if(val==-1){
-          self.norms = [];
-          self.normsArr = [];
-          self.normsVal = '';
-        }else{
-          self.axios.post(self.api + '/convertP/m/selectANV', self.qs.stringify({
+        self.norms = [];
+        self.normsArr = [];
+        self.normsVal = '';
+        self.axios.post(self.api + '/convertP/m/selectANV', self.qs.stringify({
           	attrNameId:val
           }), {
           	headers: {
@@ -383,29 +399,33 @@
           }).then((res)=>{
           	if(res.data.code == 1){
               //console.log(res)
-              self.norms = [];
-              res.data.data.forEach((e)=>{
-                self.norms.push({
-                  label:e.attrValueName,
-                  value:e.attrValueId
+              if(res.data.data.length>0){
+
+                res.data.data.forEach((e)=>{
+                  self.norms.push({
+                    label:e.attrValueName,
+                    value:e.attrValueId
+                  })
                 })
-              })
+              }
+
           	}else{
           		alert(res.data.msg)
 
           	}
 
           })
-        }
+
 
       },
       typeChange(val){
-        if(val==4||val==5){
-          this.goodsAttrVal = -1;
-        }
+
         if(val==6){
           this.gudouText = '销售价'
-        }else{
+        }else if(val==7){
+          this.gudouText = '专享价'
+        }
+        else{
           this.gudouText = '骨豆价'
         }
       },
@@ -417,7 +437,7 @@
           }
         }).then((res) => {
           if (res.data.code == 1) {
-            console.log(res)
+
             res.data.data.forEach((e)=>{
               self.goodsAttrData.push({
                 label:e.attrName,
@@ -465,7 +485,6 @@
               // self.postFormData = '';
               // self.postUrl = '';
             }
-
 
           }
         })
@@ -645,7 +664,7 @@
           margin-right:10px;
           font-size:16px;
           color:#333;
-          width:80px;
+          width:100px;
           text-align:right;
         }
         .goods_main_pic {
@@ -711,7 +730,7 @@
         margin-right:10px;
         font-size:16px;
         color:#333;
-        width:80px;
+        width:100px;
         text-align:right;
       }
       .descWangeditor{

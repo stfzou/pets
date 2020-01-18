@@ -109,7 +109,7 @@
         self.axios.get(Api.userApi+'/community/selectInitUserDynamicOfActivity',{
           params:{
           	ocaId:self.ocaId,
-            userId:38
+            userId:self.userId
           }
         },{
         	headers: {

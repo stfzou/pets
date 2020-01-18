@@ -67,7 +67,8 @@ import HelpCnt from '@/components/help/helpCnt'
 import BargainGoods from '@/components/bargain/bargainGoods'
 import Bargain from '@/components/bargain/bargain'
 import BargainRule from '@/components/bargain/bargainRule'
-
+import RushToBuyList from '@/components/rushToBuy/rushToBuyList'
+import RushToBuyXq from '@/components/rushToBuy/rushToBuyXq'
 
 Vue.use(Router)
 export default new Router({
@@ -75,7 +76,7 @@ export default new Router({
 	mode:'hash',
     routes:[
 		{
-		  path:'', 
+		  path:'',
 		  redirect:'/appShow'
 		},
 		{
@@ -83,6 +84,16 @@ export default new Router({
 			name:'vLogin',
 			component:vLogin,
 		},
+    {
+      path:'/rushToBuyList',
+      name:'rushToBuyList',
+      component:RushToBuyList
+    },
+    {
+      path:'/rushToBuyXq',
+      name:'rushToBuyXq',
+      component:RushToBuyXq
+    },
     {
       path:'/bargain',
       name:'bargain',

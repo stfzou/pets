@@ -62,6 +62,7 @@ export default {
 
 <style lang="scss">
 	@import './style/common.scss';
+  @import 'font/font.css';
 #app {
   font-family: 'Avenir', Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;

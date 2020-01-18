@@ -1,6 +1,6 @@
 export default{
 	httpApi:'https://h5.gumipet.com',
-  gtzApi:'http://app.gutouzu.com'
+  gtzApi:'https://h5.gumipet.com'
 }
 //https://customer.gutouzu.com
 //http://app.gutouzu.com
