@@ -77,7 +77,7 @@
       	this.$router.go(-1); //返回上一层
       },
       getUrlKey(name){
-          return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.href) || [, ""])[1].replace(/\+/g, '%20')) || null
+        return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.href) || [, ""])[1].replace(/\+/g, '%20')) || null
       },
       showBtn(item) {
         let self = this;

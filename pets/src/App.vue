@@ -20,18 +20,16 @@ import {mapState} from 'vuex'
 export default {
 	name: 'App',
 	created(){
-    //this.isDown = true;
-    // console.log(11)bargainRule
-    if(this.$route.name=='bargainRule'||this.$route.name=='bargain'||this.$route.name=='shopShow'||this.$route.name=='appShow'||this.$route.name=='agreement'||this.$route.name=='cgShare'||this.$route.name=='paySus'||this.$route.name=='advertisement'||this.$route.name=='payRes'||this.$route.name=='wxWhitePage'){
+
+    if(this.$route.name=='mobileCoupon'||this.$route.name=='mobileIndex'||this.$route.name=='appShowBtn'||this.$route.name=='bargainRule'||this.$route.name=='bargain'||this.$route.name=='shopShow'||this.$route.name=='appShow'||this.$route.name=='agreement'||this.$route.name=='cgShare'||this.$route.name=='paySus'||this.$route.name=='advertisement'||this.$route.name=='payRes'||this.$route.name=='wxWhitePage'){
       this.isDown = false;
     }
-    // console.log()
 	},
   watch: {
     $route: {
       handler: function(val, oldVal){
 
-        if(val.name=='bargainRule'||val.name=='bargain'||val.name=='shopShow'||val.name=='appShow'||val.name=='agreement'||val.name=='paySus'||val.name=='advertisement'||val.name=='payRes'||val.name=='wxWhitePage'||val.name=='cgShare'){
+        if(val.name=='mobileCoupon'||val.name=='mobileIndex'||val.name=='appShowBtn'||val.name=='bargainRule'||val.name=='bargain'||val.name=='shopShow'||val.name=='appShow'||val.name=='agreement'||val.name=='paySus'||val.name=='advertisement'||val.name=='payRes'||val.name=='wxWhitePage'||val.name=='cgShare'){
           this.isDown = false;
 
         }else{

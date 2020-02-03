@@ -1,40 +1,44 @@
 <template>
   <div class="rushToBuyListWarp">
-    <div class="rushToBuyListHead">
-      <div class="top_nav flex_r_s_b">
-        <div class="back" @click="back"></div>
-        <div class="nav_title">限时抢购</div>
-      </div>
-      <div class="timeNav">
-        <cube-scroll ref="scroll" :data="items" direction="horizontal" :options="hscrollOptions" class="horizontal-scroll-list-wrap">
-          <ul class="timeList flex_r_f_s">
-            <li v-for="(item,index) in navData" class="list-item" :class="{active_item:index==navIndex}" @click="navClick(item,index)">
-              <div class="day">{{item.dataObj.day}}</div>
-              <div class="hours">{{item.dataObj.time}}</div>
-            </li>
-          </ul>
-        </cube-scroll>
-      </div>
-      <div class="countDownBox flex_r_s_b">
-        <div class="countDown_l">每天10点 超值好货等你来抢</div>
-        <div v-if="isStart===1" class="countDown_r flex_r_s_b">
-          <span class="spanText">距结束</span>
-          <div class="countDownTime">
-            <span class="spanTime">{{hou}}</span>
-            <span class="spanDian">:</span>
-            <span class="spanTime">{{min}}</span>
-            <span class="spanDian">:</span>
-            <span class="spanTime">{{sec}}</span>
-          </div>
-        </div>
-        <div v-else class="time">10:00准时开始</div>
-      </div>
+    <div class="top_nav flex_r_s_b">
+      <div class="back" @click="back"></div>
+      <div class="nav_title">限时抢购</div>
+      <div class="share" @click="share"></div>
     </div>
     <div class="rushToBuyListCnt">
+
       <cube-scroll ref="vscroll">
+        <div class="rushToBuyListHead">
+
+          <div class="timeNav">
+            <cube-scroll ref="scroll" :data="items" direction="horizontal" :options="hscrollOptions" class="horizontal-scroll-list-wrap">
+              <ul class="timeList flex_r_f_s">
+                <li v-for="(item,index) in navData" class="list-item" :class="{active_item:index==navIndex}" @click="navClick(item,index)">
+                  <div class="day">{{item.dataObj.day}}</div>
+                  <div class="hours">{{item.dataObj.time}}</div>
+                </li>
+              </ul>
+            </cube-scroll>
+          </div>
+          <div class="countDownBox flex_r_s_b">
+            <div class="countDown_l">每天10点 超值好货等你来抢</div>
+            <div v-if="isStart===1" class="countDown_r flex_r_s_b">
+              <span class="spanText">距结束</span>
+              <div class="countDownTime">
+                <span class="spanTime">{{hou}}</span>
+                <span class="spanDian">:</span>
+                <span class="spanTime">{{min}}</span>
+                <span class="spanDian">:</span>
+                <span class="spanTime">{{sec}}</span>
+              </div>
+            </div>
+            <div v-else class="time">10:00准时开始</div>
+          </div>
+        </div>
         <ul class="commodityList">
           <li class="flex_r_s_b" v-for="item in commodityData" @click="xqLink(item)">
             <div class="imgBox">
+              <img class="tipPic" src="../../assets/xsqg_01.png" alt="">
               <img class="commodityPic" :src="item.commodityImage" alt="">
             </div>
             <div class="commodityInfo">
@@ -66,6 +70,7 @@
 
 <script>
   import Api from '../common/apj.js'
+  import wxapi from '../common/wxapi.js'
   export default {
     data() {
       return {
@@ -96,6 +101,13 @@
       timeFormat(param) {
         return param < 10 ? '0' + param : param;
       },
+      share(){
+      	let toast = this.$createToast({
+      		txt: '点击顶部右上角进行分享',
+      		type: 'warn'
+      	  })
+      	toast.show()
+      },
       xqLink(item){
         let self = this;
         this.$router.push({
@@ -111,7 +123,8 @@
           // 获取当前时间，同时得到活动结束时间数组
           let newTime = new Date().getTime();
           // 对结束时间进行处理渲染到页面
-          let endTime = new Date(this.endTime).getTime();
+          let endTime = new Date(this.endTime.replace(/-/g, "/")).getTime();
+
           let obj = null;
           // 如果活动未结束，对时间进行处理
           if (endTime - newTime > 0) {
@@ -174,7 +187,8 @@
 
               e.rate = parseInt(e.sellNum) / parseInt(e.totalNum) * 100
             })
-            this.commodityData = res.data.data;
+            self.commodityData = res.data.data;
+
 
             setTimeout(() => {
               self.$refs.vscroll.forceUpdate();
@@ -195,7 +209,9 @@
               e.dataObj = self.getdate(e.startTime)
 
             })
+
             self.navData = res.data.data.activityVos;
+            //console.log(self.navData)
             self.activityId = res.data.data.activityVos[0].activityId;
             self.endTime = res.data.data.activityVos[0].endTime;
 
@@ -205,6 +221,20 @@
             })
             self.countDown();
             self.commodityData = res.data.data.commodityVos;
+            let option = {
+              title: '正品大牌宠物用品1折起抢！', // 分享标题, 请自行替换
+              desc:'骨米宠物限时抢购活动，每天上午10点准时开抢，赶快来看看为你家宠物准备的心仪商品~~',
+              link: window.location.href, // 分享链接，根据自身项目决定是否需要split
+              imgUrl:self.commodityData[0].commodityImage, // 分享图标, 请自行替换，需要绝对路径
+              success: () => {
+
+              },
+              error: () => {
+
+              }
+            }
+            wxapi.wxRegister(option)
+
             setTimeout(() => {
               self.$refs.vscroll.forceUpdate();
               self.$refs.vscroll.refresh();
@@ -217,13 +247,11 @@
         })
       },
       getdate(time) {
-        var now = new Date(time),
-          y = now.getFullYear(),
-          m = ("0" + (now.getMonth() + 1)).slice(-2),
-          d = ("0" + now.getDate()).slice(-2);
+        let timeArr = []
+        timeArr = time.split(' ')
         return {
-          day: m + "月" + d + "日",
-          time: now.toTimeString().substr(0, 5)
+          day:timeArr[0].split('-')[1]+'月'+timeArr[0].split('-')[2]+'日',
+          time:'10:00'
         };
       }
     }
@@ -234,12 +262,44 @@
   .rushToBuyListWarp {
     height: 100%;
     position: relative;
+    .top_nav {
+      padding: 0 20px;
+      height: 88px;
+      box-sizing: border-box;
+      z-index: 100;
+      position:fixed;
+      background:#ff8260;
+      left:0;
+      top:0;
+      .back {
+        width: 26px;
+        height: 42px;
+        background: url(../../assets/icon/back@2x.png) no-repeat center 0;
+        background-size: cover;
+      }
 
+      .nav_title {
+        font-size: 30px;
+        color: #fff;
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        font-weight: 400;
+      }
+      .share{
+      	width: 50px;
+      	height: 40px;
+      	background: url('../../assets/icon/share@2x.png') no-repeat center 0;
+      	background-size: 100%;
+      }
+    }
     .rushToBuyListHead {
-      height: 260px;
-      background: linear-gradient(0deg, #ff6060, #ff8260, #fe9271, #f3896e);
+      height: 230px;
+      background:#ff8260;
       position: relative;
-
+      padding-top:80px;
+      box-sizing:border-box;
       .countDownBox {
         width: 660px;
         height: 60px;
@@ -320,35 +380,12 @@
         }
       }
 
-      .top_nav {
-        padding: 0 20px;
-        height: 88px;
-        box-sizing: border-box;
-        z-index: 100;
 
-        .back {
-          width: 26px;
-          height: 42px;
-          background: url(../../assets/icon/back@2x.png) no-repeat center 0;
-          background-size: cover;
-        }
-
-        .nav_title {
-          font-size: 30px;
-          color: #fff;
-          position: absolute;
-          left: 50%;
-          top: 50%;
-          transform: translate(-50%, -50%);
-          font-weight: 400;
-        }
-
-      }
     }
 
     .rushToBuyListCnt {
       position: absolute;
-      top: 260px;
+      top: 0;
       left: 0;
       right: 0;
       bottom: 0;
@@ -367,7 +404,13 @@
           width: 220px;
           height: 220px;
           border-radius: 10px;
-
+          position:relative;
+          .tipPic{
+            width:90px;
+            position:absolute;
+            top:0;
+            left:0;
+          }
           .commodityPic {
             width: 100%;
             height: 100%;

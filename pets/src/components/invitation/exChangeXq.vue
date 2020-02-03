@@ -2,7 +2,7 @@
   <div class="exChangeXq">
     <div class="top_nav flex_r_s_b">
     	<div class="back" @click="back"></div>
-    	<div class="nav_title">店铺详情</div>
+    	<div class="nav_title">商品详情</div>
       <div class="text" @click="showAlert">兑换须知</div>
     </div>
     <div class="banner">
@@ -15,20 +15,20 @@
         </cube-slide>
     </div>
     <div class="cntWarp">
-      <div class="goodsInfoBox">
-        <div class="gudouPrice flex_r_f_s">
+      <div class="goodsInfoBoxWarp">
+        <div class="gudouPrice flex_r_f_s" v-if="isExchange==0">
           <span class="new">￥<b>{{boneBeanPrice|moneyFilter}}</b></span>
           <span class="old">原价<span>￥{{price|moneyFilter}}</span></span>
         </div>
         <div class="gudouDeductionBox flex_r_s_b">
-          <div class="flex_r_f_s leftBox">
+          <div class="flex_r_f_s leftBox" v-if="isExchange==0">
             <div class="gudouDeduction flex_r_s_c">
               骨豆直抵￥<span v-if="deduction>=boneBeanPrice">{{boneBeanPrice|moneyFilter}}</span><span v-else>{{deduction|moneyFilter}}</span>
             </div>
             <div class="tip">100粒骨豆可以抵扣1.00元</div>
           </div>
 
-          <div class="getBon" @click="showBtn('请下载骨米宠物APP赚取骨豆')">去赚骨豆</div>
+          <div class="getBon" @click="showBtn('请下载骨米宠物APP赚取骨豆')" v-if="isExchange==0">去赚骨豆</div>
         </div>
         <div class="goodsName">{{goodsName}}</div>
         <div class="duihuanBox flex_r_f_s">
@@ -54,6 +54,7 @@
     data(){
       return{
         boneBean:0,
+        isExchange:1,
         bannerImg:[],
         deduction:'',
         goodsName:'',
@@ -65,7 +66,7 @@
         environment:'',
         appUrl:'',
         hOption:{
-          preventDefault:false
+          eventPassthrough: 'vertical'
         },
 
       }
@@ -77,7 +78,9 @@
       if(this.$route.query.boneBean!=null){
         this.boneBean = this.$route.query.boneBean;
       }
-
+      if(this.getUrlKey('isExchange')!=null){
+        this.isExchange = this.getUrlKey('isExchange');
+      }
       this.getData()
     },
     filters:{
@@ -110,6 +113,9 @@
     methods:{
       back() {
       	this.$router.go(-1); //返回上一层
+      },
+      getUrlKey(name){
+        return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.href) || [, ""])[1].replace(/\+/g, '%20')) || null
       },
       clickHandler(item, index) {
           console.log(item, index)
@@ -231,7 +237,7 @@
   .exChangeXq{
     padding-bottom:60px;
     padding-top:88px;
-	background:#fff;
+    background:#fff;
     .line{
 
       height:10px;
@@ -291,7 +297,7 @@
 
     }
     .cntWarp{
-      .goodsInfoBox{
+      .goodsInfoBoxWarp{
         padding: 10px 20px 0 20px;
         position: relative;
         .getBon{

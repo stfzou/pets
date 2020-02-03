@@ -130,7 +130,8 @@
           // 获取当前时间，同时得到活动结束时间数组
           let newTime = new Date().getTime();
           // 对结束时间进行处理渲染到页面
-          let endTime = new Date(this.endTime).getTime();
+          // let endTime = new Date(this.endTime).getTime();
+          let endTime = new Date(this.endTime.replace(/-/g, "/")).getTime();
           let obj = null;
           // 如果活动未结束，对时间进行处理
           if (endTime - newTime > 0) {

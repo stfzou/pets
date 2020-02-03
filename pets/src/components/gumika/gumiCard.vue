@@ -281,44 +281,22 @@
         if (this.phone == '') {
 
           alert('请填写手机号码')
-          return false;
+
         } else if (!this.reg.test(this.phone)) {
 
           alert('手机号码格式错误')
-          return false;
-        }
-        if (this.phone) {
+
+        }else {
           let _this = this;
           const TIME_COUNT = 60;
           if (!this.timer) {
             this.count = TIME_COUNT;
             this.show = false;
-            if (!this.forgetState) {
-              this.axios.get(Api.userApi + '/sms_login_code?phone=' + this.phone, {
-                  headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded'
-                  }
-                })
-                .then(function(response) {
-
-                })
-                .catch(function(error) {
-                  console.log(error);
-                });
-            } else {
-              this.axios.get('/sms_getpwd?phone=' + this.phone, {
-                  headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded'
-                  }
-                })
-                .then(function(response) {
-
-                })
-                .catch(function(error) {
-                  console.log(error);
-                });
-            }
-
+            this.axios.get(Api.userApi + '/sms_login_code?phone=' + this.phone, {
+                headers: {
+                  'Content-Type': 'application/x-www-form-urlencoded'
+                }
+            }).then(function(response) {})
             this.timer = setInterval(() => {
               if (this.count > 0 && this.count <= TIME_COUNT) {
                 this.count--;

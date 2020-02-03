@@ -40,6 +40,7 @@ import GumiCard from '@/components/gumika/gumiCard'
 import PayRes from '@/components/common/payRes'
 import WxWhitePage from '@/components/common/wxWhitePage'
 import AppShow from '@/components/common/appShow'
+import AppShowBtn from '@/components/common/appShowBtn'
 import ShopShow from '@/components/common/shopShow'
 import Agreement from '@/components/common/agreement'
 import PaySus from '@/components/common/paySus'
@@ -64,11 +65,15 @@ import NearbyCoupon from '@/components/shareCoupon/nearbyCoupon'
 import HelpHome from '@/components/help/helpHome'
 import HelpList from '@/components/help/helpList'
 import HelpCnt from '@/components/help/helpCnt'
-import BargainGoods from '@/components/bargain/bargainGoods'
+import BargainList from '@/components/bargain/bargainList'
 import Bargain from '@/components/bargain/bargain'
+import BargainGoods from '@/components/bargain/bargainGoods'
 import BargainRule from '@/components/bargain/bargainRule'
 import RushToBuyList from '@/components/rushToBuy/rushToBuyList'
 import RushToBuyXq from '@/components/rushToBuy/rushToBuyXq'
+import MobileHome from '@/components/mobileWebSite/mobileHome'
+import MobileIndex from '@/components/mobileWebSite/mobileIndex'
+import MobileCoupon from '@/components/mobileWebSite/mobileCoupon'
 
 Vue.use(Router)
 export default new Router({
@@ -85,6 +90,23 @@ export default new Router({
 			component:vLogin,
 		},
     {
+      path:'/mobileHome',
+      name:'mobileHome',
+      component:MobileHome,
+      children:[
+        {
+          path:'mobileIndex',
+          name:'mobileIndex',
+          component:MobileIndex
+        },
+        {
+          path:'mobileCoupon',
+          name:'mobileCoupon',
+          component:MobileCoupon
+        }
+      ]
+    },
+    {
       path:'/rushToBuyList',
       name:'rushToBuyList',
       component:RushToBuyList
@@ -93,6 +115,11 @@ export default new Router({
       path:'/rushToBuyXq',
       name:'rushToBuyXq',
       component:RushToBuyXq
+    },
+    {
+      path:'/bargainGoods',
+      name:'bargainGoods',
+      component:BargainGoods
     },
     {
       path:'/bargain',
@@ -110,9 +137,9 @@ export default new Router({
       component:NearbyActivity
     },
     {
-      path:'/bargainGoods',
-      name:'bargainGoods',
-      component:BargainGoods
+      path:'/bargainList',
+      name:'bargainList',
+      component:BargainList
     },
     {
       path:'/nearbyCoupon',
@@ -149,6 +176,11 @@ export default new Router({
 		name:'appShow',
 		component:AppShow
 	},
+  {
+    path:'/appShowBtn',
+    name:'appShowBtn',
+    component:AppShowBtn
+  },
   {
   	path:'/shopShow',
   	name:'shopShow',
