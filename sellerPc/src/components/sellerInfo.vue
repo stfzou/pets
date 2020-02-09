@@ -52,21 +52,8 @@
 									<el-option
 										v-for="(item,index) in storeTypeData"
 										:key="index"
-										:label="item.shopTypeName"
-										:value="item.id">
-									</el-option>
-								</el-select>
-							</div>
-						</li>
-						<li>
-							<p>经营品类<span>*</span></p>
-							<div class="list_r">
-								<el-select v-model="varietiesValue" multiple placeholder="请选择">
-									<el-option
-										v-for="item in varietiesData"
-										:key="item.typeName"
-										:label="item.typeName"
-										:value="item.id">
+										:label="item.name"
+										:value="item.typeId">
 									</el-option>
 								</el-select>
 							</div>
@@ -113,7 +100,7 @@
 												<el-upload
 													ref="uploadOutSide"
 													class="avatar-uploader"
-													action="http://192.168.0.109:8084/updateImg"
+													:action="imgApi"
 													:show-file-list="false"
 													list-type="picture-card"
 													:limit="1"
@@ -141,7 +128,7 @@
 												<el-upload
 													ref="uploadInSide"
 													class="avatar-uploader"
-													action="http://192.168.0.109:8084/updateImg"
+													:action="imgApi"
 													:show-file-list="false"
 													list-type="picture-card"
 													:limit="1"
@@ -169,13 +156,13 @@
 									<div class="outside flex_r_s_b">
 										<div class="outside_img" v-if="sellerInfo.logo">
 											<img :src="sellerInfo.logo">
-											<i @click="deleteImg($refs.uploadLogoSide.uploadFiles,'logo')" class="el-icon-circle-close"></i>
+											<i @click="deleteImgLogo($refs.uploadLogoSide.uploadFiles,'logo')" class="el-icon-circle-close"></i>
 										</div>
 										<div v-show="!sellerInfo.logo">
 												<el-upload
 													ref="uploadLogoSide"
 													class="avatar-uploader"
-													action="http://192.168.0.109:8084/updateImg"
+													:action="imgApi"
 													:show-file-list="false"
 													list-type="picture-card"
 													name="Img"
@@ -226,8 +213,7 @@
 		data() {
 			const self = this;
 			return {
-				varietiesData: [],
-				varietiesValue:[],//经营品类
+        imgApi:'https://h5.gumipet.com/im/updateImg',
 				sellerTextarea:'',//商家简介
 				markers:{
 					 dragend: (e) => {
@@ -356,32 +342,19 @@
 				}
 			})
 
+      this.axios.get(Api.shopApi+'/coupon/selectShopsTypeTree',{
+      	headers: { //商店类型
+      		'Content-Type': 'application/x-www-form-urlencoded',
+      	}
+      }).then((res)=>{
+        if(res.data.code==1){
+          self.storeTypeData = res.data.data[0].shopsTypes;
+          //console.log(self.storeTypeData)
+        }else{
+          alert(res.data.msg)
+        }
+      })
 
-			this.axios.all([
-				this.axios.post(Api.shopApi+'/getOperateAll',{
-					headers: { //经营品类
-						'Content-Type': 'application/x-www-form-urlencoded',
-					}
-				}),
-				this.axios.post(Api.shopApi+'/getShopTypeAll',{
-					headers: { //商店类型
-						'Content-Type': 'application/x-www-form-urlencoded',
-					}
-				})
-
-			]).then(self.axios.spread(function(resPl,resType){
-					if(resPl.data.code==1&&resType.data.code==1){
-						self.varietiesData = resPl.data.data;
-						self.storeTypeData = resType.data.data;
-					}else{
-						self.$message({
-							showClose: true,
-							message:'初始化数据失败',
-							type: 'error',
-						});
-					}
-
-			}));
 
 		},
 		methods: {
@@ -401,22 +374,55 @@
 				handleStoreInSuccess(res,file,fileList) {//店内照片
 					this.sellerInfo.inImg = file.response.data.imgAddr;
 					this.sellerInfo.inId = file.response.data.imgId;
+          //console.log(res)
 				},
 				handleStoreLogoSuccess(res,file,fileList) {//商户logo
 					this.sellerInfo.logo = file.response.data.imgAddr;
 					this.sellerInfo.logoId = file.response.data.imgId;
 				},
+        deleteImgLogo(arr, img){
+         let self = this;
+         //console.log(arr)
+         this.$confirm('此操作将永久删除该文件, 是否继续?', '提示', {
+         		confirmButtonText: '确定',
+         		cancelButtonText: '取消',
+         		type: 'warning',
+         		callback:function(action, instance){
+         			if(action == 'confirm'){
+
+         				self.axios.post(Api.shopApi+'/deleteImg', self.qs.stringify({
+         					imgAddr: self.sellerInfo[img],
+         				}), {
+         					headers: {
+         						'Content-Type': 'application/x-www-form-urlencoded'
+         					}
+         				}).then(function(res){
+         					if(res.data.code == 1){
+         						arr.splice(0, 1);
+         						self.sellerInfo[img] = '';
+         					}else{
+         						alert(res.data.msg)
+
+         					}
+
+         				})
+
+         			}
+         		}
+         })
+        },
 				deleteImg(arr,img){ //照片删除
 
 					let self = this;
-
+          //console.log(arr)
 					this.$confirm('此操作将永久删除该文件, 是否继续?', '提示', {
 							confirmButtonText: '确定',
 							cancelButtonText: '取消',
 							type: 'warning',
 							callback:function(action, instance){
 								if(action == 'confirm'){
-									self.axios.post(Api.shopApi+'/deleteImg', self.qs.stringify({
+
+									self.axios.post(Api.shopApi+'/im/deleteImg', self.qs.stringify({
 										imgAddr: self.sellerInfo[img],
 									}), {
 										headers: {
@@ -427,19 +433,10 @@
 											arr.splice(0, 1);
 											self.sellerInfo[img] = '';
 										}else{
-											self.$message({
-												showClose: true,
-												message:res.data.msg,
-												type: 'error',
-											});
+											alert(res.data.msg)
+
 										}
 
-									}).catch(function(res){
-											self.$message({
-												showClose: true,
-												message:'服务器错误',
-												type: 'error',
-											});
 									})
 
 								}
@@ -483,6 +480,7 @@
 				next(){
 					let self = this;
 					//商家信息填写成功
+
 					if(this.storeNameInput === ''){
 						this.$message.error('商家名字不能为空');
 						return false;
@@ -514,12 +512,13 @@
 						this.$message.error('请填写商家简介');
 						return false;
 					}else{
-						let loading = this.$loading({
-							lock: true,
-							text: '加载中，请稍后',
-							spinner: 'el-icon-loading',
-							background: 'rgba(0, 0, 0, 0.7)'
-						});
+						// let loading = this.$loading({
+						// 	lock: true,
+						// 	text: '加载中，请稍后',
+						// 	spinner: 'el-icon-loading',
+						// 	background: 'rgba(0, 0, 0, 0.7)'
+						// });
+
 						this.axios.post(Api.shopApi+'/webShop/editShopsInfo', this.qs.stringify({
 
 							shopId:self.shopId,
@@ -528,12 +527,11 @@
 							contactName:self.userNameInput,
 							contactTel:JSON.parse(sessionStorage.getItem('user')).userPhone,
 							shopTypeId:self.storeType,
-							operateIds:self.varietiesValue.join(','),
 							province:self.sheng,
 							city:self.shi,
 							area:self.qu,
 							shopAddress:self.searchMap,
-							shopImg:self.sellerInfo.logoId,
+							shopImg:self.sellerInfo.logo,
 							shopImgFacade:self.sellerInfo.outId,
 							imgInStore:self.sellerInfo.inId,
 							latitude:self.mapCenter[1],

@@ -243,7 +243,7 @@
           }), {
           	headers: {
           		'Content-Type': 'application/x-www-form-urlencoded'
-          	}
+          	} 
           }).then((res)=>{
             if(res.data.code == 1){
               setTimeout(()=>{
@@ -275,15 +275,14 @@
       },
       getStaffName(){//获取拜访客户名字
         let self = this;
-        self.axios.post(Api.staffApi + '/visit/selectCompetenceBClient', this.qs.stringify({
-          staffId:JSON.parse(localStorage.getItem('staff')).staffId
-        }), {
+        self.axios.post(Api.staffApi + '/business/selectBClientAll', {
         	headers: {
         		'Content-Type': 'application/x-www-form-urlencoded'
         	}
         }).then((res)=>{
+          //console.log(res)
           if(res.data.code==1){
-            res.data.data.forEach((e)=>{
+            res.data.data.bClientVos.forEach((e)=>{
               self.staffNameList.push({
                 value:e.clientId,
                 text:e.shopName

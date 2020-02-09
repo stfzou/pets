@@ -50,7 +50,7 @@
 										<i @click="deleteImg($refs.uploadSfzz.uploadFiles,'sfzz')" class="el-icon-circle-close"></i>
 									</div>
 									<div v-show="!imgData.sfzz">
-										<el-upload ref="uploadSfzz" class="avatar-uploader" action="http://192.168.0.109:8084/updateImg"
+										<el-upload ref="uploadSfzz" class="avatar-uploader" :action="imgApi"
 										 :show-file-list="false" list-type="picture-card" name="Img" :limit="1" :on-progress="handleSfzzPreview"
 										 :on-success="handleSfzzSuccess" :before-upload="beforeAvatarUpload">
 											<i class="el-icon-plus avatar-uploader-icon"></i>
@@ -71,7 +71,7 @@
 										<i @click="deleteImg($refs.uploadSfzf.uploadFiles,'sfzf')" class="el-icon-circle-close"></i>
 									</div>
 									<div v-show="!imgData.sfzf">
-										<el-upload ref="uploadSfzf" class="avatar-uploader" action="http://192.168.0.109:8084/updateImg"
+										<el-upload ref="uploadSfzf" class="avatar-uploader" :action="imgApi"
 										 :show-file-list="false" list-type="picture-card" :limit="1" name='Img' :on-progress="handleSfzfPreview"
 										 :on-success="handleSfzfSuccess" :before-upload="beforeAvatarUpload">
 											<i class="el-icon-plus avatar-uploader-icon"></i>
@@ -102,7 +102,7 @@
 										<i @click="deleteImg($refs.uploadYyzz.uploadFiles,'yyzz')" class="el-icon-circle-close"></i>
 									</div>
 									<div v-show="!imgData.yyzz">
-										<el-upload ref="uploadYyzz" class="avatar-uploader" action="http://192.168.0.109:8084/updateImg"
+										<el-upload ref="uploadYyzz" class="avatar-uploader" :action="imgApi"
 										 :show-file-list="false" list-type="picture-card" :limit="1" name="Img" :on-progress="handleYyzzPreview"
 										 :on-success="handleYyzzSuccess" :before-upload="beforeAvatarUpload">
 											<i class="el-icon-plus avatar-uploader-icon"></i>
@@ -133,10 +133,10 @@
 							<input type="text" value="" v-model="inputData.companyName" placeholder="请输入单位名称" />
 						</div>
 					</li>
-					<li v-if="shopTypeName == '医疗诊所'">
+					<li v-if="shopTypeName == '医疗检查'">
 						<div class="title">行业资质信息<span>(如:动物诊疗许可证，仅医疗单位提供)</span></div>
 					</li>
-					<li  v-if="shopTypeName == '医疗诊所'">
+					<li  v-if="shopTypeName == '医疗检查'">
 						<p>资质照片<span>*</span></p>
 						<div class="list_r">
 							<div class="store_img">
@@ -146,7 +146,7 @@
 										<i @click="deleteImg($refs.uploadZlz.uploadFiles,'zlz')" class="el-icon-circle-close"></i>
 									</div>
 									<div v-show="!imgData.zlz">
-										<el-upload ref="uploadZlz" class="avatar-uploader" action="http://192.168.0.109:8084/updateImg"
+										<el-upload ref="uploadZlz" class="avatar-uploader" :action="imgApi"
 										 :show-file-list="false" list-type="picture-card" name="Img" :limit="1" :on-progress="handleSZlzPreview"
 										 :on-success="handleZlzSuccess" :before-upload="beforeAvatarUpload">
 											<i class="el-icon-plus avatar-uploader-icon"></i>
@@ -166,20 +166,20 @@
 							</div>
 						</div>
 					</li>
-					<li  v-if="shopTypeName == '医疗诊所'">
+					<li  v-if="shopTypeName == '医疗检查'">
 						<p>许可证编号<span>*</span></p>
 						<div class="list_r">
 							<input v-model="inputData.identifierVal" type="text" value="" placeholder="请输入许可证编号" />
 						</div>
 					</li>
-					<li  v-if="shopTypeName == '医疗诊所'">
+					<li  v-if="shopTypeName == '医疗检查'">
 						<p>诊疗活动范围<span>*</span></p>
 						<div class="list_r">
 							<el-input class="textarea" type="textarea" resize="none" placeholder="请输入内容" v-model="activeFw">
 							</el-input>
 						</div>
 					</li>
-					<li  v-if="shopTypeName == '医疗诊所'">
+					<li  v-if="shopTypeName == '医疗检查'">
 						<p>有效期<span>*</span></p>
 						<div class="list_r">
 							<!-- <el-date-picker
@@ -187,7 +187,7 @@
 								type="date"
 								placeholder="选择日期">
 							</el-date-picker> -->
-							<el-date-picker class="yxdate" v-model="yxDate" type="daterange" range-separator="至" start-placeholder="开始日期"
+							<el-date-picker class="yxdate" unlink-panels v-model="yxDate" type="daterange" range-separator="至" start-placeholder="开始日期"
 							 end-placeholder="结束日期" value-format="yyyy-MM-dd">
 							</el-date-picker>
 							<el-checkbox v-model="checked">长期</el-checkbox>
@@ -206,6 +206,7 @@
 	export default {
 		data() {
 			return {
+        imgApi:'https://h5.gumipet.com/im/updateImg',
 				activeFw: '',
 				yxDate: '',
 				checked: '',
@@ -239,6 +240,7 @@
 			};
 		},
 		mounted(){
+
 			this.getShopId();
 
 		},
@@ -274,9 +276,10 @@
         	}
         }).then((res)=>{
         	if(res.data.code == 1){
-            console.log(res.data)
+
             self.shopId = res.data.user.userShops.shopId;
-            self.shopTypeName = res.data.user.userShops.shopTypeName;
+            self.shopTypeName = res.data.user.userShops.shopsTypes[0].name;
+            //console.log(self.shopTypeName)
         		if (res.data.user.userShops.shopStatus === 0) {
 
         			self.$router.push({
@@ -341,6 +344,7 @@
 
 				this.imgData.zlzP = file.percent;
 			},
+
 			deleteImg(arr, img) { //照片删除
 				let self = this;
 				this.$confirm('此操作将永久删除该文件, 是否继续?', '提示', {
@@ -383,7 +387,7 @@
 				let self = this;
 				let shopInfoData = {};
 
-				if (self.shopTypeName == '医疗诊所') {
+				if (self.shopTypeName == '医疗检查') {
 
 					if (this.inputData.userNameVal == '') {
 

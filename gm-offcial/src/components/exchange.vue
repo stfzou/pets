@@ -658,7 +658,7 @@
           width:300px;
         }
         .goods_main{
-          width:700px;
+          width:600px;
         }
         .item_l{
           margin-right:10px;

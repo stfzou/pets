@@ -5,6 +5,10 @@ Vue.use(Vuex);
 
 export default new Vuex.Store({
   state:{
+      location:{
+        lat:0,
+        lng:0
+      },
 			loginInfo:{
 				shopId:'',
 				productId:''
@@ -30,6 +34,10 @@ export default new Vuex.Store({
 
   },
   mutations:{
+    setLocation(state,mapInfo){
+      state.location.lat = mapInfo.lat;
+      state.location.lng = mapInfo.lng;
+    },
     setCAorderId(state,CAorderId){
       state.activityInfo.CAorderId = CAorderId;
     },

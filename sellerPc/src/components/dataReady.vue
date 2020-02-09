@@ -1,7 +1,7 @@
 <template>
 	<div class="dataReady">
 		<header class="header">
-			<img src="../assets/data_ready.png" alt="">
+			<img class="dataReadyHead" src="../assets/data_ready.png" alt="">
 		</header>
 		<div class="main-cnt">
 			<h2 class="title"><p>申请开店前，请准备好以下资料</p></h2>
@@ -12,9 +12,9 @@
 						<img src="../assets/condition/shili01.png" alt="">
 						<div class="sx">示例</div>
 					</div>
-					
+
 					<p>需拍出完整门框、门匾（建议正对门脸2米处拍摄</p>
-					
+
 				</li>
 				<li>
 					<h3>店内照片</h3>
@@ -22,7 +22,7 @@
 						<img src="../assets/condition/shili02.png" alt="">
 						<div class="sx">示例</div>
 					</div>
-					
+
 					<p>需真实反映店内环境（商品货架、美容室、收银台等）</p>
 				</li>
 				<li>
@@ -31,7 +31,7 @@
 						<img src="../assets/condition/shili03.png" alt="">
 						<div class="sx">示例</div>
 					</div>
-					
+
 					<p>需体现您店铺的特色，吸引更多消费者进店消费</p>
 				</li>
 				<li>
@@ -40,7 +40,7 @@
 						<img src="../assets/condition/shili04.png" alt="">
 						<div class="sx">示例</div>
 					</div>
-					
+
 					<p>需要清晰展示人物五官、身份证文字信息和国徽</p>
 				</li>
 				<li>
@@ -49,7 +49,7 @@
 						<img src="../assets/condition/shili05.png" alt="">
 						<div class="sx">示例</div>
 					</div>
-					
+
 					<p>需上传清晰三证合一后的营业执照，边框完整；拍复印件需加盖鲜章；二维码能够识别</p>
 				</li>
 				<li>
@@ -58,10 +58,10 @@
 						<img src="../assets/condition/shili06.png" alt="">
 						<div class="sx">示例</div>
 					</div>
-					
+
 					<p>仅医疗单位上传，例如宠物医院；上传有效期内的彩色动物诊疗许可证，复印件需加盖鲜章</p>
 				</li>
-				
+
 			</ul>
 			<div class="button pointer" @click="link">立即开店</div>
 		</div>
@@ -73,16 +73,53 @@
 	export default {
 		data() {
 			return {
-				
+
 			};
 		},
+    mounted() {
+      if(this.getUrlKey('userId')!=null){
+        let userId = this.getUrlKey('userId');
+        this.setUserInfo(userId);
+      }
+
+    },
 		methods: {
 			link() {
-				let userId = JSON.parse(sessionStorage.getItem('user'))
-				this.$router.push({name:'sellerInfo',query:{id:userId.userId}});
-			}
+				let self = this;
+				this.$router.push({name:'sellerInfo'});
+			},
+      getUrlKey(name){
+          return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.href) || [, ""])[1].replace(/\+/g, '%20')) || null
+      },
+      setUserInfo(userId){
+        let self = this;
+        this.axios.post(Api.shopApi+'/selectShopUserInfo', this.qs.stringify({
+        	userId:userId
+
+        }), {
+        	headers: {
+        		'Content-Type': 'application/x-www-form-urlencoded'
+        	}
+        }).then((res)=>{
+          if(res.data.code==1){
+            var userEntity = {
+            	userName: res.data.user.userName,
+            	userId: res.data.user.userId,
+            	userPhone: res.data.user.phone,
+            	shopId:res.data.user.userShops.shopId,
+            	shopTypeName:res.data.user.userShops.shopName,
+            	shopStatus:res.data.user.userShops.shopStatus
+            };
+            sessionStorage.setItem('user', JSON.stringify(userEntity));
+          }else{
+            alert(res.data.msg)
+          }
+
+
+        })
+      }
 		},
-		
+
 	}
 </script>
 
@@ -97,7 +134,7 @@
 			height: 120px;
 			padding-left:28px;
 			overflow: hidden;
-			img{
+			.dataReadyHead{
 				width: 382px;
 				margin-top: 30px;
 			}
@@ -176,14 +213,14 @@
 							right: 5px;
 						}
 					}
-					
+
 					p{
 						line-height: 24px;
 						font-size: 16px;
 						color: #666;
 						margin-top: 5px;
 					}
-					
+
 				}
 				li:nth-child(3n+1){
 					margin-left: 0;

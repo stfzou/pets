@@ -210,7 +210,7 @@
 				byReportUserId:'',
 				petId:'',
         hOption:{
-          preventDefault:false
+          eventPassthrough: 'vertical'
         },
 
 			}

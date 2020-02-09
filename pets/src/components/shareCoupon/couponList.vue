@@ -44,35 +44,25 @@
       </div>
     </div>
 		<div class="selectNav flex_r_f_e">
-			<div class="item" @click="navClick(index)" :class="{active:index === navIndex}" v-for="(item,index) in navData">
-				<span>{{item}}</span>
-				<img v-if="index === navIndex" src="../../assets/icon/blank_top.png" alt="">
+			<div class="item" @click="showPicker" :class="{active:false}">
+				<span>{{distanceText}}</span>
+				<img v-if="false" src="../../assets/icon/blank_top.png" alt="">
 				<img v-else src="../../assets/icon/blank_btom.png" alt="">
 			</div>
-
-			<div class="distanceSelect subNav" v-show="navIndex === 0">
-				<ul>
-					<li @click="subNavClick(item,index)" class="flex_r_s_b" :class="{activeSub:index===subNavIndex}" v-for="(item,index) in distanceList"><span>{{item.text}}</span>
-					<img v-if="index===subNavIndex" src="../../assets/select.png" alt=""></li>
-				</ul>
-			</div>
-			<div class="distanceSelect subNav" v-show="navIndex === 1">
-				<ul>
-					<li @click="subNavClickTwo(item,index)" class="flex_r_s_b" :class="{activeSub:index===subNavIndex2}" v-for="(item,index) in conditionData"><span>{{item.text}}</span>
-					<img v-if="index===subNavIndex2" src="../../assets/select.png" alt=""></li>
-				</ul>
-			</div>
-			<div class="distanceSelect subNav" v-show="navIndex === 2">
-				<ul>
-					<li @click="subNavClickThree(item,index)" class="flex_r_s_b" :class="{activeSub:index===subNavIndex3}" v-for="(item,index) in discountData"><span>{{item.text}}</span>
-					<img v-if="index===subNavIndex3" src="../../assets/select.png" alt=""></li>
-				</ul>
-			</div>
-      <div class="distanceSelect subNav" v-show="navIndex === 3">
-      	<ul>
-      		<li @click="subNavClickFour(item,index)" class="flex_r_s_b" :class="{activeSub:index===subNavIndex4}" v-for="(item,index) in couponTypeData"><span>{{item.text}}</span>
-      		<img v-if="index===subNavIndex4" src="../../assets/select.png" alt=""></li>
-      	</ul>
+      <div class="item" @click="showPicker2" :class="{active:false}">
+      	<span>{{conditionText}}</span>
+      	<img v-if="false" src="../../assets/icon/blank_top.png" alt="">
+      	<img v-else src="../../assets/icon/blank_btom.png" alt="">
+      </div>
+      <div class="item" @click="showPicker3" :class="{active:false}">
+      	<span>{{discountTetx}}</span>
+      	<img v-if="false" src="../../assets/icon/blank_top.png" alt="">
+      	<img v-else src="../../assets/icon/blank_btom.png" alt="">
+      </div>
+      <div class="item" @click="showPicker4" :class="{active:false}">
+      	<span>{{couponTypeTetx}}</span>
+      	<img v-if="false" src="../../assets/icon/blank_top.png" alt="">
+      	<img v-else src="../../assets/icon/blank_btom.png" alt="">
       </div>
 		</div>
 		<div class="couponListBox">
@@ -88,7 +78,7 @@
               <!-- <img src="" alt=""> -->
 							<div class="couponNameBox">
 								<div class="couponName">{{item.couponName | descFilter}}</div>
-								<div class="distance">{{item.distance}}</div>
+
 								<div class="progressBox flex_r_s_b">
 									<div class="progress">
 										<div :style="item.styleObj"></div>
@@ -99,19 +89,21 @@
 						</div>
 						<div class="addr flex_r_f_s">
 							<img src="../../assets/icon_gu31@3x.png" alt="">
-							<p><router-link :to="{name:'shopCoupon',query:{shopId:item.shopId}}">{{item.shopName}}</router-link></p>
+							<p><router-link :to="{name:'shopCoupon',query:{shopId:item.shopId}}">{{item.shopName}} | {{item.distance}}</router-link></p>
 						</div>
 					</div>
 					<div class="list_r">
 						<div class="sale">
-              <span v-if="item.conditionPrice!==0&&item.couponType===1">￥{{item.couponPrice|keepFloat}}</span>
-              <span v-if="item.conditionPrice!==0&&item.couponType!==1">￥{{item.conditionPrice|keepFloat}}</span>
-              <span  v-if="item.conditionPrice==0">￥{{item.couponPrice|keepFloat}}</span>
-             </div>
+
+						  <span v-if="item.couponType!=1">￥{{item.conditionPrice|keepFloat}}</span>
+						  <span v-if="item.couponType===1">￥{{item.couponPrice|keepFloat}}</span>
+
+						</div>
 						<div class="condition">
-              <span v-if="item.conditionPrice!==0&&item.couponType===1">满<span>{{item.couponPrice|keepFloat}}</span>元使用</span>
-							<span v-if="item.conditionPrice!==0&&item.couponType!=1">原价:<span class="through">{{item.couponPrice|keepFloat}}</span></span>
-							<span v-if="item.conditionPrice==0">无门槛</span>
+
+						  <span v-if="item.conditionPrice!==0&&item.couponType===1">满<span>{{item.conditionPrice|keepFloat}}</span>元使用</span>
+						  <span v-if="item.couponType!=1">原价:<span class="through">{{item.couponPrice|keepFloat}}</span></span>
+						  <span v-if="item.conditionPrice==0&&item.couponType===1">无门槛使用</span>
 						</div>
 						<div class="makeTime">{{item.couponEndTime}}前有效</div>
 						<div class="receiveBtnBox">
@@ -153,18 +145,22 @@
 			return{
         couponType:'-1',
         isDialongCnt:true,
+        distanceText:'全城区域',
+        conditionText:'全部',
+        discountTetx:'全部',
+        couponTypeTetx:'全部',
 				distanceList:[
-					{text:'全城区域',val:'-1'},{text:'1km范围内',val:'1'},{text:'3km范围内',val:'3'},{text:'5km范围内',val:'5'},{text:'10km范围内',val:'10'},{text:'10km范围外',val:'11'}
+					{text:'全城区域',value:'-1'},{text:'1km范围内',value:'1'},{text:'3km范围内',value:'3'},{text:'5km范围内',value:'5'},{text:'10km范围内',value:'10'},{text:'10km范围外',value:'11'}
 				],
 				conditionData:[
-					{text:'全部',val:'-1'},{text:'无门槛使用',val:'0'},{text:'1~100元可以用',val:'1'},{text:'101~200元可以用',val:'2'},
-					{text:'201~300元可以用',val:'3'},{text:'301~500元可以用',val:'4'},{text:'500以上',val:'5'},
+					{text:'全部',value:'-1'},{text:'无门槛使用',value:'0'},{text:'1~100元可以用',value:'1'},{text:'101~200元可以用',value:'2'},
+					{text:'201~300元可以用',value:'3'},{text:'301~500元可以用',value:'4'},{text:'500以上',value:'5'},
 				],
 				discountData:[
-					{text:'全部',val:'-1'},{text:'50元以内',val:'50'},{text:'100元以内',val:'100'},{text:'200元以内',val:'200'},
-					{text:'300元以内',val:'300'},{text:'500元以内',val:'500'},{text:'500以上',val:'600'},
+					{text:'全部',value:'-1'},{text:'50元以内',value:'50'},{text:'100元以内',value:'100'},{text:'200元以内',value:'200'},
+					{text:'300元以内',value:'300'},{text:'500元以内',value:'500'},{text:'500以上',value:'600'},
 				],
-        couponTypeData:[{text:'全部',val:'-1'}],
+        couponTypeData:[{text:'全部',value:'-1'}],
 				arr:[1,2,3,4,5,6,7],
 				navIndex:'',
 				city:'',
@@ -267,6 +263,7 @@
       }
     },
 		methods:{
+
 			getCouponList(){
 				let self = this;
 				self.axios.post(Api.userApi + '/coupon/selectCouponList', self.qs.stringify({
@@ -341,6 +338,73 @@
         this.activeIndex = '1';
 
       },
+      showPicker() {
+            if (!this.picker) {
+              let self = this;
+              this.picker = this.$createPicker({
+                title: '距离范围',
+                data: [self.distanceList],
+                onSelect:function(selectedVal, selectedIndex, selectedText){
+                    self.distance = selectedVal[0];
+                    self.distanceText = selectedText[0];
+                    self.page = 0;
+                    self.getCouponList()
+                },
+                onCancel:function(){}
+              })
+            }
+            this.picker.show()
+      },
+      showPicker2() {
+            if (!this.picker2) {
+              let self = this;
+              this.picker2 = this.$createPicker({
+                title: '优惠面额',
+                data: [self.conditionData],
+                onSelect:function(selectedVal, selectedIndex, selectedText){
+                  self.condition = selectedVal[0];
+                  self.conditionText = selectedText[0];
+                  self.page = 0;
+                  self.getCouponList()
+                },
+                onCancel: function(){}
+              })
+            }
+            this.picker2.show()
+      },
+      showPicker3() {
+            if (!this.picker3) {
+              let self = this;
+              this.picker3 = this.$createPicker({
+                title: '使用条件',
+                data: [self.discountData],
+                onSelect:function(selectedVal, selectedIndex, selectedText){
+                    self.couponPrice = selectedVal[0];
+                    self.discountTetx = selectedText[0];
+                    self.getCouponList();
+                },
+                onCancel:function(){}
+              })
+            }
+            this.picker3.show()
+      },
+      showPicker4() {
+            if (!this.picker4) {
+              let self = this;
+              this.picker4 = this.$createPicker({
+                title: '商品类型',
+                data: [self.couponTypeData],
+                onSelect:function(selectedVal, selectedIndex, selectedText){
+                  self.couponPTypeId = selectedVal[0];
+                  self.couponTypeTetx = selectedText[0]
+                  self.page = 0;
+                  self.getCouponList()
+                },
+                onCancel:function(){}
+              })
+            }
+            this.picker4.show()
+      },
       getEnvironment() { //静默授权初始化
         var ua = window.navigator.userAgent.toLowerCase();
         if (ua.match(/MicroMessenger/i) == 'micromessenger') {
@@ -397,16 +461,17 @@
       },
       getCouponType(){
         let self = this;
-        this.axios.get(Api.userApi + '/coupon/selectCouponPType', {
+        this.axios.get(Api.userApi + '/coupon/selectShopsTypeTree', {
           headers: {
             'Content-Type': 'application/x-www-form-urlencoded'
           }
         }).then(function(res) {
           if(res.data.code==1){
-            res.data.data.forEach((e)=>{
+
+            res.data.data[0].shopsTypes.forEach((e)=>{
               self.couponTypeData.push({
                 text:e.name,
-                val:e.typeId
+                value:e.typeId
               })
 
             })
@@ -432,7 +497,7 @@
 						couponId:item.couponId
 					}
 				})
-       
+
 			},
 			onPullingDown(){
 				//刷新
@@ -494,43 +559,7 @@
 
 				})
 			},
-			navClick(index){ //条件筛选显示
-				if(this.navIndex === index){
-					this.navIndex = '';
 
-				}else{
-					this.navIndex = index;
-				}
-
-			},
-			subNavClick(item,index){//条件筛选
-				this.subNavIndex = index;
-				this.distance = item.val;
-				this.navIndex = '';
-				this.page = 0;
-				this.getCouponList()
-			},
-			subNavClickTwo(item,index){//条件筛选
-				this.subNavIndex2 = index;
-				this.condition = item.val;
-				this.navIndex = '';
-				this.page = 0;
-				this.getCouponList()
-			},
-			subNavClickThree(item,index){
-				this.subNavIndex3 = index;
-				this.couponPrice = item.val;
-				this.navIndex = '';
-				this.page = 0;
-				this.getCouponList(item,index)
-			},
-      subNavClickFour(item,index){
-        this.subNavIndex4 = index;
-        this.couponPTypeId = item.val;
-        this.navIndex = '';
-        this.page = 0;
-        this.getCouponList(item,index)
-      },
 			receiveCoupon(item){
         let self = this;
         self.axios.post(Api.userApi + '/coupon/addUserCoupon', self.qs.stringify({
@@ -978,18 +1007,16 @@
 							}
 							.couponNameBox{
 								width: 240px;
+
 								.couponName{
+                  height:150px;
 									font-size: 28px;
 									color: #000;
 									line-height: 34px;
 								}
-								.distance{
-									font-size: 22px;
-									color: #666;
-									margin-top: 35px;
-								}
+
 								.progressBox{
-									padding-top: 24px;
+
 									.progress{
 										position: relative;
 										width:100px;
@@ -1028,6 +1055,10 @@
                   height: 30px;
                   line-height: 30px;
                 }
+                .distance{
+                  font-size:24px;
+                  color: #666;
+                }
 							}
 						}
 					}
@@ -1053,7 +1084,7 @@
 							padding-top: 24px;
 						}
 						.receiveBtnBox{
-							padding-top: 12px;
+							padding-top: 20px;
 							.receiveBtn{
 								margin: 0 auto;
 								width:120px;
@@ -1071,7 +1102,7 @@
 						.saleNum{
 							font-size: 22px;
 							color: #999;
-							padding-top: 20px;
+							padding-top: 30px;
 							text-align: center;
 						}
 					}

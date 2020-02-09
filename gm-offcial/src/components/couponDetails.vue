@@ -1,10 +1,36 @@
 <template>
   <div class="couponDetails">
+      <div class="loginMask" v-show="isLogin">
+        <div class="loginMaskCnt">
+          <div class="title">请输入验证码后进行购买</div>
+          <ul>
+          	<li class="flex_r_f_s">
+          		<img class="mr-30" src="../assets/icon-person@2x.png" alt="" />
+          		<el-input class="phoneInput" v-model="phone" size="mini" placeholder="请输入手机号码"></el-input>
+          	</li>
+          	<li class="flex_r_f_s">
+          		<img class="mr-30" src="../assets/icon_yanzheng@2x.png" alt="" />
+          		<el-input class="yzInput" v-model="vCode" size="mini" placeholder="请输入验证码"></el-input>
+          		<div class="v_code pointer" @click="getCode" v-if="show">获取验证码</div>
+              <div class="v_code pointer" v-else>{{count}}</div>
+          	</li>
+          	<li class="registerBtn pointer flex_r_s_b">
+          		 <el-button size="mini" @click="loginHide">取消</el-button>
+          		 <el-button size="mini" type="primary" @click="vCodeLogin">确定</el-button>
+          	</li>
+          </ul>
+        </div>
+      </div>
       <div class="couponDetailsCnt">
         <div class="couponDetailsPost flex_r_s_b">
           <div class="activityCoverBox">
-            <div class="activityCover" v-bind:style="{'background-image':'url('+couponIcanImg+')'}"></div>
+            <div class="activityCover" v-bind:style="{'background-image':'url('+couponIcanImg+')'}">
+              <img v-if="couponType===3" class="privilege" src="../assets/icon_gu30@3x.png" alt="">
+              <img v-if="couponType===2" class="privilege" src="../assets/icon_gu32@3x.png" alt="">
+              <img v-if="couponType===1" class="privilege" src="../assets/icon_gu33@3x.png" alt="">
+            </div>
             <div class="activityCoverList flex_r_s_b">
+
                 <i class="el-icon-arrow-left leftBtn pointer" :class="{activeI:couponIndex==0}" @click="leftClick"></i>
                 <ul class="flex_r_f_s pointer">
                   <li @click="imgClick(item,index)" v-for="(item,index) in couponIcan" :class="{activeLi:couponIndex==index}" v-bind:style="{'background-image':'url('+item+')'}">
@@ -21,8 +47,10 @@
                  <!-- <b>¥{{couponPrice.toFixed(2)}}</b>
                  <span>满{{conditionPrice.toFixed(2)}}元使用</span> -->
                  <div class="sale">
-                   <span v-if="couponType!=1">￥{{conditionPrice.toFixed(1)}}</span>
-                   <span v-if="couponType===1">￥{{couponPrice.toFixed(1)}}</span>
+                    <span v-if="couponType==2">￥{{conditionPrice}}</span>
+                    <span v-if="couponType==3&&isCard==1">￥{{conditionPrice}}</span>
+                    <span v-if="couponType==3&&isCard!=1">￥{{originalPrice}}</span>
+                   <span v-if="couponType===1">￥{{couponPrice}}</span>
                  </div>
                  <div class="condition">
                    <span v-if="conditionPrice!==0&&couponType===1">满<span>{{conditionPrice.toFixed(1)}}</span>元使用</span>
@@ -50,7 +78,10 @@
                 </li>
                 <li class="flex_r_f_s">
                   <div class="list_l"></div>
-                  <div class="list_r"><div class="joinBtn pointer" @click="maskShow">立即购买</div></div>
+                  <div class="list_r">
+                    <div v-if="couponType!=1" class="joinBtn pointer" @click="receive">立即购买</div>
+                    <div class="joinBtn pointer" @click="notMoneyPeceive" v-else>立即领取</div>
+                  </div>
                 </li>
               </ul>
 
@@ -65,13 +96,19 @@
           <div class="shopCouponList">
             <ul class="flex_r_f_s">
               <li class="pointer" v-for="item in shopCoupons" @click="couponXq(item)">
-                 <div class="imgBox" v-bind:style="{'background-image':'url('+item.couponIcan+')'}"></div>
+                 <div class="imgBox" v-bind:style="{'background-image':'url('+item.couponIcan+')'}">
+                   <img v-if="item.couponType===3" class="privilege" src="../assets/icon_gu30@3x.png" alt="">
+                   <img v-if="item.couponType===2" class="privilege" src="../assets/icon_gu32@3x.png" alt="">
+                   <img v-if="item.couponType===1" class="privilege" src="../assets/icon_gu33@3x.png" alt="">
+                 </div>
                  <div class="couponName">{{item.couponName|descFilter}}</div>
                  <div class="priceBox flex_r_f_s">
                    <div class="sale">
 
-                     <span v-if="item.couponType!=1">￥{{item.conditionPrice.toFixed(1)}}</span>
-                     <span v-if="item.couponType===1">￥{{item.couponPrice.toFixed(1)}}</span>
+                     <span v-if="item.couponType==2">￥{{item.conditionPrice}}</span>
+                     <span v-if="item.couponType==3&&isCard==1">￥{{item.conditionPrice}}</span>
+                     <span v-if="item.couponType==3&&isCard!=1">￥{{item.originalPrice}}</span>
+                     <span v-if="item.couponType===1">￥{{item.couponPrice}}</span>
 
                    </div>
                    <div class="condition">
@@ -95,6 +132,7 @@
   export default{
     data(){
       return{
+        isCard:0,
         lng:0,
         lat:0,
         shopImg:'',
@@ -107,6 +145,7 @@
         couponType:'',
         shopName:'',
         receiveNum:0,
+        originalPrice:0,
         couponStartTime:'',
         couponEndTime:'',
         shopAddress:'',
@@ -114,6 +153,14 @@
         couponIndex:0,
         shopId:'',
         couponId:'',
+        userId:'',
+        vCode: '',
+        show: true,
+        count: '',
+        reg: /^1[3456789]\d{9}$/,
+        timer: null,
+        phone:'',
+        isLogin:false,
         shopCoupons:[]
       }
     },
@@ -127,7 +174,16 @@
       },
     },
     mounted() {
+      //localStorage.removeItem('user')
       this.couponId = this.$route.query.couponId;
+      if(JSON.parse(localStorage.getItem('user')) != null){
+        this.userId = JSON.parse(localStorage.getItem('user')).userId;
+      }
+
+      if(JSON.parse(localStorage.getItem('isCard')) != null){
+        this.isCard = JSON.parse(localStorage.getItem('isCard'));
+      }
+      console.log(JSON.parse(localStorage.getItem('isCard')))
       this.getShopCouponList();
     },
     watch:{
@@ -140,6 +196,162 @@
     methods:{
       maskShow(){
         this.$popup();
+      },
+      loginHide(){
+        this.isLogin=false;
+      },
+      notMoneyPeceive(){
+        let self = this;
+        self.axios.post(Api.httpApi + '/coupon/addUserCoupon', self.qs.stringify({
+        	userId: self.userId,
+        	couponId:self.couponId,
+        }), {
+        	headers: {
+        		'Content-Type': 'application/x-www-form-urlencoded'
+        	}
+        }).then((res)=>{
+        	if(res.data.code == 1){
+        		self.$message({
+              message: '领取成功',
+              type: 'success'
+        		});
+        	}else{
+        		alert(res.data.msg)
+        	}
+        })
+      },
+      receive(){//立即购买
+        let self = this;
+        if(this.userId==''||this.userId==null){
+          this.isLogin=true;
+        }else{
+          let price = 0;
+          if(this.isCard==1&&this.couponType==3){
+            
+            price = this.originalPrice
+          }else{
+            price = this.conditionPrice
+          }
+          this.$router.push({
+            name:'cashier',
+            query:{
+              price:price,
+              couponId:self.couponId
+            }
+          })
+        }
+      },
+      vCodeLogin() {
+        let self = this;
+
+        if (this.phone == '') {
+
+          alert('请填写手机号码')
+
+        } else if (!this.reg.test(this.phone)) {
+
+          alert('手机号码格式错误')
+
+        } else if (this.vCode == '') {
+          alert('请填写验证码')
+
+        } else {
+          this.axios.post(Api.httpApi + '/user_sms_login', this.qs.stringify({
+            phone: this.phone,
+            vcode: this.vCode
+          }), {
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded'
+            }
+          }).then(function(res) {
+
+            if (res.data.code === 1) {
+              //console.log(res)
+              var userEntity = {
+                userName: res.data.user.userName,
+                userId: res.data.user.userId,
+                userPhone: res.data.user.phone,
+                token: res.data.token
+              };
+              self.userId = res.data.user.userId;
+              self.$message({
+                message: '验证成功',
+                type: 'success'
+              });
+              setTimeout(()=>{
+                self.isLogin = false;
+              },500)
+              self.isLogin = false;
+              localStorage.setItem('user', JSON.stringify(userEntity));
+
+              self.axios.post(Api.httpApi + '/boneMika/selectUserBoneMikaStatus', self.qs.stringify({//查询骨米卡状态
+                userId: self.userId
+              }), {
+                headers: {
+                  'Content-Type': 'application/x-www-form-urlencoded'
+                }
+              }).then((re) => {
+
+                if(re.data.code===1){
+
+                  if(re.data.data===1){
+                    localStorage.setItem('isCard',1)
+                    self.isCard = 1;
+                  }else{
+                    localStorage.setItem('isCard',0)
+                    self.isCard = 0;
+                  }
+                }else{
+                  alert(re.data.msg)
+                }
+
+              })
+            }
+
+          })
+        }
+
+      },
+      getCode() {
+        //获取验证码
+        if (this.phone == '') {
+
+          alert('请填写手机号码')
+          return false;
+        } else if (!this.reg.test(this.phone)) {
+
+          alert('手机号码格式错误')
+          return false;
+        }
+
+          let _this = this;
+          const TIME_COUNT = 60;
+          if (!this.timer) {
+            this.count = TIME_COUNT;
+            this.show = false;
+            this.axios.get(Api.httpApi + '/sms_login_code?phone=' + this.phone, {
+                headers: {
+                  'Content-Type': 'application/x-www-form-urlencoded'
+                }
+              })
+              .then(function(response) {
+
+              })
+              .catch(function(error) {
+                console.log(error);
+              });
+            this.timer = setInterval(() => {
+              if (this.count > 0 && this.count <= TIME_COUNT) {
+                this.count--;
+              } else {
+                this.show = true;
+                clearInterval(this.timer);
+                this.timer = null;
+              }
+            }, 1000)
+          }
+
+
       },
       shopLink(){
         let self = this;
@@ -199,6 +411,7 @@
             self.couponName = res.data.data.couponName;
             self.couponPrice = res.data.data.couponPrice;
             self.conditionPrice = res.data.data.conditionPrice;
+            self.originalPrice = res.data.data.originalPrice;
             self.couponType = res.data.data.couponType;
             self.receiveNum = res.data.data.receiveNum;
             self.couponIcanImg = res.data.data.couponIcan;
@@ -251,6 +464,61 @@
 <style lang="scss" scoped="scoped">
   .couponDetails{
     padding-top:108px;
+    .loginMask{
+      height:100%;
+      width:100%;
+      position: fixed;
+      left:0;
+      top:0;
+      background:rgba(0,0,0,0.6);
+      z-index:10000;
+      .loginMaskCnt{
+        width:500px;
+        height:250px;
+        background:#fff;
+        position: absolute;
+        left:50%;
+        top:50%;
+        margin-left:-250px;
+        margin-top:-125px;
+        border-radius:10px;
+        .title{
+          font-size:18px;
+          color:#333;
+          padding-top:20px;
+        }
+        ul{
+          padding:20px 40px 20px 40px;
+        }
+        li{
+          padding-bottom:30px;
+          box-sizing:border-box;
+          .mr-30{
+            margin-right:30px;
+          }
+          .phoneInput{
+            width:200px;
+
+          }
+          .yzInput{
+            width:130px;
+            margin-right:20px;
+          }
+          .v_code{
+            background:#ff523d;
+            color:#fff;
+            padding:5px;
+            // height:24px;
+            text-align:center;
+            border-radius:4px;
+          }
+
+        }
+        .registerBtn{
+          padding:10px 80px 0 80px;
+        }
+      }
+    }
     .through{
       text-decoration:line-through;
     }
@@ -267,9 +535,17 @@
           background-repeat: no-repeat;
           background-position: 50%;
           border-radius:10px;
+          position:relative;
+          img{
+            position: absolute;
+            left: 0;
+            top: 10px;
+            width: 120px;
+          }
         }
         .activityCoverList{
           padding-top:20px;
+
           i{
             font-size:32px;
             font-weight:bold;
@@ -390,6 +666,14 @@
               width:160px;
               height:160px;
               border-radius:20px;
+              position:relative;
+              img{
+                position: absolute;
+                left: 0;
+                top: 10px;
+                width: 120px;
+
+              }
             }
             .couponName{
               padding-top:10px;

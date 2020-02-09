@@ -50,7 +50,7 @@
                          <!-- <a href="###">查看</a> -->
                           <router-link :to="{name:'editFlashSale',query:{id:scope.row.id}}">编辑</router-link>
                           <span class="pointer" v-if="scope.row.status===1" @click="revoke(scope.row)">撤销</span>
-                          <span style="color:#ff523d;" class="pointer" v-else @click="resume(scope.row)">恢复正常</span>
+                          <span style="color:#ff523d;"v-else>已撤销</span>
                         </div>
 
                        </template>
@@ -300,51 +300,6 @@
       addLink(){
         this.$router.push({
           name:'addFlashSale'
-        })
-      },
-      resume(row){//恢复正常
-        let self = this;
-        self.axios.post(Api.gtzApi + '/am/updateActivity', self.qs.stringify({
-        	id:row.id,
-          status:1
-        }), {
-        	headers: {
-        		'Content-Type': 'application/x-www-form-urlencoded'
-        	}
-        }).then(res=>{
-          if(res.data.code==1){
-            setTimeout(()=>{
-              self.$message({
-                message: '恢复正常',
-                type: 'success'
-              });
-            },500)
-
-            for(let i=0;i<self.tableData.length;i++){
-              if(self.tableData[i].id==row.id){
-                self.tableData[i].status=1;
-                break;
-              }
-            }
-            for(let i=0;i<self.NotyetTableData.length;i++){
-              if(self.NotyetTableData[i].id==row.id){
-                self.NotyetTableData[i].status=1;
-                break;
-              }
-            }
-            for(let i=0;i<self.ongoingTableData.length;i++){
-              if(self.ongoingTableData[i].id==row.id){
-                self.ongoingTableData[i].status=1;
-                break;
-              }
-            }
-            for(let i=0;i<self.endTableData.length;i++){
-              if(self.endTableData[i].id==row.id){
-                self.endTableData[i].status=1;
-                break;
-              }
-            }
-          }
         })
       },
       revoke(row){//撤销

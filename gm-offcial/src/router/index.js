@@ -18,8 +18,9 @@ import ShopCoupon from '@/components/shopCoupon.vue'
 import FlashSale from '@/components/flash/flashSale.vue'
 import AddFlashSale from '@/components/flash/addFlashSale.vue'
 import EditFlashSale from '@/components/flash/editFlashSale.vue'
-
-
+import Cashier from '@/components/cashier.vue'
+import AliPay from '@/components/aliPay.vue'
+import PaySus from '@/components/paySus.vue'
 Vue.use(Router)
 
 export default new Router({
@@ -55,6 +56,11 @@ export default new Router({
       component:EditFlashSale
     },
     {
+      path:'/aliPay',
+      name:'aliPay',
+      component:AliPay
+    },
+    {
       path: '/index',
       name: 'index',
       component:Index
@@ -64,7 +70,16 @@ export default new Router({
       name: 'home',
       component:Home,
       children:[
-
+        {
+          path:'/paySus',
+          name:'paySus',
+          component:PaySus
+        },
+        {
+          path:'/cashier',
+          name:'cashier',
+          component:Cashier
+        },
         {
           path:'/couponList',
           name:'couponList',

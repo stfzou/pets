@@ -3,7 +3,7 @@
     <div class="marketPlanManageTop">
       <div class="login_nav">
       	<div class="back" @click="back"></div>
-      	<div class="title">营销计划管理</div>
+      	<div class="title">外出计划管理</div>
       </div>
       <div class="regionBox flex_r_f_s">
         <div class="title">区域  :</div>
@@ -69,7 +69,7 @@
           <li class="listItem" v-for="item in [1,2,3,4,5]">
             <div class="businessName">关于四川大学附近楼盘地推的活动计划关于四川大学 附近楼盘地推的活动计划</div>
             <div class="item">2019/11/14  12:00:00~2019/11/16  12:00:00</div>
-            <div class="item chargePerson flex_r_f_s"><div class="item_l">活动执行人&nbsp;:&nbsp;</div><div class="item_r">姜晓明</div></div>
+            <div class="item chargePerson flex_r_f_s"><div class="item_l">外出添加者&nbsp;:&nbsp;</div><div class="item_r">姜晓明</div></div>
             <div class="item addr flex_r_f_s"><div class="item_l">计划区域&nbsp;:&nbsp;</div><div class="item_r">四川省-成都市-锦江区</div></div>
             <div class="item xqAddr">一环路东三环139号</div>
             <div class="item jyType flex_r_f_s"><div class="item_l">配合人&nbsp;:&nbsp;</div><div class="item_r"><span>张三</span> <span>李四</span> <span>老王</span></div></div>
@@ -81,6 +81,7 @@
                 <div class="btn">计划详情</div>
                 <div class="btn">审批</div>
                 <div class="btn">地址导航</div>
+                <div class="btn">外出签到</div>
               </div>
               <div class="btn_r">编辑</div>
             </div>
@@ -417,7 +418,7 @@
           .btnsBox{
             padding-top:30px;
             .btn_l{
-              width:400px;
+              width:480px;
             }
             .btn{
               padding:12px;

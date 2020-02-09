@@ -71,6 +71,10 @@
 				forgetState:false
 			};
 		},
+    mounted() {
+
+
+    },
 		methods: {
 			getCode() {
 				//获取验证码
@@ -87,7 +91,9 @@
 									}
 								})
 								.then(function(response) {
-									console.log(response);
+									if(response.data.code==0){
+                    alert(response.data.msg)
+                  }
 								})
 								.catch(function(error) {
 									console.log(error);
@@ -99,7 +105,9 @@
 									}
 								})
 								.then(function(response) {
-									console.log(response);
+									if(response.data.code==0){
+									  alert(response.data.msg)
+									}
 								})
 								.catch(function(error) {
 									console.log(error);
@@ -355,7 +363,7 @@
 					return false;
 				} else {
 					let self = this;
-					this.axios.post(Api.shopApi+'/updateGetPwd', this.qs.stringify({
+					this.axios.post(Api.shopApi+'/user/updatePwd', this.qs.stringify({
 						phone: this.phone,
 						password: this.pwd
 					}), {
@@ -440,7 +448,7 @@
 					}).then(function(res) {
 
 						if (res.data.code === 1) {
-              
+
 							var userEntity = {
 								userName: res.data.user.userName,
 								userId: res.data.user.userId,
@@ -479,7 +487,7 @@
 							}else if(res.data.user.userShops.shopStatus === 2){
 
 								self.$router.push({
-									name: 'addGoods'
+									name: 'storeSuccess'
 								})
 							}else if(res.data.user.userShops.shopStatus === 1){
 
@@ -490,14 +498,10 @@
 							}
 
 						}else {
-							loading.close();
-							self.$message.error(res.data.msg);
+							// loading.close();
+							// self.$message.error(res.data.msg);
+              alert(res.data.msg)
 						}
-					}).catch(function(err){
-
-						self.$message.error('网络出了一点问题');
-						loading.close();
-
 					})
 
 				}

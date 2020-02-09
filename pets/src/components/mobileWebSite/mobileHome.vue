@@ -9,7 +9,7 @@
                <p>养宠更有趣</p>
              </div>
            </div>
-           <div class="downBtn flex_r_s_c">APP下载</div>
+           <div class="downBtn flex_r_s_c" @click="appshowLink">APP下载</div>
          </div>
         <div class="mobileNav flex_r_s_b">
           <a href="javascript:;"  @click="navClick(item,index)" :class="{active:navIndex==index}"  v-for="(item,index) in navData">{{item.title}}</a>
@@ -19,9 +19,14 @@
       <div class="mobileCnt">
         <router-view></router-view>
       </div>
+      <div class="amap-page-container" v-show="false">
+        <el-amap ref="map" vid="amapDemo" :plugin="plugin" class="amap-demo"></el-amap>
+
+      </div>
       <div class="mobileFoot">
+        <div class="lookMore" @click="appshowLink">查看更多</div>
         <div class="footNav flex_r_s_b">
-          <a href="javascript:;"  v-for="item in footNavData">{{item.title}}</a>
+          <a href="javascript:;" @click="agreementLink(item.id)"  v-for="item in footNavData">{{item.title}}</a>
         </div>
         <div class="footInfo">
           <div class="addr">地址:四川省成都市锦江区一环路东五段东恒国际2栋2单元1104号</div>
@@ -39,17 +44,80 @@
 <script>
   export default{
     data(){
+      let self = this;
       return{
-        navData:[{title:'汪圈精选',name:'mobileIndex'},{title:'附近优惠',name:'mobileCoupon'},{title:'推荐商户',name:''},{title:'宠物活动',name:''}],
-        footNavData:[{title:'关于我们',name:''},{title:'注册协议',name:''},{title:'隐私协议',name:''},{title:'侵权投诉协议',name:''}],
-        navIndex:0
+        navData:[{title:'汪圈精选',name:'mobileIndex'},{title:'附近优惠',name:'mobileCoupon'},{title:'推荐商户',name:'mobileShopCoupon'},{title:'宠物活动',name:'mobileActivity'}],
+        footNavData:[{title:'关于我们',id:18},{title:'注册协议',id:2},{title:'隐私协议',id:1},{title:'侵权投诉协议',id:3}],
+        navIndex:0,
+        plugin: [
+
+          {
+            pName: 'Geolocation',
+            enableHighAccuracy: true, //是否使用高精度定位，默认:true
+            timeout: 10000, //超过10秒后停止定位，默认：无穷大
+            maximumAge: 0, //定位结果缓存0毫秒，默认：0
+            convert: true, //自动偏移坐标，偏移后的坐标为高德坐标，默认：true
+            showButton: true, //显示定位按钮，默认：true
+            buttonPosition: 'RB', //定位按钮停靠位置，默认：'LB'，左下角
+            showMarker: true, //定位成功后在定位到的位置显示点标记，默认：true
+            showCircle: true, //定位成功后用圆圈表示定位精度范围，默认：true
+            panToLocation: true, //定位成功后将定位到的位置作为地图中心点，默认：true
+            zoomToAccuracy: true, //定位成功后调整地图视野范围使定位位置及精度范围视野内可见，默认：f
+            extensions: 'all',
+            events: {
+              init(o) {
+                // o 是高德地图定位插件实例
+                o.getCurrentPosition((status, result) => {
+
+                  if (result && result.position) {
+
+
+                    let mapInfo = {
+                      lng:result.position.lng,
+                      lat:result.position.lat
+                    }
+                    self.$store.commit('setLocation',mapInfo);
+                    // console.log(self.$store.state)
+                  } else {
+                    // self.getActivityListOne();
+                    let toast = self.$createToast({
+                      txt: '定位失败，请刷新页面重新定位',
+                      type: 'warn'
+                    })
+                    toast.show()
+                  }
+                });
+              }
+            }
+          }
+        ]
       }
+    },
+    mounted() {
+      if(sessionStorage.getItem('navIndex')!=null){
+        this.navIndex = parseInt(sessionStorage.getItem('navIndex'))
+      }
+      
     },
     methods:{
       navClick(item,index){
         this.navIndex = index;
         this.$router.push({
           name:item.name
+        })
+        sessionStorage.setItem('navIndex',index);
+      },
+      agreementLink(id){
+        this.$router.push({
+          name:'agreement',
+          query:{
+            agreementId:id
+          }
+        })
+      },
+      appshowLink(){
+        this.$router.push({
+          name:'appShowBtn'
         })
       }
     }
@@ -119,6 +187,12 @@
     }
     .mobileFoot{
       padding:30px 30px 0 30px;
+      .lookMore{
+        font-size:28px;
+        color:#ff523d;
+        text-align:center;
+        padding-bottom:50px;
+      }
       .footNav{
         border-radius:10px;
         background:#F5F5F5;

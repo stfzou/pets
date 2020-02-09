@@ -74,6 +74,8 @@ import RushToBuyXq from '@/components/rushToBuy/rushToBuyXq'
 import MobileHome from '@/components/mobileWebSite/mobileHome'
 import MobileIndex from '@/components/mobileWebSite/mobileIndex'
 import MobileCoupon from '@/components/mobileWebSite/mobileCoupon'
+import MobileShopCoupon from '@/components/mobileWebSite/mobileShopCoupon'
+import MobileActivity from '@/components/mobileWebSite/mobileActivity'
 
 Vue.use(Router)
 export default new Router({
@@ -82,7 +84,7 @@ export default new Router({
     routes:[
 		{
 		  path:'',
-		  redirect:'/appShow'
+		  redirect:'/mobileHome/mobileIndex'
 		},
 		{
 			path:'/vLogin',
@@ -103,6 +105,16 @@ export default new Router({
           path:'mobileCoupon',
           name:'mobileCoupon',
           component:MobileCoupon
+        },
+        {
+          path:'mobileShopCoupon',
+          name:'mobileShopCoupon',
+          component:MobileShopCoupon
+        },
+        {
+          path:'mobileActivity',
+          name:'mobileActivity',
+          component:MobileActivity
         }
       ]
     },

@@ -128,6 +128,7 @@ export default {
       .agreement{
         width:1080px;
         margin:0 auto;
+        padding:5px 0;
         a{
           color:#000;
           font-size:16px;

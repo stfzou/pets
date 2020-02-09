@@ -236,6 +236,12 @@
 
     @media screen and (max-height: 720px){
       .phoneBox {
+          zoom: 0.5;
+      }
+      .erweimaBox{
+          zoom: 0.8;
+      }
+      .propaganda{
           zoom: 0.6;
       }
     }

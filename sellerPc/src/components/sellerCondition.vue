@@ -8,7 +8,7 @@
 				<div class="c_right flex_r_f_s">
 					<img class="head_img" src="../assets/home/head_icon.png" alt="">
 					<div class="data_show">
-						<p>自由犬宠物用品<i class="el-icon-caret-bottom"></i></p>
+						<p>{{userName}}</p>
 					</div>
 					<span class="shuxian"></span>
 					<div class="quit pointer" @click="quit">退出登录</div>
@@ -16,18 +16,22 @@
 			</div>
 		</header>
 		<router-view></router-view>
-		
+
 	</div>
 </template>
 
 <script>
-	
+
 	export default {
 		data() {
 			return {
-				sellerInfoState:false
+				sellerInfoState:false,
+        userName:''
 			};
 		},
+    mounted() {
+      this.userName = JSON.parse(sessionStorage.getItem('user')).userName;
+    },
 		methods: {
 			link() {
 				this.$router.push({name:'sellerInfo',query:{id:123}});
@@ -45,20 +49,20 @@
 							}
 						}
 				})
-			}	
+			}
 		}
-		
-		
+
+
 	}
 </script>
 
 <style lang="scss">
 	.dataReady{
-		
+
 		width: 100%;
 		background: #fff5f4;
 		padding-bottom: 138px;
-		
+
 		.header{
 			background: #ff8677;
 			height: 120px;
@@ -70,7 +74,7 @@
 				padding:0 28px;
 				box-sizing: border-box;
 				border-bottom: 2px solid #ff523d;
-				
+
 				.c_left{
 					width: 488px;
 					align-items:flex-end;
@@ -80,7 +84,7 @@
 							width: 22px;
 							height: 22px;
 							border-radius: 50%;
-							
+
 						}
 						.back{
 							background: url(../assets/home/icon_home7.png) no-repeat center 0;
@@ -125,6 +129,6 @@
 				}
 			}
 		}
-		
+
 	}
 </style>

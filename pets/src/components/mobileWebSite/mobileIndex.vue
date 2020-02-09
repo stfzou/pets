@@ -66,7 +66,7 @@
           params:{
             userId:38,
             page:1,
-            rows:7
+            rows:50
           }
         },{
         	headers: {
@@ -92,7 +92,7 @@
 
 <style lang="scss">
   .mobileIndex{
-      height:2300px;
+      height:15400px;
       .vue-waterfall-easy-container .vue-waterfall-easy a.img-wraper > img[data-v-ded6b974]{
         border-radius:10px;
       }

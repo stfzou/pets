@@ -153,7 +153,10 @@
           </div>
 
       </div>
-      <div class="commit pointer" @click="commit">确定</div>
+      <div class="flex_r_f_s btnBox">
+        <div class="commit pointer" @click="commit">确定编辑</div>
+      </div>
+
   </div>
 </template>
 
@@ -384,7 +387,7 @@
           });
         }else{
 
-         
+
             //console.log(this.normsArr)
             this.normsArr.forEach((e)=>{
               stockVal+= parseInt(e.normsSum)
@@ -402,7 +405,7 @@
             })
 
             formData.append('skus',JSON.stringify(skus))
-          
+
           // console.log(self.descVal)
           formData.append('cPId',self.cPId)
           formData.append('pName',self.goodsName)
@@ -552,33 +555,15 @@
       deleteGoodsMain(item,index) { //活动商品图片
 
         let self = this;
-        this.$confirm('此操作将永久删除该文件, 是否继续?', '提示', {
+        this.$confirm('此操作将删除该文件, 是否继续?', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           type: 'warning',
           callback: function(action, instance) {
 
             if(action == 'confirm') {
-
-              // self.postFormData = '';
-              // self.postUrl = '';
-              self.axios.post(self.api + '/upload/deleteImg', self.qs.stringify({
-              	imgAddr:item.url
-              }), {
-              	headers: {
-              		'Content-Type': 'application/x-www-form-urlencoded'
-              	}
-              }).then((res)=>{
-              	if(res.data.code == 1){
-                  self.goodsMainList.splice(index, 1);
-              	}else{
-              		alert(res.data.msg)
-              	}
-
-              })
+              self.goodsMainList.splice(index, 1);
             }
-
-
           }
         })
       },
@@ -719,17 +704,26 @@
   .editExchangeWarp{
     text-align:left;
     padding-bottom:100px;
-    .commit{
-      width:200px;
-      height:40px;
-      border-radius:40px;
-      background:#ff523d;
-      color:#fff;
-      font-size:16px;
-      text-align:center;
-      line-height:40px;
-      margin:30px auto 0 auto;
+    .btnBox{
+      padding-left:130px;
+      box-sizing:border-box;
+      .commit{
+        width:200px;
+        height:40px;
+        border-radius:40px;
+        background:#ff523d;
+        color:#fff;
+        font-size:16px;
+        text-align:center;
+        line-height:40px;
+        margin-right:60px;
+      }
+      .copy{
+
+        background:#409eff;
+      }
     }
+
     .pd-t20{
       padding-top:20px;
     }
@@ -757,7 +751,7 @@
           width:300px;
         }
         .goods_main{
-          width:700px;
+          width:600px;
         }
         .item_l{
           margin-right:10px;
@@ -834,7 +828,7 @@
       }
       .descWangeditor{
         width:800px;
-        height:500px;
+        height:350px;
         .quill-editor{
           height:400px;
         }

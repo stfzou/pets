@@ -61,7 +61,7 @@
                 <span v-if="item.status==2" style="color:greenyellow">已支付</span>
                 <span v-if="item.status==3" style="color:#ff523d">已拒绝</span>
                </div>
-               <div class="spBtn flex_r_s_c" @click="diaShow(item)">审批</div>
+               <div class="spBtn flex_r_s_c" @click="diaShow(item)" v-if="item.status==0">审批</div>
              </div>
            </li>
         </ul>
@@ -264,6 +264,17 @@
       onPullingUp(){
         let self = this;
         self.page++;
+        let startTime = '';
+        let endTime = '';
+        self.page = 0;
+        if(self.time1!=''){
+          startTime = self.time1+' 00:00';
+        }else{
+
+        }
+        if(self.time2!=''){
+          endTime = self.time2+' 00:00';
+        }
         self.axios.post(Api.userApi + '/cooperation/selectCooperationDeclareManager',this.qs.stringify({
           shopName:self.shopName,
           userNo:self.gmNum,
@@ -271,8 +282,8 @@
           natureId:self.natureVal,
           employeeId:'',
           phone:self.phone,
-          startTime:self.time1,
-          endTime:self.time2,
+          startTime:startTime,
+          endTime:endTime,
           pageNo:self.page,
           pageSize:10
         }), {
@@ -363,14 +374,14 @@
            let temp = this.time2;
            this.time2 = this.time1;
            this.time1 = temp;
-           this.getBill();
+
          }else if(this.time2!=''&& new Date(selectedText.join('-')).getTime()==new Date(self.time2).getTime()){
 
            this.time1 = selectedText.join('-');
            this.time2 = '';
-           this.getBill();
+
          }else{
-           this.getBill();
+
          }
        },
 
@@ -396,25 +407,36 @@
          if(this.time1==''){
            this.time1 = selectedText.join('-');
            this.time2 = '';
-           this.getBill();
+
          }
          this.time2 = selectedText.join('-');
          if(this.time1!=''&& new Date(selectedText.join('-')).getTime()<new Date(self.time1).getTime()){
            let temp = this.time2;
            this.time2 = this.time1;
            this.time1 = temp;
-           this.getBill();
+
          }else if(this.time1!=''&& new Date(selectedText.join('-')).getTime()==new Date(self.time1).getTime()){
            this.time1 = selectedText.join('-');
            this.time2 = '';
-           this.getBill();
+
          }else{
-          this.getBill();
+
          }
        },
       getDeclareList(){
          let self = this;
+         let startTime = '';
+         let endTime = '';
          self.page = 0;
+         if(self.time1!=''){
+           startTime = self.time1+' 00:00';
+         }else{
+
+         }
+         if(self.time2!=''){
+           endTime = self.time2+' 00:00';
+         }
+
          self.axios.post(Api.userApi + '/cooperation/selectCooperationDeclareManager',this.qs.stringify({
            shopName:self.shopName,
            userNo:self.gmNum,
@@ -422,8 +444,8 @@
            natureId:self.natureVal,
            employeeId:'',
            phone:self.phone,
-           startTime:self.time1,
-           endTime:self.time2,
+           startTime:startTime,
+           endTime:endTime,
            pageNo:0,
            pageSize:10
          }), {
@@ -432,7 +454,7 @@
            }
          }).then((res) => {
            if (res.data.code == 1) {
-             console.log(res)
+             //console.log(res)
              self.totalNum = res.data.data.num;
              self.sumCash = res.data.data.sumCash;
              self.sumBoneCurrency = res.data.data.sumBoneCurrency;

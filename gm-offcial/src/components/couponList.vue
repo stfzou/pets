@@ -13,8 +13,10 @@
              <div class="priceBox flex_r_f_s">
                <div class="sale">
 
-                 <span v-if="item.couponType!=1">￥{{item.conditionPrice.toFixed(1)}}</span>
-                 <span v-if="item.couponType===1">￥{{item.couponPrice.toFixed(1)}}</span>
+                 <span v-if="item.couponType==2">￥{{item.conditionPrice}}</span>
+                 <span v-if="item.couponType==3&&isCard==1">￥{{item.conditionPrice}}</span>
+                 <span v-if="item.couponType==3&&isCard!=1">￥{{item.originalPrice}}</span>
+                 <span v-if="item.couponType===1">￥{{item.couponPrice}}</span>
 
                </div>
                <div class="condition">
@@ -38,11 +40,15 @@
   export default{
     data(){
       return{
-        couponList:[]
+        couponList:[],
+        isCard:0,
       }
     },
     mounted() {
       this.getCouponList();
+      if(JSON.parse(localStorage.getItem('isCard')) != null){
+        this.isCard = JSON.parse(localStorage.getItem('isCard'));
+      }
     },
     filters:{
       descFilter(val){

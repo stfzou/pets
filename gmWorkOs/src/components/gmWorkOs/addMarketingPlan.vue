@@ -3,7 +3,7 @@
 
 		<div class="login_nav">
 			<div class="back" @click="back"></div>
-			<div class="title">添加营销计划</div>
+			<div class="title">添加外出计划</div>
 		</div>
 		<div class="addCustomer_list">
 			<ul>
@@ -25,15 +25,24 @@
 					</div>
 				</li>
 				<li class="flex_r_f_s">
-					<div class="list_l"><b>*</b>活动地址:</div>
+					<div class="list_l"><b>*</b>外出地址:</div>
 					<div class="list_r">
 						<input type="text" v-model="addr" />
 					</div>
 				</li>
         <li class="flex_r_f_s">
-        	<div class="list_l"><b>*</b>活动位置:</div>
+        	<div class="list_l"><b>*</b>外出位置:</div>
         	<div class="list_r">
         		<input type="text" v-model="addr" />
+        	</div>
+        </li>
+        <li class="flex_r_f_s">
+        	<div class="list_l"><b>*</b>外出类型:</div>
+        	<div class="list_r staffStatus">
+        		<cube-select
+        		  v-model="value"
+        		  :options="options">
+        		</cube-select>
         	</div>
         </li>
         <li class="flex_r_f_s">
@@ -78,7 +87,7 @@
 					</div>
 				</li>
 			</ul>
-			<div class="confirmBtn flex_r_s_c" @click="addCustomer">确定</div>
+			<div class="confirmBtn flex_r_s_c" @click="addCustomer">确定添加</div>
 		</div>
 
 

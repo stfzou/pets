@@ -159,7 +159,7 @@
                     <template slot-scope="scope">
                      <div class="operation">
                        <el-button v-if="!scope.row.isJoin" type="primary" size="mini" @click="single(scope.row)">参加</el-button>
-                       <span class="pointer" v-else style="color: #ff523d;" @click="cancelSingle(scope.row)">取消参加</span>
+                       <span v-else style="color: #ff523d;">已参加</span>
                      </div>
 
                     </template>
@@ -580,7 +580,7 @@
 
             })
             self.saleTable = res.data.data.discountProducts;
-            self.saleTablePageData = self.pagination(1,3,self.saleTable);
+            self.saleTablePageData = self.pagination(1,30,self.saleTable);
             self.getSelectGoods();
             //console.log(self.formatDateTime(res.data.data.startTime))
           }else{

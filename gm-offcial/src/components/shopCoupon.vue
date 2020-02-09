@@ -44,13 +44,19 @@
         </div>
         <ul class="flex_r_f_s">
           <li v-for="item in shopInfo.shopCoupons" class="pointer" @click="couponXq(item)">
-            <div class="imgBox" v-bind:style="{'background-image':'url('+item.couponIcan+')'}"></div>
+            <div class="imgBox" v-bind:style="{'background-image':'url('+item.couponIcan+')'}">
+              <img v-if="item.couponType===3" class="privilege" src="../assets/icon_gu30@3x.png" alt="">
+              <img v-if="item.couponType===2" class="privilege" src="../assets/icon_gu32@3x.png" alt="">
+              <img v-if="item.couponType===1" class="privilege" src="../assets/icon_gu33@3x.png" alt="">
+            </div>
             <p>{{item.couponName|nameFilter}}</p>
             <div class="priceBox flex_r_f_s">
               <div class="sale">
 
-                <span v-if="item.couponType!=1">￥{{item.conditionPrice.toFixed(1)}}</span>
-                <span v-if="item.couponType===1">￥{{item.couponPrice.toFixed(1)}}</span>
+                <span v-if="item.couponType==2">￥{{item.conditionPrice}}</span>
+                <span v-if="item.couponType==3&&isCard==1">￥{{item.conditionPrice}}</span>
+                <span v-if="item.couponType==3&&isCard!=1">￥{{item.originalPrice}}</span>
+                <span v-if="item.couponType===1">￥{{item.couponPrice}}</span>
 
               </div>
               <div class="condition">
@@ -79,7 +85,8 @@
         shopInfo:'',
         shopUserId:'',
         storeList:[],
-        storeNum:0
+        storeNum:0,
+        isCard:0,
 
       }
     },
@@ -93,6 +100,9 @@
       },
     },
     mounted() {
+      if(JSON.parse(localStorage.getItem('isCard')) != null){
+        this.isCard = JSON.parse(localStorage.getItem('isCard'));
+      }
       this.shopId = this.$route.query.shopId;
       this.getShopCouponList();
     },
@@ -268,7 +278,14 @@
               width:160px;
               height:160px;
               border-radius:10px;
+              position:relative;
+              img{
+                position: absolute;
+                left: 0;
+                top: 10px;
+                width: 120px;
 
+              }
             }
             p{
               line-height:20px;

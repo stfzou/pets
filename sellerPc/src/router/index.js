@@ -21,12 +21,12 @@ import RealName from '@/components/activity/realName'
 import RealUser from '@/components/activity/realUser'
 import DeliveryStyle from '@/components/deliveryStyle'
 
-import abc from '@/components/activity/abc'
 
 Vue.use(Router)
 
 export default new Router({
-	mode: 'history',
+  //history
+	mode: 'hash',
 	routes: [{
 			path: '/HelloWorld',
 			component: HelloWorld
@@ -45,11 +45,6 @@ export default new Router({
 			name: 'home',
 			component: Home,
 			children:[
-      {
-        	path:'abc',
-        	name:'abc',
-        	component:abc
-      },
       {
 				path:'addGoods',
 				name:'addGoods',

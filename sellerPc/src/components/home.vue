@@ -9,35 +9,35 @@
 					<div class="c_right flex_r_f_s">
 						<img class="head_img" src="../assets/home/head_icon.png" alt="">
 						<div class="data_show">
-							<p>自由犬宠物用品<i class="el-icon-caret-bottom"></i></p>
+							<p>{{userName}}<i class="el-icon-caret-bottom"></i></p>
 						</div>
 						<span class="shuxian"></span>
 						<div class="quit pointer" @click="quit">退出登录</div>
 					</div>
 				</div>
 			</header>
-			
+
 		</div>
 		<div class="main-cnt">
 			<div class="cnt-scroll container">
 				<el-container class="scrollWrapper">
 					<el-aside width="300px" class="navWapper">
-						
+
 							<GeminiScrollbar class="my-scroll-bar">
 								<div class="nav_left">
 									<ul>
 										<li :class="{active:$store.state.nav.navNum == index}" v-for="(item,index) in navData" @click="selectNav(item,index)">
 											<div class="flex_c_f_e pointer">
-												
+
 												<img :src="item.url" alt="">
 												<p>{{item.navName}}</p>
 											</div>
 											<div class="triangle-right"></div>
 										</li>
-										
+
 									</ul>
 								</div>
-							
+
 							</GeminiScrollbar>
 							<div class="nav_right">
 								<ul>
@@ -50,8 +50,8 @@
 									</li>
 								</ul>
 							</div>
-						
-						
+
+
 					</el-aside>
 					<el-main class="cnt">
 							<router-view :key="10111111"></router-view>
@@ -60,16 +60,16 @@
 					</el-main>
 				</el-container>
 			</div>
-			
+
 		</div>
-		
+
 	</div>
-	
+
 </template>
 
 <script>
 	export default {
-		
+
 		data() {
 			return {
 				navData:[{
@@ -104,7 +104,7 @@
 							subNavName:'配送方式',
 							subIcon:require('../assets/home/icon_home4.png'),
 							link:'deliveryStyle'
-						}]	
+						}]
 					},{
 						navName:'订单管理',url:require('../assets/home/icon_dingdan@2x.png'),subData:[{subNavName:'',subIcon:'',}]
 					},{
@@ -135,10 +135,14 @@
 					}],
 				subNavData:[],
 				navIndex:1,
-				subNavIndex:0
+				subNavIndex:0,
+        userName:''
 			};
 		},
-		
+		mounted() {
+		  this.userName = JSON.parse(sessionStorage.getItem('user')).userName;
+      
+		},
 		methods: {
 			selectNav(item,index) {
 				this.navIndex = index;
@@ -153,9 +157,9 @@
 				this.subNavIndex = index;
 				this.$store.commit('changeSubIndex',index)
 			},
-			
+
 			quit(){
-				
+
 				let self = this;
 				this.$confirm('是否要退出登录?', '提示', {
 						confirmButtonText: '确定',
@@ -168,11 +172,11 @@
 							}
 						}
 				})
-			}	
+			}
 		},
-		
-		
-		
+
+
+
 	}
 </script>
 
@@ -204,7 +208,7 @@
 					padding:0 28px;
 					box-sizing: border-box;
 					border-bottom: 2px solid #ff523d;
-					
+
 					.c_left{
 						width: 488px;
 						align-items:flex-end;
@@ -214,7 +218,7 @@
 								width: 22px;
 								height: 22px;
 								border-radius: 50%;
-								
+
 							}
 							.back{
 								background: url(../assets/home/icon_home7.png) no-repeat center 0;
@@ -305,11 +309,11 @@
 									}
 								}
 							}
-							
+
 						}
 						.my-scroll-bar{
 							height: 100%;
-						
+
 							.gm-scrollbar.-vertical {
 							  width: 10px;
 							  background:#eee;
@@ -321,7 +325,7 @@
 							.nav_left{
 								width: 100px;
 								background: #434343;
-								
+
 								ul{
 									li{
 										height: 70px;
@@ -365,9 +369,9 @@
 									}
 								}
 							}
-							
+
 						}
-						
+
 					}
 					.cnt{
 						background: #fff;
