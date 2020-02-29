@@ -27,11 +27,8 @@ Vue.use(iView)
 Vue.prototype.axios = axios;
 Vue.prototype.http = http;
 Vue.prototype.qs = Qs;
-Vue.config.productionTip = false
-// axios.defaults.baseURL = 'http://192.168.0.109:8084'
-// axios.defaults.headers.common['token'] = "B99FE190CB62097255E01FE911A271D4"
+Vue.config.productionTip = false;
 
-// http.defaults.baseURL = 'http://192.168.0.109:8082'
 
 VueAMap.initAMapApiLoader({
 	key: 'fe2312e4704c6f8f7787c7864ecebae6',
@@ -42,6 +39,26 @@ VueAMap.initAMapApiLoader({
 	// 默认高德 sdk 版本为 1.4.4
 	v: '1.4.4'
 })
+
+//百度统计
+var _hmt = _hmt || [];
+window._hmt = _hmt; // 必须把_hmt挂载到window下，否则找不到
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?33e7752b2f7dd6d30fe25be4fc6e1cff";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+
+router.beforeEach((to, from, next) => {
+    if (_hmt) {
+        if (to.path) {
+            _hmt.push(['_trackPageview', '/#' + to.fullPath]);
+        }
+    }
+    next();
+});
+
 /* eslint-disable no-new */
 new Vue({
 	el: '#app',

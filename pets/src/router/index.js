@@ -76,7 +76,19 @@ import MobileIndex from '@/components/mobileWebSite/mobileIndex'
 import MobileCoupon from '@/components/mobileWebSite/mobileCoupon'
 import MobileShopCoupon from '@/components/mobileWebSite/mobileShopCoupon'
 import MobileActivity from '@/components/mobileWebSite/mobileActivity'
+import StoreData from '@/components/openStore/storeData'
+import Process from '@/components/openStore/process'
+import StoreRegister from '@/components/openStore/storeRegister'
+import StoreSus from '@/components/openStore/storeSus'
+import PromoteLogin from '@/components/promote/promoteLogin'
+import PromoteHome from '@/components/promote/promoteHome'
+import BusinessPromote from '@/components/promote/businessPromote'
+import PromoteIndex from '@/components/promote/promoteIndex'
+import BusinessDetails from '@/components/promote/businessDetails'
+import CashProcess from '@/components/promote/cashProcess'
+import Wonderful from '@/components/wonderful/wonderful'
 
+ 
 Vue.use(Router)
 export default new Router({
   //history
@@ -90,6 +102,61 @@ export default new Router({
 			path:'/vLogin',
 			name:'vLogin',
 			component:vLogin,
+		},
+    {
+      path:'/wonderful',
+      name:'wonderful',
+      component:Wonderful
+    },
+		{
+			path:'/promoteLogin',
+			name:'promoteLogin',
+			component:PromoteLogin
+		},
+		{
+			path:'/promoteHome',
+			name:'promoteHome',
+			component:PromoteHome,
+			children:[{
+				path:'/businessPromote',
+				name:'businessPromote',
+				component:BusinessPromote,
+			},{
+				path:'/promoteIndex',
+				name:'promoteIndex',
+				component:PromoteIndex
+			},{
+				path:'/businessDetails',
+				name:'businessDetails',
+				component:BusinessDetails
+			},{
+				path:'/cashProcess',
+				name:'cashProcess',
+				component:CashProcess
+			}]
+		},
+		{
+			path:'/process',
+			name:'process',
+			component:Process
+		},
+		{
+			path:'/storeRegister',
+			name:'storeRegister',
+			component:StoreRegister
+		},
+		{
+			path:'/storeSus',
+			name:'storeSus',
+			component:StoreSus
+		},
+		{
+			path:'/storeData',
+			name:'storeData',
+			component:StoreData,
+			meta:{
+				keepAlive:true // 需要要缓存
+			}
 		},
     {
       path:'/mobileHome',

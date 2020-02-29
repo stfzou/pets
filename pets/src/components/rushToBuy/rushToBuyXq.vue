@@ -83,7 +83,7 @@
         commodityId:'',
         activityId:'',
         hOption:{
-          preventDefault:false
+          eventPassthrough:'vertical'
         },
         norms:[],
         normsName:''
@@ -286,7 +286,7 @@
     }
   }
 </script>
-
+.
 <style lang="scss">
   .exChangeXq{
     padding-bottom:60px;

@@ -19,7 +19,10 @@
         <div class="gudouInfoBox" v-show="isShow">
           <div class="gudouInfo">
             <div class="gudouInfoTop flex_r_s_b">
-              <div class="gudouNum">您有<span>{{boneBean}}</span>粒骨豆可使用></div>
+              <div class="gudouNum">
+              	<p v-if="isLogin">您有<span>{{boneBean}}</span>粒骨豆可使用></p>
+              	<div @click="goLogin" class="notLogin" v-else>暂未登录</div>
+              </div>
               <div class="getGudou flex_r_s_c">如何获得骨豆？</div>
             </div>
             <div class="choujiang flex_r_s_b">
@@ -99,23 +102,7 @@
              </cube-scroll>
           </div>
         </div>
-        <div class="goodsNav" :class="{activeNav:isNavCalss}">
-          <div class="navBox">
-            <cube-scroll
-              ref="scroll"
-              :data="labels"
-              direction="horizontal"
-              class="horizontal-scroll-list-wrap">
-              <div class="textBox">
-                <span @click="navClick(item,index)" :class="{activeSpan:index==spanIndex}" v-for="(item,index) in labels">{{item.name}}</span>
-              </div>
-              </cube-scroll>
-          </div>
-
-
-
-
-        </div>
+       
         <div class="goodsNavList" v-if="isShow">
           <ul class="flex_r_s_b">
             <li v-for="item in alls">
@@ -172,6 +159,7 @@
         scroll:'',
         userId:-1,
         deduction:'',
+        isLogin:false,
         searchVal:'',
         spanIndex:0,
         boneBean:'',//骨豆
@@ -186,10 +174,10 @@
         page:1,
         testArr:[],
         hOption:{
-          preventDefault:false
+          eventPassthrough:'vertical'
         },
         listOpt:{
-          preventDefault:true,
+         
           pullDownRefresh: {
           	txt: '更新成功',
           	threshold: 40
@@ -247,11 +235,15 @@
       }
     },
     mounted() {
+    	if(JSON.parse(localStorage.getItem('user')) != null){
+    		this.userId = JSON.parse(localStorage.getItem('user')).userId;
+    		this.isLogin = true;
+    	}else{
+    		this.isLogin = false;
+    		
+    	}
       window.addEventListener('scroll', this.menu);
-      if(this.$route.query.userId!=null){
-        this.userId = this.$route.query.userId;
-      }
-
+      
       this.getListData();
     },
     destroyed () {
@@ -259,11 +251,12 @@
     },
 
     methods:{
-      navClick(item,index){
-       this.spanIndex = index;
-       this.labelId = item.labelId;
-       this.page = 1;
-       this.getLabelData();
+      goLogin(){
+      	let url = window.location.href;
+				this.$store.commit('setLoginUrl', url);
+      	this.$router.push({
+					name:'login'
+				})
       },
       link(){
        // this.$router.push({
@@ -283,11 +276,10 @@
         })
       },
       menu() {
-        let domH = document.querySelector('.goodsNav').offsetTop;
-        let navH = document.querySelector('.goodsNav').offsetHeight;
+      
         let listH = document.querySelector('.goodsNavList').offsetTop;
         this.scroll = document.documentElement.scrollTop || document.body.scrollTop;
-        if(this.scroll>navH+listH-200){
+        if(this.scroll>listH-200){
           this.isNavCalss = true;
           this.isShow = false;
           setTimeout(()=>{
@@ -419,7 +411,7 @@
 
 <style lang="scss">
   .gudouShop{
-
+		background: #f3f3f3;
     .headCnt{
       padding:0 20px;
       height:98px;
@@ -490,6 +482,9 @@
               span{
                 font-size:36px;
                 color:#ff523d;
+              }
+              .notLogin{
+              	color: #ff523d;
               }
             }
             .getGudou{
@@ -620,14 +615,10 @@
           line-height:80px;
         }
       }
-      .activeNav{
-        position: fixed;
-        left:0;
-        top:98px;
-      }
+      
       .goodsNavList{
         background:#f3f3f3;
-        padding: 0 20px;
+        padding: 30px 20px 0 20px;
         box-sizing:border-box;
 
         ul{
@@ -698,11 +689,12 @@
       .activeList{
         position:fixed;
         left:0;
-        top:178px;
+        top:98px;
         right:0;
         bottom:0;
+        padding-top: 0;
         ul{
-          // padding-top:80px;
+          padding-top:30px;
         }
       }
     }

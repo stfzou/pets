@@ -31,7 +31,7 @@
     },
     mounted() {
       this.wxShare();
-
+			
     },
     methods:{
       iosDown(){

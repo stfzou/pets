@@ -224,7 +224,7 @@
 		mounted() {
 			let self = this;
       //localStorage.removeItem('user')
-      window.addEventListener('scroll', self.handleScroll)
+      		window.addEventListener('scroll', self.handleScroll)
 			this.getUrlData();
 			if(JSON.parse(localStorage.getItem('user')) == null){
 
@@ -674,7 +674,7 @@
 
 			},
 			commitComment(){
-        let self = this;
+        		let self = this;
 				if(JSON.parse(localStorage.getItem('user')) == null){
 					let url = window.location.href;
 					this.$store.commit('setLoginUrl',url);

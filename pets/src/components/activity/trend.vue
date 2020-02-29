@@ -386,7 +386,7 @@
 					}
 				}).then((res) => {
 					if (res.data.code == 1) {
-            console.log(res)
+            
             let option = {
               title: '分享了'+res.data.data.userName+'的动态', // 分享标题, 请自行替换
               desc:res.data.data.content.substring(0,30),

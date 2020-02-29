@@ -40,7 +40,6 @@
         dataList:[],
         type:'',
         page:1,
-        
         userId:'',
         isApp:'-1',
         boneBean:0,
@@ -110,6 +109,7 @@
         	});
       },
       getDataList(){
+      	
         let self = this;
         this.axios.get(Api.userApi+'/prize/selectWinPrizeRecordByType',{
           params:{
@@ -132,7 +132,8 @@
                 }, 500)
 
               }else{
-
+								 self.$refs.scroll.forceUpdate();
+								 alert(res.data.msg);
               }
         	}).catch(function(err) {
               alert(err)
