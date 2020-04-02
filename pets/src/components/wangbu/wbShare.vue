@@ -51,13 +51,10 @@
         headImg:'',
         userName:'',
         userId:'',
-        environment:'',
-        appUrl:''
       }
     },
     mounted() {
-      this.getAppUrl();
-      this.getEnvironment();
+      
       this.userId = this.getUrlKey('userId');
       this.h = this.getUrlKey('h');
       this.km = this.getUrlKey('km');
@@ -65,35 +62,11 @@
       this.getUserInfo();
     },
     methods:{
-      getEnvironment() { //判断当前浏览器环境
-        var ua = window.navigator.userAgent.toLowerCase();
-        if (ua.match(/MicroMessenger/i) == 'micromessenger') {
-          this.environment = '-1';
-
-        } else {
-          this.environment = '1';
-        }
-      },
+      
       isAnOrIos() {
-      	var u = navigator.userAgent,
-      	app = navigator.appVersion;
-      	var isAndroid = u.indexOf('Android') > -1 || u.indexOf('Linux') > -1; //g
-      	var isIOS = !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/); //ios终端
-      	if (isAndroid) {
-      		//这个是安卓操作系统
-      	  //alert(1)
-      	  if(this.environment=='-1'){
-      	    this.$router.push({name:'wxWhitePage'})
-      	  }else{
-
-      	    window.location.href = this.appUrl;
-      	  }
-      		//alert('这个是安卓操作系统')
-      	}
-      	if (isIOS) {
-      		//这个是ios操作系统
-      		window.location.href = 'https://itunes.apple.com/cn/app/id1437699756'
-      	}
+      	this.$router.push({
+      	  name:'appShowBtn'
+      	})
       },
       getUserInfo(){
         let self = this;

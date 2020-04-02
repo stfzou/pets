@@ -31,14 +31,26 @@
     },
     mounted() {
       this.wxShare();
-			
+
     },
     methods:{
+      getIsWxClient () {
+              var ua = navigator.userAgent.toLowerCase();
+              if (ua.match(/MicroMessenger/i) == "micromessenger") {
+
+                  const toast = this.$createToast({
+                    txt: '请点击右上角打开浏览器进行下载',
+                    type: 'warn'
+                  })
+                  toast.show()
+              }
+              window.location.href = 'https://gutouzu.oss-cn-shenzhen.aliyuncs.com/package/app-gumipet-release_121_jiagu_sign.apk';
+      },
       iosDown(){
         window.location.href = 'https://itunes.apple.com/cn/app/id1437699756';
       },
       andDown(){
-        window.location.href = 'http://app.xiaomi.com/details?id=com.freedogs.freedogs';
+        this.getIsWxClient();
       },
       wxShare(){
         let option = {

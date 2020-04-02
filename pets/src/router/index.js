@@ -41,6 +41,7 @@ import PayRes from '@/components/common/payRes'
 import WxWhitePage from '@/components/common/wxWhitePage'
 import AppShow from '@/components/common/appShow'
 import AppShowBtn from '@/components/common/appShowBtn'
+import AppShowTwo from '@/components/common/appShowTwo'
 import ShopShow from '@/components/common/shopShow'
 import Agreement from '@/components/common/agreement'
 import PaySus from '@/components/common/paySus'
@@ -87,8 +88,18 @@ import PromoteIndex from '@/components/promote/promoteIndex'
 import BusinessDetails from '@/components/promote/businessDetails'
 import CashProcess from '@/components/promote/cashProcess'
 import Wonderful from '@/components/wonderful/wonderful'
+import PutQuestions from '@/components/wonderful/putQuestions'
+import TodayRead from '@/components/wonderful/todayRead'
+import HotSunPlan from '@/components/invitation/hotSunPlan'
+import CgIndex from '@/components/chuangGuan/cgIndex'
+import CgRank from '@/components/chuangGuan/cgRank'
+import CgQuestion from '@/components/chuangGuan/cgQuestion'
+import CgRes from '@/components/chuangGuan/cgRes'
+import CgGift from '@/components/chuangGuan/cgGift'
+import Conduct from '@/components/common/conduct'
+import CgConduct from '@/components/common/cgConduct'
+import WbConduct from '@/components/common/wbConduct'
 
- 
 Vue.use(Router)
 export default new Router({
   //history
@@ -98,11 +109,66 @@ export default new Router({
 		  path:'',
 		  redirect:'/mobileHome/mobileIndex'
 		},
+    {
+      path:'/conduct',
+      name:'conduct',
+      component:Conduct
+    },
+    {
+      path:'/cgConduct',
+      name:'cgConduct',
+      component:CgConduct
+    },
+    {
+      path:'/wbConduct',
+      name:'wbConduct',
+      component:WbConduct
+    },
 		{
 			path:'/vLogin',
 			name:'vLogin',
 			component:vLogin,
 		},
+    {
+      path:'/cgRes',
+      name:'cgRes',
+      component:CgRes
+    },
+    {
+      path:'/cgGift',
+      name:'cgGift',
+      component:CgGift
+    },
+    {
+      path:'/cgQuestion',
+      name:'cgQuestion',
+      component:CgQuestion
+    },
+    {
+      path:'/cgIndex',
+      name:'cgIndex',
+      component:CgIndex
+    },
+    {
+      path:'/cgRank',
+      name:'cgRank',
+      component:CgRank
+    },
+    {
+      path:'/hotSunPlan',
+      name:'hotSunPlan',
+      component:HotSunPlan
+    },
+    {
+      path:'/putQuestions',
+      name:'putQuestions',
+      component:PutQuestions
+    },
+    {
+      path:'/todayRead',
+      name:'todayRead',
+      component:TodayRead
+    },
     {
       path:'/wonderful',
       name:'wonderful',
@@ -162,26 +228,41 @@ export default new Router({
       path:'/mobileHome',
       name:'mobileHome',
       component:MobileHome,
+      meta:{
+      	keepAlive:true // 需要要缓存
+      },
       children:[
         {
           path:'mobileIndex',
           name:'mobileIndex',
-          component:MobileIndex
+          component:MobileIndex,
+          meta:{
+          	keepAlive:true // 需要要缓存
+          }
         },
         {
           path:'mobileCoupon',
           name:'mobileCoupon',
-          component:MobileCoupon
+          component:MobileCoupon,
+          meta:{
+          	keepAlive:true // 需要要缓存
+          }
         },
         {
           path:'mobileShopCoupon',
           name:'mobileShopCoupon',
-          component:MobileShopCoupon
+          component:MobileShopCoupon,
+          meta:{
+          	keepAlive:true // 需要要缓存
+          }
         },
         {
           path:'mobileActivity',
           name:'mobileActivity',
-          component:MobileActivity
+          component:MobileActivity,
+          meta:{
+          	keepAlive:true // 需要要缓存
+          }
         }
       ]
     },
@@ -259,6 +340,11 @@ export default new Router({
     path:'/appShowBtn',
     name:'appShowBtn',
     component:AppShowBtn
+  },
+  {
+    path:'/appShowTwo',
+    name:'appShowTwo',
+    component:AppShowTwo
   },
   {
   	path:'/shopShow',

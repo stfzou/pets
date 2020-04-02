@@ -194,7 +194,6 @@
 				uId:'',
         couponType:'',
         shopId:'',
-        shopImg:'',
         receiveNum:'',
         isDialong:false,
         isDialongCnt:true,
@@ -254,7 +253,7 @@
 		},
     filters:{
       descFilter(val){
-        if(val.length>12){
+        if(val.length>15){
           return val.substr(0,15)+'...'
         }else{
           return val
@@ -371,9 +370,7 @@
         }
 
       },
-      loginDailongHide(){
-        this.isLoginDialong = false;
-      },
+      
       handleImgsClick(index) {
       	let self = this;
         self.initialIndex = index
@@ -735,7 +732,7 @@
             }
 						self.shopAddress = res.data.data.shopAddress;
 						self.couponDesc = res.data.data.couponDesc.replace(/(\r\n)|(\n)/g,'<br>');
-            console.log(self.couponDesc)
+            // console.log(self.couponDesc)
 						self.couponList = res.data.data.shopCoupons;
 						self.couponPrice = res.data.data.couponPrice;
 						self.conditionPrice = res.data.data.conditionPrice;

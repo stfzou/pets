@@ -94,7 +94,7 @@
         	params: {
         		userId:self.userId,
             page:self.page,
-            rows:8
+            rows:10
         	}
         }, {
         	headers: {
@@ -139,7 +139,7 @@
         	params: {
         		userId:self.userId,
             page:1,
-            rows:8
+            rows:10
         	}
         }, {
         	headers: {

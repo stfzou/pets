@@ -6,12 +6,12 @@
 				<img src="../../assets/jd.png" alt="">
 				<div class="text">
 					<p>打开骨米宠物APP</p>
-					<p>寻找更多养宠乐趣</p>
+					<p>逛汪圈领现金红包</p>
 				</div>
 			</div>
 		</div>
 		<div class="down-f flex_r_s_c">
-			<a @click="isAnOrIos">立即打开</a>
+			<a @click="downApp">立即打开</a>
 		</div>
 	</div>
 </template>
@@ -21,68 +21,18 @@
 	export default {
     data(){
       return{
-        environment:'',
-        appUrl:''
+        
       }
-    },
-    mounted() {
-      this.getEnvironment();
-      this.getAppUrl();
     },
 		methods: {
 			closeDown() {
 				this.$emit('closeDown');
 			},
-      getAppUrl(){
-        let self = this;
-        self.axios.post(Api.userApi+'/version/selectNewestVersionInfo',{
-        	headers: {
-        		'Content-Type': 'application/x-www-form-urlencoded'
-        	}
-        }).then((res)=>{
-          if(res.data.code==1){
-            self.appUrl = res.data.data.address;
-
-          }
+      downApp(){
+        this.$router.push({
+          name:'appShowBtn'
         })
-      },
-			isAnOrIos() {
-        //alert(1)
-
-				var u = navigator.userAgent,
-				app = navigator.appVersion;
-       
-				var isAndroid = u.indexOf('Android') > -1 || u.indexOf('Linux') > -1; //g
-				var isIOS = !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/); //ios终端
-				if (isAndroid) {
-					//这个是安卓操作系统
-          //alert(1)
-          if(this.environment=='-1'){
-            this.$router.push({name:'wxWhitePage'})
-          }else{
-
-
-            window.location.href = this.appUrl;
-
-
-          }
-					//alert('这个是安卓操作系统')
-				}
-				if (isIOS) {
-					//这个是ios操作系统
-
-					window.location.href = 'https://itunes.apple.com/cn/app/id1437699756'
-				}
-			},
-      getEnvironment() { //静默授权初始化
-        var ua = window.navigator.userAgent.toLowerCase();
-        if (ua.match(/MicroMessenger/i) == 'micromessenger') {
-          this.environment = '-1';
-
-        } else {
-          this.environment = '1';
-        }
-      },
+      }
 		}
 	}
 </script>

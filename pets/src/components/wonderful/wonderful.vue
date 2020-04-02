@@ -52,8 +52,19 @@
                   <div class="userHead">
                     <img :src="i.userHeadImage" alt="">
                   </div>
+
+                </div>
+                <div class="user_r">
                   <div class="userName">
-                    <div class="name">{{i.userName}}</div>
+                    <div class="name flex_r_s_b">
+
+                      <span>{{i.userName}}</span>
+                      <div class="zan flex_r_f_s">
+                        <i class="cubeic-good" @click="like(i)" v-if="i.isLike==0"></i>
+                        <i class="cubeic-good activeLike" v-else @click="cancelLike(i)"></i>
+                        <span>{{i.likeCount}}</span>
+                      </div>
+                    </div>
                     <div class="petInfo flex_r_f_s">
                       <img src="../../assets/icon_she21@3x.png" alt="">
                       <b v-if="i.petName!=''">{{i.petName}}</b>
@@ -66,30 +77,29 @@
                       <span style="background: #ebf2ff;">{{i.weight}}kg</span>
                     </div>
                   </div>
-                </div>
-                <div class="zan flex_r_f_s">
-                  <i class="cubeic-good" @click="like(i)" v-if="i.isLike==0"></i>
-                  <i class="cubeic-good activeLike" v-else @click="cancelLike(i)"></i>
-                  <span>{{i.likeCount}}</span>
-                </div>
-              </div>
-              <div class="answerCnt">
-                {{i.answerContent}}
-              </div>
-              <div class="answerImg" v-show="i.answerCompressImages!=''">
-                <cube-scroll
-                  ref="scroll"
-                  :data="i.answerCompressImages.split(',')"
-                  direction="horizontal"
-                  :options="scrollOption"
-                  class="horizontal-scroll-list-wrap">
-                  <div class="imgBox">
-                    <div class="imgPic" @click="imgShow(i,imgIndex)" v-for="(imgItem,imgIndex) in i.answerCompressImages.split(',')">
-                      <img :src="imgItem">
-                    </div>
+
+                  <div class="answerCnt">
+                    {{i.answerContent}}
                   </div>
-                </cube-scroll>
+                  <div class="answerImg" v-show="i.answerCompressImages!=''">
+                    <cube-scroll
+                      ref="scroll"
+                      :data="i.answerCompressImages.split(',')"
+                      direction="horizontal"
+                      :options="scrollOption"
+                      class="horizontal-scroll-list-wrap">
+                      <div class="imgBox">
+                        <div class="imgPic" @click="imgShow(i,imgIndex)" v-for="(imgItem,imgIndex) in i.answerCompressImages.split(',')">
+                          <img :src="imgItem">
+                        </div>
+                      </div>
+                    </cube-scroll>
+                  </div>
+                </div>
+                
               </div>
+
+              
             </li>
           </ul>
         </div>
@@ -143,6 +153,7 @@
 </template>
 
 <script>
+  import wxapi from '../common/wxapi.js'
   import Api from '../common/apj.js'
   export default{
     data(){
@@ -163,53 +174,7 @@
         scrollOption:{
           eventPassthrough:'vertical'
         },
-        strangeTalKs:[
-          {
-                "createdTime": "2020-02-22",
-                "strangeTalkId": "15823415404094467",
-                "strangeTalkTitle": "雪纳瑞是不是真的需要断尾?\t",
-                "joinUserName": "",
-                "joinNum": 5,
-                "approveNum": 4,
-                "denyNum": 1,
-                "answerNum": 5,
-                "voteType": 0,
-                "answerUserId": "80",
-                "answerUserName": "哈比特犬",
-                "answerUserHeadImage": "http://gutouzu.oss-cn-shenzhen.aliyuncs.com/re/1582342706772.jpg",
-                "answerContent": "这里也很美腻啦……一定可以的……这种事情就应该不会改变，一起吃饭去吧！你要来的是我们在这里生活方式不在家我的人生轨迹和梦想就是在自己人上了吗！"
-              },
-              {
-                "createdTime": "2020-02-22",
-                "strangeTalkId": "15823415260009589",
-                "strangeTalkTitle": "泰迪狗一个星期洗一次澡合适吗？\t",
-                "joinUserName": "哈比特犬",
-                "joinNum": 2,
-                "approveNum": 2,
-                "denyNum": 0,
-                "answerNum": 1,
-                "voteType": 0,
-                "answerUserId": "80",
-                "answerUserName": "哈比特犬",
-                "answerUserHeadImage": "http://gutouzu.oss-cn-shenzhen.aliyuncs.com/re/1582342706772.jpg",
-                "answerContent": "是啊……这么大问题……这样可以理解我一下嘛？我是个什么的时候你的人也没有了，一直以来对自己好一点？你说你要的不是一种不可能了！你说什么都可以的、在一起的时候我们自己也会有好心情从早晨到家没有人"
-              },
-              {
-                "createdTime": "2020-02-22",
-                "strangeTalkId": "15823415114026447",
-                "strangeTalkTitle": "怀孕后真的不能养宠物吗？\t",
-                "joinUserName": "哈比特犬",
-                "joinNum": 2,
-                "approveNum": 1,
-                "denyNum": 1,
-                "answerNum": 6,
-                "voteType": 0,
-                "answerUserId": "80",
-                "answerUserName": "哈比特犬",
-                "answerUserHeadImage": "http://gutouzu.oss-cn-shenzhen.aliyuncs.com/re/1582342706772.jpg",
-                "answerContent": "不过也没有办法的通知、这里没有了什么东西能在我们这里留下痕迹、这么早起来吃了点吃晚饭吗、不能在微博中晒出来自己都很好吃了、一个人一次都没那么开心、这样我才发现你不懂为什么自己喜欢自己现在才是因为别人"
-              },
-        ]
+        strangeTalKs:[]
       }
     },
     mounted() {
@@ -321,7 +286,7 @@
         self.newIndex = num;
         this.axios.get(Api.userApi+'/strange/talk/selectAnswer',{
           params:{
-            strangeTalkId:'15823415555041265',
+            strangeTalkId:self.strangeTalkId,
             userId:self.userId,
             type:num,
             page:1,
@@ -334,8 +299,10 @@
         }).then(res=>{
           if(res.data.code==1){
 
-            if(es.data.data.length>10){
+            if(res.data.data.length>10){
               self.answerVos = res.data.data.slice(0,10)
+            }else{
+              self.answerVos = res.data.data;
             }
           }else{
             alert(res.data.msg)
@@ -477,6 +444,19 @@
             self.strangeTalkContent = res.data.data.strangeTalkContent;
             self.voteType = res.data.data.voteType;
             self.answerVos = res.data.data.answerVos;
+            let option = {
+              title: self.strangeTalkTitle, // 分享标题, 请自行替换
+              desc:self.strangeTalkContent.substr(0,30),
+              link: window.location.href, // 分享链接，根据自身项目决定是否需要split
+              imgUrl:'https://gutouzu.oss-cn-shenzhen.aliyuncs.com/static/icon_share%403x.png', // 分享图标, 请自行替换，需要绝对路径
+              success: () => {
+
+              },
+              error: () => {
+                alert('已取消分享')
+              }
+            }
+            wxapi.wxRegister(option)
 
             if(res.data.data.answerVos.length>10){
               self.answerVos = res.data.data.answerVos.slice(0,10)
@@ -488,30 +468,44 @@
             if(self.denyNum==0&&self.approveNum==0||self.voteType==0){
               self.yesWidth = '35%'
               self.noWidth = '35%'
+              console.log(1)
             }else if(self.denyNum==0&&self.approveNum!=0){
               self.yesWidth = '70%'
               self.noWidth = '20%'
+              console.log(2)
             }else if(self.denyNum!=0&&self.approveNum==0){
               self.yesWidth = '70%'
               self.noWidth = '20%'
+              console.log(3)
             }else{
 
-              if((self.approveNum/(self.approveNum+self.denyNum))*100>=60){
+              if((self.approveNum/(self.approveNum+self.denyNum))*100>=70){
                 self.yesWidth = '70%'
-              }else if((e.approveNum/(self.approveNum+self.denyNum))*100<=25){
-                self.yesWidth = '20%'
-              }else{
-                self.yesWidth = (self.approveNum/(self.approveNum+self.denyNum))*100+'%'
-              }
-
-              if((self.denyNum/(self.approveNum+self.denyNum))*100>=70){
-                self.noWidth = '70%'
-              }else if((self.denyNum/(self.approveNum+self.denyNum))*100<=25){
                 self.noWidth = '20%'
-              }else{
-                self.noWidth = (self.denyNum/(self.approveNum+e.denyNum))*100+'%'
+              }else if((self.approveNum/(self.approveNum+self.denyNum))*100<=20){
+                self.yesWidth = '20%'
+                self.noWidth = '70%'
+              }else if((self.denyNum/(self.approveNum+self.denyNum))*100<=20){
+                self.yesWidth = '70%'
+                self.noWidth = '20%'
+              }
+              else{
+
+
+                self.yesWidth = (self.approveNum/(self.approveNum+self.denyNum))*100-5+'%'
+                self.noWidth = (self.denyNum/(self.approveNum+self.denyNum))*100-5+'%'
 
               }
+
+              // if((self.denyNum/(self.approveNum+self.denyNum))*100>=70){
+              //   self.noWidth = '70%'
+              //   self.yesWidth = '20%'
+              // }else if((self.denyNum/(self.approveNum+self.denyNum))*100<=20){
+              //   self.noWidth = '20%'
+              // }else{
+              //   self.noWidth = (self.denyNum/(self.approveNum+self.denyNum))*100+'%'
+              //   console.log(self.noWidth)
+              // }
 
 
             }
@@ -530,7 +524,7 @@
     height:100%;
     @keyframes btSacl
     {
-      0% {transform: scale(0.6);}
+      0% {transform: scale(0.9);}
       100% {transform: scale(1);}
     }
     .cube-dialog-content{
@@ -722,7 +716,7 @@
             .userInfo{
               align-items:flex-start;
               .user_l{
-                width:500px;
+                width:90px;
                 align-items:flex-start;
                 .userHead{
                   height:90px;
@@ -737,12 +731,31 @@
                   }
 
                 }
+
+              }
+              .user_r{
+                width:480px;
                 .userName{
-                  width:400px;
-                  margin-left:10px;
                   .name{
                     font-size:30px;
                     color:#333;
+                    .zan{
+                      width:100px;
+                      text-align:right;
+                      display:flex;
+                      flex-direction:row;
+                      justify-content:flex-end;
+                      font-size:24px;
+                      color:#999;
+                      i{
+                        font-size:30px;
+                        margin-right:5px;
+                        color:#999;
+                      }
+                      .activeLike{
+                        color:#ff523d;
+                      }
+                    }
                   }
                   img{
                     width:22px;
@@ -761,23 +774,7 @@
                   }
                 }
               }
-              .zan{
-                width:100px;
-                text-align:right;
-                display:flex;
-                flex-direction:row;
-                justify-content:flex-end;
-                font-size:24px;
-                color:#999;
-                i{
-                  font-size:30px;
-                  margin-right:5px;
-                  color:#999;
-                }
-                .activeLike{
-                  color:#ff523d;
-                }
-              }
+
             }
             .answerCnt{
               padding-top:20px;

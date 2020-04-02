@@ -35,7 +35,7 @@
             <span>邮箱:info@gumipet.com</span>
           </div>
           <div class="corporateName">成都爱之宠宠物用品有限公司版权所有</div>
-          <div class="keepRecord">Copyright2018-2019 <a href="http://www.beian.miit.gov.cn/">蜀ICP备16029284号-2</a></div>
+          <div class="keepRecord">Copyright2018-2019 <a href="http://www.beian.miit.gov.cn/">蜀ICP备16029284号-2</a> <a href="https://tsm.miit.gov.cn/dxxzsp/xkz/xkzgl/resource/qiyesearch.jsp?num=%E5%B7%9DB2-20200089&type=xuke">增值电信业务经营许可证：川B2-20200089</a></div>
         </div>
       </div>
   </div>
@@ -97,7 +97,7 @@
       if(sessionStorage.getItem('navIndex')!=null){
         this.navIndex = parseInt(sessionStorage.getItem('navIndex'))
       }
-      
+
     },
     methods:{
       navClick(item,index){

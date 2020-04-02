@@ -8,48 +8,48 @@
         <img src="../../assets/icon/icon-search@2x.png" alt="">
       </div>
 
-      <div class="giftCenter" @click="link">礼品中心</div>
+      <div class="giftCenter">礼品中心</div>
 
     </div>
-      <header v-show="isShow" class="gudouHead">
-
-
-      </header>
+    <cube-scroll ref="listScroll" :options="listOpt" @pulling-up="onPullingUp" @pulling-down="onPullingDown">
       <div class="gudouShopCnt">
-        <div class="gudouInfoBox" v-show="isShow">
-          <div class="gudouInfo">
-            <div class="gudouInfoTop flex_r_s_b">
-              <div class="gudouNum">
-              	<p v-if="isLogin">您有<span>{{boneBean}}</span>粒骨豆可使用></p>
-              	<div @click="goLogin" class="notLogin" v-else>暂未登录</div>
-              </div>
-              <div class="getGudou flex_r_s_c">如何获得骨豆？</div>
-            </div>
-            <div class="choujiang flex_r_s_b">
-              <div class="cj-item flex_r_s_b">
-                <div>
-                  <div class="cj-name">骨豆抽奖</div>
-                  <div class="cj-js">最高得价值99元礼品</div>
+        <div class="headBg"> </div>
+        <div class="gudouInfoBox">
+            <div class="gudouInfo">
+              <div class="gudouInfoTop flex_r_s_b">
+                <div class="gudouNum">
+                	<p v-if="isLogin">您有<span>{{boneBean}}</span>粒骨豆可使用></p>
+                	<div @click="goLogin" class="notLogin" v-else>暂未登录</div>
                 </div>
-                <a href="https://h5.gumipet.com/zhuanpan/index.html">
-                  <img src="../../assets/icon_zhuanpan.png" alt="">
-                </a>
-
+                <div class="getGudou flex_r_s_c">如何获得骨豆？</div>
               </div>
-              <div class="cj-item flex_r_s_b">
-                <div class="zd">
-                  <div class="cj-name">欢乐砸金蛋</div>
-                  <div class="cj-js">最高得200粒骨豆</div>
-                </div>
-                <a href="https://h5.gumipet.com/zadan/index.html">
-                  <img src="../../assets/jindan.png" alt="">
-                </a>
+              <div class="choujiang flex_r_s_b">
+                <div class="cj-item flex_r_s_b">
+                  <div>
+                    <div class="cj-name">骨豆抽奖</div>
+                    <div class="cj-js">最高得价值99元礼品</div>
+                  </div>
+                  <a href="https://h5.gumipet.com/zhuanpan/index.html">
+                    <img src="../../assets/icon_zhuanpan.png" alt="">
+                  </a>
 
+                </div>
+                <div class="cj-item flex_r_s_b">
+                  <div class="zd">
+                    <div class="cj-name">欢乐砸金蛋</div>
+                    <div class="cj-js">最高得200粒骨豆</div>
+                  </div>
+                  <a href="https://h5.gumipet.com/zadan/index.html">
+                    <img src="../../assets/jindan.png" alt="">
+                  </a>
+
+                </div>
               </div>
             </div>
+
           </div>
 
-        </div>
+
         <div class="hotExchangeBox" v-show="isShow">
           <div class="hotExchange exBox">
              <div class="exTitle">热门兑换</div>
@@ -102,8 +102,9 @@
              </cube-scroll>
           </div>
         </div>
-       
-        <div class="goodsNavList" v-if="isShow">
+
+        <div class="goodsNavList">
+          <div class="title">------全部兑换商品------</div>
           <ul class="flex_r_s_b">
             <li v-for="item in alls">
               <div class="goodsImgBox">
@@ -124,30 +125,8 @@
             </li>
           </ul>
         </div>
-        <div class="goodsNavList activeList" v-else>
-          <cube-scroll ref="listScroll" :options="listOpt" @pulling-up="onPullingUp" @pulling-down="onPullingDown">
-            <ul class="flex_r_s_b">
-              <li v-for="item in alls">
-                <div class="goodsImgBox">
-                  <img class="goodsPic" @click="xqLink(item)" :src="item.compressImage" alt="">
-                  <img class="sxdTip" v-if="deduction>item.boneBeanPrice" src="../../assets/sxd_tip.png" alt="">
-                </div>
-                <div class="listBottom">
-                  <div class="goodsName">{{item.name|typeNameFilter}}</div>
-                  <div class="gudouPriceBox flex_r_f_s">
-                    <div class="gudouPrice flex_r_s_c">骨豆价¥{{item.boneBeanPrice|moneyFilter}}</div>
-                    <div class="oldPrice">原价:¥{{item.price|moneyFilter}}</div>
-                  </div>
-
-                  <div class="deduction">骨豆直抵¥<span v-if="deduction>item.boneBeanPrice">{{item.boneBeanPrice}}</span><span v-else>{{deduction}}</span></div>
-                  <div class="exChangePeople">已有{{item.sumSellNum}}人兑换</div>
-                </div>
-
-              </li>
-            </ul>
-          </cube-scroll>
-        </div>
       </div>
+      </cube-scroll>
   </div>
 </template>
 
@@ -177,7 +156,7 @@
           eventPassthrough:'vertical'
         },
         listOpt:{
-         
+
           pullDownRefresh: {
           	txt: '更新成功',
           	threshold: 40
@@ -240,15 +219,13 @@
     		this.isLogin = true;
     	}else{
     		this.isLogin = false;
-    		
+
     	}
-      window.addEventListener('scroll', this.menu);
-      
+
+
       this.getListData();
     },
-    destroyed () {
-     window.removeEventListener('scroll', this.menu)
-    },
+
 
     methods:{
       goLogin(){
@@ -274,21 +251,6 @@
             boneBean:self.boneBean
           }
         })
-      },
-      menu() {
-      
-        let listH = document.querySelector('.goodsNavList').offsetTop;
-        this.scroll = document.documentElement.scrollTop || document.body.scrollTop;
-        if(this.scroll>listH-200){
-          this.isNavCalss = true;
-          this.isShow = false;
-          setTimeout(()=>{
-            this.$refs.listScroll.refresh();
-          },200)
-
-        }
-
-        //console.log('scroll   '+this.scroll)
       },
       show(){
         this.isShow = true;
@@ -412,6 +374,9 @@
 <style lang="scss">
   .gudouShop{
 		background: #f3f3f3;
+    height:100%;
+    padding-top:90px;
+    box-sizing:border-box;
     .headCnt{
       padding:0 20px;
       height:98px;
@@ -449,16 +414,17 @@
         color:#fff;
       }
     }
-    .gudouHead{
-      height:246px;
-      background: linear-gradient(90deg, #fb9f84, #f97d5c, #fd7046, #ff6c6c);
 
-    }
     .gudouShopCnt{
       background:#f3f3f3;
+      .headBg{
+        height:150px;
+        background: linear-gradient(90deg, #fb9f84, #f97d5c, #fd7046, #ff6c6c);
+      }
       .gudouInfoBox{
-         height:160px;
+         height:150px;
          position:relative;
+         background:#f3f3f3;
          .cube-scroll-content{
            display: inline-block;
          }
@@ -615,12 +581,17 @@
           line-height:80px;
         }
       }
-      
+
       .goodsNavList{
         background:#f3f3f3;
         padding: 30px 20px 0 20px;
         box-sizing:border-box;
-
+        .title{
+          text-align:center;
+          font-size:28px;
+          color:#000;
+          padding-bottom:20px;
+        }
         ul{
           flex-wrap: wrap;
 

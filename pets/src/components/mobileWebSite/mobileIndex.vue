@@ -92,7 +92,7 @@
 
 <style lang="scss">
   .mobileIndex{
-      height:15400px;
+      height:10000px;
       .vue-waterfall-easy-container .vue-waterfall-easy a.img-wraper > img[data-v-ded6b974]{
         border-radius:10px;
       }
