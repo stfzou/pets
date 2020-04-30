@@ -2,6 +2,7 @@
   <div class="conduct">
     <img class="bg" v-if="city=='cq'" src="../../assets/cq_01.png" alt="">
     <img class="bg" v-if="city=='cd'" src="../../assets/cd_01.png" alt="">
+    <img class="bg" v-if="city==''" src="../../assets/mr_01.png" alt="">
     <img class="bg" src="../../assets/cd_02.png" alt="">
     <img class="bg" src="../../assets/cd_03.png" alt="">
     <div class="conductFoot">
@@ -22,19 +23,44 @@
 </template>
 
 <script>
+  import wxapi from './wxapi.js'
   export default{
     data(){
       return{
-        city:''
+        city:'',
+        userName:''
       }
     },
     mounted() {
+      if (JSON.parse(localStorage.getItem('user')) != null) {
+
+        this.userName = JSON.parse(localStorage.getItem('user')).userName;
+
+      }
+
       if(this.getUrlKey('city')!=null){
         this.city = this.getUrlKey('city');
 
       }
+      this.wxShare();
     },
     methods:{
+      wxShare(){
+        let self = this
+        let option = {
+          title: '快速认识附近的养宠达人', // 分享标题, 请自行替换
+          desc:'上骨米宠物发现身边的养宠人士，抢购大牌宠物用品，查看附近的商家优惠！',
+          link: window.location.href, // 分享链接，根据自身项目决定是否需要split
+          imgUrl:'https://gutouzu.oss-cn-shenzhen.aliyuncs.com/static/gumipet.png', // 分享图标, 请自行替换，需要绝对路径
+          success: () => {
+
+          },
+          error: () => {
+
+          }
+        }
+        wxapi.wxRegister(option)
+      },
       getUrlKey(name){
           return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.href) || [, ""])[1].replace(/\+/g, '%20')) || null
       },
@@ -58,12 +84,11 @@
       bottom:0;
       left:0;
       width:100%;
-      padding:0 20px;
       box-sizing:border-box;
       .conductFootCnt{
         height:130px;
         background:#fff;
-        border-radius:20px;
+
         padding:0 30px;
         box-sizing:border-box;
         .cnt_l{

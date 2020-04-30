@@ -14,7 +14,7 @@
     <div class="cgResBootm">
       <p>今日剩余{{answerCount}}次闯关机会</p>
       <div class="btn flex_r_s_c" v-if="answerCount>0" @click="onemoretime">再来一次</div>
-      <div class="btn flex_r_s_c" v-else>邀请好友答题</div>
+      <div class="btn flex_r_s_c" @click="share" v-else>邀请好友答题</div>
 
     </div>
 
@@ -70,7 +70,13 @@
       back() {
       	this.$router.go(-1); //返回上一层
       },
-
+      share(){
+      	let toast = this.$createToast({
+      		txt: '点击顶部右上角进行分享',
+      		type: 'warn'
+      	  })
+      	toast.show()
+      },
       wxShare(){
         let self = this
         let option = {

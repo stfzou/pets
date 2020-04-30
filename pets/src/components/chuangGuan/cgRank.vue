@@ -42,7 +42,7 @@
         let self = this;
         this.axios.get(Api.userApi+'/answerGame/selectGateLevel',{
           params:{
-            userId:80
+            userId:self.userId
           }
 
         }).then(function(res) {

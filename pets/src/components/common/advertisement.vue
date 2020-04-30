@@ -46,6 +46,9 @@
 
 <style lang="scss">
   .advertisement{
-
+    img{
+      display:block;
+      font-size:0;
+    }
   }
 </style>

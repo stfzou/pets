@@ -43,7 +43,7 @@
         this.companyName = this.$route.query.companyName;
         this.name = this.$route.query.name;
         this.wxShare();
-        this.getSus();
+        
       }else{
         this.$router.push({
           name:'cgIndex'

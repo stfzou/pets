@@ -20,17 +20,33 @@
 </template>
 
 <script>
+  import wxapi from './wxapi.js'
   export default{
     data(){
       return{
-        
+
       }
     },
     mounted() {
-      
+      this.wxShare();
     },
     methods:{
-      
+      wxShare(){
+        let self = this
+        let option = {
+          title: '一款遛狗就能得奖励的健身软件', // 分享标题, 请自行替换
+          desc:'快来和附近的养宠小伙伴一起上骨米宠物遛狗吧，遛狗得奖励，开启遛狗新模式！',
+          link: window.location.href, // 分享链接，根据自身项目决定是否需要split
+          imgUrl:'https://gutouzu.oss-cn-shenzhen.aliyuncs.com/static/wangbu.png', // 分享图标, 请自行替换，需要绝对路径
+          success: () => {
+
+          },
+          error: () => {
+
+          }
+        }
+        wxapi.wxRegister(option)
+      },
       downLink(){
         this.$router.push({
           name:'appShowBtn'
@@ -51,13 +67,13 @@
       bottom:0;
       left:0;
       width:100%;
-      padding:0 20px;
+
       box-sizing:border-box;
       .conductFootCnt{
         height:130px;
         background:#fff;
-        border-radius:20px;
         padding:0 30px;
+
         box-sizing:border-box;
         .cnt_l{
           width:350px;

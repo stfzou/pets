@@ -46,23 +46,11 @@
 				<div class="follow flex_r_s_c" @click="follow" v-if="isFocus == 0">+关注</div>
 				<div class="follow flex_r_s_c" @click="cancelFollow" v-else>已关注</div>
 			</div>
-      <div class="trend_img">
-      	<div class="imgs-container">
-          <cube-slide ref="slide" :data="compressImages" :options="hOption">
-            <cube-slide-item v-for="(item, index) in compressImages" :key="index">
-              <div class="img-box flex_r_s_c">
-                <img :src="item" alt="" @click="handleImgsClick(index)">
-              </div>
 
-            </cube-slide-item>
-
-          </cube-slide>
-      	</div>
-      </div>
       <div class="activityLabel flex_r_f_s" v-if="officialActivityName!=''">
         <img v-if="isPrize" src="../../assets/icon_gu99@3x.png" alt="">
         <span>
-          <router-link :to="{name:'communityActivity',query:{ocaId:ocaId}}">{{officialActivityName}}</router-link>
+          <router-link :to="{name:'communityActivity',query:{ocaId:ocaId}}">#{{officialActivityName}}#</router-link>
         </span>
 
       </div>
@@ -70,7 +58,24 @@
 			<div class="text_cnt" v-html="content">
 
 			</div>
+      <div class="trend_img">
+        <div class="videoBox" v-if="type==2">
+          <video
+          :src="videoUrl"
+          controls="controls" objectfit="contain" class="videocontent">
+          </video>
+        </div>
+      	<div class="imgs-container" v-else>
+          <cube-slide ref="slide" :data="compressImages" :options="hOption">
+            <cube-slide-item v-for="(item, index) in compressImages" :key="index">
+              <div class="img-box flex_r_s_c">
+                <img :src="item" alt="" @click="handleImgsClick(index)">
+              </div>
+            </cube-slide-item>
 
+          </cube-slide>
+      	</div>
+      </div>
 			<div class="trend_label">
 				<div class="addr flex_r_f_s" v-if="geoLocation!=''"><img src="../../assets/icon/map@2x.png" alt=""><span>{{geoLocation}}</span></div>
 
@@ -183,7 +188,9 @@
 				authorId: '',
 				dynamicId: '',
         ocaId:'',
+        videoUrl:'',
 				isLike: '',
+        type:'',
 				options: {
 					pullDownRefresh: {
 						txt: '更新成功',
@@ -386,7 +393,7 @@
 					}
 				}).then((res) => {
 					if (res.data.code == 1) {
-            
+
             let option = {
               title: '分享了'+res.data.data.userName+'的动态', // 分享标题, 请自行替换
               desc:res.data.data.content.substring(0,30),
@@ -412,8 +419,12 @@
 						self.geoLocation = res.data.data.geoLocation;
             self.dynamicLabelNames = res.data.data.dynamicLabelNames;
             self.petName = res.data.data.petName;
+            self.type = res.data.data.type;
             self.officialTopicNames = res.data.data.officialTopicNames;
-						if(res.data.data.images!=''){
+            if(res.data.data.type==2){
+              self.videoUrl = res.data.data.videoUrl
+            }
+						if(res.data.data.images!=''&&res.data.data.type!=2){
 							self.images = res.data.data.images;
               self.compressImages = res.data.data.compressImages.split(',');
 						}
@@ -933,15 +944,10 @@
           margin-right:10px;
         }
         span{
-          padding:10px 20px;
           width: initial;
-          // height:40px;
-          color:#fff;
-          border-radius:40px;
-          background:#ff523d;
-          font-size:22px;
+          font-size:26px;
           a{
-            color:#fff;
+            color:#ff523d;
           }
         }
       }
@@ -960,6 +966,13 @@
 			}
 
 			.trend_img {
+        .videoBox{
+          video {
+            width: 100%;
+            outline: none;
+            border-radius:20px;
+          }
+        }
 				.imgs-container{
 					// width:100%;
           height:720px;
@@ -980,6 +993,7 @@
               width: 100%;
               height: 100%;
               object-fit: cover;
+              border-radius:10px;
             }
 
           }

@@ -53,9 +53,23 @@
 		},
     mounted() {
       if(this.getUrlKey('inviteUserId')!=null){
+        
+        let inviteUserId = this.getUrlKey('userId');
         this.inviteUserId = this.getUrlKey('inviteUserId');
+        sessionStorage.setItem("inviteUserId", inviteUserId);
+        
+      }else if(this.getUrlKey('userId')!=null){
+        
+        let inviteUserId = this.getUrlKey('userId');
+        sessionStorage.setItem("inviteUserId", inviteUserId);
+        this.inviteUserId = this.getUrlKey('userId');
+        
+      }else if(sessionStorage.getItem("inviteUserId")!=null){
+        this.inviteUserId = sessionStorage.getItem("inviteUserId");
       }
+
     },
+
 		methods: {
 			back() {
 				this.$router.go(-1);//返回上一层
@@ -64,11 +78,11 @@
 				setTimeout(() => {
 				  window.scrollTo(0,0);
 				},100);
-
 			},
       getUrlKey(name){
           return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.href) || [, ""])[1].replace(/\+/g, '%20')) || null
       },
+
 			getCode() {
 				//获取验证码
 				if (this.phone!='') {

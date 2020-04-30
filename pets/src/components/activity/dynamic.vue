@@ -112,7 +112,7 @@
 
 		},
 		methods:{
-
+      
 			handleImgsClick(item,index) {
         let self = this;
         this.axios.get(Api.userApi + '/image/getImageUrlArrays?keys=' + item.images, {

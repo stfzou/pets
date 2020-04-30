@@ -21,17 +21,38 @@
 </template>
 
 <script>
+  import wxapi from './wxapi.js'
   export default{
     data(){
       return{
-
+        userName:''
       }
     },
     mounted() {
-
+      if (JSON.parse(localStorage.getItem('user')) != null) {
+      	
+        this.userName = JSON.parse(localStorage.getItem('user')).userName;
+        
+      }
+      this.wxShare();
     },
     methods:{
+      wxShare(){
+        let self = this
+        let option = {
+          title: '萌宠闯关挑战你的大脑IQ', // 分享标题, 请自行替换
+          desc:'我是'+self.userName+'我在骨米宠物参加萌宠闯关大赛，答题得奖励，养宠真有趣。快来试一下，让你脑洞大开！',
+          link: window.location.href, // 分享链接，根据自身项目决定是否需要split
+          imgUrl:'https://gutouzu.oss-cn-shenzhen.aliyuncs.com/static/gumilogo_1024.png', // 分享图标, 请自行替换，需要绝对路径
+          success: () => {
 
+          },
+          error: () => {
+
+          }
+        }
+        wxapi.wxRegister(option)
+      },
       downLink(){
         this.$router.push({
           name:'cgIndex'
@@ -52,12 +73,12 @@
       bottom:0;
       left:0;
       width:100%;
-      padding:0 20px;
+
       box-sizing:border-box;
       .conductFootCnt{
         height:130px;
         background:#fff;
-        border-radius:20px;
+
         padding:0 30px;
         box-sizing:border-box;
         .cnt_l{

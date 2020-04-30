@@ -40,11 +40,17 @@
 			return{
 				phone:'',
 				vCode:'',
+        inviteUserId:'',
 				show: true,
 				count: '',
 				timer: null,
 			}
 		},
+    mounted() {
+      if(sessionStorage.getItem("inviteUserId")!=null){
+        this.inviteUserId = sessionStorage.getItem("inviteUserId");
+      }
+    },
 		methods:{
 			getCode() {
 				//获取验证码
@@ -121,7 +127,8 @@
 				}else{
 					this.axios.post(Api.userApi+'/user_sms_login', this.qs.stringify({
 						phone: this.phone,
-						vcode: this.vCode
+						vcode: this.vCode,
+            inviteUser:this.inviteUserId
 					}), {
 						headers: {
 							'Content-Type': 'application/x-www-form-urlencoded'
@@ -152,13 +159,13 @@
 								},500)
 							}else{
 								self.$router.push({
-									name:'sellerGoods'
+									name:'conduct'
 								})
 							}
 
 
 						} else {
-							
+
 							let toast = self.$createToast({
 								txt:res.data.msg,
 								type: 'error'

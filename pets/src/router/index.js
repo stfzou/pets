@@ -26,6 +26,7 @@ import SelectCoupon from '@/components/activity/selectCoupon'
 import ActivityEnter from '@/components/activity/activityEnter'
 import ActivityOrder from '@/components/activity/activityOrder'
 import Trend from '@/components/activity/trend'
+
 import Praise from '@/components/activity/praise'
 import DynamicHome from '@/components/activity/dynamicHome'
 import Dynamic from '@/components/activity/dynamic'
@@ -516,6 +517,7 @@ export default new Router({
 			name:'trend',
 			component:Trend
 		},
+    
 		{
 			path:'/activityOrder',
 			name:'activityOrder',

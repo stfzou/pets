@@ -39,10 +39,22 @@
 				loading:false
 			}
 		},
+    mounted() {
+      if(this.getUrlKey('inviteUserId')!=null){
+        let inviteUserId = this.getUrlKey('inviteUserId');
+        sessionStorage.setItem("inviteUserId", inviteUserId);
+      }else if(this.getUrlKey('userId')!=null){
+        let inviteUserId = this.getUrlKey('userId');
+        sessionStorage.setItem("inviteUserId", inviteUserId);
+      }
+    },
 		methods: {
 			back() {
 				this.$router.go(-1);//返回上一层
 			},
+      getUrlKey(name){
+          return decodeURIComponent((new RegExp('[?|&]' + name + '=' + '([^&;]+?)(&|#|;|$)').exec(location.href) || [, ""])[1].replace(/\+/g, '%20')) || null
+      },
 			inputLoseFocus() {
 				setTimeout(() => {
 				  window.scrollTo(0,0);
@@ -95,7 +107,7 @@
 							'Content-Type': 'application/x-www-form-urlencoded'
 						}
 					}).then(function(res) {
-					
+
 						if (res.data.code === 1) {
 
 							var userEntity = {
@@ -115,14 +127,14 @@
 								},500)
 							}else{
 								self.$router.push({
-									name:'sellerGoods'
+									name:'conduct'
 								})
 							}
 
 
 
 						} else {
-							
+
 
 							setTimeout(()=>{
 								self.loading = false;
